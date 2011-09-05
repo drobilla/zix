@@ -112,6 +112,7 @@ stress(int test_num, size_t n_elems)
 			        iter_data, last);
 			return test_fail();
 		}
+		last = iter_data;
 	}
 
 	srand(seed);
