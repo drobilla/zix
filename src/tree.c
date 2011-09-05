@@ -553,10 +553,10 @@ ZIX_API
 int
 zix_tree_remove(ZixTree* t, ZixTreeIter ti)
 {
-	ZixTreeNode*  n          = ti;
-	ZixTreeNode** pp         = NULL;  // parent pointer
-	ZixTreeNode*  to_balance = n->parent;  // lowest node to start rebalace at
-	int8_t        d_balance  = 0;  // delta(balance) for n->parent
+	ZixTreeNode* const n          = ti;
+	ZixTreeNode**      pp         = NULL; // parent pointer
+	ZixTreeNode*       to_balance = n->parent; // lowest node to start rebalace at
+	int8_t             d_balance  = 0; // delta(balance) for n->parent
 
 #ifdef ZIX_TREE_DUMP
 	printf("*** REMOVE %ld\n", (intptr_t)n->data);
@@ -564,6 +564,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter ti)
 
 	if ((n == t->root) && !n->left && !n->right) {
 		t->root = NULL;
+		free(n);
 		return ZIX_STATUS_SUCCESS;
 	}
 
@@ -686,6 +687,8 @@ zix_tree_remove(ZixTree* t, ZixTreeIter ti)
 	}
 
 	DUMP(t);
+
+	free(n);
 
 #ifdef ZIX_TREE_VERIFY
 	if (!verify(t, t->root)) {
