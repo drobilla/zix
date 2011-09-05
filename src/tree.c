@@ -38,13 +38,12 @@ struct _ZixTree {
 };
 
 struct _ZixTreeNode {
-	struct _ZixTreeNode* parent;
+	const void*          data;
 	struct _ZixTreeNode* left;
 	struct _ZixTreeNode* right;
-	const void*          data;
-	int8_t               balance;
+	struct _ZixTreeNode* parent;
+	int_fast8_t          balance;
 };
-
 
 #ifdef ZIX_TREE_DUMP
 static void
