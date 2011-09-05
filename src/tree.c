@@ -722,3 +722,56 @@ zix_tree_get_data(ZixTreeIter ti)
 {
 	return ti->data;
 }
+
+ZIX_API
+ZixTreeIter
+zix_tree_begin(ZixTree* t)
+{
+	if (!t->root) {
+		return NULL;
+	}
+
+	ZixTreeNode* n = t->root;
+	while (n->left) {
+		n = n->left;
+	}
+	return n;
+}
+
+ZIX_API
+ZixTreeIter
+zix_tree_end(ZixTree* t)
+{
+	return NULL;
+}
+
+ZIX_API
+bool
+zix_tree_iter_is_end(ZixTreeIter i)
+{
+	return !i;
+}
+
+ZIX_API
+ZixTreeIter
+zix_tree_iter_next(ZixTreeIter i)
+{
+	if (!i) {
+		return NULL;
+	}
+
+	if (i->right) {
+		i = i->right;
+		while (i->left) {
+			i = i->left;
+		}
+	} else {
+		while (i->parent && i->parent->right == i) {  // i is a right child
+			i = i->parent;
+		}
+
+		i = i->parent;
+	}
+
+	return i;
+}

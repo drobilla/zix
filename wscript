@@ -65,7 +65,6 @@ def build(bld):
 
     lib_source = '''
         src/tree.c
-        src/strindex.c
     '''
 
     # Library

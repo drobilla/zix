@@ -65,7 +65,7 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Insert n_elems elements
-	for (size_t i = 0; i < n_elems; i++) {
+	for (size_t i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		int status = zix_tree_insert(t, (void*)r, &ti);
 		if (status == ZIX_STATUS_EXISTS) {
@@ -75,8 +75,8 @@ stress(int test_num, size_t n_elems)
 			return test_fail();
 		}
 		if ((intptr_t)zix_tree_get_data(ti) != r) {
-			fprintf(stderr, "Data is corrupted! Saw %" PRIdPTR ", expected %zu\n",
-			        (intptr_t)zix_tree_get_data(ti), i);
+			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			        (intptr_t)zix_tree_get_data(ti), r);
 			return test_fail();
 		}
 	}
@@ -84,15 +84,32 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Search for all elements
-	for (size_t i = 0; i < n_elems; i++) {
+	for (size_t i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		if (zix_tree_find(t, (void*)r, &ti)) {
 			fprintf(stderr, "Find failed\n");
 			return test_fail();
 		}
 		if ((intptr_t)zix_tree_get_data(ti) != r) {
-			fprintf(stderr, "Data corrupted (saw %" PRIdPTR ", expected %zu\n",
-			        (intptr_t)zix_tree_get_data(ti), i);
+			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			        (intptr_t)zix_tree_get_data(ti), r);
+			return test_fail();
+		}
+	}
+
+	srand(seed);
+
+	// Iterate over all elements
+	size_t i = 0;
+	intptr_t last = -1;
+	for (ZixTreeIter iter = zix_tree_begin(t);
+	     !zix_tree_iter_is_end(iter);
+	     iter = zix_tree_iter_next(iter), ++i) {
+		r = ith_elem(test_num, n_elems, i);
+		const intptr_t iter_data = (intptr_t)zix_tree_get_data(iter);
+		if (iter_data < last) {
+			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %zu)\n",
+			        iter_data, last);
 			return test_fail();
 		}
 	}

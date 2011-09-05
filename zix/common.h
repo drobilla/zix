@@ -14,20 +14,41 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#ifndef ZIX_ZIX_H
-#define ZIX_ZIX_H
+#ifndef ZIX_COMMON_H
+#define ZIX_COMMON_H
 
 /**
-   @defgroup zix Zix
-   A lightweight portability library.
+   @addtogroup zix
    @{
 */
 
-#include "zix/common.h"
-#include "zix/tree.h"
+#ifdef ZIX_SHARED
+#    ifdef __WIN32__
+#        define ZIX_LIB_IMPORT __declspec(dllimport)
+#        define ZIX_LIB_EXPORT __declspec(dllexport)
+#    else
+#        define ZIX_LIB_IMPORT __attribute__((visibility("default")))
+#        define ZIX_LIB_EXPORT __attribute__((visibility("default")))
+#    endif
+#    ifdef ZIX_INTERNAL
+#        define ZIX_API ZIX_LIB_EXPORT
+#    else
+#        define ZIX_API ZIX_LIB_IMPORT
+#    endif
+#else
+#    define ZIX_API
+#endif
+
+typedef enum {
+	ZIX_STATUS_SUCCESS,
+	ZIX_STATUS_ERROR,
+	ZIX_STATUS_NO_MEM,
+	ZIX_STATUS_NOT_FOUND,
+	ZIX_STATUS_EXISTS,
+} ZixStatus;
 
 /**
    @}
 */
 
-#endif  /* ZIX_ZIX_H */
+#endif  /* ZIX_COMMON_H */
