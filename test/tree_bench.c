@@ -40,9 +40,13 @@ int_cmp(const void* a, const void* b, void* user_data)
 }
 
 static int
-test_fail()
+test_fail(const char* fmt, ...)
 {
-	fprintf(stderr, "ERROR\n");
+	va_list args;
+	va_start(args, fmt);
+	fprintf(stderr, "error: ");
+	vfprintf(stderr, fmt, args);
+	va_end(args);
 	return EXIT_FAILURE;
 }
 
@@ -70,7 +74,8 @@ bench_end(const struct timespec* start_t)
 }
 
 static int
-bench_zix(size_t n_elems, FILE* insert_dat, FILE* search_dat)
+bench_zix(size_t n_elems,
+          FILE* insert_dat, FILE* search_dat, FILE* iter_dat, FILE* del_dat)
 {
 	intptr_t     r;
 	ZixTreeIter ti;
@@ -84,8 +89,8 @@ bench_zix(size_t n_elems, FILE* insert_dat, FILE* search_dat)
 	for (size_t i = 0; i < n_elems; i++) {
 		r = rand();
 		int status = zix_tree_insert(t, (void*)r, &ti);
-		if (status && status != ZIX_STATUS_EXISTS) {
-			return test_fail();
+		if (status) {
+			return test_fail("Failed to insert %zu\n", r);
 		}
 	}
 	fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
@@ -97,27 +102,40 @@ bench_zix(size_t n_elems, FILE* insert_dat, FILE* search_dat)
 	for (size_t i = 0; i < n_elems; i++) {
 		r = rand();
 		if (zix_tree_find(t, (void*)r, &ti)) {
-			return test_fail();
+			return test_fail("Failed to find %zu\n", r);
 		}
 		if ((intptr_t)zix_tree_get_data(ti) != r) {
-			return test_fail();
+			return test_fail("Failed to get %zu\n", r);
 		}
 	}
 	fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
 	srand(seed);
 
+	// Iterate over all elements
+	struct timespec iter_start = bench_start();
+	for (ZixTreeIter iter = zix_tree_begin(t);
+	     !zix_tree_iter_is_end(iter);
+	     iter = zix_tree_iter_next(iter)) {
+		zix_tree_get_data(iter);
+	}
+	fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
+
+	srand(seed);
+
 	// Delete all elements
+	struct timespec del_start = bench_start();
 	for (size_t i = 0; i < n_elems; i++) {
 		r = rand();
 		ZixTreeIter item;
 		if (zix_tree_find(t, (void*)r, &item)) {
-			return test_fail();
+			return test_fail("Failed to find %zu to delete\n", r);
 		}
 		if (zix_tree_remove(t, item)) {
-			return test_fail();
+			return test_fail("Failed to remove %zu\n", r);
 		}
 	}
+	fprintf(del_dat, "\t%lf", bench_end(&del_start));
 
 	zix_tree_free(t);
 
@@ -125,7 +143,8 @@ bench_zix(size_t n_elems, FILE* insert_dat, FILE* search_dat)
 }
 
 static int
-bench_glib(size_t n_elems, FILE* insert_dat, FILE* search_dat)
+bench_glib(size_t n_elems,
+           FILE* insert_dat, FILE* search_dat, FILE* iter_dat, FILE* del_dat)
 {
 	intptr_t   r;
 	GSequence* t = g_sequence_new(NULL);
@@ -134,9 +153,12 @@ bench_glib(size_t n_elems, FILE* insert_dat, FILE* search_dat)
 
 	// Insert n_elems elements
 	struct timespec insert_start = bench_start();
-	for (size_t i = 0; i < n_elems; i++) {
+	for (size_t i = 0; i < n_elems; ++i) {
 		r = rand();
-		g_sequence_insert_sorted(t, (void*)r, int_cmp, NULL);
+		GSequenceIter* iter = g_sequence_insert_sorted(t, (void*)r, int_cmp, NULL);
+		if (!iter || g_sequence_iter_is_end(iter)) {
+			return test_fail("Failed to insert %zu\n", r);
+		}
 	}
 	fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
 
@@ -144,29 +166,39 @@ bench_glib(size_t n_elems, FILE* insert_dat, FILE* search_dat)
 
 	// Search for all elements
 	struct timespec search_start = bench_start();
-	for (size_t i = 0; i < n_elems; i++) {
+	for (size_t i = 0; i < n_elems; ++i) {
 		r = rand();
-		if (!g_sequence_search(t, (void*)r, int_cmp, NULL)) {
-			return test_fail();
+		GSequenceIter* iter = g_sequence_lookup(t, (void*)r, int_cmp, NULL);
+		if (!iter || g_sequence_iter_is_end(iter)) {
+			return test_fail("Failed to find %zu\n", r);
 		}
 	}
 	fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
-#if 0
+	srand(seed);
+
+	// Iterate over all elements
+	struct timespec iter_start = bench_start();
+	for (GSequenceIter* iter = g_sequence_get_begin_iter(t);
+	     !g_sequence_iter_is_end(iter);
+	     iter = g_sequence_iter_next(iter)) {
+		g_sequence_get(iter);
+	}
+	fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
+
 	srand(seed);
 
 	// Delete all elements
-	for (size_t i = 0; i < n_elems; i++) {
+	struct timespec del_start = bench_start();
+	for (size_t i = 0; i < n_elems; ++i) {
 		r = rand();
-		GSequenceIter item;
-		if (g_sequence_find(t, (void*)r, &item)) {
-			return test_fail();
+		GSequenceIter* iter = g_sequence_lookup(t, (void*)r, int_cmp, NULL);
+		if (!iter || g_sequence_iter_is_end(iter)) {
+			return test_fail("Failed to remove %zu\n", r);
 		}
-		if (g_sequence_remove(t, item)) {
-			return test_fail();
-		}
+		g_sequence_remove(iter);
 	}
-#endif
+	fprintf(del_dat, "\t%lf", bench_end(&del_start));
 
 	g_sequence_free(t);
 
@@ -188,18 +220,28 @@ main(int argc, char** argv)
 
 	FILE* insert_dat = fopen("insert.dat", "w");
 	FILE* search_dat = fopen("search.dat", "w");
+	FILE* iter_dat   = fopen("iterate.dat", "w");
+	FILE* del_dat    = fopen("del.dat", "w");
 	fprintf(insert_dat, "# n\tZixTree\tGSequence\n");
 	fprintf(search_dat, "# n\tZixTree\tGSequence\n");
+	fprintf(iter_dat, "# n\tZixTree\tGSequence\n");
+	fprintf(del_dat, "# n\tZixTree\tGSequence\n");
 	for (size_t n = min_n; n <= max_n; n *= 2) {
 		fprintf(insert_dat, "%zu", n);
 		fprintf(search_dat, "%zu", n);
-		bench_zix(n, insert_dat, search_dat);
-		bench_glib(n, insert_dat, search_dat);
+		fprintf(iter_dat, "%zu", n);
+		fprintf(del_dat, "%zu", n);
+		bench_zix(n, insert_dat, search_dat, iter_dat, del_dat);
+		bench_glib(n, insert_dat, search_dat, iter_dat, del_dat);
 		fprintf(insert_dat, "\n");
 		fprintf(search_dat, "\n");
+		fprintf(iter_dat, "\n");
+		fprintf(del_dat, "\n");
 	}
 	fclose(insert_dat);
 	fclose(search_dat);
+	fclose(iter_dat);
+	fclose(del_dat);
 
 	return EXIT_SUCCESS;
 }

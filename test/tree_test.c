@@ -68,9 +68,7 @@ stress(int test_num, size_t n_elems)
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		int status = zix_tree_insert(t, (void*)r, &ti);
-		if (status == ZIX_STATUS_EXISTS) {
-			continue;
-		} else if (status != ZIX_STATUS_SUCCESS) {
+		if (status) {
 			fprintf(stderr, "Insert failed\n");
 			return test_fail();
 		}

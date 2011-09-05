@@ -1,17 +1,24 @@
 #!/usr/bin/env python
 
-import sys
+import math
 import os
+import sys
 
 from matplotlib import pyplot
 from matplotlib.pyplot import *
 
-for i in range(len(sys.argv) - 1):
+pyplot.subplots_adjust(wspace=0.2, hspace=0.2)
+
+n_plots = len(sys.argv) - 1
+for i in range(n_plots):
     filename = sys.argv[i+1]
     file = open(filename, 'r')
 
-    pyplot.subplot(2, 1, i + 1)
-    pyplot.xlabel('Number of Elements')
+    math.ceil
+    pyplot.subplot(math.ceil(math.sqrt(n_plots)),
+                   math.ceil(math.sqrt(n_plots)),
+                   i + 1)
+    pyplot.xlabel('# Elements')
     pyplot.ylabel('Time (s)')
 
     ns = []
