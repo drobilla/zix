@@ -40,12 +40,12 @@ typedef int (*ZixComparator)(const void* a, const void* b, void* user_data);
 /**
    A balanced binary search tree.
 */
-typedef struct _ZixTree ZixTree;
+typedef struct ZixTreeImpl ZixTree;
 
 /**
    A node in a @ref ZixTree.
 */
-typedef struct _ZixTreeNode ZixTreeNode;
+typedef struct ZixTreeNodeImpl ZixTreeNode;
 
 /**
    An iterator over a @ref ZixTree.

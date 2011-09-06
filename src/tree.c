@@ -30,19 +30,19 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-struct _ZixTree {
+struct ZixTreeImpl {
 	ZixTreeNode*  root;
 	ZixComparator cmp;
 	void*         cmp_data;
 	bool          allow_duplicates;
 };
 
-struct _ZixTreeNode {
-	const void*          data;
-	struct _ZixTreeNode* left;
-	struct _ZixTreeNode* right;
-	struct _ZixTreeNode* parent;
-	int_fast8_t          balance;
+struct ZixTreeNodeImpl {
+	const void*             data;
+	struct ZixTreeNodeImpl* left;
+	struct ZixTreeNodeImpl* right;
+	struct ZixTreeNodeImpl* parent;
+	int_fast8_t             balance;
 };
 
 #ifdef ZIX_TREE_DUMP
@@ -73,7 +73,7 @@ ZIX_API
 ZixTree*
 zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data)
 {
-	ZixTree* t = malloc(sizeof(struct _ZixTree));
+	ZixTree* t = malloc(sizeof(ZixTree));
 	t->root             = NULL;
 	t->cmp              = cmp;
 	t->cmp_data         = cmp_data;
