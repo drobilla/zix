@@ -33,11 +33,6 @@ extern "C" {
 */
 
 /**
-   Function for comparing two elements.
-*/
-typedef int (*ZixComparator)(const void* a, const void* b, void* user_data);
-
-/**
    A balanced binary search tree.
 */
 typedef struct ZixTreeImpl ZixTree;
@@ -67,24 +62,24 @@ zix_tree_free(ZixTree* t);
 /**
    Insert the element @a e into @a t and point @a ti at the new element.
 */
-int
+ZixStatus
 zix_tree_insert(ZixTree* t, const void* e, ZixTreeIter* ti);
 
 /**
    Remove the item pointed at by @a ti from @a t.
 */
-int
+ZixStatus
 zix_tree_remove(ZixTree* t, ZixTreeIter ti);
 
 /**
    Set @a ti to be the largest element <= @a e in @a t.
    If no such item exists, @a ti is set to NULL.
 */
-int
+ZixStatus
 zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter* ti);
 
 /**
-   Return the data associated with the given avltree item.
+   Return the data associated with the given tree item.
 */
 const void*
 zix_tree_get_data(ZixTreeIter ti);
@@ -95,12 +90,21 @@ zix_tree_get_data(ZixTreeIter ti);
 ZixTreeIter
 zix_tree_begin(ZixTree* t);
 
+/**
+   Return an iterator the the element one past the last element in @a t.
+*/
 ZixTreeIter
 zix_tree_end(ZixTree* t);
 
+/**
+   Return true iff @a i is an iterator to the end of its tree.
+*/
 bool
 zix_tree_iter_is_end(ZixTreeIter i);
 
+/**
+   Return an iterator that points to the element one past @a i.
+*/
 ZixTreeIter
 zix_tree_iter_next(ZixTreeIter i);
 

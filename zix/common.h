@@ -48,6 +48,11 @@ typedef enum {
 } ZixStatus;
 
 /**
+   Function for comparing two elements.
+*/
+typedef int (*ZixComparator)(const void* a, const void* b, void* user_data);
+
+/**
    @}
 */
 

@@ -451,7 +451,7 @@ zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
 }
 
 ZIX_API
-int
+ZixStatus
 zix_tree_insert(ZixTree* t, const void* e, ZixTreeIter* ti)
 {
 #ifdef ZIX_TREE_DUMP
@@ -549,7 +549,7 @@ zix_tree_insert(ZixTree* t, const void* e, ZixTreeIter* ti)
 }
 
 ZIX_API
-int
+ZixStatus
 zix_tree_remove(ZixTree* t, ZixTreeIter ti)
 {
 	ZixTreeNode* const n          = ti;
@@ -699,7 +699,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter ti)
 }
 
 ZIX_API
-int
+ZixStatus
 zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter* ti)
 {
 	ZixTreeNode* n = t->root;
