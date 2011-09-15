@@ -65,6 +65,7 @@ def build(bld):
 
     lib_source = '''
         src/tree.c
+        src/sorted_array.c
     '''
 
     # Library
@@ -89,7 +90,7 @@ def build(bld):
         obj.cflags       = [ '-fprofile-arcs',  '-ftest-coverage' ]
 
         # Unit test programs
-        for i in ['tree_test']:
+        for i in ['tree_test', 'sorted_array_test']:
             obj = bld(features = 'c cprogram')
             obj.source       = 'test/%s.c' % i
             obj.includes     = ['.']
@@ -138,5 +139,6 @@ def upload_docs(ctx):
 
 def test(ctx):
     autowaf.pre_test(ctx, APPNAME)
-    autowaf.run_tests(ctx, APPNAME, ['test/tree_test'], dirs=['./src','./test'])
+    for i in ['tree_test', 'sorted_array_test']:
+        autowaf.run_tests(ctx, APPNAME, ['test/%s' % i], dirs=['./src','./test'])
     autowaf.post_test(ctx, APPNAME)
