@@ -24,6 +24,7 @@
 */
 
 #include "zix/common.h"
+#include "zix/sorted_array.h"
 #include "zix/tree.h"
 
 /**
