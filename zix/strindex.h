@@ -32,12 +32,14 @@ typedef struct _ZixStrindex ZixStrindex;
    Construct a new strindex that contains all suffixes of the string @a s.
    A copy of @a s is taken and stored for the lifetime of the strindex.
 */
+ZIX_API
 ZixStrindex*
 zix_strindex_new(const char* s);
 
 /**
    Destroy @a t.
 */
+ZIX_API
 void
 zix_strindex_free(ZixStrindex* strindex);
 
@@ -45,6 +47,7 @@ zix_strindex_free(ZixStrindex* strindex);
    Check if the string in @a strindex contains the substring @a str.
    If such a substring is found, @a match is pointed at an occurrence of it.
 */
+ZIX_API
 ZixStatus
 zix_strindex_find(ZixStrindex* strindex, const char* str, char** match);
 
