@@ -27,9 +27,9 @@
 typedef struct _ZixStrindexNode {
 	struct _ZixStrindexNode* children;      /* Children of this node */
 	size_t                   num_children;  /* Number of outgoing edges */
-	char*                    first;         /* Pointer to start of this suffix */
-	char*                    label_first;   /* First character of incoming label */
-	char*                    label_last;    /* Last character of incoming label */
+	char*                    first;         /* Start of this suffix */
+	char*                    label_first;   /* Start of incoming label */
+	char*                    label_last;    /* End of incoming label */
 } ZixStrindexNode;
 
 struct _ZixStrindex {
@@ -102,10 +102,14 @@ strindex_find_edge(ZixStrindexNode* n, char c, size_t* index)
 }
 
 static void
-strindex_add_edge(ZixStrindexNode* n, char* suffix_first, char* first, char* last)
+strindex_add_edge(ZixStrindexNode* n,
+                  char*            suffix_first,
+                  char*            first,
+                  char*            last)
 {
 	assert(last > first);
-	n->children = realloc(n->children, (n->num_children + 1) * sizeof(ZixStrindexNode));
+	n->children = realloc(n->children,
+	                      (n->num_children + 1) * sizeof(ZixStrindexNode));
 
 	memset(&n->children[n->num_children], '\0', sizeof(ZixStrindexNode));
 
@@ -168,7 +172,7 @@ strindex_insert(ZixStrindexNode* n, char* suffix_first, char* first, char* last)
 				strindex_split_edge(child, split_i);
 				strindex_insert(child, suffix_first, first + split_i, last);
 			}
-		} else if ((label_len != split_i) && (label_len != s_len) ) {
+		} else if ((label_len != split_i) && (label_len != s_len)) {
 			strindex_split_edge(child, split_i);
 			if (split_i != s_len) {
 				strindex_add_edge(child, suffix_first, first + split_i, last);
