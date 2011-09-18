@@ -81,7 +81,9 @@ zix_sorted_array_size(ZixSortedArray* a)
 
 ZIX_API
 ZixStatus
-zix_sorted_array_insert(ZixSortedArray* a, const void* e, ZixSortedArrayIter* ai)
+zix_sorted_array_insert(ZixSortedArray*     a,
+                        const void*         e,
+                        ZixSortedArrayIter* ai)
 {
 	if (a->num_elems == 0) {
 		assert(!a->array);
@@ -140,7 +142,9 @@ zix_sorted_array_index(const ZixSortedArray* a, size_t index)
 
 ZIX_API
 ZixStatus
-zix_sorted_array_find(const ZixSortedArray* a, const void* e, ZixSortedArrayIter* ai)
+zix_sorted_array_find(const ZixSortedArray* a,
+                      const void*           e,
+                      ZixSortedArrayIter*   ai)
 {
 	if (a->num_elems == 0) {
 		*ai = NULL;

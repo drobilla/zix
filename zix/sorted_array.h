@@ -65,7 +65,9 @@ zix_sorted_array_size(ZixSortedArray* a);
    Insert the element @a e into @a a and point @a ai at the new element.
 */
 ZixStatus
-zix_sorted_array_insert(ZixSortedArray* a, const void* e, ZixSortedArrayIter* ai);
+zix_sorted_array_insert(ZixSortedArray*     a,
+                        const void*         e,
+                        ZixSortedArrayIter* ai);
 
 /**
    Remove the item pointed at by @a ai from @a a.
@@ -78,7 +80,9 @@ zix_sorted_array_remove(ZixSortedArray* a, ZixSortedArrayIter ai);
    If no such item exists, @a ai is set to NULL.
 */
 ZixStatus
-zix_sorted_array_find(const ZixSortedArray* a, const void* e, ZixSortedArrayIter* ai);
+zix_sorted_array_find(const ZixSortedArray* a,
+                      const void*           e,
+                      ZixSortedArrayIter*   ai);
 
 void*
 zix_sorted_array_index(const ZixSortedArray* a, size_t index);

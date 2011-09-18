@@ -23,8 +23,6 @@
 #    include <sys/mman.h>
 #endif
 
-#include "zix/ring.h"
-
 #if defined(__APPLE__)
 #    include <libkern/OSAtomic.h>
 #    define ZIX_FULL_BARRIER() OSMemoryBarrier()
@@ -38,6 +36,8 @@
 /* No support for any systems with separate read and write barriers */
 #define ZIX_READ_BARRIER() ZIX_FULL_BARRIER()
 #define ZIX_WRITE_BARRIER() ZIX_FULL_BARRIER()
+
+#include "zix/ring.h"
 
 struct ZixRingImpl {
 	uint32_t write_head;  ///< Read index into buf

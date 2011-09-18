@@ -554,9 +554,9 @@ ZixStatus
 zix_tree_remove(ZixTree* t, ZixTreeIter ti)
 {
 	ZixTreeNode* const n          = ti;
-	ZixTreeNode**      pp         = NULL; // parent pointer
-	ZixTreeNode*       to_balance = n->parent; // lowest node to start rebalace at
-	int8_t             d_balance  = 0; // delta(balance) for n->parent
+	ZixTreeNode**      pp         = NULL;  // parent pointer
+	ZixTreeNode*       to_balance = n->parent;  // lowest node to balance
+	int8_t             d_balance  = 0;  // delta(balance) for n->parent
 
 #ifdef ZIX_TREE_DUMP
 	printf("*** REMOVE %ld\n", (intptr_t)n->data);
