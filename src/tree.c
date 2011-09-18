@@ -21,7 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "zix/zix.h"
+#include "zix/common.h"
+#include "zix/tree.h"
 
 // #define ZIX_TREE_DUMP         1
 // #define ZIX_TREE_VERIFY       1
