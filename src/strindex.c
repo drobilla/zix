@@ -144,8 +144,7 @@ strindex_split_edge(ZixStrindexNode* child,
 	child->num_children = 1;
 }
 
-ZIX_API
-ZixStatus
+static ZixStatus
 strindex_insert(ZixStrindexNode* n, char* suffix_first, char* first, char* last)
 {
 	size_t           child_i;
