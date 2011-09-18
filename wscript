@@ -62,7 +62,7 @@ def configure(conf):
     autowaf.display_msg(conf, "Benchmarks", str(conf.env['BUILD_BENCHx']))
     print('')
 
-tests = ['ring_test', 'sorted_array_test', 'tree_test']
+tests = ['ring_test', 'sorted_array_test', 'strindex_test', 'tree_test']
 
 def build(bld):
     # C Headers
@@ -73,8 +73,9 @@ def build(bld):
 
     lib_source = '''
         src/ring.c
-        src/sorted_array.c
         src/tree.c
+        src/strindex.c
+        src/sorted_array.c
     '''
 
     # Library
