@@ -45,6 +45,12 @@ def configure(conf):
     autowaf.check_pkg(conf, 'glib-2.0', uselib_store='GLIB',
                       atleast_version='2.0.0', mandatory=False)
 
+    # Check for dladdr
+    conf.check(function_name='mlock',
+               header_name='sys/mman.h',
+               define_name='HAVE_MLOCK',
+               mandatory=False)
+
     conf.env['BUILD_TESTS'] = Options.options.build_tests
     if conf.is_defined('HAVE_GLIB'):
         conf.env['BUILD_BENCH'] = Options.options.build_bench
@@ -56,6 +62,8 @@ def configure(conf):
     autowaf.display_msg(conf, "Benchmarks", str(conf.env['BUILD_BENCHx']))
     print('')
 
+tests = ['ring_test', 'sorted_array_test', 'tree_test']
+
 def build(bld):
     # C Headers
     bld.install_files('${INCLUDEDIR}/zix', bld.path.ant_glob('zix/*.h'))
@@ -64,8 +72,9 @@ def build(bld):
     autowaf.build_pc(bld, 'ZIX', ZIX_VERSION, [])
 
     lib_source = '''
-        src/tree.c
+        src/ring.c
         src/sorted_array.c
+        src/tree.c
     '''
 
     # Library
@@ -87,18 +96,18 @@ def build(bld):
         obj.name         = 'libzix_static'
         obj.target       = 'zix_static'
         obj.install_path = ''
-        obj.cflags       = [ '-fprofile-arcs',  '-ftest-coverage' ]
+        obj.cflags       = ['-fprofile-arcs',  '-ftest-coverage' ]
 
         # Unit test programs
-        for i in ['tree_test', 'sorted_array_test']:
+        for i in tests:
             obj = bld(features = 'c cprogram')
             obj.source       = 'test/%s.c' % i
             obj.includes     = ['.']
             obj.use          = 'libzix_static'
-            obj.linkflags    = '-lgcov'
+            obj.linkflags    = ['-lgcov', '-lpthread']
             obj.target       = 'test/%s' % i
             obj.install_path = ''
-            obj.cflags       = [ '-fprofile-arcs',  '-ftest-coverage' ]
+            obj.cflags       = ['-fprofile-arcs',  '-ftest-coverage' ]
 
     if bld.env['BUILD_BENCH']:
         # Benchmark programs
@@ -156,6 +165,6 @@ def upload_docs(ctx):
 
 def test(ctx):
     autowaf.pre_test(ctx, APPNAME)
-    for i in ['tree_test', 'sorted_array_test']:
+    for i in tests:
         autowaf.run_tests(ctx, APPNAME, ['test/%s' % i], dirs=['./src','./test'])
     autowaf.post_test(ctx, APPNAME)
