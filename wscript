@@ -113,15 +113,20 @@ def build(bld):
             obj.install_path = ''
 
     # Documentation
-    #autowaf.build_dox(bld, 'ZIX', ZIX_VERSION, top, out)
-
-    # Man page
-    #bld.install_files('${MANDIR}/man1', 'doc/zixi.1')
+    autowaf.build_dox(bld, 'ZIX', ZIX_VERSION, top, out)
 
     bld.add_post_fun(autowaf.run_ldconfig)
+    if bld.env['DOCS']:
+        bld.add_post_fun(fix_docs)
 
 def lint(ctx):
     subprocess.call('cpplint.py --filter=-whitespace/tab,-whitespace/braces,-build/header_guard,-readability/casting,-readability/todo src/* zix/*', shell=True)
+
+def build_dir(ctx, subdir):
+    if autowaf.is_child():
+        return os.path.join('build', APPNAME, subdir)
+    else:
+        return os.path.join('build', subdir)
 
 def fix_docs(ctx):
     try:
@@ -131,8 +136,20 @@ def fix_docs(ctx):
         os.remove('index.html')
         os.symlink('group__zix.html',
                    'index.html')
+    except:
+        Logs.error("Failed to fix up %s documentation" % APPNAME)
+
+def fix_docs(ctx):
+    try:
+        top = os.getcwd()
+        os.chdir(build_dir(ctx, 'doc/html'))
+        os.system("sed -i 's/ZIX_API //' group__zix.html")
+        os.remove('index.html')
+        os.symlink('group__zix.html',
+                   'index.html')
+        os.chdir(top)
     except Exception as e:
-        Logs.error("Failed to fix up Doxygen documentation (%s)\n" % e)
+        Logs.error("Failed to fix up %s documentation (%s)" % (APPNAME, e))
 
 def upload_docs(ctx):
     os.system("rsync -avz --delete -e ssh build/doc/html/* drobilla@drobilla.net:~/drobilla.net/docs/zix")

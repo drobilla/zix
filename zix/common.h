@@ -22,6 +22,7 @@
    @{
 */
 
+/** @cond */
 #ifdef ZIX_SHARED
 #    ifdef __WIN32__
 #        define ZIX_LIB_IMPORT __declspec(dllimport)
@@ -38,6 +39,7 @@
 #else
 #    define ZIX_API
 #endif
+/** @endcond */
 
 typedef enum {
 	ZIX_STATUS_SUCCESS,
