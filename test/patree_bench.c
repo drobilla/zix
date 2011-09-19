@@ -24,6 +24,7 @@
 #include <glib.h>
 
 #include "zix/patree.h"
+#include "zix/fat_patree.h"
 
 static int
 test_fail(const char* fmt, ...)
@@ -49,6 +50,8 @@ main(int argc, char** argv)
 		return test_fail("Failed to open file %s\n", file);
 	}
 
+	size_t max_n_strings = 500000;
+
 	/* Read input strings */
 	char** strings      = NULL;
 	size_t n_strings    = 0;
@@ -64,7 +67,9 @@ main(int argc, char** argv)
 			strings[n_strings] = malloc(buf_len);
 			memcpy(strings[n_strings], buf, buf_len);
 			this_str_len = 0;
-			++n_strings;
+			if (++n_strings == max_n_strings) {
+				break;
+			}
 		} else {
 			++this_str_len;
 			if (buf_len < this_str_len + 1) {
@@ -76,14 +81,18 @@ main(int argc, char** argv)
 		}
 	}
 
+	fclose(fd);
+
 	FILE* insert_dat = fopen("insert.dat", "w");
 	FILE* search_dat = fopen("search.dat", "w");
-	fprintf(insert_dat, "# n\tGHashTable\tZixPatree\n");
-	fprintf(search_dat, "# n\tGHashTable\tZixPatree\n");
+	fprintf(insert_dat, "# n\tGHashTable\tZixPatree\tZixFatPatree\n");
+	fprintf(search_dat, "# n\tGHashTable\tZixPatree\tZixFatPatree\n");
 
 	for (size_t n = 1; n <= n_strings; n *= 2) {
-		ZixPatree*  patree = zix_patree_new();
-		GHashTable* hash   = g_hash_table_new(g_str_hash, g_str_equal);
+		printf("Benchmarking n = %zu\n", n);
+		ZixPatree*    patree     = zix_patree_new();
+		ZixFatPatree* fat_patree = zix_fat_patree_new();
+		GHashTable*   hash       = g_hash_table_new(g_str_hash, g_str_equal);
 		fprintf(insert_dat, "%zu", n);
 		fprintf(search_dat, "%zu", n);
 
@@ -99,7 +108,18 @@ main(int argc, char** argv)
 		// ZixPatree
 		insert_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
-			if (zix_patree_insert(patree, strings[i])) {
+			ZixStatus st = zix_patree_insert(patree, strings[i]);
+			if (st && st != ZIX_STATUS_EXISTS) {
+				return test_fail("Failed to insert `%s'\n", strings[i]);
+			}
+		}
+		fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
+
+		// ZixFatPatree
+		insert_start = bench_start();
+		for (size_t i = 0; i < n; ++i) {
+			ZixStatus st = zix_fat_patree_insert(fat_patree, strings[i]);
+			if (st && st != ZIX_STATUS_EXISTS) {
 				return test_fail("Failed to insert `%s'\n", strings[i]);
 			}
 		}
@@ -111,7 +131,7 @@ main(int argc, char** argv)
 		struct timespec search_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
 			char* match = g_hash_table_lookup(hash, strings[i]);
-			if (match != strings[i]) {
+			if (strcmp(match, strings[i])) {
 				return test_fail("Bad match for `%s'\n", strings[i]);
 			}
 		}
@@ -122,15 +142,29 @@ main(int argc, char** argv)
 		for (size_t i = 0; i < n; ++i) {
 			char* match = NULL;
 			if (zix_patree_find(patree, strings[i], &match)) {
-				return test_fail("Failed to find `%s'\n", strings[i]);
+				return test_fail("Patree: Failed to find `%s'\n", strings[i]);
 			}
-			if (match != strings[i]) {
-				return test_fail("Bad match for `%s'\n", strings[i]);
+			if (strcmp(match, strings[i])) {
+				return test_fail("Patree: Bad match for `%s'\n", strings[i]);
+			}
+		}
+		fprintf(search_dat, "\t%lf", bench_end(&search_start));
+
+		// ZixFatPatree
+		search_start = bench_start();
+		for (size_t i = 0; i < n; ++i) {
+			char* match = NULL;
+			if (zix_fat_patree_find(fat_patree, strings[i], &match)) {
+				return test_fail("FatPatree: Failed to find `%s'\n", strings[i]);
+			}
+			if (strcmp(match, strings[i])) {
+				return test_fail("FatPatree: Bad match for `%s'\n", strings[i]);
 			}
 		}
 		fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
 
 		zix_patree_free(patree);
+		zix_fat_patree_free(fat_patree);
 		g_hash_table_unref(hash);
 	}
 

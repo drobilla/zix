@@ -78,6 +78,7 @@ def build(bld):
     autowaf.build_pc(bld, 'ZIX', ZIX_VERSION, [])
 
     lib_source = '''
+        src/fat_patree.c
         src/patree.c
         src/ring.c
         src/sorted_array.c
