@@ -130,6 +130,7 @@ zix_sorted_array_index_unchecked(const ZixSortedArray* a, size_t index)
 	return (char*)a->array + (a->elem_size * index);
 }
 
+ZIX_API
 void*
 zix_sorted_array_index(const ZixSortedArray* a, size_t index)
 {
@@ -155,7 +156,7 @@ zix_sorted_array_find(const ZixSortedArray* a,
 	intptr_t upper = a->num_elems - 1;
 	while (upper >= lower) {
 		const size_t i      = lower + ((upper - lower) / 2);
-		void*        elem_i = zix_sorted_array_index(a, i);
+		void*        elem_i = zix_sorted_array_index_unchecked(a, i);
 		const int    cmp    = a->cmp(elem_i, e, a->cmp_data);
 
 		if (cmp == 0) {
