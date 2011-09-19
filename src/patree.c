@@ -50,6 +50,7 @@ zix_patree_print_rec(ZixPatreeNode* node, FILE* fd)
 		fprintf(fd, "\t\"%p\" [label=<"
 		        "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">"
 		        "<TR><TD>%s</TD></TR>", (void*)node, edge_label);
+		free(edge_label);
 		if (node->str) {
 			fprintf(fd, "<TR><TD>\"%s\"</TD></TR>", node->str);
 		}
