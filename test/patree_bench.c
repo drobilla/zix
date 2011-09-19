@@ -26,6 +26,8 @@
 #include "zix/patree.h"
 #include "zix/fat_patree.h"
 
+const unsigned seed = 1;
+
 static int
 test_fail(const char* fmt, ...)
 {
@@ -128,37 +130,43 @@ main(int argc, char** argv)
 		// Benchmark search
 
 		// GHashTable
+		srand(seed);
 		struct timespec search_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
-			char* match = g_hash_table_lookup(hash, strings[i]);
-			if (strcmp(match, strings[i])) {
-				return test_fail("Bad match for `%s'\n", strings[i]);
+			const size_t index = rand() % n;
+			char* match = g_hash_table_lookup(hash, strings[index]);
+			if (strcmp(match, strings[index])) {
+				return test_fail("Bad match for `%s'\n", strings[index]);
 			}
 		}
 		fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
 		// ZixPatree
+		srand(seed);
 		search_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
+			const size_t index = rand() % n;
 			char* match = NULL;
-			if (zix_patree_find(patree, strings[i], &match)) {
-				return test_fail("Patree: Failed to find `%s'\n", strings[i]);
+			if (zix_patree_find(patree, strings[index], &match)) {
+				return test_fail("Patree: Failed to find `%s'\n", strings[index]);
 			}
-			if (strcmp(match, strings[i])) {
-				return test_fail("Patree: Bad match for `%s'\n", strings[i]);
+			if (strcmp(match, strings[index])) {
+				return test_fail("Patree: Bad match for `%s'\n", strings[index]);
 			}
 		}
 		fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
 		// ZixFatPatree
+		srand(seed);
 		search_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
+			const size_t index = rand() % n;
 			char* match = NULL;
-			if (zix_fat_patree_find(fat_patree, strings[i], &match)) {
-				return test_fail("FatPatree: Failed to find `%s'\n", strings[i]);
+			if (zix_fat_patree_find(fat_patree, strings[index], &match)) {
+				return test_fail("FatPatree: Failed to find `%s'\n", strings[index]);
 			}
-			if (strcmp(match, strings[i])) {
-				return test_fail("FatPatree: Bad match for `%s'\n", strings[i]);
+			if (strcmp(match, strings[index])) {
+				return test_fail("FatPatree: Bad match for `%s'\n", strings[index]);
 			}
 		}
 		fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
