@@ -61,7 +61,7 @@ zix_patree_insert(ZixPatree* t, const char* str);
 */
 ZIX_API
 ZixStatus
-zix_patree_find(ZixPatree* t, const char* str, char** match);
+zix_patree_find(const ZixPatree* t, const char* str, char** match);
 
 /**
    @}

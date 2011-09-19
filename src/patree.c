@@ -29,11 +29,12 @@
 typedef uint_fast8_t n_edges_t;
 
 typedef struct _ZixPatreeNode {
-	char*                  label_first;   /* Start of incoming label */
-	char*                  label_last;    /* End of incoming label */
-	char*                  str;           /* String stored at this node */
-	struct _ZixPatreeNode* children;      /* Children of this node */
-	n_edges_t              num_children;  /* Number of outgoing edges */
+	char*                  label_first;       /* Start of incoming label */
+	char*                  label_last;        /* End of incoming label */
+	char*                  str;               /* String stored at this node */
+	struct _ZixPatreeNode* children;          /* Children of this node */
+	n_edges_t              num_children;      /* Number of outgoing edges */
+	char                   label_first_char;  /* First char of label_first */
 } ZixPatreeNode;
 
 struct _ZixPatree {
@@ -110,16 +111,16 @@ zix_patree_free(ZixPatree* t)
 }
 
 static inline bool
-patree_is_leaf(ZixPatreeNode* n)
+patree_is_leaf(const ZixPatreeNode* n)
 {
 	return n->num_children == 0;
 }
 
 static bool
-patree_find_edge(ZixPatreeNode* n, char c, n_edges_t* index)
+patree_find_edge(const ZixPatreeNode* n, const char c, n_edges_t* const index)
 {
 	for (n_edges_t i = 0; i < n->num_children; ++i) {
-		if (n->children[i].label_first[0] == c) {
+		if (n->children[i].label_first_char == c) {
 			*index = i;
 			return true;
 		}
@@ -133,15 +134,20 @@ patree_add_edge(ZixPatreeNode* n,
                 char*          first,
                 char*          last)
 {
+	/* Interesting performance note: building a sorted array here makes
+	   the search considerably slower, regardless of whether binary search
+	   or the existing search algorithm is used.  I suppose moving things
+	   around blows the cache for child->children which trumps everything.
+	*/
 	assert(last >= first);
 	n->children = realloc(n->children,
 	                      (n->num_children + 1) * sizeof(ZixPatreeNode));
-
-	n->children[n->num_children].label_first  = first;
-	n->children[n->num_children].label_last   = last;
-	n->children[n->num_children].str          = str;
-	n->children[n->num_children].children     = NULL;
-	n->children[n->num_children].num_children = 0;
+	n->children[n->num_children].label_first      = first;
+	n->children[n->num_children].label_last       = last;
+	n->children[n->num_children].str              = str;
+	n->children[n->num_children].children         = NULL;
+	n->children[n->num_children].num_children     = 0;
+	n->children[n->num_children].label_first_char = first[0];
 	++n->num_children;
 }
 
@@ -157,12 +163,13 @@ patree_split_edge(ZixPatreeNode* child,
 	char* const last  = child->label_last;
 	assert(last >= first);
 
-	child->children                 = malloc(sizeof(ZixPatreeNode));
-	child->children[0].children     = children;
-	child->children[0].num_children = num_children;
-	child->children[0].str          = child->str;
-	child->children[0].label_first  = first;
-	child->children[0].label_last   = last;
+	child->children                     = malloc(sizeof(ZixPatreeNode));
+	child->children[0].children         = children;
+	child->children[0].num_children     = num_children;
+	child->children[0].str              = child->str;
+	child->children[0].label_first      = first;
+	child->children[0].label_last       = last;
+	child->children[0].label_first_char = first[0];
 
 	child->label_last = child->label_first + (index - 1);  // chop end
 
@@ -230,7 +237,7 @@ zix_patree_insert(ZixPatree* t, const char* str)
 
 ZIX_API
 ZixStatus
-zix_patree_find(ZixPatree* t, const char* const str, char** match)
+zix_patree_find(const ZixPatree* t, const char* const str, char** match)
 {
 	ZixPatreeNode* n = t->root;
 	n_edges_t      child_i;
