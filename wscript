@@ -35,7 +35,6 @@ def options(opt):
                    help="Build benchmarks")
 
 def configure(conf):
-    conf.line_just = max(conf.line_just, 59)
     autowaf.configure(conf)
     autowaf.display_header('Zix Configuration')
 
