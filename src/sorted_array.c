@@ -147,17 +147,12 @@ zix_sorted_array_find(const ZixSortedArray* a,
                       const void*           e,
                       ZixSortedArrayIter*   ai)
 {
-	if (a->num_elems == 0) {
-		*ai = NULL;
-		return ZIX_STATUS_NOT_FOUND;
-	}
-
 	intptr_t lower = 0;
 	intptr_t upper = a->num_elems - 1;
 	while (upper >= lower) {
-		const size_t i      = lower + ((upper - lower) / 2);
-		void*        elem_i = zix_sorted_array_index_unchecked(a, i);
-		const int    cmp    = a->cmp(elem_i, e, a->cmp_data);
+		const intptr_t i      = lower + ((upper - lower) / 2);
+		void* const    elem_i = zix_sorted_array_index_unchecked(a, i);
+		const int      cmp    = a->cmp(elem_i, e, a->cmp_data);
 
 		if (cmp == 0) {
 			*ai = elem_i;
