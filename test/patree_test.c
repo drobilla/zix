@@ -29,6 +29,18 @@ static const char* strings[] = {
 	"http://example.net/baz",
 	"http://drobilla.net/",
 	"http://drobilla.net/software/zix",
+	"http://www.gbengasesan.com/blog",
+	"http://www.gbengasesan.com",
+	"http://echo.jpl.nasa.gov/~lance/delta_v/delta_v.rendezvous.html",
+	"http://echo.jpl.nasa.gov/asteroids/1986da/1986DA.html",
+	"http://echo.jpl.nasa.gov/",
+	"http://echo.jpl.nasa.gov/asteroids/1620_Geographos/geographos.html",
+	"http://echo.jpl.nasa.gov/~ostro/KY26/",
+	"http://echo.jpl.nasa.gov/~ostro/KY26/JPL_press_release.text",
+	"http://echo.jpl.nasa.gov",
+	"http://echo.jpl.nasa.gov/asteroids/4179_Toutatis/toutatis.html",
+	"http://echo.jpl.nasa.gov/asteroids/4769_Castalia/cast01.html",
+	"http://echo.jpl.nasa.gov/publications/review_abs.html",
 };
 
 static int

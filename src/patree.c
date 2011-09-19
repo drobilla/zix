@@ -174,7 +174,6 @@ static ZixStatus
 patree_insert_internal(ZixPatreeNode* n, char* str, char* first, char* last)
 {
 	n_edges_t      child_i;
-	ZixPatreeNode* child;
 	assert(first <= last);
 
 	if (patree_find_edge(n, *first, &child_i)) {
@@ -198,10 +197,17 @@ patree_insert_internal(ZixPatreeNode* n, char* str, char* first, char* last)
 				patree_split_edge(child, split_i);
 				return patree_insert_internal(child, str, first + split_i, last);
 			}
-		} else if (label_len != split_i && split_i != s_len) {
+		} else if (label_len != split_i) {
 			patree_split_edge(child, split_i);
-			patree_add_edge(child, str, first + split_i, last);
+			if (split_i != s_len) {
+				patree_add_edge(child, str, first + split_i, last);
+			} else {
+				assert(!child->str);
+				child->str = str;
+			}
 			return ZIX_STATUS_SUCCESS;
+		} else if (label_len == s_len && !child->str) {
+			child->str = str;
 		} else {
 			return ZIX_STATUS_EXISTS;
 		}
@@ -223,10 +229,12 @@ zix_patree_insert(ZixPatree* t, const char* str)
 
 ZIX_API
 ZixStatus
-zix_patree_find(ZixPatree* t, const char* p, char** match)
+zix_patree_find(ZixPatree* t, const char* const str, char** match)
 {
-	ZixPatreeNode* n      = t->root;
+	ZixPatreeNode* n = t->root;
 	n_edges_t      child_i;
+
+	const char* p = str;
 
 	*match = NULL;
 
@@ -247,7 +255,7 @@ zix_patree_find(ZixPatree* t, const char* p, char** match)
 
 			if (!*p) {
 				/* Reached end of search string */
-				if (!*l) {
+				if (l == label_last + 1) {
 					/* Reached end of label string as well, match */
 					*match = child->str;
 					return *match ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
