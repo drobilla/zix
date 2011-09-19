@@ -83,7 +83,8 @@ main(int argc, char** argv)
 	const char* not_indexed[] = {
 		"ftp://example.org/not-there-at-all",
 		"http://example.org/foobar",
-		"http://"
+		"http://",
+		"http://otherdomain.com"
 	};
 	const size_t n_not_indexed = sizeof(not_indexed) / sizeof(char*);
 	for (size_t i = 0; i < n_not_indexed; ++i) {
