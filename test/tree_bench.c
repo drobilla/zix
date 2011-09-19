@@ -14,10 +14,7 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#define _POSIX_C_SOURCE 199309L
-
-#include <time.h>
-#include <sys/time.h>
+#include "bench.h"
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -56,29 +53,6 @@ test_fail(const char* fmt, ...)
 	vfprintf(stderr, fmt, args);
 	va_end(args);
 	return EXIT_FAILURE;
-}
-
-static inline double
-elapsed_s(const struct timespec* start, const struct timespec* end)
-{
-	return ( (end->tv_sec - start->tv_sec)
-	         + ((end->tv_nsec - start->tv_nsec) * 0.000000001) );
-}
-
-static inline struct timespec
-bench_start()
-{
-	struct timespec start_t;
-	clock_gettime(CLOCK_REALTIME, &start_t);
-	return start_t;
-}
-
-static inline double
-bench_end(const struct timespec* start_t)
-{
-	struct timespec end_t;
-	clock_gettime(CLOCK_REALTIME, &end_t);
-	return elapsed_s(start_t, &end_t);
 }
 
 static int
