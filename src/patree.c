@@ -235,20 +235,19 @@ zix_patree_find(ZixPatree* t, const char* const str, char** match)
 	ZixPatreeNode* n = t->root;
 	n_edges_t      child_i;
 
-	const char* p = str;
+	register const char* p = str;
 
 	*match = NULL;
 
 	while (*p != '\0') {
 		if (patree_find_edge(n, p[0], &child_i)) {
 			assert(child_i <= n->num_children);
-			ZixPatreeNode* const child       = &n->children[child_i];
-			const char* const    label_first = child->label_first;
-			const char* const    label_last  = child->label_last;
+			ZixPatreeNode* const child = &n->children[child_i];
 
 			/* Prefix compare search string and label */
-			const char* l = label_first;
-			while (*p != '\0' && l <= label_last) {
+			register const char*       l     = child->label_first;
+			register const char* const l_end = child->label_last;
+			while (l <= l_end) {
 				if (*l++ != *p++) {
 					return ZIX_STATUS_NOT_FOUND;
 				}
@@ -256,7 +255,7 @@ zix_patree_find(ZixPatree* t, const char* const str, char** match)
 
 			if (!*p) {
 				/* Reached end of search string */
-				if (l == label_last + 1) {
+				if (l == l_end + 1) {
 					/* Reached end of label string as well, match */
 					*match = child->str;
 					return *match ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
