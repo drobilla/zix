@@ -62,7 +62,13 @@ def configure(conf):
     autowaf.display_msg(conf, "Benchmarks", str(conf.env['BUILD_BENCHx']))
     print('')
 
-tests = ['ring_test', 'sorted_array_test', 'strindex_test', 'tree_test']
+tests = [
+    'patree_test',
+    'ring_test',
+    'sorted_array_test',
+    'strindex_test',
+    'tree_test'
+]
 
 def build(bld):
     # C Headers
@@ -72,10 +78,11 @@ def build(bld):
     autowaf.build_pc(bld, 'ZIX', ZIX_VERSION, [])
 
     lib_source = '''
+        src/patree.c
         src/ring.c
-        src/tree.c
-        src/strindex.c
         src/sorted_array.c
+        src/strindex.c
+        src/tree.c
     '''
 
     # Library
@@ -112,7 +119,7 @@ def build(bld):
 
     if bld.env['BUILD_BENCH']:
         # Benchmark programs
-        for i in ['tree_bench']:
+        for i in ['tree_bench', 'patree_bench']:
             obj = bld(features = 'c cprogram')
             obj.source       = 'test/%s.c' % i
             obj.includes     = ['.']

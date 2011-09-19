@@ -37,10 +37,11 @@ struct _ZixStrindex {
 	ZixStrindexNode* root;  /* Root of the tree */
 };
 
-static ZixStatus strindex_insert(ZixStrindexNode* n,
-                                 char*            suffix_first,
-                                 char*            first,
-                                 char*            last);
+static ZixStatus
+strindex_insert(ZixStrindexNode* n,
+                char*            suffix_first,
+                char*            first,
+                char*            last);
 
 ZIX_API
 ZixStrindex*
