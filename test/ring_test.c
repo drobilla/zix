@@ -141,5 +141,6 @@ main(int argc, char** argv)
 		return 1;
 	}
 
+	zix_ring_free(ring);
 	return 0;
 }
