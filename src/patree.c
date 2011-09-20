@@ -145,10 +145,13 @@ patree_find_edge(const ZixPatreeNode* n, const char c, n_edges_t* const index)
 static void
 patree_add_edge(ZixPatreeNode** n_ptr,
                 const char*     str,
-                const char*     first,
-                const char*     last)
+                const char*     first)
 {
 	ZixPatreeNode* n = *n_ptr;
+
+	const char* last = first;
+	for (; *last; ++last) ;
+	--last;
 
 	/* Interesting performance note: building a sorted array here makes
 	   the search considerably slower, regardless of whether binary search
@@ -212,13 +215,10 @@ patree_split_edge(ZixPatreeNode** child_ptr,
 }
 
 static ZixStatus
-patree_insert_internal(ZixPatreeNode** n_ptr,
-                       const char* str, const char* first, const char* last)
+patree_insert_internal(ZixPatreeNode** n_ptr, const char* str, const char* first)
 {
-	n_edges_t      child_i;
-	assert(first <= last);
-
 	ZixPatreeNode* n = *n_ptr;
+	n_edges_t      child_i;
 	if (patree_find_edge(n, *first, &child_i)) {
 		ZixPatreeNode**   child_ptr   = &n->children[child_i].child;
 		ZixPatreeNode*    child       = *child_ptr;
@@ -226,36 +226,35 @@ patree_insert_internal(ZixPatreeNode** n_ptr,
 		const char* const label_last  = child->label_last;
 		size_t            split_i     = 0;
 		const size_t      label_len   = label_last - label_first + 1;
-		const size_t      s_len       = last - first + 1;
-		const size_t      max_len     = (s_len < label_len) ? s_len : label_len;
 
-		while (split_i < max_len && first[split_i] == label_first[split_i]) {
+		while (first[split_i] && split_i < label_len
+		       && first[split_i] == label_first[split_i]) {
 			++split_i;
 		}
 
-		if (label_len < s_len) {
+		if (first[split_i]) {
 			if (split_i == label_len) {
-				return patree_insert_internal(child_ptr, str, first + label_len, last);
+				return patree_insert_internal(child_ptr, str, first + label_len);
 			} else {
 				patree_split_edge(child_ptr, split_i);
-				return patree_insert_internal(child_ptr, str, first + split_i, last);
+				return patree_insert_internal(child_ptr, str, first + split_i);
 			}
 		} else if (label_len != split_i) {
 			patree_split_edge(child_ptr, split_i);
-			if (split_i != s_len) {
-				patree_add_edge(child_ptr, str, first + split_i, last);
+			if (first[split_i]) {
+				patree_add_edge(child_ptr, str, first + split_i);
 			} else {
 				assert(!(*child_ptr)->str);
 				(*child_ptr)->str = str;
 			}
 			return ZIX_STATUS_SUCCESS;
-		} else if (label_len == s_len && !child->str) {
+		} else if (label_first[split_i] && !child->str) {
 			child->str = str;
 		} else {
 			return ZIX_STATUS_EXISTS;
 		}
 	} else {
-		patree_add_edge(n_ptr, str, first, last);
+		patree_add_edge(n_ptr, str, first);
 	}
 
 	return ZIX_STATUS_SUCCESS;
@@ -265,9 +264,7 @@ ZIX_API
 ZixStatus
 zix_patree_insert(ZixPatree* t, const char* str)
 {
-	const size_t len = strlen(str);
-	// FIXME: awful casts
-	return patree_insert_internal(&t->root, (char*)str, (char*)str, (char*)str + len - 1);
+	return patree_insert_internal(&t->root, str, str);
 }
 
 static inline int
