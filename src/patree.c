@@ -30,9 +30,9 @@
 
 #ifdef __SSE4_2__
 #include <smmintrin.h>
-#warning Using SSE 4.2
+//#warning Using SSE 4.2
 #else
-#warning SSE 4.2 disabled
+//#warning SSE 4.2 disabled
 #endif
 
 typedef uint_fast8_t n_edges_t;
@@ -45,9 +45,9 @@ typedef struct {
 } ZixChildRef;
 
 typedef struct _ZixPatreeNode {
-	char*       label_first;   /* Start of incoming label */
-	char*       label_last;    /* End of incoming label */
-	char*       str;           /* String stored at this node */
+	const char* label_first;   /* Start of incoming label */
+	const char* label_last;    /* End of incoming label */
+	const char* str;           /* String stored at this node */
 	n_edges_t   num_children;  /* Number of outgoing edges */
 	ZixChildRef children[];    /* Children of this node */
 } ZixPatreeNode;
@@ -144,9 +144,9 @@ patree_find_edge(const ZixPatreeNode* n, const char c, n_edges_t* const index)
 
 static void
 patree_add_edge(ZixPatreeNode** n_ptr,
-                char*           str,
-                char*           first,
-                char*           last)
+                const char*     str,
+                const char*     first,
+                const char*     last)
 {
 	ZixPatreeNode* n = *n_ptr;
 
@@ -212,21 +212,22 @@ patree_split_edge(ZixPatreeNode** child_ptr,
 }
 
 static ZixStatus
-patree_insert_internal(ZixPatreeNode** n_ptr, char* str, char* first, char* last)
+patree_insert_internal(ZixPatreeNode** n_ptr,
+                       const char* str, const char* first, const char* last)
 {
 	n_edges_t      child_i;
 	assert(first <= last);
 
 	ZixPatreeNode* n = *n_ptr;
 	if (patree_find_edge(n, *first, &child_i)) {
-		ZixPatreeNode** child_ptr   = &n->children[child_i].child;
-		ZixPatreeNode*  child       = *child_ptr;
-		char* const     label_first = child->label_first;
-		char* const     label_last  = child->label_last;
-		size_t          split_i     = 0;
-		const size_t    label_len   = label_last - label_first + 1;
-		const size_t    s_len       = last - first + 1;
-		const size_t    max_len     = (s_len < label_len) ? s_len : label_len;
+		ZixPatreeNode**   child_ptr   = &n->children[child_i].child;
+		ZixPatreeNode*    child       = *child_ptr;
+		const char* const label_first = child->label_first;
+		const char* const label_last  = child->label_last;
+		size_t            split_i     = 0;
+		const size_t      label_len   = label_last - label_first + 1;
+		const size_t      s_len       = last - first + 1;
+		const size_t      max_len     = (s_len < label_len) ? s_len : label_len;
 
 		while (split_i < max_len && first[split_i] == label_first[split_i]) {
 			++split_i;
@@ -269,7 +270,7 @@ zix_patree_insert(ZixPatree* t, const char* str)
 	return patree_insert_internal(&t->root, (char*)str, (char*)str, (char*)str + len - 1);
 }
 
-int
+static inline int
 change_index_c(const char* a, const char* b, size_t len)
 {
 	for (size_t i = 0; i < len; ++i) {
@@ -281,7 +282,7 @@ change_index_c(const char* a, const char* b, size_t len)
 }
 
 #ifdef __SSE4_2__
-int
+static inline int
 change_index_sse(const char* a, const char* b, const size_t len)
 {
 	int ret;
@@ -306,7 +307,7 @@ change_index_sse(const char* a, const char* b, const size_t len)
 
 ZIX_API
 ZixStatus
-zix_patree_find(const ZixPatree* t, const char* const str, char** match)
+zix_patree_find(const ZixPatree* t, const char* const str, const char** match)
 {
 	ZixPatreeNode* n = t->root;
 	n_edges_t      child_i;
@@ -316,7 +317,7 @@ zix_patree_find(const ZixPatree* t, const char* const str, char** match)
 	while (patree_find_edge(n, p[0], &child_i)) {
 		assert(child_i <= n->num_children);
 		ZixPatreeNode* const child     = n->children[child_i].child;
-		char* const          child_str = child->str;
+		const char* const    child_str = child->str;
 
 		/* Prefix compare search string and label */
 		const char*       l     = child->label_first;

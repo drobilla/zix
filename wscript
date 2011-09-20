@@ -41,24 +41,25 @@ def configure(conf):
     conf.load('compiler_c')
     conf.env.append_value('CFLAGS', '-std=c99')
 
-    autowaf.check_pkg(conf, 'glib-2.0', uselib_store='GLIB',
-                      atleast_version='2.0.0', mandatory=False)
-
-    # Check for dladdr
+    # Check for mlock
     conf.check(function_name='mlock',
                header_name='sys/mman.h',
                define_name='HAVE_MLOCK',
                mandatory=False)
 
+    conf.env['BUILD_BENCH'] = Options.options.build_bench
     conf.env['BUILD_TESTS'] = Options.options.build_tests
-    if conf.is_defined('HAVE_GLIB'):
-        conf.env['BUILD_BENCH'] = Options.options.build_bench
+    if Options.options.build_bench:
+        autowaf.check_pkg(conf, 'glib-2.0', uselib_store='GLIB',
+                          atleast_version='2.0.0', mandatory=False)
+        if not conf.is_defined('HAVE_GLIB'):
+            conf.fatal("Glib is required to build benchmarks")
 
     autowaf.define(conf, 'ZIX_VERSION', ZIX_VERSION)
     conf.write_config_header('zix-config.h', remove=False)
 
     autowaf.display_msg(conf, "Unit tests", str(conf.env['BUILD_TESTS']))
-    autowaf.display_msg(conf, "Benchmarks", str(conf.env['BUILD_BENCHx']))
+    autowaf.display_msg(conf, "Benchmarks", str(conf.env['BUILD_BENCH']))
     print('')
 
 tests = [

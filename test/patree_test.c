@@ -81,8 +81,8 @@ main(int argc, char** argv)
 
 	// Search for each string
 	for (size_t i = 0; i < n_strings; ++i) {
-		char*     match = NULL;
-		ZixStatus st    = zix_patree_find(patree, strings[i], &match);
+		const char* match = NULL;
+		ZixStatus   st    = zix_patree_find(patree, strings[i], &match);
 		if (st) {
 			return test_fail("Failed to find `%s'\n", strings[i]);
 		}
@@ -100,8 +100,8 @@ main(int argc, char** argv)
 	};
 	const size_t n_not_indexed = sizeof(not_indexed) / sizeof(char*);
 	for (size_t i = 0; i < n_not_indexed; ++i) {
-		char*     match = NULL;
-		ZixStatus st    = zix_patree_find(patree, not_indexed[i], &match);
+		const char* match = NULL;
+		ZixStatus   st    = zix_patree_find(patree, not_indexed[i], &match);
 		if (st != ZIX_STATUS_NOT_FOUND) {
 			return test_fail("Unexpectedly found `%s'\n", not_indexed[i]);
 		}

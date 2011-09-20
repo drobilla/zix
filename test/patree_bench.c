@@ -146,7 +146,7 @@ main(int argc, char** argv)
 		search_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
 			const size_t index = rand() % n;
-			char* match = NULL;
+			const char* match = NULL;
 			if (zix_patree_find(patree, strings[index], &match)) {
 				return test_fail("Patree: Failed to find `%s'\n", strings[index]);
 			}
