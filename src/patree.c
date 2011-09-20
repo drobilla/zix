@@ -26,15 +26,30 @@
 #include "zix/common.h"
 #include "zix/patree.h"
 
+//#undef __SSE4_2__
+
+#ifdef __SSE4_2__
+#include <smmintrin.h>
+#warning Using SSE 4.2
+#else
+#warning SSE 4.2 disabled
+#endif
+
 typedef uint_fast8_t n_edges_t;
 
+struct _ZixPatreeNode;
+
+typedef struct {
+	struct _ZixPatreeNode* child;
+	char                   first_char;
+} ZixChildRef;
+
 typedef struct _ZixPatreeNode {
-	char*                  label_first;       /* Start of incoming label */
-	char*                  label_last;        /* End of incoming label */
-	char*                  str;               /* String stored at this node */
-	char*                  children_index;
-	struct _ZixPatreeNode* children;          /* Children of this node */
-	n_edges_t              num_children;      /* Number of outgoing edges */
+	char*       label_first;   /* Start of incoming label */
+	char*       label_last;    /* End of incoming label */
+	char*       str;           /* String stored at this node */
+	n_edges_t   num_children;  /* Number of outgoing edges */
+	ZixChildRef children[];    /* Children of this node */
 } ZixPatreeNode;
 
 struct _ZixPatree {
@@ -62,7 +77,7 @@ zix_patree_print_rec(ZixPatreeNode* node, FILE* fd)
 
 
 	for (n_edges_t i = 0; i < node->num_children; ++i) {
-		ZixPatreeNode* const child = &node->children[i];
+		ZixPatreeNode* const child = node->children[i].child;
 		zix_patree_print_rec(child, fd);
 		fprintf(fd, "\t\"%p\" -> \"%p\" ;\n", (void*)node, (void*)child);
 	}
@@ -95,9 +110,9 @@ zix_patree_free_rec(ZixPatreeNode* n)
 {
 	if (n) {
 		for (n_edges_t i = 0; i < n->num_children; ++i) {
-			zix_patree_free_rec(&n->children[i]);
+			zix_patree_free_rec(n->children[i].child);
 		}
-		free(n->children);
+		free(n);
 	}
 }
 
@@ -106,7 +121,6 @@ void
 zix_patree_free(ZixPatree* t)
 {
 	zix_patree_free_rec(t->root);
-	free(t->root);
 	free(t);
 }
 
@@ -120,7 +134,7 @@ static bool
 patree_find_edge(const ZixPatreeNode* n, const char c, n_edges_t* const index)
 {
 	for (n_edges_t i = 0; i < n->num_children; ++i) {
-		if (n->children_index[i] == c) {
+		if (n->children[i].first_char == c) {
 			*index = i;
 			return true;
 		}
@@ -129,96 +143,109 @@ patree_find_edge(const ZixPatreeNode* n, const char c, n_edges_t* const index)
 }
 
 static void
-patree_add_edge(ZixPatreeNode* n,
-                char*          str,
-                char*          first,
-                char*          last)
+patree_add_edge(ZixPatreeNode** n_ptr,
+                char*           str,
+                char*           first,
+                char*           last)
 {
+	ZixPatreeNode* n = *n_ptr;
+
 	/* Interesting performance note: building a sorted array here makes
 	   the search considerably slower, regardless of whether binary search
 	   or the existing search algorithm is used.  I suppose moving things
 	   around blows the cache for child->children which trumps everything.
 	*/
 	assert(last >= first);
-	n->children = realloc(n->children,
-	                      (n->num_children + 1) * sizeof(ZixPatreeNode));
-	n->children[n->num_children].label_first      = first;
-	n->children[n->num_children].label_last       = last;
-	n->children[n->num_children].str              = str;
-	n->children[n->num_children].children         = NULL;
-	n->children[n->num_children].children_index   = NULL;
-	n->children[n->num_children].num_children     = 0;
 
-	n->children_index = realloc(n->children_index, (n->num_children + 1));
-	n->children_index[n->num_children] = first[0];
+	ZixPatreeNode* const child = malloc(sizeof(ZixPatreeNode));
+	child->label_first       = first;
+	child->label_last        = last;
+	child->str               = str;
+	child->num_children      = 0;
 
 	++n->num_children;
+	n = realloc(n, sizeof(ZixPatreeNode) + (n->num_children * sizeof(ZixChildRef)));
+	n->children[n->num_children - 1].first_char = first[0];
+	n->children[n->num_children - 1].child      = child;
+
+	*n_ptr = n;
+
+	for (n_edges_t i = 0; i < n->num_children; ++i) {
+		assert(n->children[i].first_char != '\0');
+	}
+	for (n_edges_t i = 0; i < child->num_children; ++i) {
+		assert(child->children[i].first_char != '\0');
+	}
 }
 
 /* Split an outgoing edge (to a child) at the given index */
 static void
-patree_split_edge(ZixPatreeNode* child,
-                  size_t         index)
+patree_split_edge(ZixPatreeNode** child_ptr,
+                  size_t          index)
 {
-	ZixPatreeNode* const children     = child->children;
-	const n_edges_t      num_children = child->num_children;
+	ZixPatreeNode* child = *child_ptr;
 
-	char* const first = child->label_first + index;
-	char* const last  = child->label_last;
-	assert(last >= first);
+	const size_t grandchild_size = sizeof(ZixPatreeNode)
+		+ (child->num_children * sizeof(ZixChildRef));
 
-	child->children                     = malloc(sizeof(ZixPatreeNode));
-	child->children[0].children         = children;
-	child->children[0].children_index   = child->children_index;
-	child->children[0].num_children     = num_children;
-	child->children[0].str              = child->str;
-	child->children[0].label_first      = first;
-	child->children[0].label_last       = last;
+	ZixPatreeNode* const grandchild = malloc(grandchild_size);
+	memcpy(grandchild, child, grandchild_size);
+	grandchild->label_first = child->label_first + index;
 
-	child->children_index = malloc(1);
-	child->children_index[0] = first[0];
-	
+	child = realloc(child, sizeof(ZixPatreeNode) + sizeof(ZixChildRef));
+	child->children[0].first_char = grandchild->label_first[0];
+	child->children[0].child = grandchild;
 	child->label_last = child->label_first + (index - 1);  // chop end
 
 	child->num_children = 1;
 
 	child->str = NULL;
+
+	*child_ptr = child;
+
+	for (n_edges_t i = 0; i < child->num_children; ++i) {
+		assert(child->children[i].first_char != '\0');
+	}
+	for (n_edges_t i = 0; i < grandchild->num_children; ++i) {
+		assert(grandchild->children[i].first_char != '\0');
+	}
 }
 
 static ZixStatus
-patree_insert_internal(ZixPatreeNode* n, char* str, char* first, char* last)
+patree_insert_internal(ZixPatreeNode** n_ptr, char* str, char* first, char* last)
 {
 	n_edges_t      child_i;
 	assert(first <= last);
 
+	ZixPatreeNode* n = *n_ptr;
 	if (patree_find_edge(n, *first, &child_i)) {
-		ZixPatreeNode* child       = &n->children[child_i];
-		char* const    label_first = child->label_first;
-		char* const    label_last  = child->label_last;
-		size_t         split_i     = 0;
-		const size_t   label_len   = label_last - label_first + 1;
-		const size_t   s_len       = last - first + 1;
-		const size_t   max_len     = (s_len < label_len) ? s_len : label_len;
+		ZixPatreeNode** child_ptr   = &n->children[child_i].child;
+		ZixPatreeNode*  child       = *child_ptr;
+		char* const     label_first = child->label_first;
+		char* const     label_last  = child->label_last;
+		size_t          split_i     = 0;
+		const size_t    label_len   = label_last - label_first + 1;
+		const size_t    s_len       = last - first + 1;
+		const size_t    max_len     = (s_len < label_len) ? s_len : label_len;
 
 		while (split_i < max_len && first[split_i] == label_first[split_i]) {
 			++split_i;
 		}
-		child = n->children + child_i;
 
 		if (label_len < s_len) {
 			if (split_i == label_len) {
-				return patree_insert_internal(child, str, first + label_len, last);
+				return patree_insert_internal(child_ptr, str, first + label_len, last);
 			} else {
-				patree_split_edge(child, split_i);
-				return patree_insert_internal(child, str, first + split_i, last);
+				patree_split_edge(child_ptr, split_i);
+				return patree_insert_internal(child_ptr, str, first + split_i, last);
 			}
 		} else if (label_len != split_i) {
-			patree_split_edge(child, split_i);
+			patree_split_edge(child_ptr, split_i);
 			if (split_i != s_len) {
-				patree_add_edge(child, str, first + split_i, last);
+				patree_add_edge(child_ptr, str, first + split_i, last);
 			} else {
-				assert(!child->str);
-				child->str = str;
+				assert(!(*child_ptr)->str);
+				(*child_ptr)->str = str;
 			}
 			return ZIX_STATUS_SUCCESS;
 		} else if (label_len == s_len && !child->str) {
@@ -227,7 +254,7 @@ patree_insert_internal(ZixPatreeNode* n, char* str, char* first, char* last)
 			return ZIX_STATUS_EXISTS;
 		}
 	} else {
-		patree_add_edge(n, str, first, last);
+		patree_add_edge(n_ptr, str, first, last);
 	}
 
 	return ZIX_STATUS_SUCCESS;
@@ -239,8 +266,43 @@ zix_patree_insert(ZixPatree* t, const char* str)
 {
 	const size_t len = strlen(str);
 	// FIXME: awful casts
-	return patree_insert_internal(t->root, (char*)str, (char*)str, (char*)str + len - 1);
+	return patree_insert_internal(&t->root, (char*)str, (char*)str, (char*)str + len - 1);
 }
+
+int
+change_index_c(const char* a, const char* b, size_t len)
+{
+	for (size_t i = 0; i < len; ++i) {
+		if (a[i] != b[i]) {
+			return i;
+		}
+	}
+	return len;
+}
+
+#ifdef __SSE4_2__
+int
+change_index_sse(const char* a, const char* b, const size_t len)
+{
+	int ret;
+	for (size_t i = 0; i < len; i += sizeof(__m128i)) {
+		const __m128i  r    = _mm_loadu_si128((const __m128i*)(a + i));
+		const __m128i* s    = (const __m128i*)(b + i);
+		const int     index = _mm_cmpistri(
+			r, *s, _SIDD_SBYTE_OPS|_SIDD_CMP_EQUAL_EACH|_SIDD_NEGATIVE_POLARITY);
+
+		if (index != sizeof(__m128i)) {
+			int ret = i + index;
+			if (ret > len) {
+				ret = len;
+			}
+			return ret;
+		}
+	}
+
+	return len;
+}
+#endif
 
 ZIX_API
 ZixStatus
@@ -249,26 +311,44 @@ zix_patree_find(const ZixPatree* t, const char* const str, char** match)
 	ZixPatreeNode* n = t->root;
 	n_edges_t      child_i;
 
-	register const char* p = str;
+	const char* p = str;
 
 	while (patree_find_edge(n, p[0], &child_i)) {
 		assert(child_i <= n->num_children);
-		ZixPatreeNode* const child = &n->children[child_i];
+		ZixPatreeNode* const child     = n->children[child_i].child;
+		char* const          child_str = child->str;
 
 		/* Prefix compare search string and label */
-		register const char*       l     = child->label_first;
-		register const char* const l_end = child->label_last;
+		const char*       l     = child->label_first;
+		const char* const l_end = child->label_last;
+		const size_t      len   = l_end - l + 1;
+#ifdef __SSE4_2__
+		int change_index;
+		if (len >= sizeof(__m128i)) {
+			change_index = change_index_sse(p, l, len);
+		} else {
+			change_index = change_index_c(p, l, len);
+		}
+#else
+		int change_index = change_index_c(p, l, len);
+#endif
+		
+		l += change_index;
+		p += change_index;
+
+#if 0
 		while (l <= l_end) {
 			if (*l++ != *p++) {
 				return ZIX_STATUS_NOT_FOUND;
 			}
 		}
+#endif
 
 		if (!*p) {
 			/* Reached end of search string */
 			if (l == l_end + 1) {
 				/* Reached end of label string as well, match */
-				*match = child->str;
+				*match = child_str;
 				return *match ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
 			} else {
 				/* Label string is longer, no match (prefix match) */
