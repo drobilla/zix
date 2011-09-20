@@ -32,9 +32,9 @@ typedef struct _ZixPatreeNode {
 	char*                  label_first;       /* Start of incoming label */
 	char*                  label_last;        /* End of incoming label */
 	char*                  str;               /* String stored at this node */
+	char*                  children_index;
 	struct _ZixPatreeNode* children;          /* Children of this node */
 	n_edges_t              num_children;      /* Number of outgoing edges */
-	char                   label_first_char;  /* First char of label_first */
 } ZixPatreeNode;
 
 struct _ZixPatree {
@@ -120,7 +120,7 @@ static bool
 patree_find_edge(const ZixPatreeNode* n, const char c, n_edges_t* const index)
 {
 	for (n_edges_t i = 0; i < n->num_children; ++i) {
-		if (n->children[i].label_first_char == c) {
+		if (n->children_index[i] == c) {
 			*index = i;
 			return true;
 		}
@@ -146,8 +146,12 @@ patree_add_edge(ZixPatreeNode* n,
 	n->children[n->num_children].label_last       = last;
 	n->children[n->num_children].str              = str;
 	n->children[n->num_children].children         = NULL;
+	n->children[n->num_children].children_index   = NULL;
 	n->children[n->num_children].num_children     = 0;
-	n->children[n->num_children].label_first_char = first[0];
+
+	n->children_index = realloc(n->children_index, (n->num_children + 1));
+	n->children_index[n->num_children] = first[0];
+
 	++n->num_children;
 }
 
@@ -165,12 +169,15 @@ patree_split_edge(ZixPatreeNode* child,
 
 	child->children                     = malloc(sizeof(ZixPatreeNode));
 	child->children[0].children         = children;
+	child->children[0].children_index   = child->children_index;
 	child->children[0].num_children     = num_children;
 	child->children[0].str              = child->str;
 	child->children[0].label_first      = first;
 	child->children[0].label_last       = last;
-	child->children[0].label_first_char = first[0];
 
+	child->children_index = malloc(1);
+	child->children_index[0] = first[0];
+	
 	child->label_last = child->label_first + (index - 1);  // chop end
 
 	child->num_children = 1;
@@ -243,8 +250,6 @@ zix_patree_find(const ZixPatree* t, const char* const str, char** match)
 	n_edges_t      child_i;
 
 	register const char* p = str;
-
-	*match = NULL;
 
 	while (*p != '\0') {
 		if (patree_find_edge(n, p[0], &child_i)) {

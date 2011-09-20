@@ -52,7 +52,7 @@ main(int argc, char** argv)
 		return test_fail("Failed to open file %s\n", file);
 	}
 
-	size_t max_n_strings = 500000;
+	size_t max_n_strings = 100000;
 
 	/* Read input strings */
 	char** strings      = NULL;
