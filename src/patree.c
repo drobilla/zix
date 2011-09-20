@@ -251,42 +251,38 @@ zix_patree_find(const ZixPatree* t, const char* const str, char** match)
 
 	register const char* p = str;
 
-	while (*p != '\0') {
-		if (patree_find_edge(n, p[0], &child_i)) {
-			assert(child_i <= n->num_children);
-			ZixPatreeNode* const child = &n->children[child_i];
+	while (patree_find_edge(n, p[0], &child_i)) {
+		assert(child_i <= n->num_children);
+		ZixPatreeNode* const child = &n->children[child_i];
 
-			/* Prefix compare search string and label */
-			register const char*       l     = child->label_first;
-			register const char* const l_end = child->label_last;
-			while (l <= l_end) {
-				if (*l++ != *p++) {
-					return ZIX_STATUS_NOT_FOUND;
-				}
+		/* Prefix compare search string and label */
+		register const char*       l     = child->label_first;
+		register const char* const l_end = child->label_last;
+		while (l <= l_end) {
+			if (*l++ != *p++) {
+				return ZIX_STATUS_NOT_FOUND;
 			}
+		}
 
-			if (!*p) {
-				/* Reached end of search string */
-				if (l == l_end + 1) {
-					/* Reached end of label string as well, match */
-					*match = child->str;
-					return *match ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
-				} else {
-					/* Label string is longer, no match (prefix match) */
-					return ZIX_STATUS_NOT_FOUND;
-				}
+		if (!*p) {
+			/* Reached end of search string */
+			if (l == l_end + 1) {
+				/* Reached end of label string as well, match */
+				*match = child->str;
+				return *match ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
 			} else {
-				/* Didn't reach end of search string */
-				if (patree_is_leaf(n)) {
-					/* Hit leaf early, no match */
-					return ZIX_STATUS_NOT_FOUND;
-				} else {
-					/* Match at this node, continue search downwards (or match) */
-					n  = child;
-				}
+				/* Label string is longer, no match (prefix match) */
+				return ZIX_STATUS_NOT_FOUND;
 			}
 		} else {
-			return ZIX_STATUS_NOT_FOUND;
+			/* Didn't reach end of search string */
+			if (patree_is_leaf(n)) {
+				/* Hit leaf early, no match */
+				return ZIX_STATUS_NOT_FOUND;
+			} else {
+				/* Match at this node, continue search downwards (or match) */
+				n  = child;
+			}
 		}
 	}
 
