@@ -92,6 +92,13 @@ zix_patree_print_dot(const ZixPatree* t, FILE* fd)
 	fprintf(fd, "}\n");
 }
 
+static inline ZixPatreeNode*
+realloc_node(ZixPatreeNode* n, int num_children)
+{
+	return (ZixPatreeNode*)realloc(n, sizeof(ZixPatreeNode)
+	                               + num_children * sizeof(ZixChildRef));
+}
+
 ZIX_API
 ZixPatree*
 zix_patree_new(void)
@@ -99,7 +106,7 @@ zix_patree_new(void)
 	ZixPatree* t = (ZixPatree*)malloc(sizeof(ZixPatree));
 	memset(t, '\0', sizeof(struct _ZixPatree));
 
-	t->root = (ZixPatreeNode*)malloc(sizeof(ZixPatreeNode));
+	t->root = realloc_node(NULL, 0);
 	memset(t->root, '\0', sizeof(ZixPatreeNode));
 
 	return t;
@@ -160,14 +167,14 @@ patree_add_edge(ZixPatreeNode** n_ptr,
 	*/
 	assert(last >= first);
 
-	ZixPatreeNode* const child = malloc(sizeof(ZixPatreeNode));
+	ZixPatreeNode* const child = realloc_node(NULL, 0);
 	child->label_first       = first;
 	child->label_last        = last;
 	child->str               = str;
 	child->num_children      = 0;
 
 	++n->num_children;
-	n = realloc(n, sizeof(ZixPatreeNode) + (n->num_children * sizeof(ZixChildRef)));
+	n = realloc_node(n, n->num_children);
 	n->children[n->num_children - 1].first_char = first[0];
 	n->children[n->num_children - 1].child      = child;
 
@@ -191,11 +198,11 @@ patree_split_edge(ZixPatreeNode** child_ptr,
 	const size_t grandchild_size = sizeof(ZixPatreeNode)
 		+ (child->num_children * sizeof(ZixChildRef));
 
-	ZixPatreeNode* const grandchild = malloc(grandchild_size);
+	ZixPatreeNode* const grandchild = realloc_node(NULL, child->num_children);
 	memcpy(grandchild, child, grandchild_size);
 	grandchild->label_first = child->label_first + index;
 
-	child = realloc(child, sizeof(ZixPatreeNode) + sizeof(ZixChildRef));
+	child = realloc_node(child, 1);
 	child->children[0].first_char = grandchild->label_first[0];
 	child->children[0].child = grandchild;
 	child->label_last = child->label_first + (index - 1);  // chop end
