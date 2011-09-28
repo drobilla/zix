@@ -57,8 +57,8 @@ test_fail()
 static int
 stress(int test_num, size_t n_elems)
 {
-	intptr_t    r;
-	ZixTreeIter ti;
+	intptr_t     r;
+	ZixTreeIter* ti;
 
 	ZixTree* t = zix_tree_new(true, int_cmp, NULL);
 
@@ -72,9 +72,9 @@ stress(int test_num, size_t n_elems)
 			fprintf(stderr, "Insert failed\n");
 			return test_fail();
 		}
-		if ((intptr_t)zix_tree_get_data(ti) != r) {
+		if ((intptr_t)zix_tree_get(ti) != r) {
 			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
-			        (intptr_t)zix_tree_get_data(ti), r);
+			        (intptr_t)zix_tree_get(ti), r);
 			return test_fail();
 		}
 	}
@@ -88,9 +88,9 @@ stress(int test_num, size_t n_elems)
 			fprintf(stderr, "Find failed\n");
 			return test_fail();
 		}
-		if ((intptr_t)zix_tree_get_data(ti) != r) {
+		if ((intptr_t)zix_tree_get(ti) != r) {
 			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
-			        (intptr_t)zix_tree_get_data(ti), r);
+			        (intptr_t)zix_tree_get(ti), r);
 			return test_fail();
 		}
 	}
@@ -100,12 +100,30 @@ stress(int test_num, size_t n_elems)
 	// Iterate over all elements
 	size_t i = 0;
 	intptr_t last = -1;
-	for (ZixTreeIter iter = zix_tree_begin(t);
+	for (ZixTreeIter* iter = zix_tree_begin(t);
 	     !zix_tree_iter_is_end(iter);
 	     iter = zix_tree_iter_next(iter), ++i) {
 		r = ith_elem(test_num, n_elems, i);
-		const intptr_t iter_data = (intptr_t)zix_tree_get_data(iter);
+		const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
 		if (iter_data < last) {
+			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %zu)\n",
+			        iter_data, last);
+			return test_fail();
+		}
+		last = iter_data;
+	}
+
+	srand(seed);
+
+	// Iterate over all elements backwards
+	i = 0;
+	last = INTPTR_MAX;
+	for (ZixTreeIter* iter = zix_tree_rbegin(t);
+	     !zix_tree_iter_is_rend(iter);
+	     iter = zix_tree_iter_prev(iter), ++i) {
+		r = ith_elem(test_num, n_elems, i);
+		const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
+		if (iter_data > last) {
 			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %zu)\n",
 			        iter_data, last);
 			return test_fail();
@@ -118,7 +136,7 @@ stress(int test_num, size_t n_elems)
 	// Delete all elements
 	for (size_t i = 0; i < n_elems; i++) {
 		r = ith_elem(test_num, n_elems, i);
-		ZixTreeIter item;
+		ZixTreeIter* item;
 		if (zix_tree_find(t, (void*)r, &item) != ZIX_STATUS_SUCCESS) {
 			fprintf(stderr, "Failed to find item to remove\n");
 			return test_fail();

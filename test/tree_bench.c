@@ -60,7 +60,7 @@ bench_zix_tree(size_t n_elems,
                FILE* insert_dat, FILE* search_dat, FILE* iter_dat, FILE* del_dat)
 {
 	intptr_t     r;
-	ZixTreeIter ti;
+	ZixTreeIter* ti;
 
 	ZixTree* t = zix_tree_new(true, int_cmp, NULL);
 
@@ -86,7 +86,7 @@ bench_zix_tree(size_t n_elems,
 		if (zix_tree_find(t, (void*)r, &ti)) {
 			return test_fail("Failed to find %zu\n", r);
 		}
-		if ((intptr_t)zix_tree_get_data(ti) != r) {
+		if ((intptr_t)zix_tree_get(ti) != r) {
 			return test_fail("Failed to get %zu\n", r);
 		}
 	}
@@ -96,10 +96,10 @@ bench_zix_tree(size_t n_elems,
 
 	// Iterate over all elements
 	struct timespec iter_start = bench_start();
-	for (ZixTreeIter iter = zix_tree_begin(t);
+	for (ZixTreeIter* iter = zix_tree_begin(t);
 	     !zix_tree_iter_is_end(iter);
 	     iter = zix_tree_iter_next(iter)) {
-		zix_tree_get_data(iter);
+		zix_tree_get(iter);
 	}
 	fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
 
@@ -109,7 +109,8 @@ bench_zix_tree(size_t n_elems,
 	struct timespec del_start = bench_start();
 	for (size_t i = 0; i < n_elems; i++) {
 		r = rand();
-		ZixTreeIter item;
+		ZixTreeIter*
+			item;
 		if (zix_tree_find(t, (void*)r, &item)) {
 			return test_fail("Failed to find %zu to delete\n", r);
 		}
