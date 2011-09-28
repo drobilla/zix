@@ -17,6 +17,8 @@
 #ifndef ZIX_COMMON_H
 #define ZIX_COMMON_H
 
+#include <stdbool.h>
+
 /**
    @addtogroup zix
    @{
@@ -55,7 +57,11 @@ typedef enum {
 typedef int (*ZixComparator)(const void* a, const void* b, void* user_data);
 
 /**
-   @}
+   Function for testing equality of two elements.
+*/
+typedef bool (*ZixEqualFunc)(const void* a, const void* b);
+   
+/**@}
 */
 
 #endif  /* ZIX_COMMON_H */

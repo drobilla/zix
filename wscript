@@ -63,6 +63,7 @@ def configure(conf):
     print('')
 
 tests = [
+    'hash_test',
     'patree_test',
     'ring_test',
     'sorted_array_test',
@@ -79,6 +80,7 @@ def build(bld):
 
     lib_source = '''
         src/fat_patree.c
+        src/hash.c
         src/patree.c
         src/ring.c
         src/sorted_array.c
