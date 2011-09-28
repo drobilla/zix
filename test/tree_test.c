@@ -60,7 +60,7 @@ stress(int test_num, size_t n_elems)
 	intptr_t     r;
 	ZixTreeIter* ti;
 
-	ZixTree* t = zix_tree_new(true, int_cmp, NULL);
+	ZixTree* t = zix_tree_new(true, int_cmp, NULL, NULL);
 
 	srand(seed);
 
@@ -77,6 +77,12 @@ stress(int test_num, size_t n_elems)
 			        (intptr_t)zix_tree_get(ti), r);
 			return test_fail();
 		}
+	}
+
+	// Ensure tree size is correct
+	if (zix_tree_size(t) != n_elems) {
+		fprintf(stderr, "Tree size %zu != %zu\n", zix_tree_size(t), n_elems);
+		return test_fail();
 	}
 
 	srand(seed);
@@ -144,6 +150,35 @@ stress(int test_num, size_t n_elems)
 		if (zix_tree_remove(t, item)) {
 			fprintf(stderr, "Error removing item\n");
 		}
+	}
+
+	// Ensure the tree is empty
+	if (zix_tree_size(t) != 0) {
+		fprintf(stderr, "Tree size %zu != 0\n", zix_tree_size(t));
+		return test_fail();
+	}
+
+	srand(seed);
+
+	// Insert n_elems elements again (to test non-empty destruction)
+	for (size_t i = 0; i < n_elems; ++i) {
+		r = ith_elem(test_num, n_elems, i);
+		int status = zix_tree_insert(t, (void*)r, &ti);
+		if (status) {
+			fprintf(stderr, "Insert failed\n");
+			return test_fail();
+		}
+		if ((intptr_t)zix_tree_get(ti) != r) {
+			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			        (intptr_t)zix_tree_get(ti), r);
+			return test_fail();
+		}
+	}
+
+	// Ensure tree size is correct
+	if (zix_tree_size(t) != n_elems) {
+		fprintf(stderr, "Tree size %zu != %zu\n", zix_tree_size(t), n_elems);
+		return test_fail();
 	}
 
 	zix_tree_free(t);

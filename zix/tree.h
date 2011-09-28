@@ -18,6 +18,7 @@
 #define ZIX_TREE_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #include "zix/common.h"
 
@@ -46,13 +47,22 @@ typedef struct ZixTreeNodeImpl ZixTreeIter;
    Create a new (empty) tree.
 */
 ZixTree*
-zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data);
+zix_tree_new(bool           allow_duplicates,
+             ZixComparator  cmp,
+             void*          cmp_data,
+             ZixDestroyFunc destroy);
 
 /**
    Free @a t.
 */
 void
 zix_tree_free(ZixTree* t);
+
+/**
+   Return the number of elements in @a t.
+*/
+size_t
+zix_tree_size(ZixTree* t);
 
 /**
    Insert the element @a e into @a t and point @a ti at the new element.

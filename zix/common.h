@@ -60,6 +60,11 @@ typedef int (*ZixComparator)(const void* a, const void* b, void* user_data);
    Function for testing equality of two elements.
 */
 typedef bool (*ZixEqualFunc)(const void* a, const void* b);
+
+/**
+   Function to destroy an element.
+*/
+typedef void (*ZixDestroyFunc)(const void* ptr);
    
 /**@}
 */

@@ -27,10 +27,12 @@
 typedef struct ZixTreeNodeImpl ZixTreeNode;
 
 struct ZixTreeImpl {
-	ZixTreeNode*  root;
-	ZixComparator cmp;
-	void*         cmp_data;
-	bool          allow_duplicates;
+	ZixTreeNode*   root;
+	ZixDestroyFunc destroy;
+	ZixComparator  cmp;
+	void*          cmp_data;
+	size_t         size;
+	bool           allow_duplicates;
 };
 
 struct ZixTreeNodeImpl {
@@ -67,22 +69,30 @@ struct ZixTreeNodeImpl {
 
 ZIX_API
 ZixTree*
-zix_tree_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data)
+zix_tree_new(bool           allow_duplicates,
+             ZixComparator  cmp,
+             void*          cmp_data,
+             ZixDestroyFunc destroy)
 {
 	ZixTree* t = malloc(sizeof(ZixTree));
 	t->root             = NULL;
+	t->destroy          = destroy;
 	t->cmp              = cmp;
 	t->cmp_data         = cmp_data;
+	t->size             = 0;
 	t->allow_duplicates = allow_duplicates;
 	return t;
 }
 
 static void
-zix_tree_free_rec(ZixTreeNode* n)
+zix_tree_free_rec(ZixTree* t, ZixTreeNode* n)
 {
 	if (n) {
-		zix_tree_free_rec(n->left);
-		zix_tree_free_rec(n->right);
+		zix_tree_free_rec(t, n->left);
+		zix_tree_free_rec(t, n->right);
+		if (t->destroy) {
+			t->destroy(n->data);
+		}
 		free(n);
 	}
 }
@@ -91,9 +101,14 @@ ZIX_API
 void
 zix_tree_free(ZixTree* t)
 {
-	zix_tree_free_rec(t->root);
-
+	zix_tree_free_rec(t, t->root);
 	free(t);
+}
+
+size_t
+zix_tree_size(ZixTree* t)
+{
+	return t->size;
 }
 
 static void
@@ -130,8 +145,6 @@ rotate(ZixTreeNode* p, ZixTreeNode* q)
 
 	p->parent = q;
 }
-
-
 
 /**
  * Rotate left about @a p.
@@ -413,6 +426,8 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 
 	DUMP(t);
 
+	++t->size;
+
 #ifdef ZIX_TREE_VERIFY
 	if (!verify(t, t->root)) {
 		return ZIX_STATUS_ERROR;
@@ -435,7 +450,12 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 
 	if ((n == t->root) && !n->left && !n->right) {
 		t->root = NULL;
+		if (t->destroy) {
+			t->destroy(n->data);
+		}
 		free(n);
+		--t->size;
+		assert(t->size == 0);
 		return ZIX_STATUS_SUCCESS;
 	}
 
@@ -559,7 +579,12 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 
 	DUMP(t);
 
+	if (t->destroy) {
+		t->destroy(n->data);
+	}
 	free(n);
+
+	--t->size;
 
 #ifdef ZIX_TREE_VERIFY
 	if (!verify(t, t->root)) {

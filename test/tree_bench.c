@@ -62,7 +62,7 @@ bench_zix_tree(size_t n_elems,
 	intptr_t     r;
 	ZixTreeIter* ti;
 
-	ZixTree* t = zix_tree_new(true, int_cmp, NULL);
+	ZixTree* t = zix_tree_new(true, int_cmp, NULL, NULL);
 
 	srand(seed);
 
