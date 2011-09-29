@@ -124,7 +124,7 @@ main(int argc, char** argv)
 		if (st != ZIX_STATUS_NOT_FOUND) {
 			return test_fail("Unexpectedly removed `%s' twice\n", strings[i]);
 		}
-		
+
 		// Check to ensure remaining strings are still present
 		for (size_t j = i + 1; j < n_strings; ++j) {
 			const char* match = (const char*)zix_hash_find(hash, strings[j]);

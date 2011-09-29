@@ -337,7 +337,7 @@ zix_patree_find(const ZixPatree* t, const char* const str, const char** match)
 #else
 		int change_index = change_index_c(p, l, len);
 #endif
-		
+
 		l += change_index;
 		p += change_index;
 

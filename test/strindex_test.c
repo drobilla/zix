@@ -53,7 +53,7 @@ main(int argc, char** argv)
 			}
 		}
 	}
-	
+
 	zix_strindex_free(strindex);
 	return 0;
 }
