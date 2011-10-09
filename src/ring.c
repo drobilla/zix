@@ -153,7 +153,7 @@ peek_internal(const ZixRing* ring, uint32_t r, uint32_t w,
 	} else {
 		const uint32_t first_size = ring->size - r;
 		memcpy(dst, &ring->buf[r], first_size);
-		memcpy(dst, &ring->buf[0], size - first_size);
+		memcpy((char*)dst + first_size, &ring->buf[0], size - first_size);
 	}
 
 	return size;

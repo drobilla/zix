@@ -23,7 +23,7 @@
 
 #include "zix/ring.h"
 
-#define MSG_SIZE 4
+#define MSG_SIZE 20
 
 ZixRing* ring       = 0;
 size_t   n_writes   = 0;
