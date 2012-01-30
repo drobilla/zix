@@ -66,6 +66,7 @@ tests = [
     'hash_test',
     'patree_test',
     'ring_test',
+    'sem_test',
     'sorted_array_test',
     'strindex_test',
     'tree_test'
