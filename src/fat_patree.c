@@ -17,7 +17,6 @@
 #define _XOPEN_SOURCE 500
 
 #include <assert.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,15 +84,16 @@ patree_find_edge(ZixFatPatreeNode* n, uint8_t c, n_edges_t* index)
 
 static void
 patree_add_edge(ZixFatPatreeNode* n,
-                char*          str,
-                char*          first,
-                char*          last)
+                char*             str,
+                char*             first,
+                char*             last)
 {
 	assert(last >= first);
 	const int index = (uint8_t)first[0];
 	assert(!n->children[index]);
 
-	ZixFatPatreeNode* new_node = malloc(sizeof(ZixFatPatreeNode));
+	ZixFatPatreeNode* new_node = (ZixFatPatreeNode*)malloc(
+		sizeof(ZixFatPatreeNode));
 	n->children[index] = new_node;
 	n->children[index]->label_first = first;
 	n->children[index]->label_last  = last;
@@ -112,7 +112,8 @@ patree_split_edge(ZixFatPatreeNode* child,
 	char* const last  = child->label_last;
 	assert(last >= first);
 
-	ZixFatPatreeNode* new_node = malloc(sizeof(ZixFatPatreeNode));
+	ZixFatPatreeNode* new_node = (ZixFatPatreeNode*)malloc(
+		sizeof(ZixFatPatreeNode));
 	new_node->label_first  = first;
 	new_node->label_last   = last;
 	new_node->str          = child->str;

@@ -21,6 +21,17 @@
 
 #include "zix/common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+   @addtogroup zix
+   @{
+   @name Ring
+   @{
+*/
+
 /**
    A lock-free ring buffer.
 
@@ -106,5 +117,14 @@ zix_ring_skip(ZixRing* ring, uint32_t size);
 */
 uint32_t
 zix_ring_write(ZixRing* ring, const void* src, uint32_t size);
+
+/**
+   @}
+   @}
+*/
+
+#ifdef __cplusplus
+}  /* extern "C" */
+#endif
 
 #endif  /* ZIX_RING_H */

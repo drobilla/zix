@@ -20,15 +20,25 @@
 
 #ifdef HAVE_MLOCK
 #    include <sys/mman.h>
+#    define ZIX_MLOCK(ptr, size) mlock((ptr), (size))
+#elif defined(_WIN32)
+#    include <windows.h>
+#    define ZIX_MLOCK(ptr, size) VirtualLock((ptr), (size))
+#else
+#    pragma message("warning: No memory locking, possible RT violations")
+#    define ZIX_MLOCK(ptr, size)
 #endif
 
 #if defined(__APPLE__)
 #    include <libkern/OSAtomic.h>
 #    define ZIX_FULL_BARRIER() OSMemoryBarrier()
+#elif defined(_WIN32)
+#    include <windows.h>
+#    define ZIX_FULL_BARRIER() MemoryBarrier()
 #elif (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
 #    define ZIX_FULL_BARRIER() __sync_synchronize()
 #else
-#    warning Memory barriers unsupported, possible bugs on SMP systems
+#    pragma message("warning: No memory barriers, possible SMP bugs")
 #    define ZIX_FULL_BARRIER()
 #endif
 
@@ -68,7 +78,7 @@ zix_ring_new(uint32_t size)
 	ring->read_head  = 0;
 	ring->size       = next_power_of_two(size);
 	ring->size_mask  = ring->size - 1;
-	ring->buf        = malloc(ring->size);
+	ring->buf        = (char*)malloc(ring->size);
 	return ring;
 }
 
@@ -82,12 +92,8 @@ zix_ring_free(ZixRing* ring)
 void
 zix_ring_mlock(ZixRing* ring)
 {
-#ifdef HAVE_MLOCK
-	mlock(ring, sizeof(ZixRing));
-	mlock(ring->buf, ring->size);
-#else
-#    warning Memory locking (via mlock) unsupported
-#endif
+	ZIX_MLOCK(ring, sizeof(ZixRing));
+	ZIX_MLOCK(ring->buf, ring->size);
 }
 
 void

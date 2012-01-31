@@ -17,7 +17,6 @@
 #define _XOPEN_SOURCE 500
 
 #include <assert.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,7 +60,7 @@ zix_patree_print_rec(ZixPatreeNode* node, FILE* fd)
 {
 	if (node->label_first) {
 		size_t edge_label_len = node->label_last - node->label_first + 1;
-		char*  edge_label     = malloc(edge_label_len + 1);
+		char*  edge_label     = (char*)malloc(edge_label_len + 1);
 		strncpy(edge_label, node->label_first, edge_label_len);
 		fprintf(fd, "\t\"%p\" [label=<"
 		        "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">"

@@ -18,8 +18,6 @@
 #ifndef ZIX_SORTED_ARRAY_H
 #define ZIX_SORTED_ARRAY_H
 
-#include <stdbool.h>
-
 #include "zix/common.h"
 
 #ifdef __cplusplus

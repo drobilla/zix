@@ -36,11 +36,14 @@ def options(opt):
                    help="Build benchmarks")
 
 def configure(conf):
+    conf.load('compiler_c')
     autowaf.configure(conf)
     autowaf.display_header('Zix Configuration')
 
-    conf.load('compiler_c')
-    conf.env.append_value('CFLAGS', '-std=c99')
+    if conf.env['MSVC_COMPILER']:
+        conf.env.append_unique('CFLAGS', ['-TP', '-MD'])
+    else:
+        conf.env.append_unique('CFLAGS', '-std=c99')
 
     conf.env['BUILD_BENCH'] = Options.options.build_bench
     conf.env['BUILD_TESTS'] = Options.options.build_tests
@@ -92,6 +95,10 @@ def build(bld):
     if Options.platform == 'darwin':
         framework = ['CoreServices']
 
+    libflags = [ '-fvisibility=hidden' ]
+    if bld.env['MSVC_COMPILER']:
+        libflags = []
+
     lib_source = '''
         src/fat_patree.c
         src/hash.c
@@ -112,9 +119,8 @@ def build(bld):
               vnum            = ZIX_LIB_VERSION,
               install_path    = '${LIBDIR}',
               framework       = framework,
-              cflags          = ['-fvisibility=hidden',
-                                 '-DZIX_SHARED',
-                                 '-DZIX_INTERNAL' ])
+              cflags          = libflags + ['-DZIX_SHARED',
+                                            '-DZIX_INTERNAL'])
 
     if bld.env['BUILD_TESTS']:
         test_libs   = ['pthread']

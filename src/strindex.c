@@ -109,8 +109,8 @@ strindex_add_edge(ZixStrindexNode* n,
                   char*            last)
 {
 	assert(last > first);
-	n->children = realloc(n->children,
-	                      (n->num_children + 1) * sizeof(ZixStrindexNode));
+	n->children = (ZixStrindexNode*)realloc(
+		n->children, (n->num_children + 1) * sizeof(ZixStrindexNode));
 
 	memset(&n->children[n->num_children], '\0', sizeof(ZixStrindexNode));
 
@@ -133,7 +133,8 @@ strindex_split_edge(ZixStrindexNode* child,
 	assert(last > first);
 	assert(child->first);
 
-	child->children                 = malloc(sizeof(ZixStrindexNode));
+	child->children = (ZixStrindexNode*)malloc(sizeof(ZixStrindexNode));
+
 	child->children[0].children     = children;
 	child->children[0].num_children = num_children;
 	child->children[0].first        = child->first;

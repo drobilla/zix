@@ -15,7 +15,6 @@
 */
 
 #include <assert.h>
-#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,10 +50,12 @@ zix_sorted_array_print(ZixSortedArray* a)
 
 ZIX_API
 ZixSortedArray*
-zix_sorted_array_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data,
-                     size_t elem_size)
+zix_sorted_array_new(bool          allow_duplicates,
+                     ZixComparator cmp,
+                     void*         cmp_data,
+                     size_t        elem_size)
 {
-	ZixSortedArray* a = malloc(sizeof(ZixSortedArray));
+	ZixSortedArray* a = (ZixSortedArray*)malloc(sizeof(ZixSortedArray));
 	a->array            = NULL;
 	a->cmp              = cmp;
 	a->cmp_data         = cmp_data;
