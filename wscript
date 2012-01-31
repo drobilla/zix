@@ -94,52 +94,54 @@ def build(bld):
     '''
 
     # Library
-    obj = bld(features = 'c cshlib')
-    obj.export_includes = ['.']
-    obj.source          = lib_source
-    obj.includes        = ['.', './src']
-    obj.name            = 'libzix'
-    obj.target          = 'zix'
-    obj.vnum            = ZIX_LIB_VERSION
-    obj.install_path    = '${LIBDIR}'
-    obj.framework       = framework
-    obj.cflags          = [ '-fvisibility=hidden', '-DZIX_SHARED', '-DZIX_INTERNAL' ]
+    obj = bld(features        = 'c cshlib',
+              export_includes = ['.'],
+              source          = lib_source,
+              includes        = ['.', './src'],
+              name            = 'libzix',
+              target          = 'zix',
+              vnum            = ZIX_LIB_VERSION,
+              install_path    = '${LIBDIR}',
+              framework       = framework,
+              cflags          = ['-fvisibility=hidden',
+                                 '-DZIX_SHARED',
+                                 '-DZIX_INTERNAL' ])
 
     if bld.env['BUILD_TESTS']:
         # Static library (for unit test code coverage)
-        obj = bld(features = 'c cstlib')
-        obj.source       = lib_source
-        obj.includes     = ['.', './src']
-        obj.name         = 'libzix_static'
-        obj.target       = 'zix_static'
-        obj.install_path = ''
-        obj.framework    = framework
-        obj.cflags       = ['-fprofile-arcs',  '-ftest-coverage' ]
+        obj = bld(features     = 'c cstlib',
+                  source       = lib_source,
+                  includes     = ['.', './src'],
+                  name         = 'libzix_static',
+                  target       = 'zix_static',
+                  install_path = '',
+                  framework    = framework,
+                  cflags       = ['-fprofile-arcs',  '-ftest-coverage'])
 
         # Unit test programs
         for i in tests:
-            obj = bld(features = 'c cprogram')
-            obj.source       = 'test/%s.c' % i
-            obj.includes     = ['.']
-            obj.use          = 'libzix_static'
-            obj.linkflags    = ['-lgcov', '-lpthread']
-            obj.target       = 'test/%s' % i
-            obj.install_path = ''
-            obj.framework    = framework
-            obj.cflags       = ['-fprofile-arcs',  '-ftest-coverage' ]
+            obj = bld(features     = 'c cprogram',
+                      source       = 'test/%s.c' % i,
+                      includes     = ['.'],
+                      use          = 'libzix_static',
+                      linkflags    = ['-lgcov', '-lpthread'],
+                      target       = 'test/%s' % i,
+                      install_path = '',
+                      framework    = framework,
+                      cflags       = ['-fprofile-arcs',  '-ftest-coverage' ])
 
     if bld.env['BUILD_BENCH']:
         # Benchmark programs
         for i in ['tree_bench', 'patree_bench']:
-            obj = bld(features = 'c cprogram')
-            obj.source       = 'test/%s.c' % i
-            obj.includes     = ['.']
-            obj.use          = 'libzix'
-            obj.uselib       = 'GLIB'
-            obj.linkflags    = '-lrt'
-            obj.target       = 'test/%s' % i
-            obj.framework    = framework
-            obj.install_path = ''
+            obj = bld(features     = 'c cprogram',
+                      source       = 'test/%s.c' % i,
+                      includes     = ['.'],
+                      use          = 'libzix',
+                      uselib       = 'GLIB',
+                      linkflags    = '-lrt',
+                      target       = 'test/%s' % i,
+                      framework    = framework,
+                      install_path = '')
 
     # Documentation
     autowaf.build_dox(bld, 'ZIX', ZIX_VERSION, top, out)
