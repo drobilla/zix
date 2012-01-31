@@ -17,6 +17,10 @@
 #ifndef ZIX_TREE_DEBUG_H
 #define ZIX_TREE_DEBUG_H
 
+#ifndef _MSC_VER
+#    include <inttypes.h>
+#endif
+
 #ifdef ZIX_TREE_DUMP
 static void
 zix_tree_print(ZixTreeNode* node, int level)

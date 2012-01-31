@@ -21,6 +21,10 @@
 
 #include <sys/time.h>
 
+#ifndef _MSC_VER
+#    include <inttypes.h>
+#endif
+
 #include "zix/common.h"
 #include "zix/sorted_array.h"
 
