@@ -24,7 +24,7 @@
 #include "zix/sem.h"
 
 ZixSem sem;
-size_t n_signals = 0;
+size_t n_signals = 1024;
 
 static void*
 reader(void* arg)
@@ -55,12 +55,14 @@ writer(void* arg)
 int
 main(int argc, char** argv)
 {
-	if (argc != 2 || argv[1][0] == '-') {
+	if (argc > 2) {
 		printf("Usage: %s N_SIGNALS\n", argv[0]);
 		return 1;
 	}
 
-	n_signals = atoi(argv[1]);
+	if (argc > 1) {
+		n_signals = atoi(argv[1]);
+	}
 
 	printf("Testing %zu signals...\n", n_signals);
 
