@@ -15,13 +15,13 @@
 */
 
 #include <limits.h>
-#include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "zix/sem.h"
+#include "zix/thread.h"
 
 ZixSem sem;
 size_t n_signals = 1024;
@@ -68,20 +68,20 @@ main(int argc, char** argv)
 
 	zix_sem_init(&sem, 0);
 
-	pthread_t reader_thread;
-	if (pthread_create(&reader_thread, NULL, reader, NULL)) {
+	ZixThread reader_thread;
+	if (zix_thread_create(&reader_thread, 128, reader, NULL)) {
 		fprintf(stderr, "Failed to create reader thread\n");
 		return 1;
 	}
 
-	pthread_t writer_thread;
-	if (pthread_create(&writer_thread, NULL, writer, NULL)) {
+	ZixThread writer_thread;
+	if (zix_thread_create(&writer_thread, 128, writer, NULL)) {
 		fprintf(stderr, "Failed to create writer thread\n");
 		return 1;
 	}
 
-	pthread_join(reader_thread, NULL);
-	pthread_join(writer_thread, NULL);
+	zix_thread_join(reader_thread, NULL);
+	zix_thread_join(writer_thread, NULL);
 
 	zix_sem_destroy(&sem);
 	return 0;

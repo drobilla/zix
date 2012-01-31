@@ -15,7 +15,6 @@
 */
 
 #include <limits.h>
-#include <pthread.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -23,6 +22,7 @@
 #include <string.h>
 
 #include "zix/ring.h"
+#include "zix/thread.h"
 
 #define MSG_SIZE 20
 
@@ -141,18 +141,18 @@ main(int argc, char** argv)
 
 	zix_ring_mlock(ring);
 
-	pthread_t reader_thread;
-	if (pthread_create(&reader_thread, NULL, reader, NULL)) {
+	ZixThread reader_thread;
+	if (zix_thread_create(&reader_thread, MSG_SIZE * 4, reader, NULL)) {
 		return failure("Failed to create reader thread\n");
 	}
 
-	pthread_t writer_thread;
-	if (pthread_create(&writer_thread, NULL, writer, NULL)) {
+	ZixThread writer_thread;
+	if (zix_thread_create(&writer_thread, MSG_SIZE * 4, writer, NULL)) {
 		return failure("Failed to create writer thread\n");
 	}
 
-	pthread_join(reader_thread, NULL);
-	pthread_join(writer_thread, NULL);
+	zix_thread_join(reader_thread, NULL);
+	zix_thread_join(writer_thread, NULL);
 
 	if (read_error) {
 		return failure("Read error\n");
