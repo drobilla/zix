@@ -14,7 +14,6 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,8 +69,6 @@ zix_ring_new(uint32_t size)
 	ring->size       = next_power_of_two(size);
 	ring->size_mask  = ring->size - 1;
 	ring->buf        = malloc(ring->size);
-	assert(zix_ring_read_space(ring) == 0);
-	assert(zix_ring_write_space(ring) == ring->size - 1);
 	return ring;
 }
 
@@ -103,7 +100,7 @@ zix_ring_reset(ZixRing* ring)
 static inline uint32_t
 read_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 {
-	if (w > r) {
+	if (r < w) {
 		return w - r;
 	} else {
 		return (w - r + ring->size) & ring->size_mask;
@@ -119,12 +116,12 @@ zix_ring_read_space(const ZixRing* ring)
 static inline uint32_t
 write_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 {
-	if (w > r) {
-		return ((r - w + ring->size) & ring->size_mask) - 1;
-	} else if (w < r) {
-		return (r - w) - 1;
-	} else {
+	if (r == w) {
 		return ring->size - 1;
+	} else if (r < w) {
+		return ((r - w + ring->size) & ring->size_mask) - 1;
+	} else {
+		return (r - w) - 1;
 	}
 }
 
@@ -212,8 +209,6 @@ zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
 		ring->write_head = (w + size) & ring->size_mask;
 	} else {
 		const uint32_t this_size = ring->size - w;
-		assert(this_size < size);
-		assert(w + this_size <= ring->size);
 		memcpy(&ring->buf[w], src, this_size);
 		memcpy(&ring->buf[0], (char*)src + this_size, size - this_size);
 		ZIX_WRITE_BARRIER();

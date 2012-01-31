@@ -289,7 +289,6 @@ change_index_c(const char* a, const char* b, size_t len)
 static inline int
 change_index_sse(const char* a, const char* b, const size_t len)
 {
-	int ret;
 	for (size_t i = 0; i < len; i += sizeof(__m128i)) {
 		const __m128i  r    = _mm_loadu_si128((const __m128i*)(a + i));
 		const __m128i* s    = (const __m128i*)(b + i);
@@ -297,7 +296,7 @@ change_index_sse(const char* a, const char* b, const size_t len)
 			r, *s, _SIDD_SBYTE_OPS|_SIDD_CMP_EQUAL_EACH|_SIDD_NEGATIVE_POLARITY);
 
 		if (index != sizeof(__m128i)) {
-			int ret = i + index;
+			size_t ret = i + index;
 			if (ret > len) {
 				ret = len;
 			}

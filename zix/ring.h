@@ -32,6 +32,8 @@ typedef struct ZixRingImpl ZixRing;
 /**
    Create a new ring.
    @param size Size in bytes (note this may be rounded up).
+
+   At most @c size - 1 bytes may be stored in the ring at once.
 */
 ZixRing*
 zix_ring_new(uint32_t size);

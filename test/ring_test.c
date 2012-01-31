@@ -16,6 +16,7 @@
 
 #include <limits.h>
 #include <pthread.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +29,17 @@
 ZixRing* ring       = 0;
 size_t   n_writes   = 0;
 bool     read_error = false;
+
+static int
+failure(const char* fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	fprintf(stderr, "error: ");
+	vfprintf(stderr, fmt, args);
+	va_end(args);
+	return 1;
+}
 
 static int
 gen_msg(int* msg, int start)
@@ -120,25 +132,99 @@ main(int argc, char** argv)
 	       n_writes, MSG_SIZE, size);
 
 	ring = zix_ring_new(size);
+	if (zix_ring_read_space(ring) != 0) {
+		return failure("New ring is not empty\n");
+	}
+	if (zix_ring_write_space(ring) != zix_ring_capacity(ring)) {
+		return failure("New ring write space != capacity\n");
+	}
+
+	zix_ring_mlock(ring);
 
 	pthread_t reader_thread;
 	if (pthread_create(&reader_thread, NULL, reader, NULL)) {
-		fprintf(stderr, "Failed to create reader thread\n");
-		return 1;
+		return failure("Failed to create reader thread\n");
 	}
 
 	pthread_t writer_thread;
 	if (pthread_create(&writer_thread, NULL, writer, NULL)) {
-		fprintf(stderr, "Failed to create writer thread\n");
-		return 1;
+		return failure("Failed to create writer thread\n");
 	}
 
 	pthread_join(reader_thread, NULL);
 	pthread_join(writer_thread, NULL);
 
 	if (read_error) {
-		fprintf(stderr, "FAIL: Read error\n");
+		return failure("Read error\n");
+	}
+
+	zix_ring_reset(ring);
+	if (zix_ring_read_space(ring) > 0) {
+		fprintf(stderr, "Reset did not empty ring.\n");
 		return 1;
+	}
+	if (zix_ring_write_space(ring) != zix_ring_capacity(ring)) {
+		fprintf(stderr, "Empty write space != capacity\n");
+		return 1;
+	}
+
+	zix_ring_write(ring, "a", 1);
+	zix_ring_write(ring, "b", 1);
+
+	char     buf;
+	uint32_t n = zix_ring_peek(ring, &buf, 1);
+	if (n != 1) {
+		return failure("Peek n (%d) != 1\n", n);
+	}
+	if (buf != 'a') {
+		return failure("Peek error: '%c' != 'a'\n", buf);
+	}
+
+	n = zix_ring_skip(ring, 1);
+	if (n != 1) {
+		return failure("Skip n (%d) != 1\n", n);
+	}
+
+	if (zix_ring_read_space(ring) != 1) {
+		return failure("Read space %d != 1\n", zix_ring_read_space(ring));
+	}
+
+	n = zix_ring_read(ring, &buf, 1);
+	if (n != 1) {
+		return failure("Peek n (%d) != 1\n", n);
+	}
+	if (buf != 'b') {
+		return failure("Peek error: '%c' != 'b'\n", buf);
+	}
+
+	if (zix_ring_read_space(ring) != 0) {
+		return failure("Read space %d != 0\n", zix_ring_read_space(ring));
+	}
+
+	n = zix_ring_peek(ring, &buf, 1);
+	if (n > 0) {
+		return failure("Successful underrun peak\n");
+	}
+
+	n = zix_ring_read(ring, &buf, 1);
+	if (n > 0) {
+		return failure("Successful underrun read\n");
+	}
+
+	n = zix_ring_skip(ring, 1);
+	if (n > 0) {
+		return failure("Successful underrun read\n");
+	}
+
+	char* big_buf = calloc(size, 1);
+	n = zix_ring_write(ring, big_buf, size - 1);
+	if (n != (uint32_t)size - 1) {
+		return failure("Maximum size write failed (wrote %u)\n", n);
+	}
+
+	n = zix_ring_write(ring, big_buf, size);
+	if (n != 0) {
+		return failure("Successful overrun write (size %u)\n", n);
 	}
 
 	zix_ring_free(ring);
