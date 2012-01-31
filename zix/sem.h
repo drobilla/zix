@@ -101,19 +101,20 @@ struct ZixSemImpl {
 static inline ZixStatus
 zix_sem_init(ZixSem* sem, unsigned initial)
 {
-	MPCreateSemaphore(UINT_MAX, initial, &_sem);
+	return MPCreateSemaphore(UINT_MAX, initial, &sem->sem)
+		? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
 }
 
 static inline void
 zix_sem_destroy(ZixSem* sem)
 {
-	MPDeleteSemaphore(_sem);
+	MPDeleteSemaphore(sem->sem);
 }
 
 static inline void
 zix_sem_post(ZixSem* sem)
 {
-	MPSignalSemaphore(_sem);
+	MPSignalSemaphore(sem->sem);
 }
 
 static inline void

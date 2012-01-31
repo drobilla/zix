@@ -79,6 +79,10 @@ def build(bld):
     # Pkgconfig file
     autowaf.build_pc(bld, 'ZIX', ZIX_VERSION, [])
 
+    framework = ''
+    if Options.platform == 'darwin':
+        framework = ['CoreServices']
+
     lib_source = '''
         src/fat_patree.c
         src/hash.c
@@ -98,6 +102,7 @@ def build(bld):
     obj.target          = 'zix'
     obj.vnum            = ZIX_LIB_VERSION
     obj.install_path    = '${LIBDIR}'
+    obj.framework       = framework
     obj.cflags          = [ '-fvisibility=hidden', '-DZIX_SHARED', '-DZIX_INTERNAL' ]
 
     if bld.env['BUILD_TESTS']:
@@ -108,6 +113,7 @@ def build(bld):
         obj.name         = 'libzix_static'
         obj.target       = 'zix_static'
         obj.install_path = ''
+        obj.framework    = framework
         obj.cflags       = ['-fprofile-arcs',  '-ftest-coverage' ]
 
         # Unit test programs
@@ -119,6 +125,7 @@ def build(bld):
             obj.linkflags    = ['-lgcov', '-lpthread']
             obj.target       = 'test/%s' % i
             obj.install_path = ''
+            obj.framework    = framework
             obj.cflags       = ['-fprofile-arcs',  '-ftest-coverage' ]
 
     if bld.env['BUILD_BENCH']:
@@ -131,6 +138,7 @@ def build(bld):
             obj.uselib       = 'GLIB'
             obj.linkflags    = '-lrt'
             obj.target       = 'test/%s' % i
+            obj.framework    = framework
             obj.install_path = ''
 
     # Documentation
