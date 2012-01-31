@@ -20,8 +20,7 @@
 #include <stdbool.h>
 
 #ifdef __APPLE__
-#    include <limits.h>
-#    include <CoreServices/CoreServices.h>
+#    include <mach/mach.h>
 #else
 #    include <semaphore.h>
 #endif
@@ -95,38 +94,39 @@ zix_sem_try_wait(ZixSem* sem);
 #ifdef __APPLE__
 
 struct ZixSemImpl {
-	MPSemaphoreID sem;
+	semaphore_t sem;
 };
 
 static inline ZixStatus
 zix_sem_init(ZixSem* sem, unsigned initial)
 {
-	return MPCreateSemaphore(UINT_MAX, initial, &sem->sem)
+	return semaphore_create(mach_task_self(), &sem->sem, SYNC_POLICY_FIFO, 0)
 		? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
 }
 
 static inline void
 zix_sem_destroy(ZixSem* sem)
 {
-	MPDeleteSemaphore(sem->sem);
+	semaphore_destroy(mach_task_self(), sem->sem);
 }
 
 static inline void
 zix_sem_post(ZixSem* sem)
 {
-	MPSignalSemaphore(sem->sem);
+	semaphore_signal(sem->sem);
 }
 
 static inline void
 zix_sem_wait(ZixSem* sem)
 {
-	MPWaitOnSemaphore(sem->sem, kDurationForever);
+	semaphore_wait(sem->sem);
 }
 
 static inline bool
 zix_sem_try_wait(ZixSem* sem)
 {
-	return MPWaitOnSemaphore(sem->sem, kDurationImmediate) == noErr;
+	const mach_timespec_t zero = { 0, 0 };
+	return semaphore_timedwait(sem->sem, zero) == KERN_SUCCESS;
 }
 
 #else  /* !defined(__APPLE__) */
