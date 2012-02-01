@@ -22,15 +22,15 @@
 #include "zix/sem.h"
 #include "zix/thread.h"
 
-ZixSem sem;
-size_t n_signals = 1024;
+ZixSem   sem;
+unsigned n_signals = 1024;
 
 static void*
 reader(void* arg)
 {
 	printf("Reader starting\n");
 
-	for (size_t i = 0; i < n_signals; ++i) {
+	for (unsigned i = 0; i < n_signals; ++i) {
 		zix_sem_wait(&sem);
 	}
 
@@ -43,7 +43,7 @@ writer(void* arg)
 {
 	printf("Writer starting\n");
 
-	for (size_t i = 0; i < n_signals; ++i) {
+	for (unsigned i = 0; i < n_signals; ++i) {
 		zix_sem_post(&sem);
 	}
 
@@ -63,7 +63,7 @@ main(int argc, char** argv)
 		n_signals = atoi(argv[1]);
 	}
 
-	printf("Testing %zu signals...\n", n_signals);
+	printf("Testing %u signals...\n", n_signals);
 
 	zix_sem_init(&sem, 0);
 
