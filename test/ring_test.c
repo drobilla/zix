@@ -26,7 +26,7 @@
 #define MSG_SIZE 20
 
 ZixRing* ring       = 0;
-size_t   n_writes   = 0;
+unsigned n_writes   = 0;
 bool     read_error = false;
 
 static int
@@ -72,7 +72,7 @@ reader(void* arg)
 	int      read_msg[MSG_SIZE]; // Read from ring
 	unsigned count = 0;
 	int      start = gen_msg(ref_msg, 0);
-	for (size_t i = 0; i < n_writes; ++i) {
+	for (unsigned i = 0; i < n_writes; ++i) {
 		if (zix_ring_read_space(ring) >= MSG_SIZE * sizeof(int)) {
 			if (zix_ring_read(ring, read_msg, MSG_SIZE * sizeof(int))) {
 				if (!cmp_msg(ref_msg, read_msg)) {
@@ -97,7 +97,7 @@ writer(void* arg)
 
 	int write_msg[MSG_SIZE];  // Written to ring
 	int start = gen_msg(write_msg, 0);
-	for (size_t i = 0; i < n_writes; ++i) {
+	for (unsigned i = 0; i < n_writes; ++i) {
 		if (zix_ring_write_space(ring) >= MSG_SIZE * sizeof(int)) {
 			if (zix_ring_write(ring, write_msg, MSG_SIZE * sizeof(int))) {
 				start = gen_msg(write_msg, start);
