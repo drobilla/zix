@@ -90,7 +90,8 @@ verify_balance(ZixTreeNode* n)
 	const intptr_t left_height  = (intptr_t)height(n->left);
 	const intptr_t right_height = (intptr_t)height(n->right);
 	if (n->balance != right_height - left_height) {
-		fprintf(stderr, "Bad balance at %ld: h_r (%zu) - l_h (%zu) != %d\n",
+		fprintf(stderr, "Bad balance at %ld: h_r (%" PRIdPTR ")"
+		        "- l_h (%" PRIdPTR ") != %d\n",
 		        (intptr_t)n->data, right_height, left_height, n->balance);
 		assert(false);
 		return false;
@@ -118,7 +119,7 @@ verify(ZixTree* t, ZixTreeNode* n)
 
 	if (n->left) {
 		if (t->cmp(n->left->data, n->data, t->cmp_data) > 0) {
-			fprintf(stderr, "Bad order: %zu with left child\n",
+			fprintf(stderr, "Bad order: %" PRIdPTR " with left child\n",
 			        (intptr_t)n->data);
 			fprintf(stderr, "%p ? %p\n", (void*)n, (void*)n->left);
 			fprintf(stderr, "%" PRIdPTR " ? %" PRIdPTR "\n", (intptr_t)n->data,
@@ -132,7 +133,7 @@ verify(ZixTree* t, ZixTreeNode* n)
 
 	if (n->right) {
 		if (t->cmp(n->right->data, n->data, t->cmp_data) < 0) {
-			fprintf(stderr, "Bad order: %zu with right child\n",
+			fprintf(stderr, "Bad order: %" PRIdPTR " with right child\n",
 			        (intptr_t)n->data);
 			return false;
 		}

@@ -39,7 +39,7 @@ int_cmp(const void* a, const void* b, void* user_data)
 }
 
 static int
-ith_elem(int test_num, size_t n_elems, int i)
+ith_elem(int test_num, unsigned n_elems, int i)
 {
 	switch (test_num % 3) {
 	case 0:
@@ -59,7 +59,7 @@ test_fail()
 }
 
 static int
-stress(int test_num, size_t n_elems)
+stress(int test_num, unsigned n_elems)
 {
 	intptr_t    r;
 	ZixSortedArrayIter ti;
@@ -69,7 +69,7 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Insert n_elems elements
-	for (size_t i = 0; i < n_elems; ++i) {
+	for (unsigned i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		int status = zix_sorted_array_insert(t, &r, &ti);
 		if (status) {
@@ -77,7 +77,8 @@ stress(int test_num, size_t n_elems)
 			return test_fail();
 		}
 		if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
-			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			fprintf(stderr, "Data corrupt (saw %" PRIdPTR
+			        ", expected %" PRIdPTR ")\n",
 			        *(intptr_t*)zix_sorted_array_get_data(ti), r);
 			return test_fail();
 		}
@@ -86,14 +87,15 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Search for all elements
-	for (size_t i = 0; i < n_elems; ++i) {
+	for (unsigned i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		if (zix_sorted_array_find(t, &r, &ti)) {
 			fprintf(stderr, "Find failed\n");
 			return test_fail();
 		}
 		if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
-			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			fprintf(stderr, "Data corrupt (saw %" PRIdPTR
+			        ", expected %" PRIdPTR ")\n",
 			        *(intptr_t*)zix_sorted_array_get_data(ti), r);
 			return test_fail();
 		}
@@ -102,7 +104,7 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Iterate over all elements
-	size_t i = 0;
+	unsigned i    = 0;
 	intptr_t last = -1;
 	for (ZixSortedArrayIter iter = zix_sorted_array_begin(t);
 	     !zix_sorted_array_iter_is_end(t, iter);
@@ -110,7 +112,7 @@ stress(int test_num, size_t n_elems)
 		r = ith_elem(test_num, n_elems, i);
 		const intptr_t iter_data = *(intptr_t*)zix_sorted_array_get_data(iter);
 		if (iter_data < last) {
-			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %zu)\n",
+			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
 			        iter_data, last);
 			return test_fail();
 		}
@@ -120,7 +122,7 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Delete all elements
-	for (size_t i = 0; i < n_elems; i++) {
+	for (unsigned i = 0; i < n_elems; i++) {
 		r = ith_elem(test_num, n_elems, i);
 		ZixSortedArrayIter item;
 		if (zix_sorted_array_find(t, &r, &item) != ZIX_STATUS_SUCCESS) {
@@ -145,8 +147,8 @@ stress(int test_num, size_t n_elems)
 int
 main(int argc, char** argv)
 {
-	const size_t n_tests = 3;
-	size_t       n_elems = 0;
+	const unsigned n_tests = 3;
+	unsigned       n_elems = 0;
 
 	struct timeval time;
 	gettimeofday(&time, NULL);
@@ -167,10 +169,10 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	printf("Running %zu tests with %zu elements (seed %d)",
+	printf("Running %u tests with %u elements (seed %d)",
 	       n_tests, n_elems, seed);
 
-	for (size_t i = 0; i < n_tests; ++i) {
+	for (unsigned i = 0; i < n_tests; ++i) {
 		printf(".");
 		fflush(stdout);
 		if (stress(i, n_elems)) {
