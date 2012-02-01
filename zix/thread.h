@@ -39,21 +39,15 @@ typedef pthread_t ZixThread;
 
 /**
    Initialize @c thread to a new thread.
+
+   The thread will immediately be launched, calling @c function with @c arg
+   as the only parameter.
 */
 static inline ZixStatus
 zix_thread_create(ZixThread* thread,
                   size_t     stack_size,
                   void*      (*function)(void*),
                   void*      arg);
-
-/**
-   Cancel @c thread.
-
-   This function sends a cancellation request, but does not wait until the
-   thread actually exists.  Use zix_thread_join() for that.
-*/
-static inline ZixStatus
-zix_thread_cancel(ZixThread thread);
 
 /**
    Join @c thread (block until @c thread exits).
@@ -85,12 +79,6 @@ zix_thread_create(ZixThread* thread,
 	}
 
 	return ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_thread_cancel(ZixThread thread)
-{
-	return pthread_cancel(thread) ? ZIX_STATUS_ERROR : ZIX_STATUS_SUCCESS;
 }
 
 static inline ZixStatus
