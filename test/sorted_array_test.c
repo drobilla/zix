@@ -14,14 +14,15 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <time.h>
 
-#include <sys/time.h>
-
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+#    define PRIdPTR "Id"
+#else
 #    include <inttypes.h>
 #endif
 
@@ -77,8 +78,7 @@ stress(int test_num, unsigned n_elems)
 			return test_fail();
 		}
 		if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
-			fprintf(stderr, "Data corrupt (saw %" PRIdPTR
-			        ", expected %" PRIdPTR ")\n",
+			fprintf(stderr, "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
 			        *(intptr_t*)zix_sorted_array_get_data(ti), r);
 			return test_fail();
 		}
@@ -94,8 +94,7 @@ stress(int test_num, unsigned n_elems)
 			return test_fail();
 		}
 		if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
-			fprintf(stderr, "Data corrupt (saw %" PRIdPTR
-			        ", expected %" PRIdPTR ")\n",
+			fprintf(stderr, "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
 			        *(intptr_t*)zix_sorted_array_get_data(ti), r);
 			return test_fail();
 		}
@@ -150,9 +149,6 @@ main(int argc, char** argv)
 	const unsigned n_tests = 3;
 	unsigned       n_elems = 0;
 
-	struct timeval time;
-	gettimeofday(&time, NULL);
-
 	if (argc == 1) {
 		n_elems = 4096;
 	} else {
@@ -160,7 +156,7 @@ main(int argc, char** argv)
 		if (argc > 2) {
 			seed = atol(argv[2]);
 		} else {
-			seed = time.tv_sec + time.tv_usec;
+			seed = time(NULL);
 		}
 	}
 

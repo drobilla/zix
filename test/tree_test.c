@@ -14,14 +14,15 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <time.h>
 
-#include <sys/time.h>
-
-#ifndef _MSC_VER
+#ifdef _MSC_VER
+#    define PRIdPTR "Id"
+#else
 #    include <inttypes.h>
 #endif
 
@@ -76,7 +77,7 @@ stress(int test_num, size_t n_elems)
 			return test_fail();
 		}
 		if ((intptr_t)zix_tree_get(ti) != r) {
-			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			fprintf(stderr, "Data corrupt (%" PRIdPTR" != %" PRIdPTR ")\n",
 			        (intptr_t)zix_tree_get(ti), r);
 			return test_fail();
 		}
@@ -98,7 +99,7 @@ stress(int test_num, size_t n_elems)
 			return test_fail();
 		}
 		if ((intptr_t)zix_tree_get(ti) != r) {
-			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			fprintf(stderr, "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
 			        (intptr_t)zix_tree_get(ti), r);
 			return test_fail();
 		}
@@ -115,7 +116,7 @@ stress(int test_num, size_t n_elems)
 		r = ith_elem(test_num, n_elems, i);
 		const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
 		if (iter_data < last) {
-			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %zu)\n",
+			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
 			        iter_data, last);
 			return test_fail();
 		}
@@ -133,7 +134,7 @@ stress(int test_num, size_t n_elems)
 		r = ith_elem(test_num, n_elems, i);
 		const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
 		if (iter_data > last) {
-			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %zu)\n",
+			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
 			        iter_data, last);
 			return test_fail();
 		}
@@ -172,7 +173,7 @@ stress(int test_num, size_t n_elems)
 			return test_fail();
 		}
 		if ((intptr_t)zix_tree_get(ti) != r) {
-			fprintf(stderr, "Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
+			fprintf(stderr, "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
 			        (intptr_t)zix_tree_get(ti), r);
 			return test_fail();
 		}
@@ -192,11 +193,8 @@ stress(int test_num, size_t n_elems)
 int
 main(int argc, char** argv)
 {
-	const size_t n_tests = 3;
-	size_t       n_elems = 0;
-
-	struct timeval time;
-	gettimeofday(&time, NULL);
+	const unsigned n_tests = 3;
+	unsigned       n_elems = 0;
 
 	if (argc == 1) {
 		n_elems = 4096;
@@ -205,7 +203,7 @@ main(int argc, char** argv)
 		if (argc > 2) {
 			seed = atol(argv[2]);
 		} else {
-			seed = time.tv_sec + time.tv_usec;
+			seed = time(NULL);
 		}
 	}
 
@@ -214,10 +212,10 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	printf("Running %zu tests with %zu elements (seed %d)",
+	printf("Running %u tests with %u elements (seed %d)",
 	       n_tests, n_elems, seed);
 
-	for (size_t i = 0; i < n_tests; ++i) {
+	for (unsigned i = 0; i < n_tests; ++i) {
 		printf(".");
 		fflush(stdout);
 		if (stress(i, n_elems)) {

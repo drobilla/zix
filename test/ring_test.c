@@ -16,7 +16,6 @@
 
 #include <limits.h>
 #include <stdarg.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,15 +68,15 @@ reader(void* arg)
 {
 	printf("Reader starting\n");
 
-	int    ref_msg[MSG_SIZE];   // Reference generated for comparison
-	int    read_msg[MSG_SIZE];  // Read from ring
-	size_t count = 0;
-	int    start = gen_msg(ref_msg, 0);
+	int      ref_msg[MSG_SIZE]; // Reference generated for comparison
+	int      read_msg[MSG_SIZE]; // Read from ring
+	unsigned count = 0;
+	int      start = gen_msg(ref_msg, 0);
 	for (size_t i = 0; i < n_writes; ++i) {
 		if (zix_ring_read_space(ring) >= MSG_SIZE * sizeof(int)) {
 			if (zix_ring_read(ring, read_msg, MSG_SIZE * sizeof(int))) {
 				if (!cmp_msg(ref_msg, read_msg)) {
-					printf("FAIL: Message %zu is corrupt\n", count);
+					printf("FAIL: Message %u is corrupt\n", count);
 					read_error = true;
 					return NULL;
 				}
@@ -118,7 +117,7 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	int size = 1024;
+	unsigned size = 1024;
 	if (argc > 1) {
 		size = atoi(argv[1]);
 	}
@@ -128,7 +127,7 @@ main(int argc, char** argv)
 		n_writes = atoi(argv[2]);
 	}
 
-	printf("Testing %zu writes of %d ints to a %d int ring...\n",
+	printf("Testing %u writes of %d ints to a %d int ring...\n",
 	       n_writes, MSG_SIZE, size);
 
 	ring = zix_ring_new(size);
@@ -216,7 +215,7 @@ main(int argc, char** argv)
 		return failure("Successful underrun read\n");
 	}
 
-	char* big_buf = calloc(size, 1);
+	char* big_buf = (char*)calloc(size, 1);
 	n = zix_ring_write(ring, big_buf, size - 1);
 	if (n != (uint32_t)size - 1) {
 		return failure("Maximum size write failed (wrote %u)\n", n);

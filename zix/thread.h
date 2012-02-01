@@ -17,8 +17,12 @@
 #ifndef ZIX_THREAD_H
 #define ZIX_THREAD_H
 
-#include <errno.h>
-#include <pthread.h>
+#ifdef _WIN32
+#    include <windows.h>
+#else
+#    include <errno.h>
+#    include <pthread.h>
+#endif
 
 #include "zix/common.h"
 
@@ -35,7 +39,11 @@ extern "C" {
    @{
 */
 
+#ifdef _WIN32
+typedef HANDLE ZixThread;
+#else
 typedef pthread_t ZixThread;
+#endif
 
 /**
    Initialize @c thread to a new thread.
@@ -54,6 +62,29 @@ zix_thread_create(ZixThread* thread,
 */
 static inline ZixStatus
 zix_thread_join(ZixThread thread, void** retval);
+
+#ifdef _WIN32
+
+static inline ZixStatus
+zix_thread_create(ZixThread* thread,
+                  size_t     stack_size,
+                  void*      (*function)(void*),
+                  void*      arg)
+{
+	*thread = CreateThread(NULL, stack_size,
+	                       (LPTHREAD_START_ROUTINE)function, arg,
+	                       0, NULL);
+	return *thread ? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
+}
+
+static inline ZixStatus
+zix_thread_join(ZixThread thread, void** retval)
+{
+	return WaitForSingleObject(thread, INFINITE)
+		? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
+}
+
+#else  /* !defined(_WIN32) */
 
 static inline ZixStatus
 zix_thread_create(ZixThread* thread,
@@ -87,6 +118,8 @@ zix_thread_join(ZixThread thread, void** retval)
 	return pthread_join(thread, retval)
 		? ZIX_STATUS_ERROR : ZIX_STATUS_SUCCESS;
 }
+
+#endif
 
 /**
    @}

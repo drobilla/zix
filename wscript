@@ -125,6 +125,8 @@ def build(bld):
     if bld.env['BUILD_TESTS']:
         test_libs   = ['pthread']
         test_cflags = []
+        if bld.env['MSVC_COMPILER']:
+            test_libs = []
         if bld.is_defined('HAVE_GCOV'):
             test_libs   += ['gcov']
             test_cflags += ['-fprofile-arcs', '-ftest-coverage']
@@ -209,6 +211,7 @@ def upload_docs(ctx):
 
 def test(ctx):
     autowaf.pre_test(ctx, APPNAME)
+    os.chdir('test')
     for i in tests:
-        autowaf.run_tests(ctx, APPNAME, ['test/%s' % i], dirs=['./src','./test'])
+        autowaf.run_tests(ctx, APPNAME, ['%s' % i], dirs=['./src','./test'])
     autowaf.post_test(ctx, APPNAME)

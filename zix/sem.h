@@ -17,10 +17,10 @@
 #ifndef ZIX_SEM_H
 #define ZIX_SEM_H
 
-#include <stdbool.h>
-
 #ifdef __APPLE__
 #    include <mach/mach.h>
+#elif defined(_WIN32)
+#    include <windows.h>
 #else
 #    include <semaphore.h>
 #endif
@@ -129,7 +129,44 @@ zix_sem_try_wait(ZixSem* sem)
 	return semaphore_timedwait(sem->sem, zero) == KERN_SUCCESS;
 }
 
-#else  /* !defined(__APPLE__) */
+#elif defined(_WIN32)
+
+struct ZixSemImpl {
+	HANDLE sem;
+};
+
+static inline ZixStatus
+zix_sem_init(ZixSem* sem, unsigned initial)
+{
+	sem->sem = CreateSemaphore(NULL, initial, LONG_MAX, NULL);
+	return (sem->sem) ? ZIX_STATUS_ERROR : ZIX_STATUS_SUCCESS;
+}
+
+static inline void
+zix_sem_destroy(ZixSem* sem)
+{
+	CloseHandle(sem->sem);
+}
+
+static inline void
+zix_sem_post(ZixSem* sem)
+{
+	ReleaseSemaphore(sem->sem, 1, NULL);
+}
+
+static inline void
+zix_sem_wait(ZixSem* sem)
+{
+	WaitForSingleObject(sem->sem, INFINITE);
+}
+
+static inline bool
+zix_sem_try_wait(ZixSem* sem)
+{
+	WaitForSingleObject(sem->sem, 0);
+}
+
+#else  /* !defined(__APPLE__) && !defined(_WIN32) */
 
 struct ZixSemImpl {
 	sem_t sem;
