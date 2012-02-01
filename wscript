@@ -212,6 +212,5 @@ def upload_docs(ctx):
 def test(ctx):
     autowaf.pre_test(ctx, APPNAME)
     os.environ['PATH'] = 'test' + os.pathsep + os.getenv('PATH')
-    for i in tests:
-        autowaf.run_tests(ctx, APPNAME, ['%s' % i], dirs=['./src','./test'])
+    autowaf.run_tests(ctx, APPNAME, tests, dirs=['./src','./test'])
     autowaf.post_test(ctx, APPNAME)
