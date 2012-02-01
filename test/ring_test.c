@@ -55,8 +55,7 @@ cmp_msg(int* msg1, int* msg2)
 {
 	for (int i = 0; i < MSG_SIZE; ++i) {
 		if (msg1[i] != msg2[i]) {
-			fprintf(stderr, "ERROR: %d != %d @ %d\n", msg1[i], msg2[i], i);
-			return 0;
+			return !failure("%d != %d @ %d\n", msg1[i], msg2[i], i);
 		}
 	}
 
@@ -159,12 +158,10 @@ main(int argc, char** argv)
 
 	zix_ring_reset(ring);
 	if (zix_ring_read_space(ring) > 0) {
-		fprintf(stderr, "Reset did not empty ring.\n");
-		return 1;
+		return failure("Reset did not empty ring.\n");
 	}
 	if (zix_ring_write_space(ring) != zix_ring_capacity(ring)) {
-		fprintf(stderr, "Empty write space != capacity\n");
-		return 1;
+		return failure("Empty write space != capacity\n");
 	}
 
 	zix_ring_write(ring, "a", 1);
