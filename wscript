@@ -203,8 +203,8 @@ def fix_docs(ctx):
         os.symlink('group__zix.html',
                    'index.html')
         os.chdir(top)
-    except Exception as e:
-        Logs.error("Failed to fix up %s documentation (%s)" % (APPNAME, e))
+    except Exception:
+        Logs.error("Failed to fix up %s documentation" % APPNAME)
 
 def upload_docs(ctx):
     os.system("rsync -avz --delete -e ssh build/doc/html/* drobilla@drobilla.net:~/drobilla.net/docs/zix")
