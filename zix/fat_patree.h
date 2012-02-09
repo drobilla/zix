@@ -22,7 +22,7 @@
 /**
    @addtogroup zix
    @{
-   @name Patree
+   @name FatPatree
    @{
 */
 

@@ -37,7 +37,7 @@ extern "C" {
 typedef struct ZixSortedArrayImpl ZixSortedArray;
 
 /**
-   An iterator over a @ref ZixSortedArray.
+   An iterator over a ZixSortedArray.
 */
 typedef void* ZixSortedArrayIter;
 
