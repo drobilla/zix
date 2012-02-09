@@ -65,7 +65,10 @@ main(int argc, char** argv)
 
 	printf("Testing %u signals...\n", n_signals);
 
-	zix_sem_init(&sem, 0);
+	if (zix_sem_init(&sem, 0)) {
+		fprintf(stderr, "Failed to create semaphore.\n");
+		return 1;
+	}
 
 	ZixThread reader_thread;
 	if (zix_thread_create(&reader_thread, 128, reader, NULL)) {
