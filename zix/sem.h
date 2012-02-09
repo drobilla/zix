@@ -91,6 +91,10 @@ zix_sem_wait(ZixSem* sem);
 static inline bool
 zix_sem_try_wait(ZixSem* sem);
 
+/**
+   @cond
+*/
+
 #ifdef __APPLE__
 
 struct ZixSemImpl {
@@ -176,7 +180,7 @@ static inline ZixStatus
 zix_sem_init(ZixSem* sem, unsigned initial)
 {
 	return sem_init(&sem->sem, 0, initial)
-		? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
+		? ZIX_STATUS_ERROR : ZIX_STATUS_SUCCESS;
 }
 
 static inline void
@@ -210,6 +214,7 @@ zix_sem_try_wait(ZixSem* sem)
 #endif
 
 /**
+   @endcond
    @}
    @}
 */
