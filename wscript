@@ -184,27 +184,8 @@ def build_dir(ctx, subdir):
         return os.path.join('build', subdir)
 
 def fix_docs(ctx):
-    try:
-        os.chdir('build/doc/html')
-        os.system("sed -i 's/ZIX_API //' group__zix.html")
-        os.system("sed -i 's/ZIX_DEPRECATED //' group__zix.html")
-        os.remove('index.html')
-        os.symlink('group__zix.html',
-                   'index.html')
-    except:
-        Logs.error("Failed to fix up %s documentation" % APPNAME)
-
-def fix_docs(ctx):
-    try:
-        top = os.getcwd()
-        os.chdir(build_dir(ctx, 'doc/html'))
-        os.system("sed -i 's/ZIX_API //' group__zix.html")
-        os.remove('index.html')
-        os.symlink('group__zix.html',
-                   'index.html')
-        os.chdir(top)
-    except Exception:
-        Logs.error("Failed to fix up %s documentation" % APPNAME)
+    if ctx.cmd == 'build':
+        autowaf.make_simple_dox(APPNAME)
 
 def upload_docs(ctx):
     os.system("rsync -avz --delete -e ssh build/doc/html/* drobilla@drobilla.net:~/drobilla.net/docs/zix")
