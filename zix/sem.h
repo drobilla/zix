@@ -20,6 +20,7 @@
 #ifdef __APPLE__
 #    include <mach/mach.h>
 #elif defined(_WIN32)
+#    include <limits.h>
 #    include <windows.h>
 #else
 #    include <semaphore.h>
@@ -174,7 +175,7 @@ zix_sem_wait(ZixSem* sem)
 static inline bool
 zix_sem_try_wait(ZixSem* sem)
 {
-	WaitForSingleObject(sem->sem, 0);
+	return WaitForSingleObject(sem->sem, 0) == WAIT_OBJECT_0;
 }
 
 #else  /* !defined(__APPLE__) && !defined(_WIN32) */
