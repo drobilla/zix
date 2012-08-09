@@ -30,10 +30,10 @@ out = 'build'
 def options(opt):
     autowaf.set_options(opt)
     opt.load('compiler_c')
-    opt.add_option('--test', action='store_true', default=False, dest='build_tests',
-                   help="Build unit tests")
-    opt.add_option('--bench', action='store_true', default=False, dest='build_bench',
-                   help="Build benchmarks")
+    opt.add_option('--test', action='store_true', dest='build_tests',
+                   help='Build unit tests')
+    opt.add_option('--bench', action='store_true', dest='build_bench',
+                   help='Build benchmarks')
 
 def configure(conf):
     conf.load('compiler_c')
@@ -41,8 +41,8 @@ def configure(conf):
     autowaf.set_c99_mode(conf)
     autowaf.display_header('Zix Configuration')
 
-    conf.env['BUILD_BENCH'] = Options.options.build_bench
-    conf.env['BUILD_TESTS'] = Options.options.build_tests
+    conf.env.BUILD_BENCH = Options.options.build_bench
+    conf.env.BUILD_TESTS = Options.options.build_tests
 
     # Check for mlock
     conf.check(function_name='mlock',
@@ -51,7 +51,7 @@ def configure(conf):
                mandatory=False)
 
     # Check for gcov library (for test coverage)
-    if conf.env['BUILD_TESTS']:
+    if conf.env.BUILD_TESTS:
         conf.check_cc(lib='gcov',
                       define_name='HAVE_GCOV',
                       mandatory=False)
@@ -60,13 +60,13 @@ def configure(conf):
         autowaf.check_pkg(conf, 'glib-2.0', uselib_store='GLIB',
                           atleast_version='2.0.0', mandatory=False)
         if not conf.is_defined('HAVE_GLIB'):
-            conf.fatal("Glib is required to build benchmarks")
+            conf.fatal('Glib is required to build benchmarks')
 
     autowaf.define(conf, 'ZIX_VERSION', ZIX_VERSION)
     conf.write_config_header('zix-config.h', remove=False)
 
-    autowaf.display_msg(conf, "Unit tests", str(conf.env['BUILD_TESTS']))
-    autowaf.display_msg(conf, "Benchmarks", str(conf.env['BUILD_BENCH']))
+    autowaf.display_msg(conf, 'Unit tests', str(conf.env.BUILD_TESTS))
+    autowaf.display_msg(conf, 'Benchmarks', str(conf.env.BUILD_BENCH))
     print('')
 
 tests = [
@@ -92,7 +92,7 @@ def build(bld):
         framework = ['CoreServices']
 
     libflags = [ '-fvisibility=hidden' ]
-    if bld.env['MSVC_COMPILER']:
+    if bld.env.MSVC_COMPILER:
         libflags = []
 
     lib_source = '''
@@ -118,10 +118,10 @@ def build(bld):
               cflags          = libflags + ['-DZIX_SHARED',
                                             '-DZIX_INTERNAL'])
 
-    if bld.env['BUILD_TESTS']:
+    if bld.env.BUILD_TESTS:
         test_libs   = ['pthread']
         test_cflags = []
-        if bld.env['MSVC_COMPILER']:
+        if bld.env.MSVC_COMPILER:
             test_libs = []
         if bld.is_defined('HAVE_GCOV'):
             test_libs   += ['gcov']
@@ -150,7 +150,7 @@ def build(bld):
                       framework    = framework,
                       cflags       = test_cflags)
 
-    if bld.env['BUILD_BENCH']:
+    if bld.env.BUILD_BENCH:
         # Benchmark programs
         for i in ['tree_bench', 'patree_bench']:
             obj = bld(features     = 'c cprogram',
@@ -167,7 +167,7 @@ def build(bld):
     autowaf.build_dox(bld, 'ZIX', ZIX_VERSION, top, out)
 
     bld.add_post_fun(autowaf.run_ldconfig)
-    if bld.env['DOCS']:
+    if bld.env.DOCS:
         bld.add_post_fun(fix_docs)
 
 def lint(ctx):
@@ -184,7 +184,7 @@ def fix_docs(ctx):
         autowaf.make_simple_dox(APPNAME)
 
 def upload_docs(ctx):
-    os.system("rsync -avz --delete -e ssh build/doc/html/* drobilla@drobilla.net:~/drobilla.net/docs/zix")
+    os.system('rsync -avz --delete -e ssh build/doc/html/* drobilla@drobilla.net:~/drobilla.net/docs/zix')
 
 def test(ctx):
     autowaf.pre_test(ctx, APPNAME)
