@@ -64,7 +64,7 @@ zix_tree_free(ZixTree* t);
 */
 ZIX_API
 size_t
-zix_tree_size(ZixTree* t);
+zix_tree_size(const ZixTree* t);
 
 /**
    Insert the element @a e into @a t and point @a ti at the new element.

@@ -100,12 +100,14 @@ ZIX_API
 void
 zix_tree_free(ZixTree* t)
 {
-	zix_tree_free_rec(t, t->root);
-	free(t);
+	if (t) {
+		zix_tree_free_rec(t, t->root);
+		free(t);
+	}
 }
 
 size_t
-zix_tree_size(ZixTree* t)
+zix_tree_size(const ZixTree* t)
 {
 	return t->size;
 }
@@ -618,7 +620,7 @@ ZIX_API
 void*
 zix_tree_get(ZixTreeIter* ti)
 {
-	return ti->data;
+	return ti ? ti->data : NULL;
 }
 
 ZIX_API
