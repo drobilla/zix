@@ -216,7 +216,7 @@ zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
 	} else {
 		const uint32_t this_size = ring->size - w;
 		memcpy(&ring->buf[w], src, this_size);
-		memcpy(&ring->buf[0], (char*)src + this_size, size - this_size);
+		memcpy(&ring->buf[0], (const char*)src + this_size, size - this_size);
 		ZIX_WRITE_BARRIER();
 		ring->write_head = size - this_size;
 	}

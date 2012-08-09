@@ -190,8 +190,11 @@ ZIX_API
 ZixStatus
 zix_strindex_find(ZixStrindex* t, const char* p, char** match)
 {
-	ZixStrindexNode* n      = t->root;
-	const char*      orig_p = p;
+#ifndef NDEBUG
+	const char* orig_p = p;
+#endif
+
+	ZixStrindexNode* n = t->root;
 	size_t           child_i;
 
 	*match = NULL;

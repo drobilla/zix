@@ -53,7 +53,7 @@ ith_elem(int test_num, size_t n_elems, int i)
 }
 
 static int
-test_fail()
+test_fail(void)
 {
 	return EXIT_FAILURE;
 }
@@ -144,8 +144,8 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Delete all elements
-	for (size_t i = 0; i < n_elems; i++) {
-		r = ith_elem(test_num, n_elems, i);
+	for (size_t e = 0; e < n_elems; e++) {
+		r = ith_elem(test_num, n_elems, e);
 		ZixTreeIter* item;
 		if (zix_tree_find(t, (void*)r, &item) != ZIX_STATUS_SUCCESS) {
 			fprintf(stderr, "Failed to find item to remove\n");
@@ -165,8 +165,8 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Insert n_elems elements again (to test non-empty destruction)
-	for (size_t i = 0; i < n_elems; ++i) {
-		r = ith_elem(test_num, n_elems, i);
+	for (size_t e = 0; e < n_elems; ++e) {
+		r = ith_elem(test_num, n_elems, e);
 		int status = zix_tree_insert(t, (void*)r, &ti);
 		if (status) {
 			fprintf(stderr, "Insert failed\n");

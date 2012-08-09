@@ -34,8 +34,8 @@ unsigned seed = 1;
 static int
 int_cmp(const void* a, const void* b, void* user_data)
 {
-	const intptr_t ia = *(intptr_t*)a;
-	const intptr_t ib = *(intptr_t*)b;
+	const intptr_t ia = *(const intptr_t*)a;
+	const intptr_t ib = *(const intptr_t*)b;
 	return ia - ib;
 }
 
@@ -54,7 +54,7 @@ ith_elem(int test_num, unsigned n_elems, int i)
 }
 
 static int
-test_fail()
+test_fail(void)
 {
 	return EXIT_FAILURE;
 }
@@ -121,8 +121,8 @@ stress(int test_num, unsigned n_elems)
 	srand(seed);
 
 	// Delete all elements
-	for (unsigned i = 0; i < n_elems; i++) {
-		r = ith_elem(test_num, n_elems, i);
+	for (unsigned e = 0; e < n_elems; e++) {
+		r = ith_elem(test_num, n_elems, e);
 		ZixSortedArrayIter item;
 		if (zix_sorted_array_find(t, &r, &item) != ZIX_STATUS_SUCCESS) {
 			fprintf(stderr, "Failed to find item to remove\n");
