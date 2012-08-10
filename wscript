@@ -71,6 +71,7 @@ def configure(conf):
 
 tests = [
     'hash_test',
+    'inline_test',
     'patree_test',
     'ring_test',
     'sem_test',
@@ -96,13 +97,15 @@ def build(bld):
         libflags = []
 
     lib_source = '''
-        src/fat_patree.c
-        src/hash.c
-        src/patree.c
-        src/ring.c
-        src/sorted_array.c
-        src/strindex.c
-        src/tree.c
+        zix/chunk.c
+        zix/digest.c
+        zix/fat_patree.c
+        zix/hash.c
+        zix/patree.c
+        zix/ring.c
+        zix/sorted_array.c
+        zix/strindex.c
+        zix/tree.c
     '''
 
     # Library
@@ -189,5 +192,5 @@ def upload_docs(ctx):
 def test(ctx):
     autowaf.pre_test(ctx, APPNAME)
     os.environ['PATH'] = 'test' + os.pathsep + os.getenv('PATH')
-    autowaf.run_tests(ctx, APPNAME, tests, dirs=['./src','./test'])
+    autowaf.run_tests(ctx, APPNAME, tests, dirs=['.','src','test'])
     autowaf.post_test(ctx, APPNAME)

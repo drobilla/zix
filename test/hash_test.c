@@ -50,26 +50,44 @@ test_fail(const char* fmt, ...)
 static unsigned n_checked = 0;
 
 static void
-check(const void* key, void* value, void* user_data)
+check(const void* value, void* user_data)
 {
-	if (key == value) {
+	if (strlen(*(const char*const*)value) >= 3) {
 		++n_checked;
 	} else {
-		fprintf(stderr, "ERROR: %s != %s\n",
-		        (const char*)key, (const char*)value);
+		fprintf(stderr, "ERROR: %s\n", (const char*)value);
 	}
+}
+
+static uint32_t
+string_ptr_hash(const void* value)
+{
+	// Trusty old DJB hash
+	const char* str = *(const char*const*)value;
+	unsigned    h   = 5381;
+	for (const char* s = str; *s != '\0'; ++s) {
+		h = (h << 5) + h + *s;  // h = h * 33 + c
+	}
+	return h;
+}
+
+static bool
+string_ptr_equal(const void* a, const void* b)
+{
+	return !strcmp(*(const char*const*)a, *(const char*const*)b);
 }
 
 int
 main(int argc, char** argv)
 {
-	ZixHash* hash = zix_hash_new(zix_string_hash, zix_string_equal);
+	ZixHash* hash = zix_hash_new(
+		string_ptr_hash, string_ptr_equal, sizeof(const char*));
 
-	const size_t n_strings = sizeof(strings) / sizeof(char*);
+	const size_t n_strings = sizeof(strings) / sizeof(const char*);
 
 	// Insert each string
 	for (size_t i = 0; i < n_strings; ++i) {
-		ZixStatus st = zix_hash_insert(hash, strings[i], (char*)strings[i]);
+		ZixStatus st = zix_hash_insert(hash, &strings[i], NULL);
 		if (st) {
 			return test_fail("Failed to insert `%s'\n", strings[i]);
 		}
@@ -79,7 +97,7 @@ main(int argc, char** argv)
 
 	// Attempt to insert each string again
 	for (size_t i = 0; i < n_strings; ++i) {
-		ZixStatus st = zix_hash_insert(hash, strings[i], (char*)strings[i]);
+		ZixStatus st = zix_hash_insert(hash, &strings[i], NULL);
 		if (st != ZIX_STATUS_EXISTS) {
 			return test_fail("Double inserted `%s'\n", strings[i]);
 		}
@@ -87,12 +105,13 @@ main(int argc, char** argv)
 
 	// Search for each string
 	for (size_t i = 0; i < n_strings; ++i) {
-		const char* match = (const char*)zix_hash_find(hash, strings[i]);
+		const char*const* match = (const char*const*)zix_hash_find(
+			hash, &strings[i]);
 		if (!match) {
 			return test_fail("Failed to find `%s'\n", strings[i]);
 		}
-		if (match != strings[i]) {
-			return test_fail("Bad match for `%s'\n", strings[i]);
+		if (*match != strings[i]) {
+			return test_fail("Bad match for `%s': `%s'\n", strings[i], match);
 		}
 	}
 
@@ -105,7 +124,8 @@ main(int argc, char** argv)
 	};
 	const size_t n_not_indexed = sizeof(not_indexed) / sizeof(char*);
 	for (size_t i = 0; i < n_not_indexed; ++i) {
-		const char* match = (const char*)zix_hash_find(hash, not_indexed[i]);
+		const char*const* match = (const char*const*)zix_hash_find(
+			hash, &not_indexed[i]);
 		if (match) {
 			return test_fail("Unexpectedly found `%s'\n", not_indexed[i]);
 		}
@@ -114,24 +134,25 @@ main(int argc, char** argv)
 	// Remove strings
 	for (size_t i = 0; i < n_strings; ++i) {
 		// Remove string
-		ZixStatus st = zix_hash_remove(hash, strings[i]);
+		ZixStatus st = zix_hash_remove(hash, &strings[i]);
 		if (st) {
 			return test_fail("Failed to remove `%s'\n", strings[i]);
 		}
 
 		// Ensure second removal fails
-		st = zix_hash_remove(hash, strings[i]);
+		st = zix_hash_remove(hash, &strings[i]);
 		if (st != ZIX_STATUS_NOT_FOUND) {
 			return test_fail("Unexpectedly removed `%s' twice\n", strings[i]);
 		}
 
 		// Check to ensure remaining strings are still present
 		for (size_t j = i + 1; j < n_strings; ++j) {
-			const char* match = (const char*)zix_hash_find(hash, strings[j]);
+			const char*const* match = (const char*const*)zix_hash_find(
+				hash, &strings[j]);
 			if (!match) {
 				return test_fail("Failed to find `%s' after remove\n", strings[j]);
 			}
-			if (match != strings[j]) {
+			if (*match != strings[j]) {
 				return test_fail("Bad match for `%s' after remove\n", strings[j]);
 			}
 		}
@@ -139,7 +160,7 @@ main(int argc, char** argv)
 
 	// Insert each string again (to check non-empty desruction)
 	for (size_t i = 0; i < n_strings; ++i) {
-		ZixStatus st = zix_hash_insert(hash, strings[i], (char*)strings[i]);
+		ZixStatus st = zix_hash_insert(hash, &strings[i], NULL);
 		if (st) {
 			return test_fail("Failed to insert `%s'\n", strings[i]);
 		}

@@ -23,6 +23,7 @@
 
 #include <glib.h>
 
+#include "zix/chunk.h"
 #include "zix/fat_patree.h"
 #include "zix/hash.h"
 #include "zix/patree.h"
@@ -56,18 +57,21 @@ main(int argc, char** argv)
 	size_t max_n_strings = 10000000;
 
 	/* Read input strings */
-	char** strings      = NULL;
-	size_t n_strings    = 0;
-	char*  buf          = calloc(1, 1);
-	size_t buf_len      = 1;
-	size_t this_str_len = 0;
+	char**  strings      = NULL;
+	size_t* lengths      = NULL;
+	size_t  n_strings    = 0;
+	char*   buf          = calloc(1, 1);
+	size_t  buf_len      = 1;
+	size_t  this_str_len = 0;
 	for (char c; (c = fgetc(fd)) != EOF;) {
 		if (c == '\n') {
 			if (this_str_len == 0) {
 				continue;
 			}
 			strings = realloc(strings, (n_strings + 1) * sizeof(char*));
+			lengths = realloc(lengths, (n_strings + 1) * sizeof(size_t));
 			strings[n_strings] = malloc(buf_len);
+			lengths[n_strings] = this_str_len;
 			memcpy(strings[n_strings], buf, buf_len);
 			this_str_len = 0;
 			if (++n_strings == max_n_strings) {
@@ -94,9 +98,11 @@ main(int argc, char** argv)
 	for (size_t n = 1; n <= n_strings; n *= 2) {
 		printf("Benchmarking n = %zu\n", n);
 		ZixPatree*    patree     = zix_patree_new();
-		ZixHash*      zhash      = zix_hash_new(zix_string_hash, zix_string_equal);
 		ZixFatPatree* fat_patree = zix_fat_patree_new();
 		GHashTable*   hash       = g_hash_table_new(g_str_hash, g_str_equal);
+		ZixHash*      zhash      = zix_hash_new((ZixHashFunc)zix_chunk_hash,
+		                                        (ZixEqualFunc)zix_chunk_equal,
+		                                        sizeof(ZixChunk));
 		fprintf(insert_dat, "%zu", n);
 		fprintf(search_dat, "%zu", n);
 
@@ -112,7 +118,8 @@ main(int argc, char** argv)
 		// ZixHash
 		insert_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
-			ZixStatus st = zix_hash_insert(zhash, strings[i], strings[i]);
+			const ZixChunk chunk = { strings[i], lengths[i] + 1 };
+			ZixStatus st = zix_hash_insert(zhash, &chunk, NULL);
 			if (st && st != ZIX_STATUS_EXISTS) {
 				return test_fail("Failed to insert `%s'\n", strings[i]);
 			}
@@ -159,13 +166,15 @@ main(int argc, char** argv)
 		srand(seed);
 		search_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
-			const size_t index = rand() % n;
-			const char* match = NULL;
-			if (!(match = zix_hash_find(zhash, strings[index]))) {
+			const size_t    index = rand() % n;
+			const ZixChunk  key   = { strings[index], lengths[index] + 1 };
+			const ZixChunk* match = NULL;
+			if (!(match = zix_hash_find(zhash, &key))) {
 				return test_fail("Hash: Failed to find `%s'\n", strings[index]);
 			}
-			if (strcmp(match, strings[index])) {
-				return test_fail("Hash: Bad match for `%s'\n", strings[index]);
+			if (strcmp(match->buf, strings[index])) {
+				return test_fail("Hash: Bad match %p for `%s': `%s'\n",
+				                 (void*)match, strings[index], match->buf);
 			}
 		}
 		fprintf(search_dat, "\t%lf", bench_end(&search_start));

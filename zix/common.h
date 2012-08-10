@@ -36,8 +36,13 @@
 #    else
 #        define ZIX_API ZIX_LIB_IMPORT
 #    endif
+#    define ZIX_PRIVATE static
+#elif defined(ZIX_INLINE)
+#    define ZIX_API     static inline
+#    define ZIX_PRIVATE static inline
 #else
 #    define ZIX_API
+#    define ZIX_PRIVATE static
 #endif
 /** @endcond */
 
