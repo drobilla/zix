@@ -165,10 +165,7 @@ peek_internal(const ZixRing* ring, uint32_t r, uint32_t w,
 uint32_t
 zix_ring_peek(ZixRing* ring, void* dst, uint32_t size)
 {
-	const uint32_t r = ring->read_head;
-	const uint32_t w = ring->write_head;
-
-	return peek_internal(ring, r, w, size, dst);
+	return peek_internal(ring, ring->read_head, ring->write_head, size, dst);
 }
 
 uint32_t
