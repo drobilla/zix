@@ -1,5 +1,5 @@
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2011-2014 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -18,7 +18,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "test_malloc.h"
 #include "zix/hash.h"
+
+static bool expect_failure = false;
 
 static const char* strings[] = {
 	"one", "two", "three", "four", "five", "six", "seven", "eight",
@@ -39,6 +42,9 @@ static const char* strings[] = {
 static int
 test_fail(const char* fmt, ...)
 {
+	if (expect_failure) {
+		return 0;
+	}
 	va_list args;
 	va_start(args, fmt);
 	fprintf(stderr, "error: ");
@@ -77,27 +83,41 @@ string_ptr_equal(const void* a, const void* b)
 	return !strcmp(*(const char*const*)a, *(const char*const*)b);
 }
 
-int
-main(int argc, char** argv)
+static int
+stress(void)
 {
 	ZixHash* hash = zix_hash_new(
 		string_ptr_hash, string_ptr_equal, sizeof(const char*));
+	if (!hash) {
+		return test_fail("Failed to allocate hash\n");
+	}
 
 	const size_t n_strings = sizeof(strings) / sizeof(const char*);
 
 	// Insert each string
 	for (size_t i = 0; i < n_strings; ++i) {
-		ZixStatus st = zix_hash_insert(hash, &strings[i], NULL);
+		const void* inserted = NULL;
+		ZixStatus   st       = zix_hash_insert(hash, &strings[i], &inserted);
 		if (st) {
 			return test_fail("Failed to insert `%s'\n", strings[i]);
+		} else if (*(const void*const*)inserted != strings[i]) {
+			return test_fail("Corrupt insertion %s != %s\n",
+			                 strings[i], *(const char*const*)inserted);
 		}
+	}
+
+	// Ensure hash size is correct
+	if (zix_hash_size(hash) != n_strings) {
+		return test_fail("Hash size %zu != %zu\n",
+		                 zix_hash_size(hash), n_strings);
 	}
 
 	//zix_hash_print_dot(hash, stdout);
 
 	// Attempt to insert each string again
 	for (size_t i = 0; i < n_strings; ++i) {
-		ZixStatus st = zix_hash_insert(hash, &strings[i], NULL);
+		const void* inserted = NULL;
+		ZixStatus   st       = zix_hash_insert(hash, &strings[i], &inserted);
 		if (st != ZIX_STATUS_EXISTS) {
 			return test_fail("Double inserted `%s'\n", strings[i]);
 		}
@@ -173,6 +193,26 @@ main(int argc, char** argv)
 	}
 
 	zix_hash_free(hash);
+
+	return 0;
+}
+
+int
+main(int argc, char** argv)
+{
+	if (stress()) {
+		return 1;
+	}
+
+	const size_t total_n_allocs = test_malloc_get_n_allocs();
+	printf("Testing 0 ... %zu failed allocations\n", total_n_allocs);
+	expect_failure = true;
+	for (size_t i = 0; i < total_n_allocs; ++i) {
+		test_malloc_reset(i);
+		stress();
+	}
+
+	test_malloc_reset((size_t)-1);
 
 	return 0;
 }

@@ -124,7 +124,7 @@ def build(bld):
                                             '-DZIX_INTERNAL'])
 
     if bld.env.BUILD_TESTS:
-        test_libs   = ['pthread']
+        test_libs   = ['pthread', 'dl']
         test_cflags = []
         if bld.env.MSVC_COMPILER:
             test_libs = []
@@ -146,7 +146,7 @@ def build(bld):
         # Unit test programs
         for i in tests:
             obj = bld(features     = 'c cprogram',
-                      source       = 'test/%s.c' % i,
+                      source       = ['test/%s.c' % i, 'test/test_malloc.c'],
                       includes     = ['.'],
                       use          = 'libzix_profiled',
                       lib          = test_libs,
