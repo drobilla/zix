@@ -108,12 +108,11 @@ stress(int test_num, size_t n_elems)
 	srand(seed);
 
 	// Iterate over all elements
-	size_t i = 0;
+	size_t   i    = 0;
 	intptr_t last = -1;
 	for (ZixTreeIter* iter = zix_tree_begin(t);
 	     !zix_tree_iter_is_end(iter);
 	     iter = zix_tree_iter_next(iter), ++i) {
-		r = ith_elem(test_num, n_elems, i);
 		const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
 		if (iter_data < last) {
 			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
@@ -121,6 +120,10 @@ stress(int test_num, size_t n_elems)
 			return test_fail();
 		}
 		last = iter_data;
+	}
+	if (i != n_elems) {
+		fprintf(stderr, "Iteration stopped at %zu/%zu elements\n", i, n_elems);
+		return test_fail();
 	}
 
 	srand(seed);
@@ -131,7 +134,6 @@ stress(int test_num, size_t n_elems)
 	for (ZixTreeIter* iter = zix_tree_rbegin(t);
 	     !zix_tree_iter_is_rend(iter);
 	     iter = zix_tree_iter_prev(iter), ++i) {
-		r = ith_elem(test_num, n_elems, i);
 		const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
 		if (iter_data > last) {
 			fprintf(stderr, "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
@@ -197,7 +199,7 @@ main(int argc, char** argv)
 	unsigned       n_elems = 0;
 
 	if (argc == 1) {
-		n_elems = 4096;
+		n_elems = 100000;
 	} else {
 		n_elems = atol(argv[1]);
 		if (argc > 2) {

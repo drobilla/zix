@@ -77,7 +77,8 @@ tests = [
     'sem_test',
     'sorted_array_test',
     'strindex_test',
-    'tree_test'
+    'tree_test',
+    'btree_test'
 ]
 
 def build(bld):
@@ -106,13 +107,14 @@ def build(bld):
         zix/sorted_array.c
         zix/strindex.c
         zix/tree.c
+        zix/btree.c
     '''
 
     # Library
     obj = bld(features        = 'c cshlib',
               export_includes = ['.'],
               source          = lib_source,
-              includes        = ['.', './src'],
+              includes        = ['.'],
               name            = 'libzix',
               target          = 'zix',
               vnum            = ZIX_LIB_VERSION,
@@ -133,7 +135,7 @@ def build(bld):
         # Static library (for unit test code coverage)
         obj = bld(features     = 'c cstlib',
                   source       = lib_source,
-                  includes     = ['.', './src'],
+                  includes     = ['.'],
                   lib          = test_libs,
                   name         = 'libzix_profiled',
                   target       = 'zix_profiled',
@@ -149,7 +151,7 @@ def build(bld):
                       use          = 'libzix_profiled',
                       lib          = test_libs,
                       target       = 'test/%s' % i,
-                      install_path = '',
+                      install_path = None,
                       framework    = framework,
                       cflags       = test_cflags)
 
@@ -174,7 +176,7 @@ def build(bld):
         bld.add_post_fun(fix_docs)
 
 def lint(ctx):
-    subprocess.call('cpplint.py --filter=-whitespace/tab,-whitespace/braces,-build/header_guard,-readability/casting,-readability/todo src/* zix/*', shell=True)
+    subprocess.call('cpplint.py --filter=-whitespace/tab,-whitespace/braces,-build/header_guard,-readability/casting,-readability/todo zix/*', shell=True)
 
 def build_dir(ctx, subdir):
     if autowaf.is_child():
@@ -192,5 +194,5 @@ def upload_docs(ctx):
 def test(ctx):
     autowaf.pre_test(ctx, APPNAME)
     os.environ['PATH'] = 'test' + os.pathsep + os.getenv('PATH')
-    autowaf.run_tests(ctx, APPNAME, tests, dirs=['.','src','test'])
-    autowaf.post_test(ctx, APPNAME)
+    autowaf.run_tests(ctx, APPNAME, tests, dirs=['.', './test'])
+    autowaf.post_test(ctx, APPNAME, dirs=['.', './test'])

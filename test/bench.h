@@ -27,10 +27,10 @@ elapsed_s(const struct timespec* start, const struct timespec* end)
 }
 
 static inline struct timespec
-bench_start()
+bench_start(void)
 {
 	struct timespec start_t;
-	clock_gettime(CLOCK_REALTIME, &start_t);
+	clock_gettime(CLOCK_MONOTONIC, &start_t);
 	return start_t;
 }
 
@@ -38,7 +38,7 @@ static inline double
 bench_end(const struct timespec* start_t)
 {
 	struct timespec end_t;
-	clock_gettime(CLOCK_REALTIME, &end_t);
+	clock_gettime(CLOCK_MONOTONIC, &end_t);
 	return elapsed_s(start_t, &end_t);
 }
 
