@@ -187,7 +187,8 @@ bench_zix_btree(size_t n_elems,
 	struct timespec del_start = bench_start();
 	for (size_t i = 0; i < n_elems; i++) {
 		r = unique_rand(i);
-		if (zix_btree_remove(t, (void*)r)) {
+		void* removed;
+		if (zix_btree_remove(t, (void*)r, &removed)) {
 			return test_fail("Failed to remove %zu\n", r);
 		}
 	}
