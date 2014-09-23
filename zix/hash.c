@@ -230,4 +230,3 @@ zix_hash_foreach(const ZixHash*   hash,
 		}
 	}
 }
-

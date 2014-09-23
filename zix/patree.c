@@ -25,13 +25,11 @@
 #include "zix/common.h"
 #include "zix/patree.h"
 
-//#undef __SSE4_2__
-
 #ifdef __SSE4_2__
 #include <smmintrin.h>
-//#warning Using SSE 4.2
+// #warning Using SSE 4.2
 #else
-//#warning SSE 4.2 disabled
+// #warning SSE 4.2 disabled
 #endif
 
 typedef uint_fast8_t n_edges_t;
