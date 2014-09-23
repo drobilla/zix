@@ -78,10 +78,10 @@ ZIX_API ZixStatus
 zix_btree_insert(ZixBTree* t, void* e);
 
 /**
-   Remove the value `e` from `t`.
+   Remove the value `e` from `t`, set `removed` to the removed pointer.
 */
 ZIX_API ZixStatus
-zix_btree_remove(ZixBTree* t, const void* e);
+zix_btree_remove(ZixBTree* t, const void* e, void** removed);
 
 /**
    Set `ti` to an element equal to `e` in `t`.
@@ -89,6 +89,16 @@ zix_btree_remove(ZixBTree* t, const void* e);
 */
 ZIX_API ZixStatus
 zix_btree_find(const ZixBTree* t, const void* e, ZixBTreeIter** ti);
+
+/**
+   Set `ti` to the smallest element in `t` that is not less than `e`.
+
+   Wildcards are supported, so if the search key `e` compares equal to many
+   values in the tree, `ti` will be set to the least such element.  The search
+   key `e` is always passed as the second argument to the comparator.
+*/
+ZIX_API ZixStatus
+zix_btree_lower_bound(const ZixBTree* t, const void* e, ZixBTreeIter** ti);
 
 /**
    Return the data associated with the given tree item.

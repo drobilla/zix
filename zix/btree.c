@@ -116,6 +116,10 @@ zix_btree_new(const ZixComparator  cmp,
 		t->cmp_data = cmp_data;
 		t->size     = 0;
 		t->height   = 1;
+		if (!t->root) {
+			free(t);
+			return NULL;
+		}
 	}
 	return t;
 }
@@ -242,7 +246,7 @@ zix_btree_node_find(const ZixBTree* const     t,
 		const int      cmp  = t->cmp(n->vals[i], e, t->cmp_data);
 		if (cmp == 0) {
 			*equal = true;
-			return i;
+			len    = half;  // Keep searching for wildcard matches
 		} else if (cmp < 0) {
 			const unsigned chop = half + 1;
 			first += chop;
@@ -251,6 +255,7 @@ zix_btree_node_find(const ZixBTree* const     t,
 			len = half;
 		}
 	}
+	assert(!*equal || t->cmp(n->vals[first], e, t->cmp_data) == 0);
 	return first;
 }
 
@@ -278,10 +283,10 @@ zix_btree_insert(ZixBTree* const t, void* const e)
 				return ZIX_STATUS_NO_MEM;
 			}
 
-			const int cmp = t->cmp(e, parent->vals[i], t->cmp_data);
+			const int cmp = t->cmp(parent->vals[i], e, t->cmp_data);
 			if (cmp == 0) {
 				return ZIX_STATUS_EXISTS;
-			} else if (cmp > 0) {
+			} else if (cmp < 0) {
 				// Move to new RHS
 				n = rhs;
 				++i;
@@ -371,6 +376,7 @@ zix_btree_merge(ZixBTree* const t, ZixBTreeNode* const n, const unsigned i)
 	ZixBTreeNode* const lhs = n->children[i];
 	ZixBTreeNode* const rhs = n->children[i + 1];
 
+	assert(zix_btree_node_is_minimal(n->children[i]));
 	assert(lhs->n_vals + rhs->n_vals < zix_btree_max_vals(lhs));
 
 	// Move parent value to end of LHS
@@ -446,7 +452,8 @@ zix_btree_remove_max(ZixBTree* const t, ZixBTreeNode* n)
 ZIX_PRIVATE ZixStatus
 zix_btree_remove_rec(ZixBTree* const     t,
                      ZixBTreeNode* const n,
-                     const void* const   e)
+                     const void* const   e,
+                     void** const        removed)
 {
 	/* To remove in a single walk down, the tree is adjusted along the way so
 	   that the current node always has at least one more value than the
@@ -460,7 +467,7 @@ zix_btree_remove_rec(ZixBTree* const     t,
 	if (n->is_leaf) {
 		if (equal) {
 			// Found in leaf node
-			zix_btree_aerase(n->vals, --n->n_vals, i);
+			*removed = zix_btree_aerase(n->vals, --n->n_vals, i);
 			return ZIX_STATUS_SUCCESS;
 		} else {
 			// Not found in leaf node, or tree
@@ -470,34 +477,39 @@ zix_btree_remove_rec(ZixBTree* const     t,
 		// Found in internal node
 		if (!zix_btree_node_is_minimal(n->children[i])) {
 			// Left child can remove without merge
+			*removed = n->vals[i];
 			n->vals[i] = zix_btree_remove_max(t, n->children[i]);
 			return ZIX_STATUS_SUCCESS;
 		} else if (!zix_btree_node_is_minimal(n->children[i + 1])) {
 			// Right child can remove without merge
+			*removed = n->vals[i];
 			n->vals[i] = zix_btree_remove_min(t, n->children[i + 1]);
 			return ZIX_STATUS_SUCCESS;
 		} else {
 			// Both preceding and succeeding child are minimal
-			return zix_btree_remove_rec(t, zix_btree_merge(t, n, i), e);
+			ZixBTreeNode* const merged = zix_btree_merge(t, n, i);
+			return zix_btree_remove_rec(t, merged, e, removed);
 		}
 	} else {
 		// Not found in internal node, key is in/under children[i]
 		if (zix_btree_node_is_minimal(n->children[i])) {
 			if (i > 0 && !zix_btree_node_is_minimal(n->children[i - 1])) {
 				// Child's left sibling has at least one key to steal
-				return zix_btree_remove_rec(t, zix_btree_rotate_right(n, i), e);
+				ZixBTreeNode* const rhs = zix_btree_rotate_right(n, i);
+				return zix_btree_remove_rec(t, rhs, e, removed);
 			} else if (i < n->n_vals &&
 			           !zix_btree_node_is_minimal(n->children[i + 1])) {
 				// Child's right sibling has at least one key to steal
-				return zix_btree_remove_rec(t, zix_btree_rotate_left(n, i), e);
+				ZixBTreeNode* const lhs = zix_btree_rotate_left(n, i);
+				return zix_btree_remove_rec(t, lhs, e, removed);
 			} else {
 				// Both child's siblings are minimal, merge them
 				const unsigned m = (i < n->n_vals) ? i : i - 1;
-				assert(zix_btree_node_is_minimal(n->children[m]));
-				return zix_btree_remove_rec(t, zix_btree_merge(t, n, m), e);
+				ZixBTreeNode* const merged = zix_btree_merge(t, n, m);
+				return zix_btree_remove_rec(t, merged, e, removed);
 			}
 		} else {
-			return zix_btree_remove_rec(t, n->children[i], e);
+			return zix_btree_remove_rec(t, n->children[i], e, removed);
 		}
 	}
 
@@ -506,9 +518,9 @@ zix_btree_remove_rec(ZixBTree* const     t,
 }
 
 ZIX_API ZixStatus
-zix_btree_remove(ZixBTree* const t, const void* const e)
+zix_btree_remove(ZixBTree* const t, const void* const e, void** const removed)
 {
-	const ZixStatus st = zix_btree_remove_rec(t, t->root, e);
+	const ZixStatus st = zix_btree_remove_rec(t, t->root, e, removed);
 	if (!st) {
 		--t->size;
 	}
@@ -532,9 +544,7 @@ zix_btree_find(const ZixBTree* const t,
                ZixBTreeIter** const  ti)
 {
 	ZixBTreeNode* n = t->root;
-
-	*ti = zix_btree_iter_new(t);
-	if (!*ti) {
+	if (!(*ti = zix_btree_iter_new(t))) {
 		return ZIX_STATUS_NO_MEM;
 	}
 
@@ -559,6 +569,53 @@ zix_btree_find(const ZixBTree* const t,
 	zix_btree_iter_free(*ti);
 	*ti = NULL;
 	return ZIX_STATUS_NOT_FOUND;
+}
+
+ZIX_API ZixStatus
+zix_btree_lower_bound(const ZixBTree* const t,
+                      const void* const     e,
+                      ZixBTreeIter** const  ti)
+{
+	ZixBTreeNode* n           = t->root;
+	bool          found       = false;
+	unsigned      found_level = 0;
+	if (!(*ti = zix_btree_iter_new(t))) {
+		return ZIX_STATUS_NO_MEM;
+	}
+
+	while (n) {
+		bool           equal = false;
+		const unsigned i     = zix_btree_node_find(t, n, e, &equal);
+
+		// Update iterator stack
+		(*ti)->stack[(*ti)->level].node  = n;
+		(*ti)->stack[(*ti)->level].index = i;
+
+		if (equal) {
+			found_level = (*ti)->level;
+			found       = true;
+		}
+
+		if (n->is_leaf) {
+			break;
+		} else {
+			++(*ti)->level;
+			n = n->children[i];
+		}
+	}
+
+	const ZixBTreeIterFrame* const frame = &(*ti)->stack[(*ti)->level];
+	if (frame->index == frame->node->n_vals) {
+		if (found) {
+			// Found on a previous level but went too far
+			(*ti)->level = found_level;
+		} else {
+			// Reached end (key is greater than everything in tree)
+			(*ti)->stack[0].node = NULL;
+		}
+	}
+
+	return ZIX_STATUS_SUCCESS;
 }
 
 ZIX_API void*
