@@ -1,5 +1,5 @@
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2011-2014 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -188,7 +188,7 @@ bench_zix_btree(size_t n_elems,
 	for (size_t i = 0; i < n_elems; i++) {
 		r = unique_rand(i);
 		void* removed;
-		if (zix_btree_remove(t, (void*)r, &removed)) {
+		if (zix_btree_remove(t, (void*)r, &removed, NULL)) {
 			return test_fail("Failed to remove %zu\n", r);
 		}
 	}
