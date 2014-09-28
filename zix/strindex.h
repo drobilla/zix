@@ -1,5 +1,5 @@
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2011-2014 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -29,23 +29,23 @@
 typedef struct _ZixStrindex ZixStrindex;
 
 /**
-   Construct a new strindex that contains all suffixes of the string @a s.
-   A copy of @a s is taken and stored for the lifetime of the strindex.
+   Construct a new strindex that contains all suffixes of the string `s`.
+   A copy of `s` is taken and stored for the lifetime of the strindex.
 */
 ZIX_API
 ZixStrindex*
 zix_strindex_new(const char* s);
 
 /**
-   Destroy @a t.
+   Destroy `t`.
 */
 ZIX_API
 void
 zix_strindex_free(ZixStrindex* strindex);
 
 /**
-   Check if the string in @a strindex contains the substring @a str.
-   If such a substring is found, @a match is pointed at an occurrence of it.
+   Check if the string in `strindex` contains the substring `str`.
+   If such a substring is found, `match` is pointed at an occurrence of it.
 */
 ZIX_API
 ZixStatus

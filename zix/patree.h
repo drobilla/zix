@@ -1,5 +1,5 @@
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2011-2014 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -36,28 +36,28 @@ ZixPatree*
 zix_patree_new(void);
 
 /**
-   Destroy @a t.
+   Destroy `t`.
 */
 ZIX_API
 void
 zix_patree_free(ZixPatree* t);
 
 /**
-   Print a DOT description of @a t to @a fd.
+   Print a DOT description of `t` to `fd`.
 */
 ZIX_API
 void
 zix_patree_print_dot(const ZixPatree* t, FILE* fd);
 
 /**
-   Insert @a str into @a t.
+   Insert `str` into `t`.
 */
 ZIX_API
 ZixStatus
 zix_patree_insert(ZixPatree* t, const char* str);
 
 /**
-   Search for @a str in @a t.
+   Search for `str` in `t`.
 */
 ZIX_API
 ZixStatus

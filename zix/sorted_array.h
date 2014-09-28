@@ -1,6 +1,5 @@
-
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2011-2014 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -50,21 +49,21 @@ zix_sorted_array_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data,
                      size_t elem_size);
 
 /**
-   Free @a a.
+   Free `a`.
 */
 ZIX_API
 void
 zix_sorted_array_free(ZixSortedArray* a);
 
 /**
-   Return the number of elements in @a a.
+   Return the number of elements in `a`.
 */
 ZIX_API
 size_t
 zix_sorted_array_size(ZixSortedArray* a);
 
 /**
-   Insert the element @a e into @a a and point @a ai at the new element.
+   Insert the element `e` into `a` and point `ai` at the new element.
 */
 ZIX_API
 ZixStatus
@@ -73,15 +72,15 @@ zix_sorted_array_insert(ZixSortedArray*     a,
                         ZixSortedArrayIter* ai);
 
 /**
-   Remove the item pointed at by @a ai from @a a.
+   Remove the item pointed at by `ai` from `a`.
 */
 ZIX_API
 ZixStatus
 zix_sorted_array_remove(ZixSortedArray* a, ZixSortedArrayIter ai);
 
 /**
-   Set @a ai to be the largest element <= @a e in @a a.
-   If no such item exists, @a ai is set to NULL.
+   Set `ai` to be the largest element <= `e` in `a`.
+   If no such item exists, `ai` is set to NULL.
 */
 ZIX_API
 ZixStatus
@@ -90,7 +89,7 @@ zix_sorted_array_find(const ZixSortedArray* a,
                       ZixSortedArrayIter*   ai);
 
 /**
-   Return the element at index @a index.
+   Return the element at index `index`.
 */
 ZIX_API
 void*
@@ -104,28 +103,28 @@ void*
 zix_sorted_array_get_data(ZixSortedArrayIter ai);
 
 /**
-   Return an iterator to the first (smallest) element in @a a.
+   Return an iterator to the first (smallest) element in `a`.
 */
 ZIX_API
 ZixSortedArrayIter
 zix_sorted_array_begin(ZixSortedArray* a);
 
 /**
-   Return an iterator the the element one past the last element in @a a.
+   Return an iterator the the element one past the last element in `a`.
 */
 ZIX_API
 ZixSortedArrayIter
 zix_sorted_array_end(ZixSortedArray* a);
 
 /**
-   Return true iff @a a is an iterator to the end of its tree.
+   Return true iff `a` is an iterator to the end of its tree.
 */
 ZIX_API
 bool
 zix_sorted_array_iter_is_end(ZixSortedArray* a, ZixSortedArrayIter i);
 
 /**
-   Return an iterator that points to the element one past @a a.
+   Return an iterator that points to the element one past `a`.
 */
 ZIX_API
 ZixSortedArrayIter

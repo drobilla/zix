@@ -1,5 +1,5 @@
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2011-2014 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -44,7 +44,7 @@ typedef struct ZixRingImpl ZixRing;
    Create a new ring.
    @param size Size in bytes (note this may be rounded up).
 
-   At most @c size - 1 bytes may be stored in the ring at once.
+   At most `size` - 1 bytes may be stored in the ring at once.
 */
 ZixRing*
 zix_ring_new(uint32_t size);
