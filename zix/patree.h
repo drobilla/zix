@@ -31,36 +31,31 @@ typedef struct _ZixPatree ZixPatree;
 /**
    Construct a new Patree.
 */
-ZIX_API
-ZixPatree*
+ZIX_API ZixPatree*
 zix_patree_new(void);
 
 /**
    Destroy `t`.
 */
-ZIX_API
-void
+ZIX_API void
 zix_patree_free(ZixPatree* t);
 
 /**
    Print a DOT description of `t` to `fd`.
 */
-ZIX_API
-void
+ZIX_API void
 zix_patree_print_dot(const ZixPatree* t, FILE* fd);
 
 /**
    Insert `str` into `t`.
 */
-ZIX_API
-ZixStatus
-zix_patree_insert(ZixPatree* t, const char* str);
+ZIX_API ZixStatus
+zix_patree_insert(ZixPatree* t, const char* str, size_t len);
 
 /**
    Search for `str` in `t`.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_patree_find(const ZixPatree* t, const char* str, const char** match);
 
 /**

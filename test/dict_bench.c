@@ -128,7 +128,7 @@ main(int argc, char** argv)
 		// ZixPatree
 		insert_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
-			ZixStatus st = zix_patree_insert(patree, strings[i]);
+			ZixStatus st = zix_patree_insert(patree, strings[i], lengths[i]);
 			if (st && st != ZIX_STATUS_EXISTS) {
 				return test_fail("Failed to insert `%s'\n", strings[i]);
 			}

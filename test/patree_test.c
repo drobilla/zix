@@ -63,17 +63,19 @@ main(int argc, char** argv)
 
 	// Insert each string
 	for (size_t i = 0; i < n_strings; ++i) {
-		ZixStatus st = zix_patree_insert(patree, strings[i]);
+		ZixStatus st = zix_patree_insert(patree, strings[i], strlen(strings[i]));
 		if (st) {
 			return test_fail("Failed to insert `%s'\n", strings[i]);
 		}
 	}
 
-	//zix_patree_print_dot(patree, stdout);
+	FILE* dot_file = fopen("patree.dot", "w");
+	zix_patree_print_dot(patree, dot_file);
+	fclose(dot_file);
 
 	// Attempt to insert each string again
 	for (size_t i = 0; i < n_strings; ++i) {
-		ZixStatus st = zix_patree_insert(patree, strings[i]);
+		ZixStatus st = zix_patree_insert(patree, strings[i], strlen(strings[i]));
 		if (st != ZIX_STATUS_EXISTS) {
 			return test_fail("Double inserted `%s'\n", strings[i]);
 		}

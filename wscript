@@ -232,10 +232,11 @@ def bench(ctx):
         import random
         out = open(filename, 'w')
         for i in xrange(1 << 20):
-            wordlen = random.randrange(1, 128)
+            wordlen = random.randrange(1, 64)
+            word    = ''
             for j in xrange(wordlen):
-                out.write(chr(random.randrange(ord('A'), ord('Z'))))
-            out.write(' ')
+                word += chr(random.randrange(ord('A'), min(ord('Z'), ord('A') + j + 1)))
+            out.write(word + ' ')
         out.close()
 
     subprocess.call(['test/dict_bench', 'gibberish.txt'])
