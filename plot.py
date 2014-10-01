@@ -34,7 +34,8 @@ class SensibleScalarFormatter(matplotlib.ticker.ScalarFormatter):
 
         self.set_scientific(True)
 
-n_plots = len(sys.argv) - 2
+file_prefix = os.path.commonprefix(sys.argv[1:])
+n_plots     = len(sys.argv) - 2
 for i in range(n_plots):
     filename = sys.argv[i+2]
     file = open(filename, 'r')
@@ -80,7 +81,7 @@ for i in range(n_plots):
                   labelspacing=0.10, columnspacing=0,
                   framealpha=0.90)
 
-    pyplot.title(os.path.splitext(os.path.basename(filename))[0].title())
+    pyplot.title(os.path.splitext(filename[len(file_prefix):])[0].title())
 
     # out = filename.replace('.dat', '.png')
     # print('Writing %s' % out)

@@ -34,6 +34,8 @@ def options(opt):
                    help='Build unit tests')
     opt.add_option('--bench', action='store_true', dest='build_bench',
                    help='Build benchmarks')
+    opt.add_option('--static', action='store_true', dest='static',
+                   help='Build static library')
 
 def configure(conf):
     conf.load('compiler_c')
@@ -41,8 +43,9 @@ def configure(conf):
     autowaf.set_c99_mode(conf)
     autowaf.display_header('Zix Configuration')
 
-    conf.env.BUILD_BENCH = Options.options.build_bench
-    conf.env.BUILD_TESTS = Options.options.build_tests
+    conf.env.BUILD_BENCH  = Options.options.build_bench
+    conf.env.BUILD_TESTS  = Options.options.build_tests
+    conf.env.BUILD_STATIC = Options.options.static
 
     # Check for mlock
     conf.check(function_name='mlock',
@@ -100,7 +103,6 @@ def build(bld):
     lib_source = '''
         zix/chunk.c
         zix/digest.c
-        zix/fat_patree.c
         zix/hash.c
         zix/patree.c
         zix/ring.c
@@ -123,6 +125,19 @@ def build(bld):
               cflags          = libflags + ['-DZIX_SHARED',
                                             '-DZIX_INTERNAL'])
 
+    if bld.env.BUILD_STATIC or bld.env.BUILD_BENCH:
+        obj = bld(features        = 'c cstlib',
+                  export_includes = ['.'],
+                  source          = lib_source,
+                  includes        = ['.'],
+                  name            = 'libzix_static',
+                  target          = 'zix',
+                  vnum            = ZIX_LIB_VERSION,
+                  install_path    = None,
+                  framework       = framework,
+                  cflags          = libflags + ['-DZIX_SHARED',
+                                                '-DZIX_INTERNAL'])
+
     if bld.env.BUILD_TESTS:
         test_libs   = ['pthread', 'dl']
         test_cflags = []
@@ -132,7 +147,7 @@ def build(bld):
             test_libs   += ['gcov']
             test_cflags += ['-fprofile-arcs', '-ftest-coverage']
 
-        # Static library (for unit test code coverage)
+        # Profiled static library (for unit test code coverage)
         obj = bld(features     = 'c cstlib',
                   source       = lib_source,
                   includes     = ['.'],
@@ -157,11 +172,11 @@ def build(bld):
 
     if bld.env.BUILD_BENCH:
         # Benchmark programs
-        for i in ['tree_bench', 'patree_bench']:
+        for i in ['tree_bench', 'dict_bench']:
             obj = bld(features     = 'c cprogram',
                       source       = 'test/%s.c' % i,
                       includes     = ['.'],
-                      use          = 'libzix',
+                      use          = 'libzix_static',
                       uselib       = 'GLIB',
                       lib          = ['rt'],
                       target       = 'test/%s' % i,
@@ -196,3 +211,35 @@ def test(ctx):
     os.environ['PATH'] = 'test' + os.pathsep + os.getenv('PATH')
     autowaf.run_tests(ctx, APPNAME, tests, dirs=['.', './test'])
     autowaf.post_test(ctx, APPNAME, dirs=['.', './test'])
+
+def bench(ctx):
+    os.chdir('build')
+
+    # Benchmark trees
+
+    subprocess.call(['test/tree_bench', '400000', '6400000'])
+    subprocess.call(['../plot.py', 'tree_bench.svg',
+                     'tree_insert.txt',
+                     'tree_search.txt',
+                     'tree_iterate.txt',
+                     'tree_delete.txt'])
+
+    # Benchmark dictionaries
+
+    filename = 'gibberish.txt'
+    if not os.path.exists(filename):
+        Logs.info('Generating random text %s' % filename)
+        import random
+        out = open(filename, 'w')
+        for i in xrange(1 << 20):
+            wordlen = random.randrange(1, 128)
+            for j in xrange(wordlen):
+                out.write(chr(random.randrange(ord('A'), ord('Z'))))
+            out.write(' ')
+        out.close()
+
+    subprocess.call(['test/dict_bench', 'gibberish.txt'])
+    subprocess.call(['../plot.py', 'dict_bench.svg',
+                     'dict_insert.txt', 'dict_search.txt'])
+    
+                

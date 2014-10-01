@@ -1,5 +1,5 @@
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2011-2014 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -16,6 +16,7 @@
 
 #include "bench.h"
 
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +25,6 @@
 #include <glib.h>
 
 #include "zix/chunk.h"
-#include "zix/fat_patree.h"
 #include "zix/hash.h"
 #include "zix/patree.h"
 
@@ -54,7 +54,7 @@ main(int argc, char** argv)
 		return test_fail("Failed to open file %s\n", file);
 	}
 
-	size_t max_n_strings = 10000000;
+	size_t max_n_strings = 100000000;
 
 	/* Read input strings */
 	char**  strings      = NULL;
@@ -64,7 +64,7 @@ main(int argc, char** argv)
 	size_t  buf_len      = 1;
 	size_t  this_str_len = 0;
 	for (char c; (c = fgetc(fd)) != EOF;) {
-		if (c == '\n') {
+		if (isspace(c)) {
 			if (this_str_len == 0) {
 				continue;
 			}
@@ -90,19 +90,18 @@ main(int argc, char** argv)
 
 	fclose(fd);
 
-	FILE* insert_dat = fopen("insert.dat", "w");
-	FILE* search_dat = fopen("search.dat", "w");
-	fprintf(insert_dat, "# n\tGHashTable\tZixHash\tZixPatree\tZixFatPatree\n");
-	fprintf(search_dat, "# n\tGHashTable\tZixHash\tZixPatree\tZixFatPatree\n");
+	FILE* insert_dat = fopen("dict_insert.txt", "w");
+	FILE* search_dat = fopen("dict_search.txt", "w");
+	fprintf(insert_dat, "# n\tGHashTable\tZixHash\tZixPatree\n");
+	fprintf(search_dat, "# n\tGHashTable\tZixHash\tZixPatree\n");
 
-	for (size_t n = 1; n <= n_strings; n *= 2) {
+	for (size_t n = n_strings / 16; n <= n_strings; n *= 2) {
 		printf("Benchmarking n = %zu\n", n);
-		ZixPatree*    patree     = zix_patree_new();
-		ZixFatPatree* fat_patree = zix_fat_patree_new();
-		GHashTable*   hash       = g_hash_table_new(g_str_hash, g_str_equal);
-		ZixHash*      zhash      = zix_hash_new((ZixHashFunc)zix_chunk_hash,
-		                                        (ZixEqualFunc)zix_chunk_equal,
-		                                        sizeof(ZixChunk));
+		ZixPatree*  patree = zix_patree_new();
+		GHashTable* hash   = g_hash_table_new(g_str_hash, g_str_equal);
+		ZixHash*    zhash  = zix_hash_new((ZixHashFunc)zix_chunk_hash,
+		                                  (ZixEqualFunc)zix_chunk_equal,
+		                                  sizeof(ZixChunk));
 		fprintf(insert_dat, "%zu", n);
 		fprintf(search_dat, "%zu", n);
 
@@ -134,18 +133,6 @@ main(int argc, char** argv)
 				return test_fail("Failed to insert `%s'\n", strings[i]);
 			}
 		}
-		fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
-
-		// ZixFatPatree
-		insert_start = bench_start();
-		/*
-		for (size_t i = 0; i < n; ++i) {
-			ZixStatus st = zix_fat_patree_insert(fat_patree, strings[i]);
-			if (st && st != ZIX_STATUS_EXISTS) {
-				return test_fail("Failed to insert `%s'\n", strings[i]);
-			}
-		}
-		*/
 		fprintf(insert_dat, "\t%lf\n", bench_end(&insert_start));
 
 		// Benchmark search
@@ -193,33 +180,17 @@ main(int argc, char** argv)
 				return test_fail("Patree: Bad match for `%s'\n", strings[index]);
 			}
 		}
-		fprintf(search_dat, "\t%lf", bench_end(&search_start));
-
-		// ZixFatPatree
-		srand(seed);
-		search_start = bench_start();
-		/*
-		for (size_t i = 0; i < n; ++i) {
-			const size_t index = rand() % n;
-			char* match = NULL;
-			if (zix_fat_patree_find(fat_patree, strings[index], &match)) {
-				return test_fail("FatPatree: Failed to find `%s'\n", strings[index]);
-			}
-			if (strcmp(match, strings[index])) {
-				return test_fail("FatPatree: Bad match for `%s'\n", strings[index]);
-			}
-		}
-		*/
 		fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
 
 		zix_patree_free(patree);
-		zix_fat_patree_free(fat_patree);
 		zix_hash_free(zhash);
 		g_hash_table_unref(hash);
 	}
 
 	fclose(insert_dat);
 	fclose(search_dat);
+
+	fprintf(stderr, "Wrote dict_insert.txt dict_search.txt\n");
 
 	return 0;
 }

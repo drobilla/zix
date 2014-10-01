@@ -363,10 +363,10 @@ main(int argc, char** argv)
 
 #define HEADER "# n\tZixTree\tZixBTree\tGSequence\n"
 
-	FILE* insert_dat = fopen("insert.dat", "w");
-	FILE* search_dat = fopen("search.dat", "w");
-	FILE* iter_dat   = fopen("iterate.dat", "w");
-	FILE* del_dat    = fopen("delete.dat", "w");
+	FILE* insert_dat = fopen("tree_insert.txt", "w");
+	FILE* search_dat = fopen("tree_search.txt", "w");
+	FILE* iter_dat   = fopen("tree_iterate.txt", "w");
+	FILE* del_dat    = fopen("tree_delete.txt", "w");
 	fprintf(insert_dat, HEADER);
 	fprintf(search_dat, HEADER);
 	fprintf(iter_dat, HEADER);
@@ -393,7 +393,7 @@ main(int argc, char** argv)
 	fclose(iter_dat);
 	fclose(del_dat);
 
-	fprintf(stderr, "Wrote insert.dat search.dat iterate.dat del.dat\n");
+	fprintf(stderr, "Wrote tree_insert.txt tree_search.txt tree_iterate.txt tree_del.txt\n");
 
 	return EXIT_SUCCESS;
 }
