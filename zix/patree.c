@@ -199,15 +199,11 @@ patree_find_edge(const ZixPatreeNode* n, const char c, n_edges_t* const index)
 
 #ifndef NDEBUG
 ZIX_PRIVATE bool
-patree_node_check(const ZixPatreeNode* const node)
+zix_patree_node_check(ZixPatreeNode* const n)
 {
 	for (n_edges_t i = 0; i < n->num_children; ++i) {
 		assert(n->children[i] != '\0');
 		assert(*zix_patree_get_child_ptr(n, i) != NULL);
-	}
-	for (n_edges_t i = 0; i < child->num_children; ++i) {
-		assert(child->children[i] != '\0');
-		assert(*zix_patree_get_child_ptr(child, i) != NULL);
 	}
 	return true;
 }
@@ -288,8 +284,8 @@ patree_split_edge(ZixPatreeNode** child_ptr,
 
 	*child_ptr = child;
 
-	assert(zix_patree_node_check(n));
 	assert(zix_patree_node_check(child));
+	assert(zix_patree_node_check(grandchild));
 }
 
 ZIX_PRIVATE int
