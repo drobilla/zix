@@ -73,6 +73,10 @@ ith_elem(int test_num, size_t n_elems, int i)
 	}
 }
 
+static void destroy(void* ptr)
+{
+}
+
 typedef struct {
 	int    test_num;
 	size_t n_elems;
@@ -172,6 +176,10 @@ stress(int test_num, size_t n_elems)
 			                 (uintptr_t)zix_btree_get(ti), r);
 		}
 		zix_btree_iter_free(ti);
+	}
+
+	if (zix_btree_lower_bound(NULL, (void*)r, &ti) != ZIX_STATUS_BAD_ARG) {
+		return test_fail(t, "Lower bound on NULL tree succeeded\n");
 	}
 
 	// Find the lower bound of all elements and ensure it's exact
@@ -314,12 +322,24 @@ stress(int test_num, size_t n_elems)
 		return test_fail(t, "Tree size %zu != %zu\n", zix_btree_size(t), n_elems);
 	}
 
+	// Delete some elements in a random order
+	for (size_t e = 0; e < zix_btree_size(t); e++) {
+		r = ith_elem(test_num, n_elems, rand() % n_elems);
+		uintptr_t removed;
+		ZixStatus rst = zix_btree_remove(t, (void*)r, (void**)&removed, &next);
+		if (rst != ZIX_STATUS_SUCCESS && rst != ZIX_STATUS_NOT_FOUND) {
+			return test_fail(t, "Error deleting %lu\n", (uintptr_t)r);
+		}
+	}
+	zix_btree_iter_free(next);
+	next = NULL;
+
 	zix_btree_free(t);
 
 	// Test lower_bound with wildcard comparator
 
 	TestContext ctx = { test_num, n_elems };
-	if (!(t = zix_btree_new(wildcard_cmp, &ctx, NULL))) {
+	if (!(t = zix_btree_new(wildcard_cmp, &ctx, destroy))) {
 		return test_fail(t, "Failed to allocate tree\n");
 	}
 
@@ -352,7 +372,7 @@ stress(int test_num, size_t n_elems)
 		return test_fail(t, "Wildcard lower bound %" PRIdPTR " != %" PRIdPTR "\n",
 		                 iter_data, cut);
 	}
-		
+
 	zix_btree_iter_free(ti);
 
 	// Find lower bound of value past end
