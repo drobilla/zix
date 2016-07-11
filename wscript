@@ -36,6 +36,8 @@ def options(opt):
                    help='Build benchmarks')
     opt.add_option('--static', action='store_true', dest='static',
                    help='Build static library')
+    opt.add_option('--page-size', type='int', default=4096, dest='page_size',
+                   help='Page size for B-tree')
 
 def configure(conf):
     conf.load('compiler_c')
@@ -66,6 +68,7 @@ def configure(conf):
             conf.fatal('Glib is required to build benchmarks')
 
     autowaf.define(conf, 'ZIX_VERSION', ZIX_VERSION)
+    autowaf.define(conf, 'ZIX_BTREE_PAGE_SIZE', Options.options.page_size)
     conf.write_config_header('zix-config.h', remove=False)
 
     autowaf.display_msg(conf, 'Unit tests', str(conf.env.BUILD_TESTS))

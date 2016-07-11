@@ -24,7 +24,10 @@
 
 // #define ZIX_BTREE_DEBUG 1
 
-#define ZIX_BTREE_PAGE_SIZE  4096
+#ifndef ZIX_BTREE_PAGE_SIZE
+#    define ZIX_BTREE_PAGE_SIZE 4096
+#endif
+
 #define ZIX_BTREE_NODE_SPACE (ZIX_BTREE_PAGE_SIZE - 2 * sizeof(uint16_t))
 #define ZIX_BTREE_LEAF_VALS  ((ZIX_BTREE_NODE_SPACE / sizeof(void*)) - 1)
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2)
