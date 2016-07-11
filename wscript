@@ -76,12 +76,15 @@ tests = [
     'hash_test',
     'inline_test',
     'patree_test',
+    'trie_test',
     'ring_test',
     'sem_test',
     'sorted_array_test',
     'strindex_test',
     'tree_test',
-    'btree_test'
+    'btree_test',
+    'bitset_test',
+    'ampatree_test'
 ]
 
 def build(bld):
@@ -105,11 +108,14 @@ def build(bld):
         zix/digest.c
         zix/hash.c
         zix/patree.c
+        zix/trie.c
         zix/ring.c
         zix/sorted_array.c
         zix/strindex.c
         zix/tree.c
         zix/btree.c
+        zix/bitset.c
+        zix/ampatree.c
     '''
 
     # Library
@@ -242,5 +248,3 @@ def bench(ctx):
     subprocess.call(['test/dict_bench', 'gibberish.txt'])
     subprocess.call(['../plot.py', 'dict_bench.svg',
                      'dict_insert.txt', 'dict_search.txt'])
-    
-                
