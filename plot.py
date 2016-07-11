@@ -28,7 +28,7 @@ class SensibleScalarFormatter(matplotlib.ticker.ScalarFormatter):
     def _set_orderOfMagnitude(self, range):
         # Calculate "best" order in the usual way
         matplotlib.ticker.ScalarFormatter._set_orderOfMagnitude(self, range)
-        
+
         # Round down to sensible (millions, billions, etc) order
         self.orderOfMagnitude = self.orderOfMagnitude - (self.orderOfMagnitude % 3)
 
@@ -70,7 +70,7 @@ for i in range(n_plots):
         for i in fields:
             times[num].append([float(i)])
             num += 1
-            
+
     file.close()
 
     for i in range(len(times) - 1):
