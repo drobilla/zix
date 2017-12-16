@@ -322,12 +322,9 @@ zix_btree_insert(ZixBTree* const t, void* const e)
 ZIX_PRIVATE ZixBTreeIter*
 zix_btree_iter_new(const ZixBTree* const t)
 {
-	const size_t        s = t->height * sizeof(ZixBTreeIterFrame);
-	ZixBTreeIter* const i = (ZixBTreeIter*)malloc(sizeof(ZixBTreeIter) + s);
-	if (i) {
-		i->level = 0;
-	}
-	return i;
+	const size_t s = t->height * sizeof(ZixBTreeIterFrame);
+
+	return (ZixBTreeIter*)calloc(1, sizeof(ZixBTreeIter) + s);
 }
 
 ZIX_PRIVATE void
