@@ -641,6 +641,7 @@ zix_btree_lower_bound(const ZixBTree* const t,
 	}
 
 	const ZixBTreeIterFrame* const frame = &(*ti)->stack[(*ti)->level];
+	assert(frame->node);
 	if (frame->index == frame->node->n_vals) {
 		if (found) {
 			// Found on a previous level but went too far
@@ -658,6 +659,7 @@ ZIX_API void*
 zix_btree_get(const ZixBTreeIter* const ti)
 {
 	const ZixBTreeIterFrame* const frame = &ti->stack[ti->level];
+	assert(frame->node);
 	assert(frame->index < frame->node->n_vals);
 	return frame->node->vals[frame->index];
 }
