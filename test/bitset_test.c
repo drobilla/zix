@@ -22,6 +22,8 @@
 #define N_BITS  256
 #define N_ELEMS (ZIX_BITSET_ELEMS(N_BITS))
 
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+
 static int
 test_fail(const char* fmt, ...)
 {
@@ -57,24 +59,29 @@ main(int argc, char** argv)
 	for (size_t i = 0; i <= N_BITS; ++i) {
 		const size_t count = zix_bitset_count_up_to(b, t, i);
 		if (count != i) {
-			return test_fail("Count up to %zu is %zu != %zu\n", i, count, i);
+			return test_fail("Count to %zu is %zu != %zu\n", i, count, i);
 		}
 	}
 
 	for (size_t i = 0; i <= N_BITS; ++i) {
-		zix_bitset_reset(b, t, i);
+		if (i < N_BITS) {
+			zix_bitset_reset(b, t, i);
+		}
 		const size_t count = zix_bitset_count_up_to(b, t, i);
 		if (count != 0) {
-			return test_fail("Count up to %zu is %zu != %zu\n", i, count, 0);
+			return test_fail("Count to %zu is %zu != %zu\n", i, count, 0);
 		}
 	}
 
 	zix_bitset_clear(b, t, N_BITS);
 	for (size_t i = 0; i <= N_BITS; i += 2) {
-		zix_bitset_set(b, t, i);
-		const size_t count = zix_bitset_count_up_to(b, t, i + 1);
-		if (count != i / 2 + 1) {
-			return test_fail("Count up to %zu is %zu != %zu\n", i, count, i / 2 + 1);
+		if (i < N_BITS) {
+			zix_bitset_set(b, t, i);
+		}
+		const size_t count  = zix_bitset_count_up_to(b, t, i + 1);
+		const size_t result = MIN(N_BITS / 2, i / 2 + 1);
+		if (count != result) {
+			return test_fail("Count to %zu is %zu != %zu\n", i, count, result);
 		}
 	}
 
