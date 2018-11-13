@@ -1,5 +1,5 @@
 /*
-  Copyright 2011 David Robillard <http://drobilla.net>
+  Copyright 2016 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -50,6 +50,12 @@
 extern "C" {
 #else
 #    include <stdbool.h>
+#endif
+
+#ifdef __GNUC__
+#define ZIX_UNUSED  __attribute__((__unused__))
+#else
+#define ZIX_UNUSED
 #endif
 
 typedef enum {
