@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2012 David Robillard <http://drobilla.net>
+  Copyright 2011-2015 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -112,7 +112,7 @@ zix_hash_remove(ZixHash*    hash,
    @param hash The hash table.
    @param value The value to search for.
 */
-ZIX_API const void*
+ZIX_API void*
 zix_hash_find(const ZixHash* hash,
               const void*    value);
 

@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2014 David Robillard <http://drobilla.net>
+  Copyright 2011-2018 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -141,7 +141,7 @@ find_entry(const ZixHash* hash,
 	return NULL;
 }
 
-ZIX_API const void*
+ZIX_API void*
 zix_hash_find(const ZixHash* hash, const void* value)
 {
 	const unsigned h_nomod = hash->hash_func(value);
