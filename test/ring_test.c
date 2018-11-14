@@ -215,14 +215,17 @@ main(int argc, char** argv)
 	char* big_buf = (char*)calloc(size, 1);
 	n = zix_ring_write(ring, big_buf, size - 1);
 	if (n != (uint32_t)size - 1) {
+		free(big_buf);
 		return failure("Maximum size write failed (wrote %u)\n", n);
 	}
 
 	n = zix_ring_write(ring, big_buf, size);
 	if (n != 0) {
+		free(big_buf);
 		return failure("Successful overrun write (size %u)\n", n);
 	}
 
+	free(big_buf);
 	zix_ring_free(ring);
 	return 0;
 }
