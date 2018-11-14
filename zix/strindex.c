@@ -76,12 +76,12 @@ zix_strindex_free_rec(ZixStrindexNode* n)
 
 ZIX_API
 void
-zix_strindex_free(ZixStrindex* t)
+zix_strindex_free(ZixStrindex* strindex)
 {
-	zix_strindex_free_rec(t->root);
-	free(t->s);
-	free(t->root);
-	free(t);
+	zix_strindex_free_rec(strindex->root);
+	free(strindex->s);
+	free(strindex->root);
+	free(strindex);
 }
 
 static inline int
@@ -188,13 +188,13 @@ strindex_insert(ZixStrindexNode* n, char* suffix_first, char* first, char* last)
 
 ZIX_API
 ZixStatus
-zix_strindex_find(ZixStrindex* t, const char* p, char** match)
+zix_strindex_find(ZixStrindex* strindex, const char* p, char** match)
 {
 #ifndef NDEBUG
 	const char* orig_p = p;
 #endif
 
-	ZixStrindexNode* n = t->root;
+	ZixStrindexNode* n = strindex->root;
 	size_t           child_i;
 
 	*match = NULL;
@@ -238,14 +238,14 @@ zix_strindex_find(ZixStrindex* t, const char* p, char** match)
 				p += label_len;
 				n  = &n->children[child_i];
 				if (label_len >= p_len) {
-					assert(strstr(t->s, orig_p) != NULL);
+					assert(strstr(strindex->s, orig_p) != NULL);
 					assert(strncmp(orig_p, *match, max_len));
 					return ZIX_STATUS_SUCCESS;
 				}
 			}
 
 		} else {
-			assert(strstr(t->s, orig_p) == NULL);
+			assert(strstr(strindex->s, orig_p) == NULL);
 			return ZIX_STATUS_NOT_FOUND;
 		}
 	}
