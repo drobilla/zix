@@ -49,8 +49,8 @@ typedef uint8_t ZixBitsetTally;
    The number of bitset elements needed for the given number of bits.
 */
 #define ZIX_BITSET_ELEMS(n_bits) \
-	((n_bits / ZIX_BITSET_BITS_PER_ELEM) + \
-	 (n_bits % ZIX_BITSET_BITS_PER_ELEM ? 1 : 0))
+	(((n_bits) / ZIX_BITSET_BITS_PER_ELEM) + \
+	 ((n_bits) % ZIX_BITSET_BITS_PER_ELEM ? 1 : 0))
 
 /**
    Clear a Bitset.
