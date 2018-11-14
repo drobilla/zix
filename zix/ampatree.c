@@ -60,7 +60,7 @@ zix_ampatree_print_rec(ZixAMPatreeNode* node, FILE* fd)
 	if (node->label_first) {
 		size_t edge_label_len = node->label_last - node->label_first + 1;
 		char*  edge_label     = (char*)calloc(1, edge_label_len + 1);
-		strncpy(edge_label, node->label_first, edge_label_len);
+		strncpy(edge_label, (const char*)node->label_first, edge_label_len);
 		fprintf(fd, "\t\"%p\" [label=<"
 		        "<TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\">"
 		        "<TR><TD>%s</TD></TR>", (void*)node, edge_label);
@@ -281,7 +281,7 @@ ZIX_API ZixStatus
 zix_ampatree_find(const ZixAMPatree* t, const char* const str, const char** match)
 {
 	ZixAMPatreeNode* n = t->root;
-	const uint8_t*   p = str;
+	const uint8_t*   p = (const uint8_t*)str;
 	n_edges_t        child_i;
 	while ((child_i = ampatree_find_edge(n, p[0])) != (n_edges_t)-1) {
 		assert(child_i <= n->n_children);
@@ -298,7 +298,7 @@ zix_ampatree_find(const ZixAMPatree* t, const char* const str, const char** matc
 			/* Reached end of search string */
 			if (l + change_index == child->label_last + 1) {
 				/* Reached end of label string as well, match */
-				*match = child->str;
+				*match = (const char*)child->str;
 				return *match ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
 			} else {
 				/* Label string is longer, no match (prefix match) */
