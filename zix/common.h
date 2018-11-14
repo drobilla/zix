@@ -86,7 +86,9 @@ zix_strerror(const ZixStatus status)
 /**
    Function for comparing two elements.
 */
-typedef int (*ZixComparator)(const void* a, const void* b, void* user_data);
+typedef int (*ZixComparator)(const void* a,
+                             const void* b,
+                             const void* user_data);
 
 /**
    Function for testing equality of two elements.

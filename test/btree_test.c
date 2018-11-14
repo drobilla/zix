@@ -49,7 +49,7 @@ unique_rand(uint32_t i)
 }
 
 static int
-int_cmp(const void* a, const void* b, void* user_data)
+int_cmp(const void* a, const void* b, const void* user_data)
 {
 	const uintptr_t ia = (uintptr_t)a;
 	const uintptr_t ib = (uintptr_t)b;
@@ -90,7 +90,7 @@ wildcard_cut(int test_num, size_t n_elems)
 
 /** Wildcard comparator where 0 matches anything >= wildcard_cut(n_elems). */
 static int
-wildcard_cmp(const void* a, const void* b, void* user_data)
+wildcard_cmp(const void* a, const void* b, const void* user_data)
 {
 	const TestContext* ctx      = (TestContext*)user_data;
 	const size_t       n_elems  = ctx->n_elems;

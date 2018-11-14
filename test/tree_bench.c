@@ -45,7 +45,7 @@ unique_rand(uint32_t i)
 }
 
 static int
-int_cmp(const void* a, const void* b, void* user_data)
+int_cmp(const void* a, const void* b, const void* user_data)
 {
 	const intptr_t ia = (intptr_t)a;
 	const intptr_t ib = (intptr_t)b;
@@ -57,6 +57,12 @@ int_cmp(const void* a, const void* b, void* user_data)
 	} else {
 		return 1;
 	}
+}
+
+static int
+g_int_cmp(const void* a, const void* b, void* user_data)
+{
+	return int_cmp(a, b, user_data);
 }
 
 static int
@@ -304,7 +310,7 @@ bench_glib(size_t n_elems,
 	struct timespec insert_start = bench_start();
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = unique_rand(i);
-		GSequenceIter* iter = g_sequence_insert_sorted(t, (void*)r, int_cmp, NULL);
+		GSequenceIter* iter = g_sequence_insert_sorted(t, (void*)r, g_int_cmp, NULL);
 		if (!iter || g_sequence_iter_is_end(iter)) {
 			return test_fail("Failed to insert %zu\n", r);
 		}
@@ -315,7 +321,7 @@ bench_glib(size_t n_elems,
 	struct timespec search_start = bench_start();
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = unique_rand(i);
-		GSequenceIter* iter = g_sequence_lookup(t, (void*)r, int_cmp, NULL);
+		GSequenceIter* iter = g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);
 		if (!iter || g_sequence_iter_is_end(iter)) {
 			return test_fail("Failed to find %zu\n", r);
 		}
@@ -335,7 +341,8 @@ bench_glib(size_t n_elems,
 	struct timespec del_start = bench_start();
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = unique_rand(i);
-		GSequenceIter* iter = g_sequence_lookup(t, (void*)r, int_cmp, NULL);
+		GSequenceIter* iter =
+			g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);
 		if (!iter || g_sequence_iter_is_end(iter)) {
 			return test_fail("Failed to remove %zu\n", r);
 		}

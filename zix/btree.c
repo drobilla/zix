@@ -36,7 +36,7 @@ struct ZixBTreeImpl {
 	ZixBTreeNode*  root;
 	ZixDestroyFunc destroy;
 	ZixComparator  cmp;
-	void*          cmp_data;
+	const void*    cmp_data;
 	size_t         size;
 	unsigned       height;  ///< Number of levels, i.e. root only has height 1
 };
@@ -109,7 +109,7 @@ zix_btree_node_new(const bool leaf)
 
 ZIX_API ZixBTree*
 zix_btree_new(const ZixComparator  cmp,
-              void* const          cmp_data,
+              const void* const    cmp_data,
               const ZixDestroyFunc destroy)
 {
 	ZixBTree* t = (ZixBTree*)malloc(sizeof(ZixBTree));

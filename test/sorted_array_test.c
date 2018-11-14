@@ -32,7 +32,7 @@
 unsigned seed = 1;
 
 static int
-int_cmp(const void* a, const void* b, void* user_data)
+int_cmp(const void* a, const void* b, const void* user_data)
 {
 	const intptr_t ia = *(const intptr_t*)a;
 	const intptr_t ib = *(const intptr_t*)b;
