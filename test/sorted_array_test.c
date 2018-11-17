@@ -29,7 +29,7 @@
 #include "zix/common.h"
 #include "zix/sorted_array.h"
 
-unsigned seed = 1;
+static unsigned seed = 1;
 
 static int
 int_cmp(const void* a, const void* b, const void* user_data)

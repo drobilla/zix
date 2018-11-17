@@ -22,8 +22,8 @@
 #include "zix/sem.h"
 #include "zix/thread.h"
 
-ZixSem   sem;
-unsigned n_signals = 1024;
+static ZixSem   sem;
+static unsigned n_signals = 1024;
 
 static void*
 reader(void* arg)

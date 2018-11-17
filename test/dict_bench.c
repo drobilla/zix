@@ -30,7 +30,7 @@
 #include "zix/patree.h"
 #include "zix/trie.h"
 
-const unsigned seed = 1;
+static const unsigned seed = 1;
 
 static int
 test_fail(const char* fmt, ...)

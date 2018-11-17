@@ -25,9 +25,9 @@
 
 #define MSG_SIZE 20
 
-ZixRing* ring       = 0;
-unsigned n_writes   = 0;
-bool     read_error = false;
+static ZixRing* ring       = 0;
+static unsigned n_writes   = 0;
+static bool     read_error = false;
 
 static int
 failure(const char* fmt, ...)
