@@ -54,6 +54,7 @@ typedef struct {
 } ZixBTreeIterFrame;
 
 struct ZixBTreeIterImpl {
+	unsigned          n_levels; ///< Maximum depth of stack
 	unsigned          level;    ///< Current level in stack
 	ZixBTreeIterFrame stack[];  ///< Position stack
 };
@@ -323,7 +324,11 @@ zix_btree_iter_new(const ZixBTree* const t)
 {
 	const size_t s = t->height * sizeof(ZixBTreeIterFrame);
 
-	return (ZixBTreeIter*)calloc(1, sizeof(ZixBTreeIter) + s);
+	ZixBTreeIter* i = (ZixBTreeIter*)calloc(1, sizeof(ZixBTreeIter) + s);
+	if (i) {
+		i->n_levels = t->height;
+	}
+	return i;
 }
 
 ZIX_PRIVATE void
@@ -685,10 +690,46 @@ zix_btree_begin(const ZixBTree* const t)
 	return i;
 }
 
+ZIX_API ZixBTreeIter*
+zix_btree_end(const ZixBTree* const t)
+{
+	return zix_btree_iter_new(t);
+}
+
+ZIX_API ZixBTreeIter*
+zix_btree_iter_copy(const ZixBTreeIter* const i)
+{
+	if (!i) {
+		return NULL;
+	}
+
+	const size_t  s = i->n_levels * sizeof(ZixBTreeIterFrame);
+	ZixBTreeIter* j = (ZixBTreeIter*)calloc(1, sizeof(ZixBTreeIter) + s);
+	if (j) {
+		memcpy(j, i, sizeof(ZixBTreeIter) + s);
+	}
+	return j;
+}
+
 ZIX_API bool
 zix_btree_iter_is_end(const ZixBTreeIter* const i)
 {
 	return !i || i->stack[0].node == NULL;
+}
+
+ZIX_API bool
+zix_btree_iter_equals(const ZixBTreeIter* const lhs, const ZixBTreeIter* const rhs)
+{
+	if (zix_btree_iter_is_end(lhs) && zix_btree_iter_is_end(rhs)) {
+		return true;
+	} else if (!lhs || !rhs || lhs->n_levels != rhs->n_levels) {
+		return false;
+	}
+
+	return !memcmp(lhs,
+	               rhs,
+	               sizeof(ZixBTreeIter) +
+	                       lhs->n_levels * sizeof(ZixBTreeIterFrame));
 }
 
 ZIX_API void

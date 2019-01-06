@@ -125,6 +125,26 @@ ZIX_API ZixBTreeIter*
 zix_btree_begin(const ZixBTree* t);
 
 /**
+   Return an iterator to the end of `t` (one past the last element).
+
+   The returned iterator must be freed with zix_btree_iter_free().
+*/
+ZIX_API ZixBTreeIter*
+zix_btree_end(const ZixBTree* t);
+
+/**
+   Return a new copy of `i`.
+*/
+ZIX_API ZixBTreeIter*
+zix_btree_iter_copy(const ZixBTreeIter* i);
+
+/**
+   Return true iff `lhs` is equal to `rhs`.
+*/
+ZIX_API bool
+zix_btree_iter_equals(const ZixBTreeIter* lhs, const ZixBTreeIter* rhs);
+
+/**
    Return true iff `i` is an iterator to the end of its tree.
 */
 ZIX_API bool
