@@ -14,11 +14,11 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/strindex.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "zix/strindex.h"
 
 static int
 test_fail(const char* fmt, ...)

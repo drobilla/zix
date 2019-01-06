@@ -14,21 +14,22 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <limits.h>
+#include "zix/btree.h"
+
+#include "test_malloc.h"
+
+#include <stdbool.h>
+#include <assert.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 #ifdef _MSC_VER
 #    define PRIdPTR "Id"
 #else
 #    include <inttypes.h>
 #endif
-
-#include "test_malloc.h"
-#include "zix/zix.h"
 
 static bool expect_failure = false;
 

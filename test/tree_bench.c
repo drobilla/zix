@@ -16,15 +16,15 @@
 
 #include "bench.h"
 
+#include "zix/zix.h"
+
+#include <glib.h>
+
 #include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include <glib.h>
-
-#include "zix/zix.h"
 
 // #define BENCH_SORTED_ARRAY 1
 

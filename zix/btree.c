@@ -14,13 +14,12 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/btree.h"
+
 #include <assert.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "zix/btree.h"
 
 // #define ZIX_BTREE_DEBUG 1
 

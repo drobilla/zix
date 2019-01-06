@@ -14,7 +14,10 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <limits.h>
+#include "zix/common.h"
+#include "zix/sorted_array.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,9 +28,6 @@
 #else
 #    include <inttypes.h>
 #endif
-
-#include "zix/common.h"
-#include "zix/sorted_array.h"
 
 static unsigned seed = 1;
 

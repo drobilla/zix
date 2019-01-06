@@ -14,10 +14,11 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <string.h>
-
 #include "zix/chunk.h"
+
 #include "zix/digest.h"
+
+#include <string.h>
 
 ZIX_API uint32_t
 zix_chunk_hash(const ZixChunk* const chunk)

@@ -17,6 +17,9 @@
 #ifndef ZIX_TRIE_UTIL_H
 #define ZIX_TRIE_UTIL_H
 
+#include <assert.h>
+#include <stdint.h>
+
 #ifdef __SSE4_2__
 #    include <smmintrin.h>
 #endif

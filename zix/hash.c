@@ -14,12 +14,11 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/hash.h"
+
 #include <assert.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "zix/hash.h"
 
 /**
    Primes, each slightly less than twice its predecessor, and as far away

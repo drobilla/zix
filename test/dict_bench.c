@@ -16,19 +16,19 @@
 
 #include "bench.h"
 
-#include <ctype.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <glib.h>
-
 #include "zix/ampatree.h"
 #include "zix/chunk.h"
 #include "zix/hash.h"
 #include "zix/patree.h"
 #include "zix/trie.h"
+
+#include <glib.h>
+
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static const unsigned seed = 1;
 

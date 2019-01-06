@@ -16,8 +16,8 @@
 
 #define _POSIX_C_SOURCE 199309L
 
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 
 static inline double
 elapsed_s(const struct timespec* start, const struct timespec* end)

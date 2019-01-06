@@ -16,16 +16,18 @@
 
 #define _XOPEN_SOURCE 500
 
+#include "zix/ampatree.h"
+
+#include "zix/bitset.h"
+#include "zix/common.h"
+#include "zix/trie_util.h"
+
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "zix/ampatree.h"
-#include "zix/bitset.h"
-#include "zix/common.h"
-#include "zix/trie_util.h"
 
 #define ZIX_AMPATREE_BITS  256
 #define ZIX_AMPATREE_ELEMS (ZIX_BITSET_ELEMS(ZIX_AMPATREE_BITS))

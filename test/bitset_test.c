@@ -14,10 +14,10 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/bitset.h"
+
 #include <stdarg.h>
 #include <stdio.h>
-
-#include "zix/bitset.h"
 
 #define N_BITS  256
 #define N_ELEMS (ZIX_BITSET_ELEMS(N_BITS))

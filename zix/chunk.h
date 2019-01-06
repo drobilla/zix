@@ -17,10 +17,11 @@
 #ifndef ZIX_CHUNK_H
 #define ZIX_CHUNK_H
 
+#include "zix/common.h"
+
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "zix/common.h"
 
 #ifdef __cplusplus
 extern "C" {

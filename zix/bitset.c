@@ -14,11 +14,9 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <string.h>
-
-#include <stdio.h>
-
 #include "zix/bitset.h"
+
+#include <string.h>
 
 /** Number of bits per ZixBitset element (ala CHAR_BIT). */
 #define ZIX_BITSET_ELEM_BIT (CHAR_BIT * sizeof(ZixBitset))

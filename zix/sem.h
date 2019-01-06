@@ -17,6 +17,10 @@
 #ifndef ZIX_SEM_H
 #define ZIX_SEM_H
 
+#include "zix/common.h"
+
+#include <stdbool.h>
+
 #ifdef __APPLE__
 #    include <mach/mach.h>
 #elif defined(_WIN32)
@@ -26,8 +30,6 @@
 #    include <semaphore.h>
 #    include <errno.h>
 #endif
-
-#include "zix/common.h"
 
 #ifdef __cplusplus
 extern "C" {

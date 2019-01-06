@@ -17,11 +17,12 @@
 #ifndef ZIX_BITSET_H
 #define ZIX_BITSET_H
 
+#include "zix/common.h"
+
 #include <limits.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "zix/common.h"
 
 /**
    @addtogroup zix

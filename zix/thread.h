@@ -17,6 +17,10 @@
 #ifndef ZIX_THREAD_H
 #define ZIX_THREAD_H
 
+#include "zix/common.h"
+
+#include <stdbool.h>
+
 #ifdef _WIN32
 #    include <windows.h>
 #else
@@ -24,12 +28,8 @@
 #    include <pthread.h>
 #endif
 
-#include "zix/common.h"
-
 #ifdef __cplusplus
 extern "C" {
-#else
-#    include <stdbool.h>
 #endif
 
 /**

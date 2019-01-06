@@ -14,13 +14,11 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "zix/sem.h"
 #include "zix/thread.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 static ZixSem   sem;
 static unsigned n_signals = 1024;

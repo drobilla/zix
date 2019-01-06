@@ -17,14 +17,13 @@
 #ifndef ZIX_BTREE_H
 #define ZIX_BTREE_H
 
-#include <stddef.h>
-
 #include "zix/common.h"
+
+#include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
-#else
-#    include <stdbool.h>
 #endif
 
 /**

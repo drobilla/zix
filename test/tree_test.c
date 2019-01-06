@@ -14,7 +14,11 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <limits.h>
+#include "zix/tree.h"
+
+#include "zix/common.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,8 +29,6 @@
 #else
 #    include <inttypes.h>
 #endif
-
-#include "zix/zix.h"
 
 static unsigned seed = 1;
 

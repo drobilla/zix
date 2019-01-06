@@ -16,17 +16,19 @@
 
 #define _XOPEN_SOURCE 500
 
+#include "zix/patree.h"
+
+#include "zix/common.h"
+#include "zix/trie_util.h"
+
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // #define ZIX_TRIE_LINEAR_SEARCH 1
-
-#include "zix/common.h"
-#include "zix/patree.h"
-#include "zix/trie_util.h"
 
 typedef size_t n_edges_t;
 

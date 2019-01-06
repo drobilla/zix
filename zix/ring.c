@@ -14,7 +14,8 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include <stdint.h>
+#include "zix/ring.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -45,8 +46,6 @@
 /* No support for any systems with separate read and write barriers */
 #define ZIX_READ_BARRIER() ZIX_FULL_BARRIER()
 #define ZIX_WRITE_BARRIER() ZIX_FULL_BARRIER()
-
-#include "zix/ring.h"
 
 struct ZixRingImpl {
 	uint32_t write_head;  ///< Read index into buf

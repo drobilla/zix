@@ -16,13 +16,14 @@
 
 #define _XOPEN_SOURCE 500
 
+#include "zix/strindex.h"
+
+#include "zix/common.h"
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "zix/common.h"
-#include "zix/strindex.h"
 
 typedef struct _ZixStrindexNode {
 	struct _ZixStrindexNode* children;      /* Children of this node */

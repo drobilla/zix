@@ -19,6 +19,8 @@
 
 #include "zix/common.h"
 
+#include <stdio.h>
+
 /**
    @addtogroup zix
    @{

@@ -16,15 +16,12 @@
 
 #define _GNU_SOURCE
 
+#include "test_malloc.h"
+
 #include <dlfcn.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <assert.h>
-#include <stdio.h>
-
-#include "test_malloc.h"
 
 static void* (*test_malloc_sys_malloc)(size_t size) = NULL;
 

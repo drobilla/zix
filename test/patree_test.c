@@ -14,11 +14,11 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/patree.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "zix/patree.h"
 
 static const char* strings[] = {
 	"http://example.org/foo",
