@@ -66,6 +66,21 @@ def configure(conf):
          'Build benchmarks': bool(conf.env.BUILD_BENCH),
          'Page size': Options.options.page_size})
 
+sources = [
+    'zix/chunk.c',
+    'zix/digest.c',
+    'zix/hash.c',
+    'zix/patree.c',
+    'zix/trie.c',
+    'zix/ring.c',
+    'zix/sorted_array.c',
+    'zix/strindex.c',
+    'zix/tree.c',
+    'zix/btree.c',
+    'zix/bitset.c',
+    'zix/ampatree.c'
+]
+
 tests = [
     'hash_test',
     'inline_test',
@@ -97,25 +112,10 @@ def build(bld):
     if bld.env.MSVC_COMPILER:
         libflags = []
 
-    lib_source = '''
-        zix/chunk.c
-        zix/digest.c
-        zix/hash.c
-        zix/patree.c
-        zix/trie.c
-        zix/ring.c
-        zix/sorted_array.c
-        zix/strindex.c
-        zix/tree.c
-        zix/btree.c
-        zix/bitset.c
-        zix/ampatree.c
-    '''
-
     # Library
     bld(features        = 'c cshlib',
         export_includes = ['.'],
-        source          = lib_source,
+        source          = sources,
         includes        = ['.'],
         name            = 'libzix',
         target          = 'zix',
@@ -127,7 +127,7 @@ def build(bld):
     if bld.env.BUILD_STATIC or bld.env.BUILD_BENCH:
         bld(features        = 'c cstlib',
             export_includes = ['.'],
-            source          = lib_source,
+            source          = sources,
             includes        = ['.'],
             name            = 'libzix_static',
             target          = 'zix',
@@ -148,7 +148,7 @@ def build(bld):
 
         # Profiled static library (for unit test code coverage)
         bld(features     = 'c cstlib',
-            source       = lib_source,
+            source       = sources,
             includes     = ['.'],
             lib          = test_libs,
             name         = 'libzix_profiled',
@@ -194,17 +194,20 @@ def build(bld):
 def lint(ctx):
     "checks code for style issues"
     import subprocess
+    import glob
 
-    subprocess.call("flake8 --ignore E221,W504,E302,E305,E251 wscript",
-                    shell=True)
+    subprocess.call(
+        ['flake8', '--ignore', 'E221,W504,E302,E305,E251', 'wscript'])
 
-    cmd = ("clang-tidy -p=. -header-filter=.* -checks=\"*," +
-           "-hicpp-signed-bitwise," +
-           "-llvm-header-guard," +
-           "-misc-unused-parameters," +
-           "-readability-else-after-return\" " +
-           "../zix/*.c")
-    subprocess.call(cmd, cwd='build', shell=True)
+    files = ['../%s' % x for x in glob.glob('**/*.c')]
+    checks = ['*',
+              '-clang-analyzer-valist.Uninitialized',
+              '-llvm-header-guard',
+              '-misc-unused-parameters',
+              '-readability-else-after-return']
+    subprocess.call(['clang-tidy', '-p=.', '-header-filter=.*',
+                     '-checks="%s"' % ','.join(checks)] + files,
+                    cwd='build')
 
 def build_dir(ctx, subdir):
     if autowaf.is_child():
