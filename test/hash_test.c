@@ -100,8 +100,8 @@ stress(void)
 
 	// Insert each string
 	for (size_t i = 0; i < n_strings; ++i) {
-		const void* inserted = NULL;
-		ZixStatus   st       = zix_hash_insert(hash, &strings[i], &inserted);
+		void*     inserted = NULL;
+		ZixStatus st       = zix_hash_insert(hash, &strings[i], &inserted);
 		if (st) {
 			return test_fail("Failed to insert `%s'\n", strings[i]);
 		} else if (*(const void*const*)inserted != strings[i]) {
@@ -120,8 +120,8 @@ stress(void)
 
 	// Attempt to insert each string again
 	for (size_t i = 0; i < n_strings; ++i) {
-		const void* inserted = NULL;
-		ZixStatus   st       = zix_hash_insert(hash, &strings[i], &inserted);
+		void*     inserted = NULL;
+		ZixStatus st       = zix_hash_insert(hash, &strings[i], &inserted);
 		if (st != ZIX_STATUS_EXISTS) {
 			return test_fail("Double inserted `%s'\n", strings[i]);
 		}

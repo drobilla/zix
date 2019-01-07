@@ -91,9 +91,9 @@ zix_hash_size(const ZixHash* hash);
    @return ZIX_STATUS_SUCCESS, ZIX_STATUS_EXISTS, or ZIX_STATUS_NO_MEM.
 */
 ZIX_API ZixStatus
-zix_hash_insert(ZixHash*     hash,
-                const void*  value,
-                const void** inserted);
+zix_hash_insert(ZixHash*    hash,
+                const void* value,
+                void**      inserted);
 
 /**
    Remove an item from `hash`.

@@ -150,7 +150,7 @@ zix_hash_find(const ZixHash* hash, const void* value)
 }
 
 ZIX_API ZixStatus
-zix_hash_insert(ZixHash* hash, const void* value, const void** inserted)
+zix_hash_insert(ZixHash* hash, const void* value, void** inserted)
 {
 	unsigned h_nomod = hash->hash_func(value);
 	unsigned h       = h_nomod % *hash->n_buckets;
