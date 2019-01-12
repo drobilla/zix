@@ -526,21 +526,26 @@ zix_btree_remove(ZixBTree* const      t,
 			}
 		} else if (equal) {
 			// Found in internal node
-			if (!zix_btree_node_is_minimal(n->children[i])) {
+			const size_t l_size = n->children[i]->n_vals;
+			const size_t r_size = n->children[i + 1]->n_vals;
+			if (zix_btree_node_is_minimal(n->children[i]) &&
+			    zix_btree_node_is_minimal(n->children[i + 1])) {
+				// Both preceding and succeeding child are minimal
+				n = zix_btree_merge(t, n, i);
+			} else if (l_size >= r_size) {
 				// Left child can remove without merge
+				assert(!zix_btree_node_is_minimal(n->children[i]));
 				*out = n->vals[i];
 				n->vals[i] = zix_btree_remove_max(t, n->children[i]);
 				--t->size;
 				return ZIX_STATUS_SUCCESS;
-			} else if (!zix_btree_node_is_minimal(n->children[i + 1])) {
+			} else {
 				// Right child can remove without merge
+				assert(!zix_btree_node_is_minimal(n->children[i + 1]));
 				*out = n->vals[i];
 				n->vals[i] = zix_btree_remove_min(t, n->children[i + 1]);
 				--t->size;
 				return ZIX_STATUS_SUCCESS;
-			} else {
-				// Both preceding and succeeding child are minimal
-				n = zix_btree_merge(t, n, i);
 			}
 		} else {
 			// Not found in internal node, key is in/under children[i]
