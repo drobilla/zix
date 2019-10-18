@@ -131,10 +131,11 @@ test_fail(ZixBTree* t, const char* fmt, ...)
 }
 
 static int
-stress(int test_num, size_t n_elems)
+stress(const int test_num, const size_t n_elems)
 {
+	assert(n_elems > 0);
+
 	uintptr_t     r  = 0;
-	ZixBTreeIter* ti = NULL;
 	ZixBTree*     t  = zix_btree_new(int_cmp, NULL, NULL);
 	ZixStatus     st = ZIX_STATUS_SUCCESS;
 
@@ -143,13 +144,21 @@ stress(int test_num, size_t n_elems)
 	}
 
 	// Ensure begin iterator is end on empty tree
-	ti = zix_btree_begin(t);
+	ZixBTreeIter* ti  = zix_btree_begin(t);
+	ZixBTreeIter* end = zix_btree_end(t);
 	if (!ti) {
 		return test_fail(t, "Failed to allocate iterator\n");
 	} else if (!zix_btree_iter_is_end(ti)) {
 		return test_fail(t, "Begin iterator on empty tree is not end\n");
+	} else if (!zix_btree_iter_equals(ti, end)) {
+		return test_fail(t, "Begin and end of empty tree are not equal\n");
 	}
+	zix_btree_iter_free(end);
 	zix_btree_iter_free(ti);
+
+	if (zix_btree_iter_copy(NULL)) {
+		return test_fail(t, "Copy of null iterator returned non-null\n");
+	}
 
 	// Insert n_elems elements
 	for (size_t i = 0; i < n_elems; ++i) {
@@ -166,6 +175,22 @@ stress(int test_num, size_t n_elems)
 	if (zix_btree_size(t) != n_elems) {
 		return test_fail(t, "Tree size %zu != %zu\n", zix_btree_size(t), n_elems);
 	}
+
+	// Ensure begin no longer equals end
+	ti  = zix_btree_begin(t);
+	end = zix_btree_end(t);
+	if (zix_btree_iter_equals(ti, end)) {
+		return test_fail(t, "Begin and end of non-empty tree are equal\n");
+	}
+	zix_btree_iter_free(end);
+
+	// Ensure non-null iterator copying works
+	ZixBTreeIter* begin_copy = zix_btree_iter_copy(ti);
+	if (!zix_btree_iter_equals(ti, begin_copy)) {
+		return test_fail(t, "Iterator copy is not equal to original\n");
+	}
+	zix_btree_iter_free(begin_copy);
+	zix_btree_iter_free(ti);
 
 	// Search for all elements
 	for (size_t i = 0; i < n_elems; ++i) {
@@ -421,7 +446,7 @@ main(int argc, char** argv)
 	}
 
 	const unsigned n_tests = 3;
-	unsigned       n_elems = (argc > 1) ? atol(argv[1]) : 100000;
+	unsigned       n_elems = (argc > 1) ? atol(argv[1]) : 524288U;
 
 	printf("Running %u tests with %u elements", n_tests, n_elems);
 	for (unsigned i = 0; i < n_tests; ++i) {
