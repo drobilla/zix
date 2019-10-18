@@ -55,7 +55,7 @@ test_fail(const char* fmt, ...)
 }
 
 int
-main(int argc, char** argv)
+main(void)
 {
 	ZixAMPatree* patree = zix_ampatree_new();
 

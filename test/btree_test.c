@@ -18,6 +18,8 @@
 
 #include "test_malloc.h"
 
+#include "zix/common.h"
+
 #include <stdbool.h>
 #include <assert.h>
 #include <stdarg.h>
@@ -50,7 +52,7 @@ unique_rand(uint32_t i)
 }
 
 static int
-int_cmp(const void* a, const void* b, const void* user_data)
+int_cmp(const void* a, const void* b, ZIX_UNUSED const void* user_data)
 {
 	const uintptr_t ia = (uintptr_t)a;
 	const uintptr_t ib = (uintptr_t)b;

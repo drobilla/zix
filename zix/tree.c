@@ -632,7 +632,7 @@ zix_tree_begin(ZixTree* t)
 }
 
 ZIX_API ZixTreeIter*
-zix_tree_end(ZixTree* t)
+zix_tree_end(ZIX_UNUSED ZixTree* t)
 {
 	return NULL;
 }
@@ -652,7 +652,7 @@ zix_tree_rbegin(ZixTree* t)
 }
 
 ZIX_API ZixTreeIter*
-zix_tree_rend(ZixTree* t)
+zix_tree_rend(ZIX_UNUSED ZixTree* t)
 {
 	return NULL;
 }

@@ -24,7 +24,7 @@ static ZixSem   sem;
 static unsigned n_signals = 1024;
 
 static void*
-reader(void* arg)
+reader(ZIX_UNUSED void* arg)
 {
 	printf("Reader starting\n");
 
@@ -37,7 +37,7 @@ reader(void* arg)
 }
 
 static void*
-writer(void* arg)
+writer(ZIX_UNUSED void* arg)
 {
 	printf("Writer starting\n");
 
@@ -58,7 +58,7 @@ main(int argc, char** argv)
 	}
 
 	if (argc > 1) {
-		n_signals = atoi(argv[1]);
+		n_signals = (unsigned)atoi(argv[1]);
 	}
 
 	printf("Testing %u signals...\n", n_signals);

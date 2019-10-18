@@ -37,6 +37,9 @@ def configure(conf):
         'BUILD_BENCH': Options.options.bench,
         'BUILD_STATIC': Options.options.static})
 
+    if Options.options.ultra_strict and not conf.env.MSVC_COMPILER:
+        conf.env.append_value('CFLAGS', ['-Wunused-parameter'])
+
     # Check for mlock
     conf.check_function('c', 'mlock',
                         header_name='sys/mman.h',

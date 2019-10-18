@@ -36,7 +36,7 @@ test_fail(const char* fmt, ...)
 }
 
 int
-main(int argc, char** argv)
+main(void)
 {
 	ZixBitset      b[N_ELEMS];
 	ZixBitsetTally t[N_ELEMS];

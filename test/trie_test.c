@@ -55,7 +55,7 @@ test_fail(const char* fmt, ...)
 }
 
 int
-main(int argc, char** argv)
+main(void)
 {
 	ZixTrie* trie = zix_trie_new();
 

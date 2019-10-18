@@ -63,7 +63,7 @@ cmp_msg(int* msg1, int* msg2)
 }
 
 static void*
-reader(void* arg)
+reader(ZIX_UNUSED void* arg)
 {
 	printf("Reader starting\n");
 
@@ -90,7 +90,7 @@ reader(void* arg)
 }
 
 static void*
-writer(void* arg)
+writer(ZIX_UNUSED void* arg)
 {
 	printf("Writer starting\n");
 
@@ -118,12 +118,12 @@ main(int argc, char** argv)
 
 	unsigned size = 1024;
 	if (argc > 1) {
-		size = atoi(argv[1]);
+		size = (unsigned)atoi(argv[1]);
 	}
 
 	n_writes = size * 1024;
 	if (argc > 2) {
-		n_writes = atoi(argv[2]);
+		n_writes = (unsigned)atoi(argv[2]);
 	}
 
 	printf("Testing %u writes of %d ints to a %d int ring...\n",

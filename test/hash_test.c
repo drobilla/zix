@@ -61,7 +61,7 @@ test_fail(const char* fmt, ...)
 static unsigned n_checked = 0;
 
 static void
-check(void* value, void* user_data)
+check(void* value, ZIX_UNUSED void* user_data)
 {
 	if (strlen(*(const char*const*)value) >= 3) {
 		++n_checked;
@@ -199,7 +199,7 @@ stress(void)
 }
 
 int
-main(int argc, char** argv)
+main(void)
 {
 	if (stress()) {
 		return 1;

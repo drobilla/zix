@@ -32,7 +32,7 @@ test_fail(const char* fmt, ...)
 }
 
 int
-main(int argc, char** argv)
+main(void)
 {
 	const char*  str      = "BANANA";
 	const size_t str_len  = strlen(str);
