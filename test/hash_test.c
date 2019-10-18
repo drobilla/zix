@@ -17,6 +17,7 @@
 #include "test_malloc.h"
 
 #include "zix/common.h"
+#include "zix/digest.h"
 #include "zix/hash.h"
 
 #include <stdarg.h>
@@ -72,13 +73,9 @@ check(void* value, void* user_data)
 static uint32_t
 string_ptr_hash(const void* value)
 {
-	// Trusty old DJB hash
-	const char* str = *(const char*const*)value;
-	unsigned    h   = 5381;
-	for (const char* s = str; *s != '\0'; ++s) {
-		h = (h << 5) + h + *s;  // h = h * 33 + c
-	}
-	return h;
+	const char* const str = *(const char* const*)value;
+
+	return zix_digest_add(zix_digest_start(), str, strlen(str));
 }
 
 static bool
