@@ -140,6 +140,8 @@ def build(bld):
         test_libs      = ['pthread', 'dl']
         if bld.env.MSVC_COMPILER:
             test_libs = []
+        elif bld.env.DEST_OS == 'win32':
+            test_libs = 'pthread'
         if bld.is_defined('HAVE_GCOV'):
             test_cflags    += ['--coverage']
             test_linkflags += ['--coverage']
@@ -156,10 +158,15 @@ def build(bld):
             cflags       = test_cflags + ['-DZIX_INTERNAL'],
             linkflags    = test_linkflags)
 
+        if bld.env.DEST_OS == 'win32':
+            test_malloc = []
+        else:
+            test_malloc = ['test/test_malloc.c']
+
         # Unit test programs
         for i in tests:
             bld(features     = 'c cprogram',
-                source       = ['test/%s.c' % i, 'test/test_malloc.c'],
+                source       = ['test/%s.c' % i] + test_malloc,
                 includes     = ['.'],
                 use          = 'libzix_profiled',
                 lib          = test_libs,

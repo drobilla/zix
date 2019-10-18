@@ -460,6 +460,7 @@ main(int argc, char** argv)
 	}
 	printf("\n");
 
+#ifndef _WIN32
 	const size_t total_n_allocs = test_malloc_get_n_allocs();
 	const size_t fail_n_elems   = 1000;
 	printf("Testing 0 ... %zu failed allocations\n", total_n_allocs);
@@ -473,6 +474,7 @@ main(int argc, char** argv)
 	}
 
 	test_malloc_reset((size_t)-1);
+#endif
 
 	return EXIT_SUCCESS;
 }

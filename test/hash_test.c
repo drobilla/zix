@@ -205,6 +205,7 @@ main(void)
 		return 1;
 	}
 
+#ifndef _WIN32
 	const size_t total_n_allocs = test_malloc_get_n_allocs();
 	printf("Testing 0 ... %zu failed allocations\n", total_n_allocs);
 	expect_failure = true;
@@ -214,6 +215,7 @@ main(void)
 	}
 
 	test_malloc_reset((size_t)-1);
+#endif
 
 	return 0;
 }
