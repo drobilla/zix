@@ -53,7 +53,7 @@ zix_strindex_new(const char* s)
 	ZixStrindex* t = (ZixStrindex*)malloc(sizeof(ZixStrindex));
 	memset(t, '\0', sizeof(struct _ZixStrindex));
 
-	t->s = calloc(1, len + 1);
+	t->s = (char*)calloc(1, len + 1);
 	memcpy(t->s, s, len);
 
 	t->root = (ZixStrindexNode*)malloc(sizeof(ZixStrindexNode));

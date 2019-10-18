@@ -111,7 +111,7 @@ zix_trie_new(void)
 {
 	ZixTrie* t = (ZixTrie*)calloc(1, sizeof(ZixTrie));
 
-	t->root = calloc(1, sizeof(ZixTrieNode));
+	t->root = (ZixTrieNode*)calloc(1, sizeof(ZixTrieNode));
 
 	return t;
 }
@@ -177,7 +177,7 @@ zix_trie_add_child(ZixTrieNode** n_ptr,
 	*zix_trie_get_child_ptr(n, n->num_children - 1) = child;
 #else
 	const n_edges_t l = zix_trie_find_key(n->children, n->num_children, first);
-	ZixTrieNode*    m = malloc(zix_trie_node_size(n->num_children + 1));
+	ZixTrieNode*    m = (ZixTrieNode*)malloc(zix_trie_node_size(n->num_children + 1));
 	m->str          = n->str;
 	m->num_children = n->num_children + 1;
 

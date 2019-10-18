@@ -122,7 +122,7 @@ zix_patree_new(void)
 {
 	ZixPatree* t = (ZixPatree*)calloc(1, sizeof(ZixPatree));
 
-	t->root = calloc(1, sizeof(ZixPatreeNode));
+	t->root = (ZixPatreeNode*)calloc(1, sizeof(ZixPatreeNode));
 
 	return t;
 }
@@ -196,7 +196,7 @@ patree_add_edge(ZixPatreeNode** n_ptr,
 	*zix_patree_get_child_ptr(n, n->n_children - 1) = child;
 #else
 	const n_edges_t l = zix_trie_find_key(n->children, n->n_children, first[0]);
-	ZixPatreeNode*  m = malloc(zix_patree_node_size(n->n_children + 1));
+	ZixPatreeNode*  m = (ZixPatreeNode*)malloc(zix_patree_node_size(n->n_children + 1));
 	m->label_first  = n->label_first;
 	m->label_last   = n->label_last;
 	m->str          = n->str;

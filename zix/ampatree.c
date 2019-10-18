@@ -108,7 +108,7 @@ zix_ampatree_new(void)
 {
 	ZixAMPatree* t = (ZixAMPatree*)calloc(1, sizeof(ZixAMPatree));
 
-	t->root = calloc(1, sizeof(ZixAMPatreeNode));
+	t->root = (ZixAMPatreeNode*)calloc(1, sizeof(ZixAMPatreeNode));
 
 	return t;
 }
@@ -171,8 +171,8 @@ patree_add_edge(ZixAMPatreeNode** n_ptr,
 	child->str          = str;
 	child->n_children = 0;
 
- 	n = realloc_node(n, n->n_children + 1);
-	ZixAMPatreeNode* m = malloc(zix_ampatree_node_size(n->n_children + 1));
+	n = (ZixAMPatreeNode*)realloc_node(n, n->n_children + 1);
+	ZixAMPatreeNode* m = (ZixAMPatreeNode*)malloc(zix_ampatree_node_size(n->n_children + 1));
 	m->label_first  = n->label_first;
 	m->label_last   = n->label_last;
 	m->str          = n->str;
