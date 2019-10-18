@@ -182,7 +182,7 @@ stress(void)
 		}
 	}
 
-	// Insert each string again (to check non-empty desruction)
+	// Insert each string again (to check non-empty destruction)
 	for (size_t i = 0; i < n_strings; ++i) {
 		ZixStatus st = zix_hash_insert(hash, &strings[i], NULL);
 		if (st) {
