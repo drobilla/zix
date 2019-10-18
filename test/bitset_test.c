@@ -74,10 +74,9 @@ main(int argc, char** argv)
 	}
 
 	zix_bitset_clear(b, t, N_BITS);
-	for (size_t i = 0; i <= N_BITS; i += 2) {
-		if (i < N_BITS) {
-			zix_bitset_set(b, t, i);
-		}
+	for (size_t i = 0; i < N_BITS; i += 2) {
+		zix_bitset_set(b, t, i);
+
 		const size_t count  = zix_bitset_count_up_to(b, t, i + 1);
 		const size_t result = MIN(N_BITS / 2, i / 2 + 1);
 		if (count != result) {
