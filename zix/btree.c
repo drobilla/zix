@@ -22,6 +22,7 @@
 #include <string.h>
 
 // #define ZIX_BTREE_DEBUG 1
+// #define ZIX_BTREE_SORTED_CHECK 1
 
 #ifndef ZIX_BTREE_PAGE_SIZE
 #    define ZIX_BTREE_PAGE_SIZE 4096
@@ -235,6 +236,30 @@ zix_btree_split_child(ZixBTreeNode* const n,
 	return rhs;
 }
 
+#ifdef ZIX_BTREE_SORTED_CHECK
+/** Check that `n` is sorted with respect to search key `e`. */
+ZIX_PRIVATE bool
+zix_btree_node_is_sorted_with_respect_to(const ZixBTree* const     t,
+                                         const ZixBTreeNode* const n,
+                                         const void* const         e)
+{
+	if (n->n_vals <= 1) {
+		return true;
+	}
+
+	int cmp = t->cmp(n->vals[0], e, t->cmp_data);
+	for (uint16_t i = 1; i < n->n_vals; ++i) {
+		const int next_cmp = t->cmp(n->vals[i], e, t->cmp_data);
+		if ((cmp >= 0 && next_cmp < 0)) {
+			return false;
+		}
+		cmp = next_cmp;
+	}
+
+	return true;
+}
+#endif
+
 /** Find the first value in `n` that is not less than `e` (lower bound). */
 ZIX_PRIVATE unsigned
 zix_btree_node_find(const ZixBTree* const     t,
@@ -242,6 +267,10 @@ zix_btree_node_find(const ZixBTree* const     t,
                     const void* const         e,
                     bool* const               equal)
 {
+#ifdef ZIX_BTREE_SORTED_CHECK
+	assert(zix_btree_node_is_sorted_with_respect_to(t, n, e));
+#endif
+
 	unsigned first = 0U;
 	unsigned len   = n->n_vals;
 	while (len > 0) {
