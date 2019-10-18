@@ -16,10 +16,24 @@
 
 #include "zix/bitset.h"
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
+
 #include <string.h>
 
 /** Number of bits per ZixBitset element (ala CHAR_BIT). */
 #define ZIX_BITSET_ELEM_BIT (CHAR_BIT * sizeof(ZixBitset))
+
+static inline size_t
+zix_bitset_popcount(const ZixBitset value)
+{
+#ifdef _MSC_VER
+	return (size_t)__popcnt(value);
+#else
+	return (size_t)__builtin_popcountl(value);
+#endif
+}
 
 ZIX_API void
 zix_bitset_clear(ZixBitset* b, ZixBitsetTally* t, size_t n_bits)
@@ -79,7 +93,7 @@ zix_bitset_count_up_to(const ZixBitset* b, const ZixBitsetTally* t, size_t i)
 
 	if (extra) {
 		const ZixBitset mask = ~(~(ZixBitset)0 << extra);
-		count += (size_t)__builtin_popcountl(b[full_elems] & mask);
+		count += zix_bitset_popcount(b[full_elems] & mask);
 	}
 
 	return count;
@@ -103,7 +117,7 @@ zix_bitset_count_up_to_if(const ZixBitset* b, const ZixBitsetTally* t, size_t i)
 
 	if (extra) {
 		const ZixBitset mask = ~(~(ZixBitset)0 << extra);
-		count += (size_t)__builtin_popcountl(b[full_elems] & mask);
+		count += zix_bitset_popcount(b[full_elems] & mask);
 	}
 
 	return count;
