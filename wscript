@@ -22,37 +22,31 @@ out     = 'build'      # Build directory
 
 def options(ctx):
     ctx.load('compiler_c')
-    autowaf.set_options(ctx, test=True)
     opt = ctx.get_option_group('Configuration options')
-    autowaf.add_flags(opt, {'bench': 'build benchmarks',
-                            'static': 'build static library'})
+    ctx.add_flags(opt, {'bench': 'build benchmarks',
+                        'static': 'build static library'})
     opt.add_option('--page-size', type='int', default=4096, dest='page_size',
                    help='Page size for B-tree')
 
 def configure(conf):
-    autowaf.display_header('Zix Configuration')
-    conf.load('compiler_c')
-    autowaf.configure(conf)
+    conf.load('compiler_c', cache=True)
+    conf.load('autowaf', cache=True)
     autowaf.set_c_lang(conf, 'c99')
 
-    conf.env.BUILD_BENCH  = Options.options.bench
-    conf.env.BUILD_STATIC = Options.options.static
+    conf.env.update({
+        'BUILD_BENCH': Options.options.bench,
+        'BUILD_STATIC': Options.options.static})
 
     # Check for mlock
-    autowaf.check_function(conf, 'c', 'mlock',
-                           header_name='sys/mman.h',
-                           define_name='HAVE_MLOCK',
-                           mandatory=False)
-
-    # Check for gcov library (for test coverage)
-    if conf.env.BUILD_TESTS:
-        conf.check_cc(lib='gcov',
-                      define_name='HAVE_GCOV',
-                      mandatory=False)
+    conf.check_function('c', 'mlock',
+                        header_name='sys/mman.h',
+                        define_name='HAVE_MLOCK',
+                        mandatory=False)
 
     if Options.options.bench:
-        autowaf.check_pkg(conf, 'glib-2.0', uselib_store='GLIB',
-                          atleast_version='2.0.0', mandatory=False)
+        conf.check_pkg('glib-2.0 >= 2.0.0',
+                       uselib_store='GLIB',
+                       mandatory=False)
         if not conf.is_defined('HAVE_GLIB'):
             conf.fatal('Glib is required to build benchmarks')
 
@@ -223,11 +217,10 @@ def upload_docs(ctx):
     os.system('rsync -avz --delete -e ssh build/doc/html/*'
               ' drobilla@drobilla.net:~/drobilla.net/docs/zix')
 
-def test(ctx):
-    autowaf.pre_test(ctx, APPNAME)
-    os.environ['PATH'] = 'test' + os.pathsep + os.getenv('PATH')
-    autowaf.run_tests(ctx, APPNAME, tests, dirs=['.', './test'])
-    autowaf.post_test(ctx, APPNAME, dirs=['.', './test'])
+def test(tst):
+    with tst.group('unit') as check:
+        for test in tests:
+            check([os.path.join('test', test)])
 
 def bench(ctx):
     os.chdir('build')
