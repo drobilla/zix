@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2014 David Robillard <http://drobilla.net>
+  Copyright 2011-2019 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -557,6 +557,15 @@ zix_btree_remove(ZixBTree* const      t,
 				           !zix_btree_node_is_minimal(n->children[i + 1])) {
 					// Steal a key from child's right sibling
 					n = zix_btree_rotate_left(n, i);
+				} else if (n == t->root && n->n_vals == 1) {
+					// Root has two children, both minimal, delete it
+					assert(i == 0 || i == 1);
+					const uint16_t counts[2] = {n->children[0]->n_vals,
+					                            n->children[1]->n_vals};
+
+					n = zix_btree_merge(t, n, 0);
+					ti->stack[ti->level].node = n;
+					ti->stack[ti->level].index = counts[i];
 				} else {
 					// Both child's siblings are minimal, merge them
 					if (i < n->n_vals) {

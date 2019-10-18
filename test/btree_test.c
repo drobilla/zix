@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2014 David Robillard <http://drobilla.net>
+  Copyright 2011-2019 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -324,7 +324,7 @@ stress(int test_num, size_t n_elems)
 	}
 
 	// Delete some elements in a random order
-	for (size_t e = 0; e < zix_btree_size(t); e++) {
+	for (size_t e = 0; e < zix_btree_size(t) / 2; e++) {
 		r = ith_elem(test_num, n_elems, rand() % n_elems);
 		uintptr_t removed;
 		ZixStatus rst = zix_btree_remove(t, (void*)r, (void**)&removed, &next);
@@ -332,6 +332,28 @@ stress(int test_num, size_t n_elems)
 			return test_fail(t, "Error deleting %lu\n", (uintptr_t)r);
 		}
 	}
+	zix_btree_iter_free(next);
+	next = NULL;
+
+	// Delete all remaining elements via next iterator
+	next = zix_btree_begin(t);
+	uintptr_t last_value = 0;
+	while (!zix_btree_iter_is_end(next)) {
+		const uintptr_t value   = (uintptr_t)zix_btree_get(next);
+		uintptr_t       removed = 0;
+		if (zix_btree_remove(t, zix_btree_get(next), (void**)&removed, &next)) {
+			return test_fail(t, "Error removing next item %lu\n", (uintptr_t)r);
+		} else if (removed != value) {
+			return test_fail(t, "Removed wrong next item %lu != %lu\n",
+			                 removed, (uintptr_t)value);
+		} else if (removed < last_value) {
+			return test_fail(t, "Removed unordered next item %lu < %lu\n",
+			                 removed, (uintptr_t)value);
+		}
+
+		last_value = removed;
+	}
+	assert(!next || zix_btree_size(t) == 0);
 	zix_btree_iter_free(next);
 	next = NULL;
 
