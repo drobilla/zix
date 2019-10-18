@@ -48,15 +48,19 @@ ZIX_API
 ZixStrindex*
 zix_strindex_new(const char* s)
 {
+	const size_t len = strlen(s);
+
 	ZixStrindex* t = (ZixStrindex*)malloc(sizeof(ZixStrindex));
 	memset(t, '\0', sizeof(struct _ZixStrindex));
-	t->s    = strdup(s);
+
+	t->s = calloc(1, len + 1);
+	memcpy(t->s, s, len);
+
 	t->root = (ZixStrindexNode*)malloc(sizeof(ZixStrindexNode));
 	memset(t->root, '\0', sizeof(ZixStrindexNode));
 	t->root->num_children = 0;
 	t->root->first        = t->s;
 
-	const size_t len = strlen(t->s);
 	for (size_t i = 0; i < len; ++i) {
 		strindex_insert(t->root, t->s + i, t->s + i, t->s + (len - 1));
 	}
