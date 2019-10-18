@@ -218,7 +218,7 @@ def upload_docs(ctx):
               ' drobilla@drobilla.net:~/drobilla.net/docs/zix')
 
 def test(tst):
-    with tst.group('unit') as check:
+    with tst.group('unit', verbosity=1) as check:
         for test in tests:
             check([os.path.join('test', test)])
 
