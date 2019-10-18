@@ -29,8 +29,8 @@ static size_t        test_malloc_n_allocs   = 0;
 static size_t        test_malloc_fail_after = (size_t)-1;
 static volatile bool in_test_malloc_init    = false;
 
-void*
-malloc(size_t size)
+static void*
+test_malloc(size_t size)
 {
 	if (in_test_malloc_init) {
 		return NULL;  // dlsym is asking for memory, but handles this fine
@@ -47,9 +47,15 @@ malloc(size_t size)
 }
 
 void*
+malloc(size_t size)
+{
+	return test_malloc(size);
+}
+
+void*
 calloc(size_t nmemb, size_t size)
 {
-	void* ptr = malloc(nmemb * size);
+	void* ptr = test_malloc(nmemb * size);
 	if (ptr) {
 		memset(ptr, 0, nmemb * size);
 	}
