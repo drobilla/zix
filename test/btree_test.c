@@ -36,8 +36,8 @@
 static bool expect_failure = false;
 
 // Return a pseudo-pseudo-pseudo-random-ish integer with no duplicates
-static uint32_t
-unique_rand(uint32_t i)
+static uintptr_t
+unique_rand(size_t i)
 {
 	i ^= 0x00005CA1E;  // Juggle bits to avoid linear clumps
 
@@ -46,7 +46,7 @@ unique_rand(uint32_t i)
 	if (i >= prime) {
 		return i;  // Values >= prime are mapped to themselves
 	} else {
-		const uint32_t residue = ((uint64_t)i * i) % prime;
+		const uint64_t residue = ((uint64_t)i * i) % prime;
 		return (i <= prime / 2) ? residue : prime - residue;
 	}
 }
@@ -66,8 +66,8 @@ int_cmp(const void* a, const void* b, ZIX_UNUSED const void* user_data)
 	}
 }
 
-static uint32_t
-ith_elem(int test_num, size_t n_elems, int i)
+static uintptr_t
+ith_elem(const unsigned test_num, const size_t n_elems, const size_t i)
 {
 	switch (test_num % 3) {
 	case 0:  return i + 1;           // Increasing
@@ -76,17 +76,17 @@ ith_elem(int test_num, size_t n_elems, int i)
 	}
 }
 
-static void destroy(void* ptr)
+static void destroy(ZIX_UNUSED void* ptr)
 {
 }
 
 typedef struct {
-	int    test_num;
-	size_t n_elems;
+	unsigned test_num;
+	size_t   n_elems;
 } TestContext;
 
-static uint32_t
-wildcard_cut(int test_num, size_t n_elems)
+static uintptr_t
+wildcard_cut(unsigned test_num, size_t n_elems)
 {
 	return ith_elem(test_num, n_elems, n_elems / 3);
 }
@@ -95,9 +95,9 @@ wildcard_cut(int test_num, size_t n_elems)
 static int
 wildcard_cmp(const void* a, const void* b, const void* user_data)
 {
-	const TestContext* ctx      = (TestContext*)user_data;
+	const TestContext* ctx      = (const TestContext*)user_data;
 	const size_t       n_elems  = ctx->n_elems;
-	const int          test_num = ctx->test_num;
+	const unsigned     test_num = ctx->test_num;
 	const uintptr_t    ia       = (uintptr_t)a;
 	const uintptr_t    ib       = (uintptr_t)b;
 	if (ia == 0) {
@@ -133,7 +133,7 @@ test_fail(ZixBTree* t, const char* fmt, ...)
 }
 
 static int
-stress(const int test_num, const size_t n_elems)
+stress(const unsigned test_num, const size_t n_elems)
 {
 	assert(n_elems > 0);
 

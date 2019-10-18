@@ -40,7 +40,7 @@ int_cmp(const void* a, const void* b, ZIX_UNUSED const void* user_data)
 	return ia - ib;
 }
 
-static int
+static uintptr_t
 ith_elem(int test_num, size_t n_elems, int i)
 {
 	switch (test_num % 3) {

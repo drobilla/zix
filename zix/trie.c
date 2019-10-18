@@ -101,7 +101,7 @@ zix_trie_node_size(n_edges_t num_children)
 }
 
 ZIX_PRIVATE ZixTrieNode*
-realloc_node(ZixTrieNode* n, int num_children)
+realloc_node(ZixTrieNode* n, n_edges_t num_children)
 {
 	return (ZixTrieNode*)realloc(n, zix_trie_node_size(num_children));
 }

@@ -170,7 +170,7 @@ zix_btree_max_vals(const ZixBTreeNode* const node)
 ZIX_PRIVATE uint16_t
 zix_btree_min_vals(const ZixBTreeNode* const node)
 {
-	return ((zix_btree_max_vals(node) + 1U) / 2U) - 1U;
+	return (uint16_t)(((zix_btree_max_vals(node) + 1U) / 2U) - 1U);
 }
 
 /** Shift pointers in `array` of length `n` right starting at `i`. */
@@ -212,7 +212,7 @@ zix_btree_split_child(ZixBTreeNode* const n,
 
 	// LHS and RHS get roughly half, less the middle value which moves up
 	lhs->n_vals = max_n_vals / 2U;
-	rhs->n_vals = max_n_vals - lhs->n_vals - 1U;
+	rhs->n_vals = (uint16_t)(max_n_vals - lhs->n_vals - 1);
 
 	// Copy large half of values from LHS to new RHS node
 	memcpy(rhs->vals,
@@ -223,7 +223,7 @@ zix_btree_split_child(ZixBTreeNode* const n,
 	if (!lhs->is_leaf) {
 		memcpy(rhs->children,
 		       lhs->children + lhs->n_vals + 1,
-		       (rhs->n_vals + 1) * sizeof(ZixBTreeNode*));
+		       (rhs->n_vals + 1U) * sizeof(ZixBTreeNode*));
 	}
 
 	// Move middle value up to parent
@@ -416,9 +416,9 @@ zix_btree_merge(ZixBTree* const t, ZixBTreeNode* const n, const unsigned i)
 	if (!lhs->is_leaf) {
 		memcpy(lhs->children + lhs->n_vals,
 		       rhs->children,
-		       (rhs->n_vals + 1) * sizeof(void*));
+		       (rhs->n_vals + 1U) * sizeof(void*));
 	}
-	lhs->n_vals += rhs->n_vals;
+	lhs->n_vals = (uint16_t)(lhs->n_vals + rhs->n_vals);
 
 	if (--n->n_vals == 0) {
 		// Root is now empty, replace it with its only child

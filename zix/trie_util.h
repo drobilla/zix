@@ -42,7 +42,7 @@ zix_trie_find_key(const uint8_t* const keys, const size_t n, const uint8_t k)
 #else
 
 /** Return the index of the first element in `keys` >= `k`, or `n`. */
-ZIX_PRIVATE size_t
+static inline size_t
 zix_trie_find_key(const uint8_t* const keys, const size_t n, const uint8_t k)
 {
 	size_t first = 0;
@@ -111,7 +111,7 @@ zix_trie_change_index_sse(const uint8_t* a, const uint8_t* b, const size_t len)
 
 #endif
 
-ZIX_PRIVATE size_t
+static inline size_t
 zix_trie_change_index(const uint8_t* a, const uint8_t* b, const size_t len)
 {
 #ifdef __SSE4_2__

@@ -97,7 +97,7 @@ zix_sorted_array_insert(ZixSortedArray*     a,
 
 	zix_sorted_array_find(a, e, ai);
 	assert(*ai);
-	const size_t i = ((char*)*ai - (char*)a->array) / a->elem_size;
+	const size_t i = (size_t)((char*)*ai - (char*)a->array) / a->elem_size;
 
 	a->array = realloc(a->array, ++a->num_elems * a->elem_size);
 	memmove((char*)a->array + ((i + 1) * a->elem_size),
@@ -116,7 +116,7 @@ ZIX_API
 ZixStatus
 zix_sorted_array_remove(ZixSortedArray* a, ZixSortedArrayIter ai)
 {
-	const size_t i = ((char*)ai - (char*)a->array) / a->elem_size;
+	const size_t i = (size_t)((char*)ai - (char*)a->array) / a->elem_size;
 	memmove((char*)a->array + (i * a->elem_size),
 	        (char*)a->array + ((i + 1) * a->elem_size),
 	        (a->num_elems - i - 1) * a->elem_size);
@@ -148,12 +148,12 @@ zix_sorted_array_find(const ZixSortedArray* a,
                       const void*           e,
                       ZixSortedArrayIter*   ai)
 {
-	intptr_t lower = 0;
-	intptr_t upper = a->num_elems - 1;
+	uintptr_t lower = 0;
+	uintptr_t upper = (uintptr_t)a->num_elems - 1;
 	while (upper >= lower) {
-		const intptr_t i      = lower + ((upper - lower) / 2);
-		void* const    elem_i = zix_sorted_array_index_unchecked(a, i);
-		const int      cmp    = a->cmp(elem_i, e, a->cmp_data);
+		const uintptr_t i      = lower + ((upper - lower) / 2);
+		void* const     elem_i = zix_sorted_array_index_unchecked(a, i);
+		const int       cmp    = a->cmp(elem_i, e, a->cmp_data);
 
 		if (cmp == 0) {
 			*ai = elem_i;

@@ -39,6 +39,7 @@ def configure(conf):
 
     if Options.options.ultra_strict and not conf.env.MSVC_COMPILER:
         conf.env.append_value('CFLAGS', ['-Wunused-parameter'])
+        conf.env.append_value('CFLAGS', ['-Wsign-conversion'])
 
     # Check for mlock
     conf.check_function('c', 'mlock',
