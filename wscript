@@ -45,7 +45,6 @@ def configure(conf):
                 '-Wno-cast-align',
                 '-Wno-format-nonliteral',
                 '-Wno-implicit-int-conversion',
-                '-Wno-implicit-int-float-conversion',
                 '-Wno-padded',
                 '-Wno-reserved-id-macro',
                 '-Wno-shorten-64-to-32',

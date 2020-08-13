@@ -22,8 +22,8 @@
 static inline double
 elapsed_s(const struct timespec* start, const struct timespec* end)
 {
-	return ( (end->tv_sec - start->tv_sec)
-	         + ((end->tv_nsec - start->tv_nsec) * 0.000000001) );
+	return ( (double)(end->tv_sec - start->tv_sec)
+	         + ((double)(end->tv_nsec - start->tv_nsec) * 0.000000001) );
 }
 
 static inline struct timespec
