@@ -24,7 +24,7 @@ static ZixSem   sem;
 static unsigned n_signals = 1024;
 
 static void*
-reader(ZIX_UNUSED void* arg)
+reader(void* ZIX_UNUSED(arg))
 {
 	printf("Reader starting\n");
 
@@ -37,7 +37,7 @@ reader(ZIX_UNUSED void* arg)
 }
 
 static void*
-writer(ZIX_UNUSED void* arg)
+writer(void* ZIX_UNUSED(arg))
 {
 	printf("Writer starting\n");
 

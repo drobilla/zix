@@ -63,7 +63,7 @@ cmp_msg(int* msg1, int* msg2)
 }
 
 static void*
-reader(ZIX_UNUSED void* arg)
+reader(void* ZIX_UNUSED(arg))
 {
 	printf("Reader starting\n");
 
@@ -90,7 +90,7 @@ reader(ZIX_UNUSED void* arg)
 }
 
 static void*
-writer(ZIX_UNUSED void* arg)
+writer(void* ZIX_UNUSED(arg))
 {
 	printf("Writer starting\n");
 

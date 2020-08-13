@@ -51,7 +51,6 @@ def configure(conf):
                 '-Wno-reserved-id-macro',
                 '-Wno-shorten-64-to-32',
                 '-Wno-sign-conversion',
-                '-Wno-unused-parameter',
                 '-Wno-unused-variable',
             ],
             'gcc': [
@@ -67,7 +66,6 @@ def configure(conf):
                 '-Wno-suggest-attribute=const',
                 '-Wno-suggest-attribute=format',
                 '-Wno-suggest-attribute=pure',
-                '-Wno-unused-parameter',
                 '-Wno-unused-variable',
             ],
             'msvc': [

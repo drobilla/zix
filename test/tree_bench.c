@@ -16,6 +16,7 @@
 
 #include "bench.h"
 
+#include "zix/common.h"
 #include "zix/zix.h"
 
 #include <glib.h>
@@ -45,7 +46,7 @@ unique_rand(uint32_t i)
 }
 
 static int
-int_cmp(const void* a, const void* b, const void* user_data)
+int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
 	const intptr_t ia = (intptr_t)a;
 	const intptr_t ib = (intptr_t)b;

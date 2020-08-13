@@ -80,6 +80,8 @@ zix_thread_create(ZixThread* thread,
 static inline ZixStatus
 zix_thread_join(ZixThread thread, void** retval)
 {
+	(void)retval;
+
 	return WaitForSingleObject(thread, INFINITE)
 		? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
 }

@@ -205,10 +205,10 @@ zix_trie_add_child(ZixTrieNode** n_ptr,
 }
 
 ZIX_PRIVATE ZixTrieNode**
-trie_insert_tail(ZixTrieNode**           n_ptr,
-                 const uint8_t*          str,
-                 const uint8_t*          first,
-                 ZIX_UNUSED const size_t len)
+trie_insert_tail(ZixTrieNode**  n_ptr,
+                 const uint8_t* str,
+                 const uint8_t* first,
+                 const size_t   ZIX_UNUSED(len))
 {
 	assert(first[0]);
 	ZixTrieNode* c = NULL;

@@ -52,10 +52,13 @@ extern "C" {
 #    include <stdbool.h>
 #endif
 
-#ifdef __GNUC__
-#define ZIX_UNUSED  __attribute__((__unused__))
+// Unused parameter macro to suppresses warnings and make it impossible to use
+#if defined(__cplusplus)
+#   define ZIX_UNUSED(name)
+#elif defined(__GNUC__)
+#   define ZIX_UNUSED(name) name##_unused __attribute__((__unused__))
 #else
-#define ZIX_UNUSED
+#   define ZIX_UNUSED(name) name
 #endif
 
 typedef enum {

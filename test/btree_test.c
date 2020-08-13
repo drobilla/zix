@@ -52,7 +52,7 @@ unique_rand(size_t i)
 }
 
 static int
-int_cmp(const void* a, const void* b, ZIX_UNUSED const void* user_data)
+int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
 	const uintptr_t ia = (uintptr_t)a;
 	const uintptr_t ib = (uintptr_t)b;
@@ -76,7 +76,7 @@ ith_elem(const unsigned test_num, const size_t n_elems, const size_t i)
 	}
 }
 
-static void destroy(ZIX_UNUSED void* ptr)
+static void destroy(void* ZIX_UNUSED(ptr))
 {
 }
 

@@ -61,7 +61,7 @@ test_fail(const char* fmt, ...)
 static unsigned n_checked = 0;
 
 static void
-check(void* value, ZIX_UNUSED void* user_data)
+check(void* value, void* ZIX_UNUSED(user_data))
 {
 	if (strlen(*(const char*const*)value) >= 3) {
 		++n_checked;
