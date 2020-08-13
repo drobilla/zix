@@ -123,6 +123,7 @@ sources = [
 ]
 
 tests = [
+    'digest_test',
     'hash_test',
     'inline_test',
     'patree_test',
