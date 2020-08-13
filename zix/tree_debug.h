@@ -17,9 +17,7 @@
 #ifndef ZIX_TREE_DEBUG_H
 #define ZIX_TREE_DEBUG_H
 
-#ifndef _MSC_VER
-#    include <inttypes.h>
-#endif
+#include <inttypes.h>
 
 #ifdef ZIX_TREE_DUMP
 static void

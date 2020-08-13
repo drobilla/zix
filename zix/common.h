@@ -17,6 +17,8 @@
 #ifndef ZIX_COMMON_H
 #define ZIX_COMMON_H
 
+#include <stdbool.h>
+
 /**
    @addtogroup zix
    @{
@@ -48,8 +50,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#else
-#    include <stdbool.h>
 #endif
 
 #ifdef __GNUC__

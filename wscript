@@ -69,6 +69,7 @@ def configure(conf):
                 '/wd4365',  # signed/unsigned mismatch
                 '/wd4514',  # unreferenced inline function has been removed
                 '/wd4706',  # assignment within conditional expression
+                '/wd4777',  # format string and argument mismatch
                 '/wd4820',  # padding added after construct
                 '/wd5045',  # will insert Spectre mitigation for memory load
             ],

@@ -19,8 +19,6 @@
 
 #include "zix/common.h"
 
-#include <stdbool.h>
-
 #ifdef __APPLE__
 #    include <mach/mach.h>
 #elif defined(_WIN32)
@@ -34,6 +32,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <stdbool.h>
 
 /**
    @addtogroup zix

@@ -17,17 +17,12 @@
 #include "zix/common.h"
 #include "zix/sorted_array.h"
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-#ifdef _MSC_VER
-#    define PRIdPTR "Id"
-#else
-#    include <inttypes.h>
-#endif
 
 static unsigned seed = 1;
 

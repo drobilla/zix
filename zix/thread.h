@@ -19,14 +19,14 @@
 
 #include "zix/common.h"
 
-#include <stdbool.h>
-
 #ifdef _WIN32
 #    include <windows.h>
 #else
 #    include <errno.h>
 #    include <pthread.h>
 #endif
+
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
