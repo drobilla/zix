@@ -37,19 +37,68 @@ def configure(conf):
         'BUILD_BENCH': Options.options.bench,
         'BUILD_STATIC': Options.options.static})
 
-    if Options.options.ultra_strict and not conf.env.MSVC_COMPILER:
-        conf.env.append_value('CFLAGS', ['-Wunused-parameter'])
-        conf.env.append_value('CFLAGS', ['-Wsign-conversion'])
+    if Options.options.ultra_strict:
+        autowaf.add_compiler_flags(conf.env, '*', {
+            'clang': [
+                '-Wno-atomic-implicit-seq-cst',
+                '-Wno-bad-function-cast',
+                '-Wno-cast-align',
+                '-Wno-cast-qual',
+                '-Wno-format-nonliteral',
+                '-Wno-implicit-int-conversion',
+                '-Wno-implicit-int-float-conversion',
+                '-Wno-padded',
+                '-Wno-reserved-id-macro',
+                '-Wno-shorten-64-to-32',
+                '-Wno-sign-conversion',
+                '-Wno-unused-parameter',
+                '-Wno-unused-variable',
+            ],
+            'gcc': [
+                '-Wno-bad-function-cast',
+                '-Wno-c++-compat',
+                '-Wno-cast-align',
+                '-Wno-cast-qual',
+                '-Wno-conversion',
+                '-Wno-format',
+                '-Wno-inline',
+                '-Wno-null-dereference',
+                '-Wno-padded',
+                '-Wno-suggest-attribute=const',
+                '-Wno-suggest-attribute=format',
+                '-Wno-suggest-attribute=pure',
+                '-Wno-unused-parameter',
+                '-Wno-unused-variable',
+            ],
+            'msvc': [
+                '/wd4191',  # unsafe function conversion
+                '/wd4200',  # zero-sized array in struct/union
+                '/wd4365',  # signed/unsigned mismatch
+                '/wd4514',  # unreferenced inline function has been removed
+                '/wd4706',  # assignment within conditional expression
+                '/wd4820',  # padding added after construct
+                '/wd5045',  # will insert Spectre mitigation for memory load
+            ],
+        })
+
+        if 'mingw' in conf.env.CC[0]:
+            conf.env.append_unique('CFLAGS', [
+                '-Wno-cast-function-type',
+                '-Wno-format',
+            ])
 
     # Check for mlock
     conf.check_function('c', 'mlock',
                         header_name='sys/mman.h',
+                        return_type='int',
+                        arg_types='const void*,size_t',
                         define_name='HAVE_MLOCK',
                         mandatory=False)
 
     if Options.options.bench:
         conf.check_pkg('glib-2.0 >= 2.0.0',
                        uselib_store='GLIB',
+                       system=True,
                        mandatory=False)
         if not conf.is_defined('HAVE_GLIB'):
             conf.fatal('Glib is required to build benchmarks')
@@ -193,8 +242,6 @@ def build(bld):
     autowaf.build_dox(bld, 'ZIX', ZIX_VERSION, top, out)
 
     bld.add_post_fun(autowaf.run_ldconfig)
-    if bld.env.DOCS:
-        bld.add_post_fun(fix_docs)
 
 def lint(ctx):
     "checks code for style issues"
@@ -219,10 +266,6 @@ def build_dir(ctx, subdir):
         return os.path.join('build', APPNAME, subdir)
     else:
         return os.path.join('build', subdir)
-
-def fix_docs(ctx):
-    if ctx.cmd == 'build':
-        autowaf.make_simple_dox(APPNAME)
 
 def upload_docs(ctx):
     os.system('rsync -avz --delete -e ssh build/doc/html/*'
