@@ -44,6 +44,7 @@ static const char* strings[] = {
 	"Done", "Dtwo", "Dthree", "Dfour", "Dfive", "Dsix", "Dseven", "Deight",
 };
 
+ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {

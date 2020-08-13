@@ -15,6 +15,7 @@
 */
 
 #include "zix/ampatree.h"
+#include "zix/common.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -43,6 +44,7 @@ static const char* strings[] = {
 	"http://echo.jpl.nasa.gov/publications/review_abs.html",
 };
 
+ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {

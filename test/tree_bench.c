@@ -66,6 +66,7 @@ g_int_cmp(const void* a, const void* b, void* user_data)
 	return int_cmp(a, b, user_data);
 }
 
+ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {

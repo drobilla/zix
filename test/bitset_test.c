@@ -15,6 +15,7 @@
 */
 
 #include "zix/bitset.h"
+#include "zix/common.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -24,6 +25,7 @@
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
+ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {

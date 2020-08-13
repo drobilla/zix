@@ -43,7 +43,7 @@ def configure(conf):
                 '-Wno-atomic-implicit-seq-cst',
                 '-Wno-bad-function-cast',
                 '-Wno-cast-align',
-                '-Wno-format-nonliteral',
+                '-Wno-format',
                 '-Wno-implicit-int-conversion',
                 '-Wno-padded',
                 '-Wno-reserved-id-macro',
@@ -59,7 +59,6 @@ def configure(conf):
                 '-Wno-null-dereference',
                 '-Wno-padded',
                 '-Wno-suggest-attribute=const',
-                '-Wno-suggest-attribute=format',
                 '-Wno-suggest-attribute=pure',
             ],
             'msvc': [

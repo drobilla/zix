@@ -14,12 +14,14 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/common.h"
 #include "zix/strindex.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
+ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {

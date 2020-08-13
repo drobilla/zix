@@ -117,6 +117,7 @@ wildcard_cmp(const void* a, const void* b, const void* user_data)
 	}
 }
 
+ZIX_LOG_FUNC(2, 3)
 static int
 test_fail(ZixBTree* t, const char* fmt, ...)
 {

@@ -14,6 +14,7 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/common.h"
 #include "zix/trie.h"
 
 #include <stdarg.h>
@@ -43,6 +44,7 @@ static const char* strings[] = {
 	"http://echo.jpl.nasa.gov/publications/review_abs.html",
 };
 
+ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {

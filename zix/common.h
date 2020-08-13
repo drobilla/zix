@@ -52,6 +52,12 @@ extern "C" {
 #    include <stdbool.h>
 #endif
 
+#ifdef __GNUC__
+#define ZIX_LOG_FUNC(fmt, arg1) __attribute__((format(printf, fmt, arg1)))
+#else
+#define ZIX_LOG_FUNC(fmt, arg1)
+#endif
+
 // Unused parameter macro to suppresses warnings and make it impossible to use
 #if defined(__cplusplus)
 #   define ZIX_UNUSED(name)

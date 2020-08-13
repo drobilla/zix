@@ -14,6 +14,7 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/common.h"
 #include "zix/ring.h"
 #include "zix/thread.h"
 
@@ -29,6 +30,7 @@ static ZixRing* ring       = 0;
 static unsigned n_writes   = 0;
 static bool     read_error = false;
 
+ZIX_LOG_FUNC(1, 2)
 static int
 failure(const char* fmt, ...)
 {

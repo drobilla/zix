@@ -18,6 +18,7 @@
 
 #include "zix/ampatree.h"
 #include "zix/chunk.h"
+#include "zix/common.h"
 #include "zix/hash.h"
 #include "zix/patree.h"
 #include "zix/trie.h"
@@ -32,6 +33,7 @@
 
 static const unsigned seed = 1;
 
+ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {
