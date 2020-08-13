@@ -42,7 +42,6 @@ def configure(conf):
             'clang': [
                 '-Wno-bad-function-cast',
                 '-Wno-cast-align',
-                '-Wno-implicit-int-conversion',
                 '-Wno-padded',
                 '-Wno-reserved-id-macro',
                 '-Wno-sign-conversion',

@@ -566,10 +566,10 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 
 		if (i->parent) {
 			if (i == i->parent->left) {
-				d_balance = height_change * -1;
+				d_balance = (uint8_t)height_change * -1;
 			} else {
 				assert(i == i->parent->right);
-				d_balance = height_change;
+				d_balance = (uint8_t)height_change;
 			}
 		}
 	}

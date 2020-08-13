@@ -67,7 +67,7 @@ main(int argc, char** argv)
 	char*   buf          = (char*)calloc(1, 1);
 	size_t  buf_len      = 1;
 	size_t  this_str_len = 0;
-	for (char c; (c = fgetc(fd)) != EOF;) {
+	for (int c; (c = fgetc(fd)) != EOF;) {
 		if (isspace(c)) {
 			if (this_str_len == 0) {
 				continue;
@@ -87,7 +87,7 @@ main(int argc, char** argv)
 				buf_len = this_str_len + 1;
 				buf = (char*)realloc(buf, buf_len);
 			}
-			buf[this_str_len - 1] = c;
+			buf[this_str_len - 1] = (char)c;
 			buf[this_str_len] = '\0';
 		}
 	}
