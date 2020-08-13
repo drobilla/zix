@@ -20,6 +20,7 @@ VERSION = ZIX_VERSION  # Package version for waf dist
 top     = '.'          # Source directory
 out     = 'build'      # Build directory
 
+
 def options(ctx):
     ctx.load('compiler_c')
     opt = ctx.get_option_group('Configuration options')
@@ -27,6 +28,7 @@ def options(ctx):
                         'static': 'build static library'})
     opt.add_option('--page-size', type='int', default=4096, dest='page_size',
                    help='Page size for B-tree')
+
 
 def configure(conf):
     conf.load('compiler_c', cache=True)
@@ -99,6 +101,7 @@ def configure(conf):
          'Build benchmarks': bool(conf.env.BUILD_BENCH),
          'Page size': Options.options.page_size})
 
+
 sources = [
     'zix/chunk.c',
     'zix/digest.c',
@@ -128,6 +131,7 @@ tests = [
     'bitset_test',
     'ampatree_test'
 ]
+
 
 def build(bld):
     # C Headers
@@ -229,6 +233,7 @@ def build(bld):
 
     bld.add_post_fun(autowaf.run_ldconfig)
 
+
 def lint(ctx):
     "checks code for style issues"
     import subprocess
@@ -253,14 +258,17 @@ def build_dir(ctx, subdir):
     else:
         return os.path.join('build', subdir)
 
+
 def upload_docs(ctx):
     os.system('rsync -avz --delete -e ssh build/doc/html/*'
               ' drobilla@drobilla.net:~/drobilla.net/docs/zix')
+
 
 def test(tst):
     with tst.group('unit') as check:
         for test in tests:
             check([os.path.join('test', test)])
+
 
 def bench(ctx):
     os.chdir('build')
