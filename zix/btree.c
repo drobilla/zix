@@ -593,8 +593,10 @@ zix_btree_remove(ZixBTree* const      t,
 					                            n->children[1]->n_vals};
 
 					n = zix_btree_merge(t, n, 0);
-					ti->stack[ti->level].node = n;
-					ti->stack[ti->level].index = counts[i];
+					if (ti) {
+						ti->stack[ti->level].node = n;
+						ti->stack[ti->level].index = counts[i];
+					}
 				} else {
 					// Both child's siblings are minimal, merge them
 					if (i < n->n_vals) {

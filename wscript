@@ -59,7 +59,6 @@ def configure(conf):
                 '-Wno-cast-align',
                 '-Wno-conversion',
                 '-Wno-inline',
-                '-Wno-null-dereference',
                 '-Wno-padded',
                 '-Wno-suggest-attribute=const',
                 '-Wno-suggest-attribute=pure',

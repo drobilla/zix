@@ -215,7 +215,11 @@ trie_insert_tail(ZixTrieNode**  n_ptr,
 	while (first[0]) {
 		assert(zix_trie_node_check(*n_ptr));
 
-		c               = realloc_node(NULL, 1);
+		c = realloc_node(NULL, 1);
+		if (!c) {
+			return NULL;
+		}
+
 		c->str          = NULL;
 		c->num_children = 0;
 
@@ -225,6 +229,11 @@ trie_insert_tail(ZixTrieNode**  n_ptr,
 
 		++first;
 	}
+
+	if (!c) {
+		return NULL;
+	}
+
 	c->num_children = 0;
 	c->str = str;
 	assert(zix_trie_node_check(c));

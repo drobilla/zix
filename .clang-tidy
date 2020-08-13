@@ -9,7 +9,6 @@ Checks: >
   -cert-err34-c,
   -cert-msc30-c,
   -cert-msc50-cpp,
-  -clang-analyzer-core.NullDereference,
   -cppcoreguidelines-init-variables,
   -google-readability-casting,
   -hicpp-multiway-paths-covered,
