@@ -489,11 +489,16 @@ if not get_option('benchmarks').disabled()
   subdir('benchmark')
 endif
 
+if not get_option('fuzzers').disabled()
+  subdir('fuzz')
+endif
+
 # Display top-level summary (augmented in subdirectories)
 if not meson.is_subproject()
   summary(
     {
       'Tests': not get_option('tests').disabled(),
+      'Fuzzers': not get_option('fuzzers').disabled(),
       'Benchmarks': build_benchmarks,
     },
     bool_yn: true,
