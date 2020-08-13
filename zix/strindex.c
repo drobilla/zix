@@ -193,8 +193,10 @@ strindex_insert(ZixStrindexNode* n, char* suffix_first, char* first, char* last)
 
 ZIX_API
 ZixStatus
-zix_strindex_find(ZixStrindex* strindex, const char* p, char** match)
+zix_strindex_find(ZixStrindex* strindex, const char* const str, char** match)
 {
+	const char* p = str;
+
 #ifndef NDEBUG
 	const char* orig_p = p;
 #endif
