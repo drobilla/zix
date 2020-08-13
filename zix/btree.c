@@ -661,6 +661,9 @@ zix_btree_lower_bound(const ZixBTree* const t,
 	if (!t) {
 		*ti = NULL;
 		return ZIX_STATUS_BAD_ARG;
+	} else if (!t->root) {
+		*ti = NULL;
+		return ZIX_STATUS_SUCCESS;
 	}
 
 	ZixBTreeNode* n           = t->root;
