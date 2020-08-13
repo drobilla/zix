@@ -99,7 +99,7 @@ zix_digest_add(uint32_t hash, const void* const buf, const size_t len)
 	const uint8_t* str = (const uint8_t*)buf;
 
 	for (size_t i = 0; i < len; ++i) {
-		hash = (hash << 5) + hash + str[i];
+		hash = (hash << 5u) + hash + str[i];
 	}
 
 	return hash;
