@@ -22,16 +22,11 @@
 
 #include <stdbool.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#ifdef _MSC_VER
-#    define PRIdPTR "Id"
-#else
-#    include <inttypes.h>
-#endif
 
 static bool expect_failure = false;
 
@@ -167,9 +162,9 @@ stress(const unsigned test_num, const size_t n_elems)
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		if (!zix_btree_find(t, (void*)r, &ti)) {
-			return test_fail(t, "%lu already in tree\n", (uintptr_t)r);
+			return test_fail(t, "%" PRIuPTR " already in tree\n", (uintptr_t)r);
 		} else if ((st = zix_btree_insert(t, (void*)r))) {
-			return test_fail(t, "Insert %lu failed (%s)\n",
+			return test_fail(t, "Insert %" PRIuPTR " failed (%s)\n",
 			                 (uintptr_t)r, zix_strerror(st));
 		}
 	}
@@ -199,9 +194,9 @@ stress(const unsigned test_num, const size_t n_elems)
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		if (zix_btree_find(t, (void*)r, &ti)) {
-			return test_fail(t, "Find %lu @ %zu failed\n", (uintptr_t)r, i);
+			return test_fail(t, "Find %" PRIuPTR " @ %zu failed\n", (uintptr_t)r, i);
 		} else if ((uintptr_t)zix_btree_get(ti) != r) {
-			return test_fail(t, "Search data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
+			return test_fail(t, "Search data corrupt (%" PRIuPTR " != %" PRIuPTR ")\n",
 			                 (uintptr_t)zix_btree_get(ti), r);
 		}
 		zix_btree_iter_free(ti);
@@ -215,11 +210,13 @@ stress(const unsigned test_num, const size_t n_elems)
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems, i);
 		if (zix_btree_lower_bound(t, (void*)r, &ti)) {
-			return test_fail(t, "Lower bound %lu @ %zu failed\n", (uintptr_t)r, i);
+			return test_fail(t, "Lower bound %" PRIuPTR " @ %zu failed\n",
+			                 (uintptr_t)r, i);
 		} else if (zix_btree_iter_is_end(ti)) {
-			return test_fail(t, "Lower bound %lu @ %zu hit end\n", (uintptr_t)r, i);
+			return test_fail(t, "Lower bound %" PRIuPTR " @ %zu hit end\n",
+			                 (uintptr_t)r, i);
 		} else if ((uintptr_t)zix_btree_get(ti) != r) {
-			return test_fail(t, "Lower bound corrupt (%" PRIdPTR " != %" PRIdPTR "\n",
+			return test_fail(t, "Lower bound corrupt (%" PRIuPTR " != %" PRIuPTR "\n",
 			                 (uintptr_t)zix_btree_get(ti), r);
 		}
 		zix_btree_iter_free(ti);
@@ -229,7 +226,8 @@ stress(const unsigned test_num, const size_t n_elems)
 	for (size_t i = 0; i < n_elems; ++i) {
 		r = ith_elem(test_num, n_elems * 3, n_elems + i);
 		if (!zix_btree_find(t, (void*)r, &ti)) {
-			return test_fail(t, "Unexpectedly found %lu\n", (uintptr_t)r);
+			return test_fail(t, "Unexpectedly found %" PRIuPTR "\n",
+			                 (uintptr_t)r);
 		}
 	}
 
@@ -241,7 +239,7 @@ stress(const unsigned test_num, const size_t n_elems)
 	     zix_btree_iter_increment(ti), ++i) {
 		const uintptr_t iter_data = (uintptr_t)zix_btree_get(ti);
 		if (iter_data < last) {
-			return test_fail(t, "Iter @ %zu corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
+			return test_fail(t, "Iter @ %zu corrupt (%" PRIuPTR " < %" PRIuPTR ")\n",
 			                 i, iter_data, last);
 		}
 		last = iter_data;
@@ -262,13 +260,13 @@ stress(const unsigned test_num, const size_t n_elems)
 	// Search for the middle element then iterate from there
 	r = ith_elem(test_num, n_elems, n_elems / 2);
 	if (zix_btree_find(t, (void*)r, &ti)) {
-		return test_fail(t, "Find %lu failed\n", (uintptr_t)r);
+		return test_fail(t, "Find %" PRIuPTR " failed\n", (uintptr_t)r);
 	}
 	last = (uintptr_t)zix_btree_get(ti);
 	zix_btree_iter_increment(ti);
 	for (i = 1; !zix_btree_iter_is_end(ti); zix_btree_iter_increment(ti), ++i) {
 		if ((uintptr_t)zix_btree_get(ti) == last) {
-			return test_fail(t, "Duplicate element @ %u %" PRIdPTR "\n", i, last);
+			return test_fail(t, "Duplicate element @ %" PRIuPTR " %" PRIuPTR "\n", i, last);
 		}
 		last = (uintptr_t)zix_btree_get(ti);
 	}
@@ -280,15 +278,18 @@ stress(const unsigned test_num, const size_t n_elems)
 		r = ith_elem(test_num, n_elems, e);
 		uintptr_t removed;
 		if (zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
-			return test_fail(t, "Error removing item %lu\n", (uintptr_t)r);
+			return test_fail(t, "Error removing item %" PRIuPTR "\n",
+			                 (uintptr_t)r);
 		} else if (removed != r) {
-			return test_fail(t, "Removed wrong item %lu != %lu\n",
+			return test_fail(t,
+			                 "Removed wrong item %" PRIuPTR " != %" PRIuPTR "\n",
 			                 removed, (uintptr_t)r);
 		} else if (test_num == 0) {
 			const uintptr_t next_value = ith_elem(test_num, n_elems, e + 1);
 			if (!((zix_btree_iter_is_end(next) && e == n_elems - 1) ||
 			      (uintptr_t)zix_btree_get(next) == next_value)) {
-				return test_fail(t, "Delete all next iterator %lu != %lu\n",
+				return test_fail(t,
+				                 "Delete all next iterator %" PRIuPTR " != %" PRIuPTR "\n",
 				                 (uintptr_t)zix_btree_get(next), next_value);
 			}
 		}
@@ -314,7 +315,8 @@ stress(const unsigned test_num, const size_t n_elems)
 		r = ith_elem(test_num, n_elems * 3, n_elems + e);
 		uintptr_t removed;
 		if (!zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
-			return test_fail(t, "Non-existant deletion of %lu succeeded\n", (uintptr_t)r);
+			return test_fail(t, "Non-existant deletion of %" PRIuPTR " succeeded\n",
+			                 (uintptr_t)r);
 		}
 	}
 	zix_btree_iter_free(next);
@@ -330,15 +332,15 @@ stress(const unsigned test_num, const size_t n_elems)
 		r = ith_elem(test_num, n_elems, n_elems - (n_elems / 4) + e);
 		uintptr_t     removed;
 		if (zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
-			return test_fail(t, "Deletion of %lu failed\n", (uintptr_t)r);
+			return test_fail(t, "Deletion of %" PRIuPTR " failed\n", (uintptr_t)r);
 		} else if (removed != r) {
-			return test_fail(t, "Removed wrong item %lu != %lu\n",
+			return test_fail(t, "Removed wrong item %" PRIuPTR " != %" PRIuPTR "\n",
 			                 removed, (uintptr_t)r);
 		} else if (test_num == 0) {
 			const uintptr_t next_value = ith_elem(test_num, n_elems, e + 1);
 			if (!zix_btree_iter_is_end(next) &&
 			    (uintptr_t)zix_btree_get(next) == next_value) {
-				return test_fail(t, "Next iterator %lu != %lu\n",
+				return test_fail(t, "Next iterator %" PRIuPTR " != %" PRIuPTR "\n",
 				                 (uintptr_t)zix_btree_get(next), next_value);
 			}
 		}
@@ -357,7 +359,7 @@ stress(const unsigned test_num, const size_t n_elems)
 		uintptr_t removed;
 		ZixStatus rst = zix_btree_remove(t, (void*)r, (void**)&removed, &next);
 		if (rst != ZIX_STATUS_SUCCESS && rst != ZIX_STATUS_NOT_FOUND) {
-			return test_fail(t, "Error deleting %lu\n", (uintptr_t)r);
+			return test_fail(t, "Error deleting %" PRIuPTR "\n", (uintptr_t)r);
 		}
 	}
 	zix_btree_iter_free(next);
@@ -370,12 +372,13 @@ stress(const unsigned test_num, const size_t n_elems)
 		const uintptr_t value   = (uintptr_t)zix_btree_get(next);
 		uintptr_t       removed = 0;
 		if (zix_btree_remove(t, zix_btree_get(next), (void**)&removed, &next)) {
-			return test_fail(t, "Error removing next item %lu\n", (uintptr_t)r);
+			return test_fail(t, "Error removing next item %" PRIuPTR "\n",
+			                 (uintptr_t)r);
 		} else if (removed != value) {
-			return test_fail(t, "Removed wrong next item %lu != %lu\n",
+			return test_fail(t, "Removed wrong next item %" PRIuPTR " != %" PRIuPTR "\n",
 			                 removed, (uintptr_t)value);
 		} else if (removed < last_value) {
-			return test_fail(t, "Removed unordered next item %lu < %lu\n",
+			return test_fail(t, "Removed unordered next item %" PRIuPTR " < %" PRIuPTR "\n",
 			                 removed, (uintptr_t)value);
 		}
 
@@ -399,7 +402,7 @@ stress(const unsigned test_num, const size_t n_elems)
 		r = ith_elem(test_num, n_elems, i);
 		if (r != 0) {  // Can't insert wildcards
 			if ((st = zix_btree_insert(t, (void*)r))) {
-				return test_fail(t, "Insert %lu failed (%s)\n",
+				return test_fail(t, "Insert %" PRIuPTR " failed (%s)\n",
 				                 (uintptr_t)r, zix_strerror(st));
 			}
 		}
@@ -417,10 +420,10 @@ stress(const unsigned test_num, const size_t n_elems)
 	const uintptr_t iter_data = (uintptr_t)zix_btree_get(ti);
 	const uintptr_t cut       = wildcard_cut(test_num, n_elems);
 	if (iter_data != cut) {
-		return test_fail(t, "Lower bound %" PRIdPTR " != %" PRIdPTR "\n",
+		return test_fail(t, "Lower bound %" PRIuPTR " != %" PRIuPTR "\n",
 		                 iter_data, cut);
 	} else if (wildcard_cmp((void*)wildcard, (void*)iter_data, &ctx)) {
-		return test_fail(t, "Wildcard lower bound %" PRIdPTR " != %" PRIdPTR "\n",
+		return test_fail(t, "Wildcard lower bound %" PRIuPTR " != %" PRIuPTR "\n",
 		                 iter_data, cut);
 	}
 

@@ -100,7 +100,7 @@ bench_zix_tree(size_t n_elems,
 		r = unique_rand(i);
 		int status = zix_tree_insert(t, (void*)r, &ti);
 		if (status) {
-			return test_fail("Failed to insert %zu\n", r);
+			return test_fail("Failed to insert %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
@@ -110,10 +110,10 @@ bench_zix_tree(size_t n_elems,
 	for (size_t i = 0; i < n_elems; i++) {
 		r = unique_rand(i);
 		if (zix_tree_find(t, (void*)r, &ti)) {
-			return test_fail("Failed to find %zu\n", r);
+			return test_fail("Failed to find %" PRIdPTR "\n", r);
 		}
 		if ((intptr_t)zix_tree_get(ti) != r) {
-			return test_fail("Failed to get %zu\n", r);
+			return test_fail("Failed to get %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -133,10 +133,10 @@ bench_zix_tree(size_t n_elems,
 		r = unique_rand(i);
 		ZixTreeIter* item;
 		if (zix_tree_find(t, (void*)r, &item)) {
-			return test_fail("Failed to find %zu to delete\n", r);
+			return test_fail("Failed to find %" PRIdPTR " to delete\n", r);
 		}
 		if (zix_tree_remove(t, item)) {
-			return test_fail("Failed to remove %zu\n", r);
+			return test_fail("Failed to remove %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(del_dat, "\t%lf", bench_end(&del_start));
@@ -162,7 +162,7 @@ bench_zix_btree(size_t n_elems,
 		r = unique_rand(i);
 		int status = zix_btree_insert(t, (void*)r);
 		if (status) {
-			return test_fail("Failed to insert %zu\n", r);
+			return test_fail("Failed to insert %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
@@ -172,10 +172,10 @@ bench_zix_btree(size_t n_elems,
 	for (size_t i = 0; i < n_elems; i++) {
 		r = unique_rand(i);
 		if (zix_btree_find(t, (void*)r, &ti)) {
-			return test_fail("Failed to find %zu\n", r);
+			return test_fail("Failed to find %" PRIdPTR "\n", r);
 		}
 		if ((intptr_t)zix_btree_get(ti) != r) {
-			return test_fail("Failed to get %zu\n", r);
+			return test_fail("Failed to get %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -197,7 +197,7 @@ bench_zix_btree(size_t n_elems,
 		r = unique_rand(i);
 		void* removed;
 		if (zix_btree_remove(t, (void*)r, &removed, NULL)) {
-			return test_fail("Failed to remove %zu\n", r);
+			return test_fail("Failed to remove %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(del_dat, "\t%lf", bench_end(&del_start));
@@ -314,7 +314,7 @@ bench_glib(size_t n_elems,
 		r = unique_rand(i);
 		GSequenceIter* iter = g_sequence_insert_sorted(t, (void*)r, g_int_cmp, NULL);
 		if (!iter || g_sequence_iter_is_end(iter)) {
-			return test_fail("Failed to insert %zu\n", r);
+			return test_fail("Failed to insert %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
@@ -325,7 +325,7 @@ bench_glib(size_t n_elems,
 		r = unique_rand(i);
 		GSequenceIter* iter = g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);
 		if (!iter || g_sequence_iter_is_end(iter)) {
-			return test_fail("Failed to find %zu\n", r);
+			return test_fail("Failed to find %" PRIdPTR "\n", r);
 		}
 	}
 	fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -346,7 +346,7 @@ bench_glib(size_t n_elems,
 		GSequenceIter* iter =
 			g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);
 		if (!iter || g_sequence_iter_is_end(iter)) {
-			return test_fail("Failed to remove %zu\n", r);
+			return test_fail("Failed to remove %" PRIdPTR "\n", r);
 		}
 		g_sequence_remove(iter);
 	}

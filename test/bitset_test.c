@@ -71,7 +71,7 @@ main(void)
 		}
 		const size_t count = zix_bitset_count_up_to(b, t, i);
 		if (count != 0) {
-			return test_fail("Count to %zu is %zu != %zu\n", i, count, 0);
+			return test_fail("Count to %zu is %zu != %d\n", i, count, 0);
 		}
 	}
 

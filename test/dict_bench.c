@@ -187,7 +187,9 @@ main(int argc, char** argv)
 			}
 			if (strcmp((const char*)match->buf, strings[index])) {
 				return test_fail("Hash: Bad match %p for `%s': `%s'\n",
-				                 (const void*)match, strings[index], match->buf);
+				                 (const void*)match,
+				                 strings[index],
+				                 (const char*)match->buf);
 			}
 		}
 		fprintf(search_dat, "\t%lf", bench_end(&search_start));

@@ -133,7 +133,7 @@ stress(void)
 			return test_fail("Failed to find `%s'\n", strings[i]);
 		}
 		if (*match != strings[i]) {
-			return test_fail("Bad match for `%s': `%s'\n", strings[i], match);
+			return test_fail("Bad match for `%s': `%s'\n", strings[i], *match);
 		}
 	}
 

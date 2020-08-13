@@ -216,7 +216,7 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	printf("Running %u tests with %u elements (seed %d)",
+	printf("Running %u tests with %u elements (seed %u)",
 	       n_tests, n_elems, seed);
 
 	for (unsigned i = 0; i < n_tests; ++i) {

@@ -128,7 +128,7 @@ main(int argc, char** argv)
 		n_writes = (unsigned)atoi(argv[2]);
 	}
 
-	printf("Testing %u writes of %d ints to a %d int ring...\n",
+	printf("Testing %u writes of %d ints to a %u int ring...\n",
 	       n_writes, MSG_SIZE, size);
 
 	ring = zix_ring_new(size);
@@ -172,7 +172,7 @@ main(int argc, char** argv)
 	char     buf;
 	uint32_t n = zix_ring_peek(ring, &buf, 1);
 	if (n != 1) {
-		return failure("Peek n (%d) != 1\n", n);
+		return failure("Peek n (%u) != 1\n", n);
 	}
 	if (buf != 'a') {
 		return failure("Peek error: '%c' != 'a'\n", buf);
@@ -180,23 +180,23 @@ main(int argc, char** argv)
 
 	n = zix_ring_skip(ring, 1);
 	if (n != 1) {
-		return failure("Skip n (%d) != 1\n", n);
+		return failure("Skip n (%u) != 1\n", n);
 	}
 
 	if (zix_ring_read_space(ring) != 1) {
-		return failure("Read space %d != 1\n", zix_ring_read_space(ring));
+		return failure("Read space %u != 1\n", zix_ring_read_space(ring));
 	}
 
 	n = zix_ring_read(ring, &buf, 1);
 	if (n != 1) {
-		return failure("Peek n (%d) != 1\n", n);
+		return failure("Peek n (%u) != 1\n", n);
 	}
 	if (buf != 'b') {
 		return failure("Peek error: '%c' != 'b'\n", buf);
 	}
 
 	if (zix_ring_read_space(ring) != 0) {
-		return failure("Read space %d != 0\n", zix_ring_read_space(ring));
+		return failure("Read space %u != 0\n", zix_ring_read_space(ring));
 	}
 
 	n = zix_ring_peek(ring, &buf, 1);
