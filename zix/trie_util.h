@@ -48,7 +48,7 @@ zix_trie_find_key(const uint8_t* const keys, const size_t n, const uint8_t k)
 	size_t first = 0;
 	size_t len   = n;
 	while (len > 0) {
-		const size_t half = len >> 1;
+		const size_t half = len >> 1u;
 		const size_t i    = first + half;
 		if (keys[i] < k) {
 			const size_t chop = half + 1;

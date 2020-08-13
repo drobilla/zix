@@ -50,7 +50,7 @@ zix_digest_add(uint32_t hash, const void* const buf, const size_t len)
 #else
 	// Classic DJB hash
 	for (size_t i = 0; i < len; ++i) {
-		hash = (hash << 5) + hash + str[i];
+		hash = (hash << 5u) + hash + str[i];
 	}
 #endif
 	return hash;

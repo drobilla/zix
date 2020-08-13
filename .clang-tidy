@@ -12,7 +12,6 @@ Checks: >
   -cppcoreguidelines-init-variables,
   -google-readability-casting,
   -hicpp-multiway-paths-covered,
-  -hicpp-signed-bitwise,
   -llvm-header-guard,
   -readability-else-after-return,
 WarningsAsErrors: '*'
