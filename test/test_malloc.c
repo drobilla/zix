@@ -14,7 +14,9 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#ifndef __APPLE__
 #define _GNU_SOURCE
+#endif
 
 #include "test_malloc.h"
 
