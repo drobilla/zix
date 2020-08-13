@@ -47,8 +47,8 @@ struct _ZixTrie {
 };
 
 /** Round `size` up to the next multiple of the word size. */
-ZIX_PRIVATE uint32_t
-zix_trie_pad(uint32_t size)
+ZIX_PRIVATE n_edges_t
+zix_trie_pad(n_edges_t size)
 {
 	return (size + sizeof(void*) - 1) & (~(sizeof(void*) - 1));
 }

@@ -30,17 +30,17 @@
 // #define BENCH_SORTED_ARRAY 1
 
 // Return a pseudo-pseudo-pseudo-random-ish integer with no duplicates
-static uint32_t
-unique_rand(uint32_t i)
+static size_t
+unique_rand(size_t i)
 {
 	i ^= 0x5CA1AB1E;  // Juggle bits to avoid linear clumps
 
 	// Largest prime < 2^32 which satisfies (2^32 = 3 mod 4)
-	static const uint32_t prime = 4294967291;
+	static const size_t prime = 4294967291;
 	if (i >= prime) {
 		return i;  // Values >= prime are mapped to themselves
 	} else {
-		const uint32_t residue = ((uint64_t)i * i) % prime;
+		const size_t residue = ((uint64_t)i * i) % prime;
 		return (i <= prime / 2) ? residue : prime - residue;
 	}
 }

@@ -452,7 +452,7 @@ main(int argc, char** argv)
 	}
 
 	const unsigned n_tests = 3;
-	unsigned       n_elems = (argc > 1) ? atol(argv[1]) : 524288U;
+	unsigned       n_elems = (argc > 1) ? (unsigned)atol(argv[1]) : 524288u;
 
 	printf("Running %u tests with %u elements", n_tests, n_elems);
 	for (unsigned i = 0; i < n_tests; ++i) {

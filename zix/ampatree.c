@@ -98,7 +98,7 @@ zix_ampatree_node_size(n_edges_t n_children)
 }
 
 ZIX_PRIVATE ZixAMPatreeNode*
-realloc_node(ZixAMPatreeNode* n, int n_children)
+realloc_node(ZixAMPatreeNode* n, n_edges_t n_children)
 {
 	return (ZixAMPatreeNode*)realloc(n, zix_ampatree_node_size(n_children));
 }
@@ -171,7 +171,7 @@ patree_add_edge(ZixAMPatreeNode** n_ptr,
 	child->str          = str;
 	child->n_children = 0;
 
-	n = (ZixAMPatreeNode*)realloc_node(n, n->n_children + 1);
+	n = (ZixAMPatreeNode*)realloc_node(n, n->n_children + 1u);
 	ZixAMPatreeNode* m = (ZixAMPatreeNode*)malloc(zix_ampatree_node_size(n->n_children + 1));
 	m->label_first  = n->label_first;
 	m->label_last   = n->label_last;
@@ -292,7 +292,7 @@ zix_ampatree_find(const ZixAMPatree* t, const char* const str, const char** matc
 		/* Prefix compare search string and label */
 		const uint8_t* const l            = child->label_first;
 		const size_t         len          = child->label_last - l + 1;
-		const int            change_index = zix_trie_change_index(p, l, len);
+		const size_t         change_index = zix_trie_change_index(p, l, len);
 
 		p += change_index;
 

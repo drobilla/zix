@@ -36,7 +36,8 @@ int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
 	const intptr_t ia = *(const intptr_t*)a;
 	const intptr_t ib = *(const intptr_t*)b;
-	return ia - ib;
+
+	return ia < ib ? -1 : ia > ib ? 1 : 0;
 }
 
 static intptr_t
@@ -152,11 +153,11 @@ main(int argc, char** argv)
 	if (argc == 1) {
 		n_elems = 4096;
 	} else {
-		n_elems = atol(argv[1]);
+		n_elems = (unsigned)atol(argv[1]);
 		if (argc > 2) {
-			seed = atol(argv[2]);
+			seed = (unsigned)atol(argv[2]);
 		} else {
-			seed = time(NULL);
+			seed = (unsigned)time(NULL);
 		}
 	}
 

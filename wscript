@@ -45,7 +45,6 @@ def configure(conf):
                 '-Wno-implicit-int-conversion',
                 '-Wno-padded',
                 '-Wno-reserved-id-macro',
-                '-Wno-shorten-64-to-32',
                 '-Wno-sign-conversion',
             ],
             'gcc': [

@@ -48,8 +48,8 @@ struct _ZixPatree {
 };
 
 /** Round `size` up to the next multiple of the word size. */
-ZIX_PRIVATE uint32_t
-zix_patree_pad(uint32_t size)
+ZIX_PRIVATE n_edges_t
+zix_patree_pad(n_edges_t size)
 {
 	return (size + sizeof(void*) - 1) & (~(sizeof(void*) - 1));
 }
@@ -112,7 +112,7 @@ zix_patree_node_size(n_edges_t n_children)
 }
 
 ZIX_PRIVATE ZixPatreeNode*
-realloc_node(ZixPatreeNode* n, int n_children)
+realloc_node(ZixPatreeNode* n, n_edges_t n_children)
 {
 	return (ZixPatreeNode*)realloc(n, zix_patree_node_size(n_children));
 }
@@ -186,7 +186,7 @@ patree_add_edge(ZixPatreeNode** n_ptr,
 	child->str          = str;
 	child->n_children = 0;
 
-	n = realloc_node(n, n->n_children + 1);
+	n = realloc_node(n, n->n_children + 1u);
 #ifdef ZIX_TRIE_LINEAR_SEARCH
 	memmove(n->children + zix_patree_pad(n->n_children + 1),
 	        n->children + zix_patree_pad(n->n_children),
