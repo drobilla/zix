@@ -350,9 +350,7 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 		cmp = t->cmp(e, n->data, t->cmp_data);
 		if (cmp < 0) {
 			n = n->left;
-		} else if (cmp > 0) {
-			n = n->right;
-		} else if (t->allow_duplicates) {
+		} else if (cmp > 0 || t->allow_duplicates) {
 			n = n->right;
 		} else {
 			if (ti) {
