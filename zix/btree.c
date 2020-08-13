@@ -537,7 +537,8 @@ zix_btree_remove(ZixBTree* const      t,
 				*out = zix_btree_aerase(n->vals, --n->n_vals, i);
 				if (ti && i == n->n_vals) {
 					if (i == 0) {
-						ti->stack[ti->level = 0].node = NULL;
+						ti->level         = 0;
+						ti->stack[0].node = NULL;
 					} else {
 						--ti->stack[ti->level].index;
 						zix_btree_iter_increment(ti);
@@ -697,6 +698,7 @@ zix_btree_lower_bound(const ZixBTree* const t,
 			(*ti)->level = found_level;
 		} else {
 			// Reached end (key is greater than everything in tree)
+			(*ti)->level         = 0;
 			(*ti)->stack[0].node = NULL;
 		}
 	}
@@ -720,6 +722,7 @@ zix_btree_begin(const ZixBTree* const t)
 	if (!i) {
 		return NULL;
 	} else if (t->size == 0) {
+		i->level         = 0;
 		i->stack[0].node = NULL;
 	} else {
 		ZixBTreeNode* n = t->root;
