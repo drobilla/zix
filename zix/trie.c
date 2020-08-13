@@ -266,6 +266,7 @@ trie_insert_internal(ZixTrieNode**  n_ptr,
 				ZixTrieNode** c = trie_insert_tail(n_ptr, str, first, len);
 				assert(zix_trie_node_check(*n_ptr));
 				assert(zix_trie_node_check(*c));
+				(void)c;
 				return ZIX_STATUS_SUCCESS;
 			} else {
 				/* Match at this node, continue search downwards (or match) */
@@ -292,6 +293,7 @@ trie_insert_internal(ZixTrieNode**  n_ptr,
 	ZixTrieNode** c = trie_insert_tail(n_ptr, str, first, len);
 	assert(zix_trie_node_check(*n_ptr));
 	assert(zix_trie_node_check(*c));
+	(void)c;
 	return ZIX_STATUS_SUCCESS;
 }
 
