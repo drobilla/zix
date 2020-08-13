@@ -198,10 +198,10 @@ zix_trie_add_child(ZixTrieNode** n_ptr,
 
 	*n_ptr = n;
 
-	return l;
-
 	assert(zix_trie_node_check(n));
 	//assert(zix_trie_node_check(child));
+
+	return l;
 }
 
 ZIX_PRIVATE ZixTrieNode**
