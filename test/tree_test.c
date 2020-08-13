@@ -42,7 +42,7 @@ int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 }
 
 static uintptr_t
-ith_elem(int test_num, size_t n_elems, size_t i)
+ith_elem(unsigned test_num, size_t n_elems, size_t i)
 {
 	switch (test_num % 3) {
 	case 0:
@@ -62,7 +62,7 @@ test_fail(void)
 }
 
 static int
-stress(int test_num, size_t n_elems)
+stress(unsigned test_num, size_t n_elems)
 {
 	intptr_t     r;
 	ZixTreeIter* ti;

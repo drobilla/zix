@@ -1,7 +1,6 @@
 Checks: >
   *,
   -*-magic-numbers,
-  -*-narrowing-conversions,
   -*-uppercase-literal-suffix,
   -android-cloexec-fopen,
   -bugprone-branch-clone,

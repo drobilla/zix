@@ -41,7 +41,7 @@ int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 }
 
 static intptr_t
-ith_elem(int test_num, unsigned n_elems, int i)
+ith_elem(unsigned test_num, unsigned n_elems, unsigned i)
 {
 	switch (test_num % 3) {
 	case 0:
@@ -61,7 +61,7 @@ test_fail(void)
 }
 
 static int
-stress(int test_num, unsigned n_elems)
+stress(unsigned test_num, unsigned n_elems)
 {
 	intptr_t    r;
 	ZixSortedArrayIter ti;
