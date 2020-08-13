@@ -125,7 +125,9 @@ test_fail(ZixBTree* t, const char* fmt, ...)
 static int
 stress(const unsigned test_num, const size_t n_elems)
 {
-	assert(n_elems > 0);
+	if (n_elems == 0) {
+		return 0;
+	}
 
 	uintptr_t     r  = 0;
 	ZixBTree*     t  = zix_btree_new(int_cmp, NULL, NULL);
