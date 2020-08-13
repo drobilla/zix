@@ -202,6 +202,8 @@ stress(void)
 int
 main(void)
 {
+	zix_hash_free(NULL);
+
 	if (stress()) {
 		return 1;
 	}

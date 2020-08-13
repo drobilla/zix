@@ -75,6 +75,10 @@ zix_hash_new(ZixHashFunc  hash_func,
 ZIX_API void
 zix_hash_free(ZixHash* hash)
 {
+	if (!hash) {
+		return;
+	}
+
 	for (unsigned b = 0; b < *hash->n_buckets; ++b) {
 		ZixHashEntry* bucket = hash->buckets[b];
 		for (ZixHashEntry* e = bucket; e;) {
