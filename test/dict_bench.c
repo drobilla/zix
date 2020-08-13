@@ -62,7 +62,7 @@ main(int argc, char** argv)
 	char**  strings      = NULL;
 	size_t* lengths      = NULL;
 	size_t  n_strings    = 0;
-	char*   buf          = calloc(1, 1);
+	char*   buf          = (char*)calloc(1, 1);
 	size_t  buf_len      = 1;
 	size_t  this_str_len = 0;
 	for (char c; (c = fgetc(fd)) != EOF;) {
@@ -70,9 +70,9 @@ main(int argc, char** argv)
 			if (this_str_len == 0) {
 				continue;
 			}
-			strings = realloc(strings, (n_strings + 1) * sizeof(char*));
-			lengths = realloc(lengths, (n_strings + 1) * sizeof(size_t));
-			strings[n_strings] = malloc(buf_len);
+			strings = (char**)realloc(strings, (n_strings + 1) * sizeof(char*));
+			lengths = (size_t*)realloc(lengths, (n_strings + 1) * sizeof(size_t));
+			strings[n_strings] = (char*)malloc(buf_len);
 			lengths[n_strings] = this_str_len;
 			memcpy(strings[n_strings], buf, buf_len);
 			this_str_len = 0;
@@ -83,7 +83,7 @@ main(int argc, char** argv)
 			++this_str_len;
 			if (buf_len < this_str_len + 1) {
 				buf_len = this_str_len + 1;
-				buf = realloc(buf, buf_len);
+				buf = (char*)realloc(buf, buf_len);
 			}
 			buf[this_str_len - 1] = c;
 			buf[this_str_len] = '\0';
@@ -166,7 +166,7 @@ main(int argc, char** argv)
 		struct timespec search_start = bench_start();
 		for (size_t i = 0; i < n; ++i) {
 			const size_t index = rand() % n;
-			char* match = g_hash_table_lookup(hash, strings[index]);
+			char* match = (char*)g_hash_table_lookup(hash, strings[index]);
 			if (strcmp(match, strings[index])) {
 				return test_fail("Bad match for `%s'\n", strings[index]);
 			}
@@ -180,12 +180,12 @@ main(int argc, char** argv)
 			const size_t    index = rand() % n;
 			const ZixChunk  key   = { strings[index], lengths[index] + 1 };
 			const ZixChunk* match = NULL;
-			if (!(match = zix_hash_find(zhash, &key))) {
+			if (!(match = (const ZixChunk*)zix_hash_find(zhash, &key))) {
 				return test_fail("Hash: Failed to find `%s'\n", strings[index]);
 			}
-			if (strcmp(match->buf, strings[index])) {
+			if (strcmp((const char*)match->buf, strings[index])) {
 				return test_fail("Hash: Bad match %p for `%s': `%s'\n",
-				                 (void*)match, strings[index], match->buf);
+				                 (const void*)match, strings[index], match->buf);
 			}
 		}
 		fprintf(search_dat, "\t%lf", bench_end(&search_start));

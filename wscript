@@ -43,7 +43,6 @@ def configure(conf):
                 '-Wno-atomic-implicit-seq-cst',
                 '-Wno-bad-function-cast',
                 '-Wno-cast-align',
-                '-Wno-cast-qual',
                 '-Wno-format-nonliteral',
                 '-Wno-implicit-int-conversion',
                 '-Wno-implicit-int-float-conversion',
@@ -54,9 +53,7 @@ def configure(conf):
             ],
             'gcc': [
                 '-Wno-bad-function-cast',
-                '-Wno-c++-compat',
                 '-Wno-cast-align',
-                '-Wno-cast-qual',
                 '-Wno-conversion',
                 '-Wno-format',
                 '-Wno-inline',
