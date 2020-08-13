@@ -173,9 +173,9 @@ zix_ring_read(ZixRing* ring, void* dst, uint32_t size)
 		ZIX_READ_BARRIER();
 		ring->read_head = (r + size) & ring->size_mask;
 		return size;
-	} else {
-		return 0;
 	}
+
+	return 0;
 }
 
 uint32_t
