@@ -17,12 +17,14 @@
 #define ZIX_INLINE
 
 #include "zix/hash.c"
-#include "zix/hash.h"
 #include "zix/tree.c"
-#include "zix/tree.h"
+
+#include <stddef.h>
 
 int
 main(void)
 {
+	zix_hash_free(NULL);
+	zix_tree_free(NULL);
 	return 0;
 }

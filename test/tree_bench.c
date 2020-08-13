@@ -16,16 +16,19 @@
 
 #include "bench.h"
 
+#include "zix/btree.h"
 #include "zix/common.h"
-#include "zix/zix.h"
+#include "zix/tree.h"
 
 #include <glib.h>
 
 #include <inttypes.h>
-#include <limits.h>
+#include <stdarg.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // #define BENCH_SORTED_ARRAY 1
 

@@ -27,8 +27,8 @@
 #    include <limits.h>
 #    include <windows.h>
 #else
-#    include <semaphore.h>
 #    include <errno.h>
+#    include <semaphore.h>
 #endif
 
 #ifdef __cplusplus
@@ -41,6 +41,8 @@ extern "C" {
    @name Semaphore
    @{
 */
+
+struct ZixSemImpl;
 
 /**
    A counting semaphore.
