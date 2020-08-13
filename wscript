@@ -40,7 +40,6 @@ def configure(conf):
     if Options.options.ultra_strict:
         autowaf.add_compiler_flags(conf.env, '*', {
             'clang': [
-                '-Wno-atomic-implicit-seq-cst',
                 '-Wno-bad-function-cast',
                 '-Wno-cast-align',
                 '-Wno-implicit-int-conversion',

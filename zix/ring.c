@@ -30,22 +30,18 @@
 #    define ZIX_MLOCK(ptr, size)
 #endif
 
-#if defined(__APPLE__)
-#    include <libkern/OSAtomic.h>
-#    define ZIX_FULL_BARRIER() OSMemoryBarrier()
-#elif defined(_WIN32)
+#if defined(_MSC_VER)
 #    include <windows.h>
-#    define ZIX_FULL_BARRIER() MemoryBarrier()
-#elif (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)
-#    define ZIX_FULL_BARRIER() __sync_synchronize()
+#    define ZIX_READ_BARRIER() MemoryBarrier()
+#    define ZIX_WRITE_BARRIER() MemoryBarrier()
+#elif defined(__GNUC__)
+#    define ZIX_READ_BARRIER() __atomic_thread_fence(__ATOMIC_ACQUIRE)
+#    define ZIX_WRITE_BARRIER() __atomic_thread_fence(__ATOMIC_RELEASE)
 #else
 #    pragma message("warning: No memory barriers, possible SMP bugs")
-#    define ZIX_FULL_BARRIER()
+#    define ZIX_READ_BARRIER()
+#    define ZIX_WRITE_BARRIER()
 #endif
-
-/* No support for any systems with separate read and write barriers */
-#define ZIX_READ_BARRIER() ZIX_FULL_BARRIER()
-#define ZIX_WRITE_BARRIER() ZIX_FULL_BARRIER()
 
 struct ZixRingImpl {
 	uint32_t write_head;  ///< Read index into buf
