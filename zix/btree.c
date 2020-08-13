@@ -773,14 +773,16 @@ zix_btree_iter_equals(const ZixBTreeIter* const lhs, const ZixBTreeIter* const r
 {
 	if (zix_btree_iter_is_end(lhs) && zix_btree_iter_is_end(rhs)) {
 		return true;
-	} else if (!lhs || !rhs || lhs->n_levels != rhs->n_levels) {
+	} else if (zix_btree_iter_is_end(lhs) || zix_btree_iter_is_end(rhs)) {
+		return false;
+	} else if (!lhs || !rhs || lhs->level != rhs->level) {
 		return false;
 	}
 
 	return !memcmp(lhs,
 	               rhs,
 	               sizeof(ZixBTreeIter) +
-	                       lhs->n_levels * sizeof(ZixBTreeIterFrame));
+	                   (lhs->level + 1) * sizeof(ZixBTreeIterFrame));
 }
 
 ZIX_API void
