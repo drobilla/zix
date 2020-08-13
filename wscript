@@ -219,12 +219,12 @@ def build(bld):
         # Benchmark programs
         for i in ['tree_bench', 'dict_bench']:
             bld(features     = 'c cprogram',
-                source       = 'test/%s.c' % i,
+                source       = 'benchmark/%s.c' % i,
                 includes     = ['.'],
                 use          = 'libzix_static',
                 uselib       = 'GLIB',
                 lib          = ['rt'],
-                target       = 'test/%s' % i,
+                target       = 'benchmark/%s' % i,
                 framework    = framework,
                 install_path = '')
 
@@ -275,7 +275,7 @@ def bench(ctx):
 
     # Benchmark trees
 
-    subprocess.call(['test/tree_bench', '400000', '6400000'])
+    subprocess.call(['benchmark/tree_bench', '400000', '6400000'])
     subprocess.call(['../plot.py', 'tree_bench.svg',
                      'tree_insert.txt',
                      'tree_search.txt',
@@ -298,6 +298,6 @@ def bench(ctx):
             out.write(word + ' ')
         out.close()
 
-    subprocess.call(['test/dict_bench', 'gibberish.txt'])
+    subprocess.call(['benchmark/dict_bench', 'gibberish.txt'])
     subprocess.call(['../plot.py', 'dict_bench.svg',
                      'dict_insert.txt', 'dict_search.txt'])
