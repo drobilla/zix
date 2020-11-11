@@ -48,7 +48,6 @@ zix_sorted_array_print(ZixSortedArray* a)
 #    define DUMP(a)
 #endif
 
-ZIX_API
 ZixSortedArray*
 zix_sorted_array_new(bool          allow_duplicates,
                      ZixComparator cmp,
@@ -65,7 +64,6 @@ zix_sorted_array_new(bool          allow_duplicates,
 	return a;
 }
 
-ZIX_API
 void
 zix_sorted_array_free(ZixSortedArray* a)
 {
@@ -73,14 +71,12 @@ zix_sorted_array_free(ZixSortedArray* a)
 	free(a);
 }
 
-ZIX_API
 size_t
 zix_sorted_array_size(ZixSortedArray* a)
 {
 	return a->num_elems;
 }
 
-ZIX_API
 ZixStatus
 zix_sorted_array_insert(ZixSortedArray*     a,
                         const void*         e,
@@ -112,7 +108,6 @@ zix_sorted_array_insert(ZixSortedArray*     a,
 	return ZIX_STATUS_SUCCESS;
 }
 
-ZIX_API
 ZixStatus
 zix_sorted_array_remove(ZixSortedArray* a, ZixSortedArrayIter ai)
 {
@@ -131,7 +126,6 @@ zix_sorted_array_index_unchecked(const ZixSortedArray* a, size_t index)
 	return (char*)a->array + (a->elem_size * index);
 }
 
-ZIX_API
 void*
 zix_sorted_array_index(const ZixSortedArray* a, size_t index)
 {
@@ -142,7 +136,6 @@ zix_sorted_array_index(const ZixSortedArray* a, size_t index)
 	return zix_sorted_array_index_unchecked(a, index);
 }
 
-ZIX_API
 ZixStatus
 zix_sorted_array_find(const ZixSortedArray* a,
                       const void*           e,
@@ -169,35 +162,30 @@ zix_sorted_array_find(const ZixSortedArray* a,
 	return ZIX_STATUS_NOT_FOUND;
 }
 
-ZIX_API
 void*
 zix_sorted_array_get_data(ZixSortedArrayIter ai)
 {
 	return ai;
 }
 
-ZIX_API
 ZixSortedArrayIter
 zix_sorted_array_begin(ZixSortedArray* a)
 {
 	return a->array;
 }
 
-ZIX_API
 ZixSortedArrayIter
 zix_sorted_array_end(ZixSortedArray* a)
 {
 	return (char*)a->array + (a->elem_size * a->num_elems);
 }
 
-ZIX_API
 bool
 zix_sorted_array_iter_is_end(ZixSortedArray* a, ZixSortedArrayIter i)
 {
 	return i != zix_sorted_array_end(a);
 }
 
-ZIX_API
 ZixSortedArrayIter
 zix_sorted_array_iter_next(ZixSortedArray* a, ZixSortedArrayIter i)
 {

@@ -83,7 +83,6 @@ zix_trie_print_rec(ZixTrieNode* node, FILE* fd)
 	}
 }
 
-ZIX_API
 void
 zix_trie_print_dot(const ZixTrie* t, FILE* fd)
 {
@@ -106,7 +105,7 @@ realloc_node(ZixTrieNode* n, n_edges_t num_children)
 	return (ZixTrieNode*)realloc(n, zix_trie_node_size(num_children));
 }
 
-ZIX_API ZixTrie*
+ZixTrie*
 zix_trie_new(void)
 {
 	ZixTrie* t = (ZixTrie*)calloc(1, sizeof(ZixTrie));
@@ -127,7 +126,7 @@ zix_trie_free_rec(ZixTrieNode* n)
 	}
 }
 
-ZIX_API void
+void
 zix_trie_free(ZixTrie* t)
 {
 	zix_trie_free_rec(t->root);
@@ -306,7 +305,7 @@ trie_insert_internal(ZixTrieNode**  n_ptr,
 	return ZIX_STATUS_SUCCESS;
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_trie_insert(ZixTrie* t, const char* str, size_t len)
 {
 	assert(strlen(str) == len);
@@ -315,7 +314,7 @@ zix_trie_insert(ZixTrie* t, const char* str, size_t len)
 	return trie_insert_internal(&t->root, ustr, ustr, len);
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_trie_find(const ZixTrie* t, const char* const str, const char** match)
 {
 	ZixTrieNode* n = t->root;

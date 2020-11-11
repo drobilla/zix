@@ -35,14 +35,14 @@ zix_bitset_popcount(const ZixBitset value)
 #endif
 }
 
-ZIX_API void
+void
 zix_bitset_clear(ZixBitset* b, ZixBitsetTally* t, size_t n_bits)
 {
 	memset(b, 0, ZIX_BITSET_ELEMS(n_bits) * sizeof(ZixBitset));
 	memset(t, 0, ZIX_BITSET_ELEMS(n_bits) * sizeof(ZixBitsetTally));
 }
 
-ZIX_API void
+void
 zix_bitset_set(ZixBitset* b, ZixBitsetTally* t, size_t i)
 {
 	const size_t    e    = i / ZIX_BITSET_ELEM_BIT;
@@ -56,7 +56,7 @@ zix_bitset_set(ZixBitset* b, ZixBitsetTally* t, size_t i)
 	b[e] |= mask;
 }
 
-ZIX_API void
+void
 zix_bitset_reset(ZixBitset* b, ZixBitsetTally* t, size_t i)
 {
 	const size_t    e    = i / ZIX_BITSET_ELEM_BIT;
@@ -70,7 +70,7 @@ zix_bitset_reset(ZixBitset* b, ZixBitsetTally* t, size_t i)
 	b[e] &= ~mask;
 }
 
-ZIX_API bool
+bool
 zix_bitset_get(const ZixBitset* b, size_t i)
 {
 	const size_t    e    = i / ZIX_BITSET_ELEM_BIT;
@@ -80,7 +80,7 @@ zix_bitset_get(const ZixBitset* b, size_t i)
 	return b[e] & mask;
 }
 
-ZIX_API size_t
+size_t
 zix_bitset_count_up_to(const ZixBitset* b, const ZixBitsetTally* t, size_t i)
 {
 	const size_t full_elems = i / ZIX_BITSET_ELEM_BIT;
@@ -99,7 +99,7 @@ zix_bitset_count_up_to(const ZixBitset* b, const ZixBitsetTally* t, size_t i)
 	return count;
 }
 
-ZIX_API size_t
+size_t
 zix_bitset_count_up_to_if(const ZixBitset* b, const ZixBitsetTally* t, size_t i)
 {
 	const size_t full_elems = i / ZIX_BITSET_ELEM_BIT;

@@ -20,13 +20,13 @@
 
 #include <string.h>
 
-ZIX_API uint32_t
+uint32_t
 zix_chunk_hash(const ZixChunk* const chunk)
 {
 	return zix_digest_add(zix_digest_start(), chunk->buf, chunk->len);
 }
 
-ZIX_API bool
+bool
 zix_chunk_equal(const ZixChunk* a, const ZixChunk* b)
 {
 	return a->len == b->len && !memcmp(a->buf, b->buf, a->len);

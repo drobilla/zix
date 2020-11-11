@@ -44,7 +44,6 @@ strindex_insert(ZixStrindexNode* n,
                 char*            first,
                 char*            last);
 
-ZIX_API
 ZixStrindex*
 zix_strindex_new(const char* s)
 {
@@ -79,7 +78,6 @@ zix_strindex_free_rec(ZixStrindexNode* n)
 	}
 }
 
-ZIX_API
 void
 zix_strindex_free(ZixStrindex* strindex)
 {
@@ -191,7 +189,6 @@ strindex_insert(ZixStrindexNode* n, char* suffix_first, char* first, char* last)
 	return ZIX_STATUS_SUCCESS;
 }
 
-ZIX_API
 ZixStatus
 zix_strindex_find(ZixStrindex* strindex, const char* const str, char** match)
 {

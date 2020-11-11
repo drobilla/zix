@@ -66,7 +66,7 @@ struct ZixTreeNodeImpl {
 #    define DEBUG_PRINTF(fmt, ...)
 #endif
 
-ZIX_API ZixTree*
+ZixTree*
 zix_tree_new(bool           allow_duplicates,
              ZixComparator  cmp,
              void*          cmp_data,
@@ -95,7 +95,7 @@ zix_tree_free_rec(ZixTree* t, ZixTreeNode* n)
 	}
 }
 
-ZIX_API void
+void
 zix_tree_free(ZixTree* t)
 {
 	if (t) {
@@ -104,7 +104,7 @@ zix_tree_free(ZixTree* t)
 	}
 }
 
-ZIX_API size_t
+size_t
 zix_tree_size(const ZixTree* t)
 {
 	return t->size;
@@ -336,7 +336,7 @@ zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
 	return replacement;
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 {
 	DEBUG_PRINTF("**** INSERT %ld\n", (intptr_t)e);
@@ -433,7 +433,7 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 	return ZIX_STATUS_SUCCESS;
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 {
 	ZixTreeNode* const n          = ti;
@@ -590,7 +590,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 	return ZIX_STATUS_SUCCESS;
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
 {
 	ZixTreeNode* n = t->root;
@@ -609,13 +609,13 @@ zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
 	return (n) ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
 }
 
-ZIX_API void*
+void*
 zix_tree_get(const ZixTreeIter* ti)
 {
 	return ti ? ti->data : NULL;
 }
 
-ZIX_API ZixTreeIter*
+ZixTreeIter*
 zix_tree_begin(ZixTree* t)
 {
 	if (!t->root) {
@@ -629,13 +629,13 @@ zix_tree_begin(ZixTree* t)
 	return n;
 }
 
-ZIX_API ZixTreeIter*
+ZixTreeIter*
 zix_tree_end(ZixTree* ZIX_UNUSED(t))
 {
 	return NULL;
 }
 
-ZIX_API ZixTreeIter*
+ZixTreeIter*
 zix_tree_rbegin(ZixTree* t)
 {
 	if (!t->root) {
@@ -649,25 +649,25 @@ zix_tree_rbegin(ZixTree* t)
 	return n;
 }
 
-ZIX_API ZixTreeIter*
+ZixTreeIter*
 zix_tree_rend(ZixTree* ZIX_UNUSED(t))
 {
 	return NULL;
 }
 
-ZIX_API bool
+bool
 zix_tree_iter_is_end(const ZixTreeIter* i)
 {
 	return !i;
 }
 
-ZIX_API bool
+bool
 zix_tree_iter_is_rend(const ZixTreeIter* i)
 {
 	return !i;
 }
 
-ZIX_API ZixTreeIter*
+ZixTreeIter*
 zix_tree_iter_next(ZixTreeIter* i)
 {
 	if (!i) {
@@ -690,7 +690,7 @@ zix_tree_iter_next(ZixTreeIter* i)
 	return i;
 }
 
-ZIX_API ZixTreeIter*
+ZixTreeIter*
 zix_tree_iter_prev(ZixTreeIter* i)
 {
 	if (!i) {

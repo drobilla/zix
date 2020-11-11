@@ -82,7 +82,6 @@ zix_ampatree_print_rec(ZixAMPatreeNode* node, FILE* fd)
 	}
 }
 
-ZIX_API
 void
 zix_ampatree_print_dot(const ZixAMPatree* t, FILE* fd)
 {
@@ -103,7 +102,7 @@ realloc_node(ZixAMPatreeNode* n, n_edges_t n_children)
 	return (ZixAMPatreeNode*)realloc(n, zix_ampatree_node_size(n_children));
 }
 
-ZIX_API ZixAMPatree*
+ZixAMPatree*
 zix_ampatree_new(void)
 {
 	ZixAMPatree* t = (ZixAMPatree*)calloc(1, sizeof(ZixAMPatree));
@@ -124,7 +123,7 @@ zix_ampatree_free_rec(ZixAMPatreeNode* n)
 	}
 }
 
-ZIX_API void
+void
 zix_ampatree_free(ZixAMPatree* t)
 {
 	zix_ampatree_free_rec(t->root);
@@ -270,7 +269,7 @@ patree_insert_internal(ZixAMPatreeNode** n_ptr,
 	return ZIX_STATUS_SUCCESS;
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_ampatree_insert(ZixAMPatree* t, const char* str, size_t len)
 {
 	assert(strlen(str) == len);
@@ -279,7 +278,7 @@ zix_ampatree_insert(ZixAMPatree* t, const char* str, size_t len)
 	return patree_insert_internal(&t->root, ustr, ustr, len);
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_ampatree_find(const ZixAMPatree* t, const char* const str, const char** match)
 {
 	ZixAMPatreeNode* n = t->root;

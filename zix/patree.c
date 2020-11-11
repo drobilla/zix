@@ -117,7 +117,7 @@ realloc_node(ZixPatreeNode* n, n_edges_t n_children)
 	return (ZixPatreeNode*)realloc(n, zix_patree_node_size(n_children));
 }
 
-ZIX_API ZixPatree*
+ZixPatree*
 zix_patree_new(void)
 {
 	ZixPatree* t = (ZixPatree*)calloc(1, sizeof(ZixPatree));
@@ -138,7 +138,7 @@ zix_patree_free_rec(ZixPatreeNode* n)
 	}
 }
 
-ZIX_API void
+void
 zix_patree_free(ZixPatree* t)
 {
 	zix_patree_free_rec(t->root);
@@ -293,7 +293,7 @@ patree_insert_internal(ZixPatreeNode** n_ptr,
 	return ZIX_STATUS_SUCCESS;
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_patree_insert(ZixPatree* t, const char* str, size_t len)
 {
 	assert(strlen(str) == len);
@@ -302,7 +302,7 @@ zix_patree_insert(ZixPatree* t, const char* str, size_t len)
 	return patree_insert_internal(&t->root, ustr, ustr, len);
 }
 
-ZIX_API ZixStatus
+ZixStatus
 zix_patree_find(const ZixPatree* t, const char* const str, const char** match)
 {
 	ZixPatreeNode* n = t->root;
