@@ -460,7 +460,7 @@ main(int argc, char** argv)
 	}
 	printf("\n");
 
-#ifndef _WIN32
+#ifdef ZIX_WITH_TEST_MALLOC
 	const size_t total_n_allocs = test_malloc_get_n_allocs();
 	const size_t fail_n_elems   = 1000;
 	printf("Testing 0 ... %zu failed allocations\n", total_n_allocs);

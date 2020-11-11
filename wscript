@@ -28,6 +28,9 @@ def options(ctx):
                         'static': 'build static library'})
     opt.add_option('--page-size', type='int', default=4096, dest='page_size',
                    help='Page size for B-tree')
+    opt.add_option('--no-test-malloc', action='store_true',
+                   dest='no_test_malloc',
+                   help='Do not use test malloc implementation')
 
 
 def configure(conf):
@@ -96,6 +99,11 @@ def configure(conf):
                        mandatory=False)
         if not conf.is_defined('HAVE_GLIB'):
             conf.fatal('Glib is required to build benchmarks')
+
+    if not (conf.env.DEST_OS == 'win32' or Options.options.no_test_malloc):
+        conf.env['ZIX_WITH_TEST_MALLOC'] = True
+    else:
+        conf.env['ZIX_WITH_TEST_MALLOC'] = False
 
     conf.define('ZIX_VERSION', ZIX_VERSION)
     conf.define('ZIX_BTREE_PAGE_SIZE', Options.options.page_size)
@@ -204,10 +212,11 @@ def build(bld):
             cflags       = test_cflags + ['-DZIX_INTERNAL'],
             linkflags    = test_linkflags)
 
-        if bld.env.DEST_OS == 'win32':
-            test_malloc = []
-        else:
+        if bld.env.ZIX_WITH_TEST_MALLOC:
             test_malloc = ['test/test_malloc.c']
+            test_cflags += ['-DZIX_WITH_TEST_MALLOC']
+        else:
+            test_malloc = []
 
         # Unit test programs
         for i in tests:

@@ -208,7 +208,7 @@ main(void)
 		return 1;
 	}
 
-#ifndef _WIN32
+#ifdef ZIX_WITH_TEST_MALLOC
 	const size_t total_n_allocs = test_malloc_get_n_allocs();
 	printf("Testing 0 ... %zu failed allocations\n", total_n_allocs);
 	expect_failure = true;
