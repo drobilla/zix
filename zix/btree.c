@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2019 David Robillard <http://drobilla.net>
+  Copyright 2011-2020 David Robillard <http://drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -48,6 +48,11 @@ struct ZixBTreeNodeImpl {
 	void*         vals[ZIX_BTREE_INODE_VALS];  // ZIX_BTREE_LEAF_VALS for leaves
 	ZixBTreeNode* children[ZIX_BTREE_INODE_VALS + 1];  // Nonexistent for leaves
 };
+
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112l) || \
+	(defined(__cplusplus) && __cplusplus >= 201103L)
+static_assert(sizeof(ZixBTreeNode) == ZIX_BTREE_PAGE_SIZE, "");
+#endif
 
 typedef struct {
 	ZixBTreeNode* node;
@@ -99,7 +104,11 @@ print_tree(const ZixBTreeNode* parent, const ZixBTreeNode* node, int level)
 ZIX_PRIVATE ZixBTreeNode*
 zix_btree_node_new(const bool leaf)
 {
+#if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112l) || \
+      (defined(__cplusplus) && __cplusplus >= 201103L))
 	assert(sizeof(ZixBTreeNode) == ZIX_BTREE_PAGE_SIZE);
+#endif
+
 	ZixBTreeNode* node = (ZixBTreeNode*)malloc(sizeof(ZixBTreeNode));
 	if (node) {
 		node->is_leaf = leaf;
