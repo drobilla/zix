@@ -773,9 +773,8 @@ zix_btree_iter_equals(const ZixBTreeIter* const lhs, const ZixBTreeIter* const r
 {
 	if (zix_btree_iter_is_end(lhs) && zix_btree_iter_is_end(rhs)) {
 		return true;
-	} else if (zix_btree_iter_is_end(lhs) || zix_btree_iter_is_end(rhs)) {
-		return false;
-	} else if (!lhs || !rhs || lhs->level != rhs->level) {
+	} else if (zix_btree_iter_is_end(lhs) || zix_btree_iter_is_end(rhs) ||
+	           lhs->level != rhs->level) {
 		return false;
 	}
 
