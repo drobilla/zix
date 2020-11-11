@@ -35,10 +35,10 @@ typedef struct {
 	size_t len;  /**< Length of memory chunk */
 } ZixChunk;
 
-ZIX_API uint32_t
+ZIX_PURE_API uint32_t
 zix_chunk_hash(const ZixChunk* chunk);
 
-ZIX_API bool
+ZIX_PURE_API bool
 zix_chunk_equal(const ZixChunk* a, const ZixChunk* b);
 
 #ifdef __cplusplus

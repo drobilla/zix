@@ -72,7 +72,7 @@ zix_sorted_array_free(ZixSortedArray* a)
 }
 
 size_t
-zix_sorted_array_size(ZixSortedArray* a)
+zix_sorted_array_size(const ZixSortedArray* a)
 {
 	return a->num_elems;
 }

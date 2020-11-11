@@ -60,8 +60,6 @@ def configure(conf):
                 '-Wno-conversion',
                 '-Wno-inline',
                 '-Wno-padded',
-                '-Wno-suggest-attribute=const',
-                '-Wno-suggest-attribute=pure',
             ],
             'msvc': [
                 '/wd4191',  # unsafe function conversion

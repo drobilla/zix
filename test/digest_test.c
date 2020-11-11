@@ -80,7 +80,7 @@ test_ptr(void)
 	assert(zix_digest_add(zix_digest_start(), data, 8 * sizeof(void*)) == d);
 }
 
-int
+ZIX_PURE_FUNC int
 main(void)
 {
 	test_bytes();

@@ -61,9 +61,9 @@ zix_sorted_array_free(ZixSortedArray* a);
 /**
    Return the number of elements in `a`.
 */
-ZIX_API
+ZIX_PURE_API
 size_t
-zix_sorted_array_size(ZixSortedArray* a);
+zix_sorted_array_size(const ZixSortedArray* a);
 
 /**
    Insert the element `e` into `a` and point `ai` at the new element.
@@ -94,42 +94,42 @@ zix_sorted_array_find(const ZixSortedArray* a,
 /**
    Return the element at index `index`.
 */
-ZIX_API
+ZIX_PURE_API
 void*
 zix_sorted_array_index(const ZixSortedArray* a, size_t index);
 
 /**
    Return the data associated with the given array item.
 */
-ZIX_API
+ZIX_CONST_API
 void*
 zix_sorted_array_get_data(ZixSortedArrayIter ai);
 
 /**
    Return an iterator to the first (smallest) element in `a`.
 */
-ZIX_API
+ZIX_PURE_API
 ZixSortedArrayIter
 zix_sorted_array_begin(ZixSortedArray* a);
 
 /**
    Return an iterator the the element one past the last element in `a`.
 */
-ZIX_API
+ZIX_PURE_API
 ZixSortedArrayIter
 zix_sorted_array_end(ZixSortedArray* a);
 
 /**
    Return true iff `a` is an iterator to the end of its tree.
 */
-ZIX_API
+ZIX_PURE_API
 bool
 zix_sorted_array_iter_is_end(ZixSortedArray* a, ZixSortedArrayIter i);
 
 /**
    Return an iterator that points to the element one past `a`.
 */
-ZIX_API
+ZIX_PURE_API
 ZixSortedArrayIter
 zix_sorted_array_iter_next(ZixSortedArray* a, ZixSortedArrayIter i);
 

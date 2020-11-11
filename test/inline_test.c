@@ -16,12 +16,13 @@
 
 #define ZIX_INLINE
 
+#include "zix/common.h"
 #include "zix/hash.c"
 #include "zix/tree.c"
 
 #include <stddef.h>
 
-int
+ZIX_CONST_FUNC int
 main(void)
 {
 	zix_hash_free(NULL);
