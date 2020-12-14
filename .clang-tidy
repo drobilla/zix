@@ -1,9 +1,13 @@
 Checks: >
   *,
+  -*-else-after-return,
   -*-magic-numbers,
   -*-uppercase-literal-suffix,
   -android-cloexec-fopen,
+  -bugprone-reserved-identifier,
   -bugprone-suspicious-string-compare,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp,
   -cert-err34-c,
   -cert-msc30-c,
   -cert-msc50-cpp,
@@ -12,7 +16,8 @@ Checks: >
   -google-readability-casting,
   -hicpp-multiway-paths-covered,
   -llvm-header-guard,
-  -readability-else-after-return,
+  -llvmlibc-*,
+  -misc-no-recursion,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
