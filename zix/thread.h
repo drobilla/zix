@@ -26,7 +26,7 @@
 #    include <pthread.h>
 #endif
 
-#include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {

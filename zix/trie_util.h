@@ -17,12 +17,15 @@
 #ifndef ZIX_TRIE_UTIL_H
 #define ZIX_TRIE_UTIL_H
 
-#include <assert.h>
-#include <stdint.h>
+#include "zix/common.h"
 
 #ifdef __SSE4_2__
 #    include <smmintrin.h>
 #endif
+
+#include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #ifdef ZIX_TRIE_LINEAR_SEARCH
 
