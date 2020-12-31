@@ -17,8 +17,8 @@
 #include "bench.h"
 #include "warnings.h"
 
-#include "zix/chunk.h"
 #include "zix/common.h"
+#include "zix/digest.h"
 #include "zix/hash.h"
 
 ZIX_DISABLE_GLIB_WARNINGS
@@ -27,10 +27,28 @@ ZIX_RESTORE_WARNINGS
 
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+typedef struct {
+  void*  buf;
+  size_t len;
+} ZixChunk;
+
+static uint32_t
+zix_chunk_hash(const ZixChunk* const chunk)
+{
+  return zix_digest_add(zix_digest_start(), chunk->buf, chunk->len);
+}
+
+static bool
+zix_chunk_equal(const ZixChunk* a, const ZixChunk* b)
+{
+  return a->len == b->len && !memcmp(a->buf, b->buf, a->len);
+}
 
 static const unsigned seed = 1;
 

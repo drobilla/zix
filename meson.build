@@ -173,7 +173,6 @@ endif
 sources = [
   'src/bitset.c',
   'src/btree.c',
-  'src/chunk.c',
   'src/digest.c',
   'src/hash.c',
   'src/ring.c',
@@ -211,7 +210,6 @@ pkg.generate(
 headers = [
   'include/zix/bitset.h',
   'include/zix/btree.h',
-  'include/zix/chunk.h',
   'include/zix/common.h',
   'include/zix/digest.h',
   'include/zix/hash.h',
