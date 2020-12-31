@@ -132,7 +132,8 @@ bench_zix_tree(size_t n_elems,
   struct timespec iter_start = bench_start();
   for (ZixTreeIter* iter = zix_tree_begin(t); !zix_tree_iter_is_end(iter);
        iter              = zix_tree_iter_next(iter)) {
-    zix_tree_get(iter);
+    volatile void* const value = zix_tree_get(iter);
+    (void)value;
   }
   fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
 
@@ -196,7 +197,8 @@ bench_zix_btree(size_t n_elems,
   struct timespec iter_start = bench_start();
   ZixBTreeIter*   iter       = zix_btree_begin(t);
   for (; !zix_btree_iter_is_end(iter); zix_btree_iter_increment(iter)) {
-    zix_btree_get(iter);
+    volatile void* const value = zix_btree_get(iter);
+    (void)value;
   }
   zix_btree_iter_free(iter);
   fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
