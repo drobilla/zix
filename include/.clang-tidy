@@ -1,0 +1,9 @@
+Checks: >
+  *,
+  -clang-diagnostic-unused-function,
+  -clang-diagnostic-unused-macros,
+  -hicpp-multiway-paths-covered,
+  -llvmlibc-*,
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+FormatStyle: file
