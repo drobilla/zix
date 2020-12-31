@@ -312,36 +312,3 @@ def test(tst):
     with tst.group('unit') as check:
         for test in tests:
             check([os.path.join('test', test)])
-
-
-def bench(ctx):
-    os.chdir('build')
-
-    # Benchmark trees
-
-    subprocess.call(['benchmark/tree_bench', '40000', '640000'])
-    subprocess.call(['../plot.py', 'tree_bench.svg',
-                     'tree_insert.txt',
-                     'tree_search.txt',
-                     'tree_iterate.txt',
-                     'tree_delete.txt'])
-
-    # Benchmark dictionaries
-
-    filename = 'gibberish.txt'
-    if not os.path.exists(filename):
-        Logs.info('Generating random text %s' % filename)
-        import random
-        out = open(filename, 'w')
-        for i in range(1 << 20):
-            wordlen = random.randrange(1, 64)
-            word    = ''
-            for j in range(wordlen):
-                word += chr(random.randrange(ord('A'),
-                                             min(ord('Z'), ord('A') + j + 1)))
-            out.write(word + ' ')
-        out.close()
-
-    subprocess.call(['benchmark/dict_bench', 'gibberish.txt'])
-    subprocess.call(['../plot.py', 'dict_bench.svg',
-                     'dict_insert.txt', 'dict_search.txt'])
