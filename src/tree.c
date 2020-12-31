@@ -39,7 +39,7 @@ struct ZixTreeNodeImpl {
   struct ZixTreeNodeImpl* left;
   struct ZixTreeNodeImpl* right;
   struct ZixTreeNodeImpl* parent;
-  int_fast8_t             balance;
+  int                     balance;
 };
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -445,7 +445,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
   ZixTreeNode* const n          = ti;
   ZixTreeNode**      pp         = NULL;      // parent pointer
   ZixTreeNode*       to_balance = n->parent; // lowest node to balance
-  int8_t             d_balance  = 0;         // delta(balance) for n->parent
+  int                d_balance  = 0;         // delta(balance) for n->parent
 
   DEBUG_PRINTF("*** REMOVE %ld\n", (intptr_t)n->data);
 
@@ -573,10 +573,10 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 
     if (i->parent) {
       if (i == i->parent->left) {
-        d_balance = (uint8_t)height_change * -1;
+        d_balance = height_change * -1;
       } else {
         assert(i == i->parent->right);
-        d_balance = (uint8_t)height_change;
+        d_balance = height_change;
       }
     }
   }
