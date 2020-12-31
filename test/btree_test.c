@@ -89,21 +89,24 @@ wildcard_cmp(const void* a, const void* b, const void* user_data)
 	const unsigned     test_num = ctx->test_num;
 	const uintptr_t    ia       = (uintptr_t)a;
 	const uintptr_t    ib       = (uintptr_t)b;
+
 	if (ia == 0) {
 		if (ib >= wildcard_cut(test_num, n_elems)) {
 			return 0;  // Wildcard match
-		} else {
-			return 1;  // Wildcard a > b
 		}
-	} else if (ib == 0) {
+
+		return 1;  // Wildcard a > b
+	}
+
+	if (ib == 0) {
 		if (ia >= wildcard_cut(test_num, n_elems)) {
 			return 0;  // Wildcard match
-		} else {
-			return -1;  // Wildcard b > a
 		}
-	} else {
-		return int_cmp(a, b, user_data);
+
+		return -1;  // Wildcard b > a
 	}
+
+	return int_cmp(a, b, user_data);
 }
 
 ZIX_LOG_FUNC(2, 3)
@@ -142,11 +145,16 @@ stress(const unsigned test_num, const size_t n_elems)
 	ZixBTreeIter* end = zix_btree_end(t);
 	if (!ti) {
 		return test_fail(t, "Failed to allocate iterator\n");
-	} else if (!zix_btree_iter_is_end(ti)) {
+	}
+
+	if (!zix_btree_iter_is_end(ti)) {
 		return test_fail(t, "Begin iterator on empty tree is not end\n");
-	} else if (!zix_btree_iter_equals(ti, end)) {
+	}
+
+	if (!zix_btree_iter_equals(ti, end)) {
 		return test_fail(t, "Begin and end of empty tree are not equal\n");
 	}
+
 	zix_btree_iter_free(end);
 	zix_btree_iter_free(ti);
 
@@ -159,7 +167,9 @@ stress(const unsigned test_num, const size_t n_elems)
 		r = ith_elem(test_num, n_elems, i);
 		if (!zix_btree_find(t, (void*)r, &ti)) {
 			return test_fail(t, "%" PRIuPTR " already in tree\n", (uintptr_t)r);
-		} else if ((st = zix_btree_insert(t, (void*)r))) {
+		}
+
+		if ((st = zix_btree_insert(t, (void*)r))) {
 			return test_fail(t, "Insert %" PRIuPTR " failed (%s)\n",
 			                 (uintptr_t)r, zix_strerror(st));
 		}
@@ -191,10 +201,13 @@ stress(const unsigned test_num, const size_t n_elems)
 		r = ith_elem(test_num, n_elems, i);
 		if (zix_btree_find(t, (void*)r, &ti)) {
 			return test_fail(t, "Find %" PRIuPTR " @ %zu failed\n", (uintptr_t)r, i);
-		} else if ((uintptr_t)zix_btree_get(ti) != r) {
+		}
+
+		if ((uintptr_t)zix_btree_get(ti) != r) {
 			return test_fail(t, "Search data corrupt (%" PRIuPTR " != %" PRIuPTR ")\n",
 			                 (uintptr_t)zix_btree_get(ti), r);
 		}
+
 		zix_btree_iter_free(ti);
 	}
 
@@ -208,13 +221,18 @@ stress(const unsigned test_num, const size_t n_elems)
 		if (zix_btree_lower_bound(t, (void*)r, &ti)) {
 			return test_fail(t, "Lower bound %" PRIuPTR " @ %zu failed\n",
 			                 (uintptr_t)r, i);
-		} else if (zix_btree_iter_is_end(ti)) {
+		}
+
+		if (zix_btree_iter_is_end(ti)) {
 			return test_fail(t, "Lower bound %" PRIuPTR " @ %zu hit end\n",
 			                 (uintptr_t)r, i);
-		} else if ((uintptr_t)zix_btree_get(ti) != r) {
+		}
+
+		if ((uintptr_t)zix_btree_get(ti) != r) {
 			return test_fail(t, "Lower bound corrupt (%" PRIuPTR " != %" PRIuPTR "\n",
 			                 (uintptr_t)zix_btree_get(ti), r);
 		}
+
 		zix_btree_iter_free(ti);
 	}
 
@@ -276,11 +294,15 @@ stress(const unsigned test_num, const size_t n_elems)
 		if (zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
 			return test_fail(t, "Error removing item %" PRIuPTR "\n",
 			                 (uintptr_t)r);
-		} else if (removed != r) {
+		}
+
+		if (removed != r) {
 			return test_fail(t,
 			                 "Removed wrong item %" PRIuPTR " != %" PRIuPTR "\n",
 			                 removed, (uintptr_t)r);
-		} else if (test_num == 0) {
+		}
+
+		if (test_num == 0) {
 			const uintptr_t next_value = ith_elem(test_num, n_elems, e + 1);
 			if (!((zix_btree_iter_is_end(next) && e == n_elems - 1) ||
 			      (uintptr_t)zix_btree_get(next) == next_value)) {
@@ -329,10 +351,14 @@ stress(const unsigned test_num, const size_t n_elems)
 		uintptr_t     removed;
 		if (zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
 			return test_fail(t, "Deletion of %" PRIuPTR " failed\n", (uintptr_t)r);
-		} else if (removed != r) {
+		}
+
+		if (removed != r) {
 			return test_fail(t, "Removed wrong item %" PRIuPTR " != %" PRIuPTR "\n",
 			                 removed, (uintptr_t)r);
-		} else if (test_num == 0) {
+		}
+
+		if (test_num == 0) {
 			const uintptr_t next_value = ith_elem(test_num, n_elems, e + 1);
 			if (!zix_btree_iter_is_end(next) &&
 			    (uintptr_t)zix_btree_get(next) == next_value) {
@@ -370,10 +396,14 @@ stress(const unsigned test_num, const size_t n_elems)
 		if (zix_btree_remove(t, zix_btree_get(next), (void**)&removed, &next)) {
 			return test_fail(t, "Error removing next item %" PRIuPTR "\n",
 			                 (uintptr_t)r);
-		} else if (removed != value) {
+		}
+
+		if (removed != value) {
 			return test_fail(t, "Removed wrong next item %" PRIuPTR " != %" PRIuPTR "\n",
 			                 removed, (uintptr_t)value);
-		} else if (removed < last_value) {
+		}
+
+		if (removed < last_value) {
 			return test_fail(t, "Removed unordered next item %" PRIuPTR " < %" PRIuPTR "\n",
 			                 removed, (uintptr_t)value);
 		}
@@ -408,7 +438,9 @@ stress(const unsigned test_num, const size_t n_elems)
 	const uintptr_t wildcard = 0;
 	if (zix_btree_lower_bound(t, (void*)wildcard, &ti)) {
 		return test_fail(t, "Lower bound failed\n");
-	} else if (zix_btree_iter_is_end(ti)) {
+	}
+
+	if (zix_btree_iter_is_end(ti)) {
 		return test_fail(t, "Lower bound reached end\n");
 	}
 
@@ -418,7 +450,9 @@ stress(const unsigned test_num, const size_t n_elems)
 	if (iter_data != cut) {
 		return test_fail(t, "Lower bound %" PRIuPTR " != %" PRIuPTR "\n",
 		                 iter_data, cut);
-	} else if (wildcard_cmp((void*)wildcard, (void*)iter_data, &ctx)) {
+	}
+
+	if (wildcard_cmp((void*)wildcard, (void*)iter_data, &ctx)) {
 		return test_fail(t, "Wildcard lower bound %" PRIuPTR " != %" PRIuPTR "\n",
 		                 iter_data, cut);
 	}
@@ -429,7 +463,9 @@ stress(const unsigned test_num, const size_t n_elems)
 	const uintptr_t max = (uintptr_t)-1;
 	if (zix_btree_lower_bound(t, (void*)max, &ti)) {
 		return test_fail(t, "Lower bound failed\n");
-	} else if (!zix_btree_iter_is_end(ti)) {
+	}
+
+	if (!zix_btree_iter_is_end(ti)) {
 		return test_fail(t, "Lower bound of maximum value is not end\n");
 	}
 

@@ -151,7 +151,9 @@ zix_sorted_array_find(const ZixSortedArray* a,
 		if (cmp == 0) {
 			*ai = elem_i;
 			return ZIX_STATUS_SUCCESS;
-		} else if (cmp > 0) {
+		}
+
+		if (cmp > 0) {
 			upper = i - 1;
 		} else {
 			lower = i + 1;

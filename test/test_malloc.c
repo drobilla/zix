@@ -36,7 +36,9 @@ test_malloc(size_t size)
 {
 	if (in_test_malloc_init) {
 		return NULL;  // dlsym is asking for memory, but handles this fine
-	} else if (!test_malloc_sys_malloc) {
+	}
+
+	if (!test_malloc_sys_malloc) {
 		test_malloc_init();
 	}
 

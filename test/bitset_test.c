@@ -53,7 +53,9 @@ main(void)
 		const size_t count = zix_bitset_count_up_to(b, t, N_BITS);
 		if (count != i + 1) {
 			return test_fail("Count %zu != %zu\n", count, i + 1);
-		} else if (!zix_bitset_get(b, i)) {
+		}
+
+		if (!zix_bitset_get(b, i)) {
 			return test_fail("Bit %zu is not set\n", i);
 		}
 	}

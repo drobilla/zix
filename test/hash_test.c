@@ -102,7 +102,9 @@ stress(void)
 		ZixStatus st       = zix_hash_insert(hash, &strings[i], &inserted);
 		if (st) {
 			return test_fail("Failed to insert `%s'\n", strings[i]);
-		} else if (*(const void*const*)inserted != strings[i]) {
+		}
+
+		if (*(const void*const*)inserted != strings[i]) {
 			return test_fail("Corrupt insertion %s != %s\n",
 			                 strings[i], *(const char*const*)inserted);
 		}

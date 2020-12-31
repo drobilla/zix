@@ -234,18 +234,20 @@ zix_strindex_find(ZixStrindex* strindex, const char* const str, char** match)
 				*match = n->children[child_i].first;
 				assert(!strncmp(*match, orig_p, strlen(orig_p)));
 				return ZIX_STATUS_SUCCESS;
-			} else if (strindex_is_leaf(n)) {
+			}
+
+			if (strindex_is_leaf(n)) {
 				/* Hit leaf early, no match */
 				return ZIX_STATUS_NOT_FOUND;
-			} else {
-				/* Match at this node, continue search downwards (or match) */
-				p += label_len;
-				n  = &n->children[child_i];
-				if (label_len >= p_len) {
-					assert(strstr(strindex->s, orig_p) != NULL);
-					assert(strncmp(orig_p, *match, max_len));
-					return ZIX_STATUS_SUCCESS;
-				}
+			}
+
+			/* Match at this node, continue search downwards (or match) */
+			p += label_len;
+			n  = &n->children[child_i];
+			if (label_len >= p_len) {
+				assert(strstr(strindex->s, orig_p) != NULL);
+				assert(strncmp(orig_p, *match, max_len));
+				return ZIX_STATUS_SUCCESS;
 			}
 
 		} else {

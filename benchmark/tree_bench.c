@@ -42,10 +42,10 @@ unique_rand(size_t i)
 	static const size_t prime = 4294967291;
 	if (i >= prime) {
 		return i;  // Values >= prime are mapped to themselves
-	} else {
-		const size_t residue = ((uint64_t)i * i) % prime;
-		return (i <= prime / 2) ? residue : prime - residue;
 	}
+
+	const size_t residue = ((uint64_t)i * i) % prime;
+	return (i <= prime / 2) ? residue : prime - residue;
 }
 
 static int
@@ -53,14 +53,18 @@ int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
 	const intptr_t ia = (intptr_t)a;
 	const intptr_t ib = (intptr_t)b;
+
 	// note the (ia - ib) trick here would overflow
+
 	if (ia == ib) {
 		return 0;
-	} else if (ia < ib) {
-		return -1;
-	} else {
-		return 1;
 	}
+
+	if (ia < ib) {
+		return -1;
+	}
+
+	return 1;
 }
 
 static int
