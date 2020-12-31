@@ -183,7 +183,10 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Ensure tree size is correct
   if (zix_btree_size(t) != n_elems) {
-    return test_fail(t, "Tree size %zu != %zu\n", zix_btree_size(t), n_elems);
+    return test_fail(t,
+                     "Tree size %" PRIuPTR " != %" PRIuPTR "\n",
+                     zix_btree_size(t),
+                     n_elems);
   }
 
   // Ensure begin no longer equals end
@@ -206,7 +209,8 @@ stress(const unsigned test_num, const size_t n_elems)
   for (size_t i = 0; i < n_elems; ++i) {
     r = ith_elem(test_num, n_elems, i);
     if (zix_btree_find(t, (void*)r, &ti)) {
-      return test_fail(t, "Find %" PRIuPTR " @ %zu failed\n", (uintptr_t)r, i);
+      return test_fail(
+        t, "Find %" PRIuPTR " @ %" PRIuPTR " failed\n", (uintptr_t)r, i);
     }
 
     if ((uintptr_t)zix_btree_get(ti) != r) {
@@ -228,12 +232,14 @@ stress(const unsigned test_num, const size_t n_elems)
     r = ith_elem(test_num, n_elems, i);
     if (zix_btree_lower_bound(t, (void*)r, &ti)) {
       return test_fail(
-        t, "Lower bound %" PRIuPTR " @ %zu failed\n", (uintptr_t)r, i);
+        t, "Lower bound %" PRIuPTR " @ %" PRIuPTR " failed\n", (uintptr_t)r, i);
     }
 
     if (zix_btree_iter_is_end(ti)) {
-      return test_fail(
-        t, "Lower bound %" PRIuPTR " @ %zu hit end\n", (uintptr_t)r, i);
+      return test_fail(t,
+                       "Lower bound %" PRIuPTR " @ %" PRIuPTR " hit end\n",
+                       (uintptr_t)r,
+                       i);
     }
 
     if ((uintptr_t)zix_btree_get(ti) != r) {
@@ -262,7 +268,8 @@ stress(const unsigned test_num, const size_t n_elems)
     const uintptr_t iter_data = (uintptr_t)zix_btree_get(ti);
     if (iter_data < last) {
       return test_fail(t,
-                       "Iter @ %zu corrupt (%" PRIuPTR " < %" PRIuPTR ")\n",
+                       "Iter @ %" PRIuPTR " corrupt (%" PRIuPTR " < %" PRIuPTR
+                       ")\n",
                        i,
                        iter_data,
                        last);
@@ -271,7 +278,11 @@ stress(const unsigned test_num, const size_t n_elems)
   }
   zix_btree_iter_free(ti);
   if (i != n_elems) {
-    return test_fail(t, "Iteration stopped at %zu/%zu elements\n", i, n_elems);
+    return test_fail(t,
+                     "Iteration stopped at %" PRIuPTR "/%" PRIuPTR
+                     " elements\n",
+                     i,
+                     n_elems);
   }
 
   // Insert n_elems elements again, ensuring duplicates fail
@@ -332,7 +343,7 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Ensure the tree is empty
   if (zix_btree_size(t) != 0) {
-    return test_fail(t, "Tree size %zu != 0\n", zix_btree_size(t));
+    return test_fail(t, "Tree size %" PRIuPTR " != 0\n", zix_btree_size(t));
   }
 
   // Insert n_elems elements again (to test non-empty destruction)
@@ -357,7 +368,10 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Ensure tree size is still correct
   if (zix_btree_size(t) != n_elems) {
-    return test_fail(t, "Tree size %zu != %zu\n", zix_btree_size(t), n_elems);
+    return test_fail(t,
+                     "Tree size %" PRIuPTR " != %" PRIuPTR "\n",
+                     zix_btree_size(t),
+                     n_elems);
   }
 
   // Delete some elements towards the end
@@ -391,7 +405,10 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Check tree size
   if (zix_btree_size(t) != n_elems - (n_elems / 4)) {
-    return test_fail(t, "Tree size %zu != %zu\n", zix_btree_size(t), n_elems);
+    return test_fail(t,
+                     "Tree size %" PRIuPTR " != %" PRIuPTR "\n",
+                     zix_btree_size(t),
+                     n_elems);
   }
 
   // Delete some elements in a random order
@@ -526,7 +543,7 @@ main(int argc, char** argv)
 #ifdef ZIX_WITH_TEST_MALLOC
   const size_t total_n_allocs = test_malloc_get_n_allocs();
   const size_t fail_n_elems   = 1000;
-  printf("Testing 0 ... %zu failed allocations\n", total_n_allocs);
+  printf("Testing 0 ... %" PRIuPTR " failed allocations\n", total_n_allocs);
   expect_failure = true;
   for (size_t i = 0; i < total_n_allocs; ++i) {
     test_malloc_reset(i);

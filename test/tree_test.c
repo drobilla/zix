@@ -84,7 +84,10 @@ stress(unsigned test_num, size_t n_elems)
 
   // Ensure tree size is correct
   if (zix_tree_size(t) != n_elems) {
-    fprintf(stderr, "Tree size %zu != %zu\n", zix_tree_size(t), n_elems);
+    fprintf(stderr,
+            "Tree size %" PRIuPTR " != %" PRIuPTR "\n",
+            zix_tree_size(t),
+            n_elems);
     return test_fail();
   }
 
@@ -124,7 +127,10 @@ stress(unsigned test_num, size_t n_elems)
     last = iter_data;
   }
   if (i != n_elems) {
-    fprintf(stderr, "Iteration stopped at %zu/%zu elements\n", i, n_elems);
+    fprintf(stderr,
+            "Iteration stopped at %" PRIuPTR "/%" PRIuPTR " elements\n",
+            i,
+            n_elems);
     return test_fail();
   }
 
@@ -164,7 +170,7 @@ stress(unsigned test_num, size_t n_elems)
 
   // Ensure the tree is empty
   if (zix_tree_size(t) != 0) {
-    fprintf(stderr, "Tree size %zu != 0\n", zix_tree_size(t));
+    fprintf(stderr, "Tree size %" PRIuPTR " != 0\n", zix_tree_size(t));
     return test_fail();
   }
 
@@ -189,7 +195,10 @@ stress(unsigned test_num, size_t n_elems)
 
   // Ensure tree size is correct
   if (zix_tree_size(t) != n_elems) {
-    fprintf(stderr, "Tree size %zu != %zu\n", zix_tree_size(t), n_elems);
+    fprintf(stderr,
+            "Tree size %" PRIuPTR " != %" PRIuPTR "\n",
+            zix_tree_size(t),
+            n_elems);
     return test_fail();
   }
 

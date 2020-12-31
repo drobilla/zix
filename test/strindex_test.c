@@ -17,6 +17,7 @@
 #include "zix/common.h"
 #include "zix/strindex.h"
 
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,11 +46,15 @@ main(void)
       char*     match = NULL;
       ZixStatus ret   = zix_strindex_find(strindex, str + i, &match);
       if (ret) {
-        return test_fail("No match for substring at %zu length %zu\n", i, l);
+        return test_fail(
+          "No match for substring at %" PRIuPTR " length %" PRIuPTR "\n", i, l);
       }
 
       if (strncmp(str + i, match, l)) {
-        return test_fail("Bad match for substring at %zu length %zu\n", i, l);
+        return test_fail("Bad match for substring at %" PRIuPTR
+                         " length %" PRIuPTR "\n",
+                         i,
+                         l);
       }
     }
   }

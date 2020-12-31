@@ -17,6 +17,7 @@
 #include "zix/bitset.h"
 #include "zix/common.h"
 
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -52,18 +53,19 @@ main(void)
     zix_bitset_set(b, t, i);
     const size_t count = zix_bitset_count_up_to(b, t, N_BITS);
     if (count != i + 1) {
-      return test_fail("Count %zu != %zu\n", count, i + 1);
+      return test_fail("Count %" PRIuPTR " != %" PRIuPTR "\n", count, i + 1);
     }
 
     if (!zix_bitset_get(b, i)) {
-      return test_fail("Bit %zu is not set\n", i);
+      return test_fail("Bit %" PRIuPTR " is not set\n", i);
     }
   }
 
   for (size_t i = 0; i <= N_BITS; ++i) {
     const size_t count = zix_bitset_count_up_to(b, t, i);
     if (count != i) {
-      return test_fail("Count to %zu is %zu != %zu\n", i, count, i);
+      return test_fail(
+        "Count to %" PRIuPTR " is %" PRIuPTR " != %" PRIuPTR "\n", i, count, i);
     }
   }
 
@@ -73,7 +75,8 @@ main(void)
     }
     const size_t count = zix_bitset_count_up_to(b, t, i);
     if (count != 0) {
-      return test_fail("Count to %zu is %zu != %d\n", i, count, 0);
+      return test_fail(
+        "Count to %" PRIuPTR " is %" PRIuPTR " != %d\n", i, count, 0);
     }
   }
 
@@ -84,7 +87,11 @@ main(void)
     const size_t count  = zix_bitset_count_up_to(b, t, i + 1);
     const size_t result = MIN(N_BITS / 2, i / 2 + 1);
     if (count != result) {
-      return test_fail("Count to %zu is %zu != %zu\n", i, count, result);
+      return test_fail("Count to %" PRIuPTR " is %" PRIuPTR " != %" PRIuPTR
+                       "\n",
+                       i,
+                       count,
+                       result);
     }
   }
 

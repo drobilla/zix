@@ -20,6 +20,7 @@
 #include "zix/digest.h"
 #include "zix/hash.h"
 
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -113,7 +114,9 @@ stress(void)
 
   // Ensure hash size is correct
   if (zix_hash_size(hash) != n_strings) {
-    return test_fail("Hash size %zu != %zu\n", zix_hash_size(hash), n_strings);
+    return test_fail("Hash size %" PRIuPTR " != %" PRIuPTR "\n",
+                     zix_hash_size(hash),
+                     n_strings);
   }
 
   // zix_hash_print_dot(hash, stdout);
@@ -210,7 +213,7 @@ main(void)
 
 #ifdef ZIX_WITH_TEST_MALLOC
   const size_t total_n_allocs = test_malloc_get_n_allocs();
-  printf("Testing 0 ... %zu failed allocations\n", total_n_allocs);
+  printf("Testing 0 ... %" PRIuPTR " failed allocations\n", total_n_allocs);
   expect_failure = true;
   for (size_t i = 0; i < total_n_allocs; ++i) {
     test_malloc_reset(i);
