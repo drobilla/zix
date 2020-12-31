@@ -144,12 +144,12 @@ main(int argc, char** argv)
 
   zix_ring_mlock(ring);
 
-  ZixThread reader_thread;
+  ZixThread reader_thread; // NOLINT
   if (zix_thread_create(&reader_thread, MSG_SIZE * 4, reader, NULL)) {
     return failure("Failed to create reader thread\n");
   }
 
-  ZixThread writer_thread;
+  ZixThread writer_thread; // NOLINT
   if (zix_thread_create(&writer_thread, MSG_SIZE * 4, writer, NULL)) {
     return failure("Failed to create writer thread\n");
   }
@@ -172,8 +172,8 @@ main(int argc, char** argv)
   zix_ring_write(ring, "a", 1);
   zix_ring_write(ring, "b", 1);
 
-  char     buf;
-  uint32_t n = zix_ring_peek(ring, &buf, 1);
+  char     buf = 0;
+  uint32_t n   = zix_ring_peek(ring, &buf, 1);
   if (n != 1) {
     return failure("Peek n (%u) != 1\n", n);
   }

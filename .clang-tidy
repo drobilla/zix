@@ -7,7 +7,6 @@ Checks: >
   -cert-dcl37-c,
   -cert-dcl51-cpp,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
-  -cppcoreguidelines-init-variables,
   -hicpp-multiway-paths-covered,
   -llvmlibc-*,
   -misc-no-recursion,

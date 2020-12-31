@@ -153,8 +153,8 @@ strindex_split_edge(ZixStrindexNode* child, size_t index)
 static ZixStatus
 strindex_insert(ZixStrindexNode* n, char* suffix_first, char* first, char* last)
 {
-  size_t           child_i;
-  ZixStrindexNode* child;
+  size_t           child_i = 0;
+  ZixStrindexNode* child   = NULL;
   assert(first <= last);
 
   if (strindex_find_edge(n, *first, &child_i)) {
@@ -199,8 +199,8 @@ zix_strindex_find(ZixStrindex* strindex, const char* const str, char** match)
   const char* orig_p = p;
 #endif
 
-  ZixStrindexNode* n = strindex->root;
-  size_t           child_i;
+  ZixStrindexNode* n       = strindex->root;
+  size_t           child_i = 0;
 
   *match = NULL;
 

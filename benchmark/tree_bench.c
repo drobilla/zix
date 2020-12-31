@@ -141,7 +141,8 @@ bench_zix_tree(size_t n_elems,
   struct timespec del_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
-    ZixTreeIter* item;
+
+    ZixTreeIter* item = NULL;
     if (zix_tree_find(t, (void*)r, &item)) {
       return test_fail("Failed to find %" PRIdPTR " to delete\n", r);
     }
@@ -207,7 +208,8 @@ bench_zix_btree(size_t n_elems,
   struct timespec del_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
-    void* removed;
+
+    void* removed = NULL;
     if (zix_btree_remove(t, (void*)r, &removed, NULL)) {
       return test_fail("Failed to remove %" PRIdPTR "\n", r);
     }

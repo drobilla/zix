@@ -58,8 +58,8 @@ test_fail(void)
 static int
 stress(unsigned test_num, unsigned n_elems)
 {
-  intptr_t           r;
-  ZixSortedArrayIter ti;
+  intptr_t           r  = 0;
+  ZixSortedArrayIter ti = NULL;
 
   ZixSortedArray* t =
     zix_sorted_array_new(true, int_cmp, NULL, sizeof(intptr_t));
@@ -126,7 +126,8 @@ stress(unsigned test_num, unsigned n_elems)
   // Delete all elements
   for (unsigned e = 0; e < n_elems; e++) {
     r = ith_elem(test_num, n_elems, e);
-    ZixSortedArrayIter item;
+
+    ZixSortedArrayIter item = NULL;
     if (zix_sorted_array_find(t, &r, &item) != ZIX_STATUS_SUCCESS) {
       fprintf(stderr, "Failed to find item to remove\n");
       return test_fail();

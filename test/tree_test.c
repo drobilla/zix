@@ -59,10 +59,9 @@ test_fail(void)
 static int
 stress(unsigned test_num, size_t n_elems)
 {
-  intptr_t     r;
-  ZixTreeIter* ti;
-
-  ZixTree* t = zix_tree_new(true, int_cmp, NULL, NULL);
+  intptr_t     r  = 0;
+  ZixTreeIter* ti = NULL;
+  ZixTree*     t  = zix_tree_new(true, int_cmp, NULL, NULL);
 
   srand(seed);
 
@@ -152,7 +151,8 @@ stress(unsigned test_num, size_t n_elems)
   // Delete all elements
   for (size_t e = 0; e < n_elems; e++) {
     r = ith_elem(test_num, n_elems, e);
-    ZixTreeIter* item;
+
+    ZixTreeIter* item = NULL;
     if (zix_tree_find(t, (void*)r, &item) != ZIX_STATUS_SUCCESS) {
       fprintf(stderr, "Failed to find item to remove\n");
       return test_fail();

@@ -13,7 +13,6 @@ Checks: >
   -cert-msc50-cpp,
   -cert-msc51-cpp,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
-  -cppcoreguidelines-init-variables,
   -hicpp-multiway-paths-covered,
   -llvm-header-guard,
   -llvmlibc-*,

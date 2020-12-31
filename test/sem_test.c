@@ -68,13 +68,13 @@ main(int argc, char** argv)
     return 1;
   }
 
-  ZixThread reader_thread;
+  ZixThread reader_thread; // NOLINT
   if (zix_thread_create(&reader_thread, 128, reader, NULL)) {
     fprintf(stderr, "Failed to create reader thread\n");
     return 1;
   }
 
-  ZixThread writer_thread;
+  ZixThread writer_thread; // NOLINT
   if (zix_thread_create(&writer_thread, 128, writer, NULL)) {
     fprintf(stderr, "Failed to create writer thread\n");
     return 1;

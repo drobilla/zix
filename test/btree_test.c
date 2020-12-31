@@ -300,7 +300,8 @@ stress(const unsigned test_num, const size_t n_elems)
   ZixBTreeIter* next = NULL;
   for (size_t e = 0; e < n_elems; e++) {
     r = ith_elem(test_num, n_elems, e);
-    uintptr_t removed;
+
+    uintptr_t removed = 0;
     if (zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
       return test_fail(t, "Error removing item %" PRIuPTR "\n", (uintptr_t)r);
     }
@@ -342,8 +343,8 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Delete elements that don't exist
   for (size_t e = 0; e < n_elems; e++) {
-    r = ith_elem(test_num, n_elems * 3, n_elems + e);
-    uintptr_t removed;
+    r                 = ith_elem(test_num, n_elems * 3, n_elems + e);
+    uintptr_t removed = 0;
     if (!zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
       return test_fail(
         t, "Non-existant deletion of %" PRIuPTR " succeeded\n", (uintptr_t)r);
@@ -360,7 +361,7 @@ stress(const unsigned test_num, const size_t n_elems)
   // Delete some elements towards the end
   for (size_t e = 0; e < n_elems / 4; e++) {
     r = ith_elem(test_num, n_elems, n_elems - (n_elems / 4) + e);
-    uintptr_t removed;
+    uintptr_t removed = 0;
     if (zix_btree_remove(t, (void*)r, (void**)&removed, &next)) {
       return test_fail(t, "Deletion of %" PRIuPTR " failed\n", (uintptr_t)r);
     }
@@ -394,8 +395,9 @@ stress(const unsigned test_num, const size_t n_elems)
   // Delete some elements in a random order
   for (size_t e = 0; e < zix_btree_size(t) / 2; e++) {
     r = ith_elem(test_num, n_elems, rand() % n_elems);
-    uintptr_t removed;
-    ZixStatus rst = zix_btree_remove(t, (void*)r, (void**)&removed, &next);
+
+    uintptr_t removed = 0;
+    ZixStatus rst     = zix_btree_remove(t, (void*)r, (void**)&removed, &next);
     if (rst != ZIX_STATUS_SUCCESS && rst != ZIX_STATUS_NOT_FOUND) {
       return test_fail(t, "Error deleting %" PRIuPTR "\n", (uintptr_t)r);
     }

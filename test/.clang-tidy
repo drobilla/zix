@@ -13,7 +13,6 @@ Checks: >
   -cert-msc50-cpp,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -cppcoreguidelines-avoid-non-const-global-variables,
-  -cppcoreguidelines-init-variables,
   -google-readability-casting,
   -hicpp-multiway-paths-covered,
   -llvm-header-guard,
