@@ -119,21 +119,20 @@ def configure(conf):
 
 
 sources = [
-    'zix/chunk.c',
-    'zix/digest.c',
-    'zix/hash.c',
-    'zix/ring.c',
-    'zix/sorted_array.c',
-    'zix/strindex.c',
-    'zix/tree.c',
-    'zix/btree.c',
-    'zix/bitset.c',
+    'src/chunk.c',
+    'src/digest.c',
+    'src/hash.c',
+    'src/ring.c',
+    'src/sorted_array.c',
+    'src/strindex.c',
+    'src/tree.c',
+    'src/btree.c',
+    'src/bitset.c',
 ]
 
 tests = [
     'digest_test',
     'hash_test',
-    'inline_test',
     'ring_test',
     'sem_test',
     'sorted_array_test',
@@ -146,7 +145,8 @@ tests = [
 
 def build(bld):
     # C Headers
-    bld.install_files('${INCLUDEDIR}/zix', bld.path.ant_glob('zix/*.h'))
+    includedir = '${INCLUDEDIR}/zix-%s/zix' % ZIX_MAJOR_VERSION
+    bld.install_files(includedir, bld.path.ant_glob('include/zix/*.h'))
 
     # Pkgconfig file
     autowaf.build_pc(bld, 'ZIX', ZIX_VERSION, ZIX_MAJOR_VERSION, [],
@@ -162,9 +162,9 @@ def build(bld):
 
     # Library
     bld(features        = 'c cshlib',
-        export_includes = ['.'],
+        export_includes = ['.', 'include'],
         source          = sources,
-        includes        = ['.'],
+        includes        = ['.', 'include'],
         name            = 'libzix',
         target          = 'zix',
         vnum            = ZIX_VERSION,
@@ -174,9 +174,9 @@ def build(bld):
 
     if bld.env.BUILD_STATIC or bld.env.BUILD_BENCH:
         bld(features        = 'c cstlib',
-            export_includes = ['.'],
+            export_includes = ['.', 'include'],
             source          = sources,
-            includes        = ['.'],
+            includes        = ['.', 'include'],
             name            = 'libzix_static',
             target          = 'zix',
             vnum            = ZIX_VERSION,
@@ -199,7 +199,7 @@ def build(bld):
         # Profiled static library (for unit test code coverage)
         bld(features     = 'c cstlib',
             source       = sources,
-            includes     = ['.'],
+            includes     = ['.', 'include'],
             lib          = test_libs,
             name         = 'libzix_profiled',
             target       = 'zix_profiled',
@@ -218,7 +218,7 @@ def build(bld):
         for i in tests:
             bld(features     = 'c cprogram',
                 source       = ['test/%s.c' % i] + test_malloc,
-                includes     = ['.'],
+                includes     = ['.', 'include'],
                 use          = 'libzix_profiled',
                 lib          = test_libs,
                 target       = 'test/%s' % i,
@@ -232,7 +232,7 @@ def build(bld):
         for i in ['tree_bench', 'dict_bench']:
             bld(features     = 'c cprogram',
                 source       = 'benchmark/%s.c' % i,
-                includes     = ['.'],
+                includes     = ['.', 'include'],
                 use          = 'libzix_static',
                 uselib       = 'GLIB',
                 lib          = ['rt'],
