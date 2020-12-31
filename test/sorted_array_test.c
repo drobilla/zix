@@ -74,6 +74,7 @@ stress(unsigned test_num, unsigned n_elems)
       fprintf(stderr, "Insert failed\n");
       return test_fail();
     }
+
     if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
       fprintf(stderr,
               "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
@@ -92,6 +93,7 @@ stress(unsigned test_num, unsigned n_elems)
       fprintf(stderr, "Find failed\n");
       return test_fail();
     }
+
     if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
       fprintf(stderr,
               "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
@@ -109,7 +111,8 @@ stress(unsigned test_num, unsigned n_elems)
   for (ZixSortedArrayIter iter = zix_sorted_array_begin(t);
        !zix_sorted_array_iter_is_end(t, iter);
        iter = zix_sorted_array_iter_next(t, iter), ++i) {
-    r                        = ith_elem(test_num, n_elems, i);
+    r = ith_elem(test_num, n_elems, i);
+
     const intptr_t iter_data = *(intptr_t*)zix_sorted_array_get_data(iter);
     if (iter_data < last) {
       fprintf(stderr,
@@ -129,6 +132,30 @@ stress(unsigned test_num, unsigned n_elems)
     return test_fail();
   }
 
+  if (zix_sorted_array_index(t, zix_sorted_array_size(t))) {
+    fprintf(stderr, "Got element past end\n");
+    return test_fail();
+  }
+
+  srand(seed);
+
+  // Iterate over all elements by index
+  last = -1;
+  for (i = 0; i < zix_sorted_array_size(t); ++i) {
+    r = ith_elem(test_num, n_elems, i);
+
+    const intptr_t iter_data = *(intptr_t*)zix_sorted_array_index(t, i);
+    if (iter_data < last) {
+      fprintf(stderr,
+              "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
+              iter_data,
+              last);
+      return test_fail();
+    }
+
+    last = iter_data;
+  }
+
   srand(seed);
 
   // Delete all elements
@@ -140,6 +167,7 @@ stress(unsigned test_num, unsigned n_elems)
       fprintf(stderr, "Failed to find item to remove\n");
       return test_fail();
     }
+
     if (zix_sorted_array_remove(t, item)) {
       fprintf(stderr, "Error removing item\n");
     }
@@ -177,7 +205,7 @@ main(int argc, char** argv)
     return 1;
   }
 
-  printf("Running %u tests with %u elements (seed %u)", n_tests, n_elems, seed);
+  printf("Running %u tests with %u elements (seed %u)\n", n_tests, n_elems, seed);
 
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");
