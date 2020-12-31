@@ -183,7 +183,7 @@ zix_sorted_array_end(ZixSortedArray* a)
 bool
 zix_sorted_array_iter_is_end(ZixSortedArray* a, ZixSortedArrayIter i)
 {
-  return i != zix_sorted_array_end(a);
+  return i >= zix_sorted_array_end(a);
 }
 
 ZixSortedArrayIter

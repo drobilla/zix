@@ -121,6 +121,14 @@ stress(unsigned test_num, unsigned n_elems)
     last = iter_data;
   }
 
+  if (i != zix_sorted_array_size(t)) {
+    fprintf(stderr,
+            "Iterated over only %u/%" PRIuPTR " elements\n",
+            i,
+            zix_sorted_array_size(t));
+    return test_fail();
+  }
+
   srand(seed);
 
   // Delete all elements
