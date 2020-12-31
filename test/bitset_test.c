@@ -95,5 +95,27 @@ main(void)
     }
   }
 
+  zix_bitset_clear(b, t, N_BITS);
+  for (size_t i = 0; i < N_BITS; ++i) {
+    if (i % 2 == 0) {
+      zix_bitset_set(b, t, i);
+
+      const size_t count  = zix_bitset_count_up_to_if(b, t, i);
+      const size_t result = MIN(N_BITS / 2, i / 2);
+      if (count != result) {
+        return test_fail("Count to %" PRIuPTR " is %" PRIuPTR " != %" PRIuPTR
+                         "\n",
+                         i,
+                         count,
+                         result);
+      }
+    } else {
+      if (zix_bitset_count_up_to_if(b, t, i) != (size_t)-1) {
+        return test_fail(
+          "Got unexpected non-zero count at index %" PRIuPTR "\n", i);
+      }
+    }
+  }
+
   return 0;
 }
