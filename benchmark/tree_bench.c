@@ -36,7 +36,7 @@
 static size_t
 unique_rand(size_t i)
 {
-  i ^= 0x5CA1AB1E; // Juggle bits to avoid linear clumps
+  i ^= 0x5CA1AB1Eu; // Juggle bits to avoid linear clumps
 
   // Largest prime < 2^32 which satisfies (2^32 = 3 mod 4)
   static const size_t prime = 4294967291;
