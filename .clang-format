@@ -20,7 +20,6 @@ StatementMacros:
   - ZIX_CONST_API
   - ZIX_CONST_API
   - ZIX_MALLOC_API
-  - ZIX_PRIVATE
   - ZIX_PURE_API
   - ZIX_UNUSED
 ...

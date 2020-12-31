@@ -82,8 +82,7 @@ zix_tree_new(bool           allow_duplicates,
   return t;
 }
 
-ZIX_PRIVATE
-void
+static void
 zix_tree_free_rec(ZixTree* t, ZixTreeNode* n)
 {
   if (n) {
@@ -111,8 +110,7 @@ zix_tree_size(const ZixTree* t)
   return t->size;
 }
 
-ZIX_PRIVATE
-void
+static void
 rotate(ZixTreeNode* p, ZixTreeNode* q)
 {
   assert(q->parent == p);
@@ -156,8 +154,7 @@ rotate(ZixTreeNode* p, ZixTreeNode* q)
  *     / \        / \
  *    B   C      A   B
  */
-ZIX_PRIVATE
-ZixTreeNode*
+static ZixTreeNode*
 rotate_left(ZixTreeNode* p, int* height_change)
 {
   ZixTreeNode* const q = p->right;
@@ -190,8 +187,7 @@ rotate_left(ZixTreeNode* p, int* height_change)
  *  A   B          B   C
  *
  */
-ZIX_PRIVATE
-ZixTreeNode*
+static ZixTreeNode*
 rotate_right(ZixTreeNode* p, int* height_change)
 {
   ZixTreeNode* const q = p->left;
@@ -226,8 +222,7 @@ rotate_right(ZixTreeNode* p, int* height_change)
  *    B   C
  *
  */
-ZIX_PRIVATE
-ZixTreeNode*
+static ZixTreeNode*
 rotate_left_right(ZixTreeNode* p, int* height_change)
 {
   ZixTreeNode* const q = p->left;
@@ -274,8 +269,7 @@ rotate_left_right(ZixTreeNode* p, int* height_change)
  *  B   C
  *
  */
-ZIX_PRIVATE
-ZixTreeNode*
+static ZixTreeNode*
 rotate_right_left(ZixTreeNode* p, int* height_change)
 {
   ZixTreeNode* const q = p->right;
@@ -311,8 +305,7 @@ rotate_right_left(ZixTreeNode* p, int* height_change)
   return r;
 }
 
-ZIX_PRIVATE
-ZixTreeNode*
+static ZixTreeNode*
 zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
 {
 #ifdef ZIX_TREE_HYPER_VERIFY
