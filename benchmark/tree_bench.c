@@ -15,12 +15,15 @@
 */
 
 #include "bench.h"
+#include "warnings.h"
 
 #include "zix/btree.h"
 #include "zix/common.h"
 #include "zix/tree.h"
 
+ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>
+ZIX_RESTORE_WARNINGS
 
 #include <inttypes.h>
 #include <stdarg.h>

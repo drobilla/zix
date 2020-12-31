@@ -15,12 +15,15 @@
 */
 
 #include "bench.h"
+#include "warnings.h"
 
 #include "zix/chunk.h"
 #include "zix/common.h"
 #include "zix/hash.h"
 
+ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>
+ZIX_RESTORE_WARNINGS
 
 #include <ctype.h>
 #include <stdarg.h>

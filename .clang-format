@@ -22,4 +22,5 @@ StatementMacros:
   - ZIX_MALLOC_API
   - ZIX_PURE_API
   - ZIX_UNUSED
+  - _Pragma
 ...
