@@ -25,15 +25,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct _ZixStrindexNode {
-  struct _ZixStrindexNode* children;     /* Children of this node */
-  size_t                   num_children; /* Number of outgoing edges */
-  char*                    first;        /* Start of this suffix */
-  char*                    label_first;  /* Start of incoming label */
-  char*                    label_last;   /* End of incoming label */
+typedef struct ZixStrindexNode {
+  struct ZixStrindexNode* children;     /* Children of this node */
+  size_t                  num_children; /* Number of outgoing edges */
+  char*                   first;        /* Start of this suffix */
+  char*                   label_first;  /* Start of incoming label */
+  char*                   label_last;   /* End of incoming label */
 } ZixStrindexNode;
 
-struct _ZixStrindex {
+struct ZixStrindexImpl {
   char*            s;    /* String contained in this tree */
   ZixStrindexNode* root; /* Root of the tree */
 };
@@ -50,7 +50,7 @@ zix_strindex_new(const char* s)
   const size_t len = strlen(s);
 
   ZixStrindex* t = (ZixStrindex*)malloc(sizeof(ZixStrindex));
-  memset(t, '\0', sizeof(struct _ZixStrindex));
+  memset(t, '\0', sizeof(ZixStrindex));
 
   t->s = (char*)calloc(1, len + 1);
   memcpy(t->s, s, len);

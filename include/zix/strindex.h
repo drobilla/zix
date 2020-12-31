@@ -26,7 +26,7 @@
    @{
 */
 
-typedef struct _ZixStrindex ZixStrindex;
+typedef struct ZixStrindexImpl ZixStrindex;
 
 /**
    Construct a new strindex that contains all suffixes of the string `s`.
