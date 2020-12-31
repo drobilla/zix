@@ -25,19 +25,12 @@
 */
 
 /** @cond */
-#ifdef ZIX_SHARED
-#  ifdef _WIN32
-#    define ZIX_LIB_IMPORT __declspec(dllimport)
-#    define ZIX_LIB_EXPORT __declspec(dllexport)
-#  else
-#    define ZIX_LIB_IMPORT __attribute__((visibility("default")))
-#    define ZIX_LIB_EXPORT __attribute__((visibility("default")))
-#  endif
-#  ifdef ZIX_INTERNAL
-#    define ZIX_API ZIX_LIB_EXPORT
-#  else
-#    define ZIX_API ZIX_LIB_IMPORT
-#  endif
+#if defined(_WIN32) && !defined(ZIX_STATIC) && defined(ZIX_INTERNAL)
+#  define ZIX_API __declspec(dllexport)
+#elif defined(_WIN32) && !defined(ZIX_STATIC)
+#  define ZIX_API __declspec(dllimport)
+#elif defined(__GNUC__)
+#  define ZIX_API __attribute__((visibility("default")))
 #else
 #  define ZIX_API
 #endif
