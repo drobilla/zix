@@ -16,12 +16,9 @@
 
 #include "bench.h"
 
-#include "zix/ampatree.h"
 #include "zix/chunk.h"
 #include "zix/common.h"
 #include "zix/hash.h"
-#include "zix/patree.h"
-#include "zix/trie.h"
 
 #include <glib.h>
 
@@ -97,14 +94,11 @@ main(int argc, char** argv)
 
 	FILE* insert_dat = fopen("dict_insert.txt", "w");
 	FILE* search_dat = fopen("dict_search.txt", "w");
-	fprintf(insert_dat, "# n\tGHashTable\tZixHash\tZixPatree\tZixTrie\tZixAMPatree\n");
-	fprintf(search_dat, "# n\tGHashTable\tZixHash\tZixPatree\tZixTrie\tZixAMPatree\n");
+	fprintf(insert_dat, "# n\tGHashTable\tZixHash\n");
+	fprintf(search_dat, "# n\tGHashTable\tZixHash\n");
 
 	for (size_t n = n_strings / 16; n <= n_strings; n *= 2) {
 		printf("Benchmarking n = %zu\n", n);
-		ZixPatree*   patree   = zix_patree_new();
-		ZixAMPatree* ampatree = zix_ampatree_new();
-		ZixTrie*     trie     = zix_trie_new();
 		GHashTable*  hash     = g_hash_table_new(g_str_hash, g_str_equal);
 		ZixHash*     zhash    = zix_hash_new((ZixHashFunc)zix_chunk_hash,
 		                                     (ZixEqualFunc)zix_chunk_equal,
@@ -126,36 +120,6 @@ main(int argc, char** argv)
 		for (size_t i = 0; i < n; ++i) {
 			const ZixChunk chunk = { strings[i], lengths[i] + 1 };
 			ZixStatus st = zix_hash_insert(zhash, &chunk, NULL);
-			if (st && st != ZIX_STATUS_EXISTS) {
-				return test_fail("Failed to insert `%s'\n", strings[i]);
-			}
-		}
-		fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
-
-		// ZixPatree
-		insert_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			ZixStatus st = zix_patree_insert(patree, strings[i], lengths[i]);
-			if (st && st != ZIX_STATUS_EXISTS) {
-				return test_fail("Failed to insert `%s'\n", strings[i]);
-			}
-		}
-		fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
-
-		// ZixTrie
-		insert_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			ZixStatus st = zix_trie_insert(trie, strings[i], lengths[i]);
-			if (st && st != ZIX_STATUS_EXISTS) {
-				return test_fail("Failed to insert `%s'\n", strings[i]);
-			}
-		}
-		fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
-
-		// ZixAMPatree
-		insert_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			ZixStatus st = zix_ampatree_insert(ampatree, strings[i], lengths[i]);
 			if (st && st != ZIX_STATUS_EXISTS) {
 				return test_fail("Failed to insert `%s'\n", strings[i]);
 			}
@@ -193,58 +157,8 @@ main(int argc, char** argv)
 				                 (const char*)match->buf);
 			}
 		}
-		fprintf(search_dat, "\t%lf", bench_end(&search_start));
-
-		// ZixPatree
-		srand(seed);
-		search_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			const size_t index = rand() % n;
-			const char* match = NULL;
-			if (zix_patree_find(patree, strings[index], &match)) {
-				return test_fail("Patree: Failed to find `%s'\n", strings[index]);
-			}
-			if (strcmp(match, strings[index])) {
-				return test_fail("Patree: Bad match for `%s'\n", strings[index]);
-			}
-		}
-		fprintf(search_dat, "\t%lf", bench_end(&search_start));
-
-		// ZixTrie
-		srand(seed);
-		search_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			const size_t index = rand() % n;
-			const char* match = NULL;
-			if (zix_trie_find(trie, strings[index], &match)) {
-				return test_fail("Trie: Failed to find `%s'\n", strings[index]);
-			}
-			if (strcmp(match, strings[index])) {
-				return test_fail("Trie: Bad match `%s' for `%s'\n",
-				                 match, strings[index]);
-			}
-		}
-		fprintf(search_dat, "\t%lf", bench_end(&search_start));
-
-		// ZixAMPatree
-		srand(seed);
-		search_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			const size_t index = rand() % n;
-			const char* match = NULL;
-			if (zix_ampatree_find(ampatree, strings[index], &match)) {
-				return test_fail("AMPatree: Failed to find `%s'\n", strings[index]);
-			}
-			if (strcmp(match, strings[index])) {
-				return test_fail("AMPatree: Bad match `%s' for `%s'\n",
-				                 match, strings[index]);
-			}
-		}
 		fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
 
-		zix_patree_free(patree);
-		zix_ampatree_free(ampatree);
-		zix_trie_free(trie);
 		zix_hash_free(zhash);
 		g_hash_table_unref(hash);
 	}

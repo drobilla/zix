@@ -122,23 +122,18 @@ sources = [
     'zix/chunk.c',
     'zix/digest.c',
     'zix/hash.c',
-    'zix/patree.c',
-    'zix/trie.c',
     'zix/ring.c',
     'zix/sorted_array.c',
     'zix/strindex.c',
     'zix/tree.c',
     'zix/btree.c',
     'zix/bitset.c',
-    'zix/ampatree.c'
 ]
 
 tests = [
     'digest_test',
     'hash_test',
     'inline_test',
-    'patree_test',
-    'trie_test',
     'ring_test',
     'sem_test',
     'sorted_array_test',
@@ -146,7 +141,6 @@ tests = [
     'tree_test',
     'btree_test',
     'bitset_test',
-    'ampatree_test'
 ]
 
 
@@ -325,7 +319,7 @@ def bench(ctx):
 
     # Benchmark trees
 
-    subprocess.call(['benchmark/tree_bench', '400000', '6400000'])
+    subprocess.call(['benchmark/tree_bench', '40000', '640000'])
     subprocess.call(['../plot.py', 'tree_bench.svg',
                      'tree_insert.txt',
                      'tree_search.txt',
