@@ -25,37 +25,35 @@ ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	fprintf(stderr, "error: ");
-	vfprintf(stderr, fmt, args);
-	va_end(args);
-	return 1;
+  va_list args;
+  va_start(args, fmt);
+  fprintf(stderr, "error: ");
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+  return 1;
 }
 
 int
 main(void)
 {
-	const char*  str      = "BANANA";
-	const size_t str_len  = strlen(str);
-	ZixStrindex* strindex = zix_strindex_new(str);
+  const char*  str      = "BANANA";
+  const size_t str_len  = strlen(str);
+  ZixStrindex* strindex = zix_strindex_new(str);
 
-	for (size_t l = 1; l <= str_len; ++l) {
-		for (size_t i = 0; i < str_len - l; ++i) {
-			char* match = NULL;
-			ZixStatus ret = zix_strindex_find(strindex, str + i, &match);
-			if (ret) {
-				return test_fail("No match for substring at %zu length %zu\n",
-				                 i, l);
-			}
+  for (size_t l = 1; l <= str_len; ++l) {
+    for (size_t i = 0; i < str_len - l; ++i) {
+      char*     match = NULL;
+      ZixStatus ret   = zix_strindex_find(strindex, str + i, &match);
+      if (ret) {
+        return test_fail("No match for substring at %zu length %zu\n", i, l);
+      }
 
-			if (strncmp(str + i, match, l)) {
-				return test_fail("Bad match for substring at %zu length %zu\n",
-				                 i, l);
-			}
-		}
-	}
+      if (strncmp(str + i, match, l)) {
+        return test_fail("Bad match for substring at %zu length %zu\n", i, l);
+      }
+    }
+  }
 
-	zix_strindex_free(strindex);
-	return 0;
+  zix_strindex_free(strindex);
+  return 0;
 }

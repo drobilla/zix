@@ -23,11 +23,11 @@
 uint32_t
 zix_chunk_hash(const ZixChunk* const chunk)
 {
-	return zix_digest_add(zix_digest_start(), chunk->buf, chunk->len);
+  return zix_digest_add(zix_digest_start(), chunk->buf, chunk->len);
 }
 
 bool
 zix_chunk_equal(const ZixChunk* a, const ZixChunk* b)
 {
-	return a->len == b->len && !memcmp(a->buf, b->buf, a->len);
+  return a->len == b->len && !memcmp(a->buf, b->buf, a->len);
 }

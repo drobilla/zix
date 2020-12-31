@@ -22,23 +22,22 @@
 static inline double
 elapsed_s(const struct timespec* start, const struct timespec* end)
 {
-	return ( (double)(end->tv_sec - start->tv_sec)
-	         + ((double)(end->tv_nsec - start->tv_nsec) * 0.000000001) );
+  return ((double)(end->tv_sec - start->tv_sec) +
+          ((double)(end->tv_nsec - start->tv_nsec) * 0.000000001));
 }
 
 static inline struct timespec
 bench_start(void)
 {
-	struct timespec start_t;
-	clock_gettime(CLOCK_MONOTONIC, &start_t);
-	return start_t;
+  struct timespec start_t;
+  clock_gettime(CLOCK_MONOTONIC, &start_t);
+  return start_t;
 }
 
 static inline double
 bench_end(const struct timespec* start_t)
 {
-	struct timespec end_t;
-	clock_gettime(CLOCK_MONOTONIC, &end_t);
-	return elapsed_s(start_t, &end_t);
+  struct timespec end_t;
+  clock_gettime(CLOCK_MONOTONIC, &end_t);
+  return elapsed_s(start_t, &end_t);
 }
-

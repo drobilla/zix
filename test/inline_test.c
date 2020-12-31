@@ -25,7 +25,7 @@
 ZIX_CONST_FUNC int
 main(void)
 {
-	zix_hash_free(NULL);
-	zix_tree_free(NULL);
-	return 0;
+  zix_hash_free(NULL);
+  zix_tree_free(NULL);
+  return 0;
 }

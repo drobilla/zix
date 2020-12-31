@@ -26,63 +26,63 @@ static unsigned n_signals = 1024;
 static void*
 reader(void* ZIX_UNUSED(arg))
 {
-	printf("Reader starting\n");
+  printf("Reader starting\n");
 
-	for (unsigned i = 0; i < n_signals; ++i) {
-		zix_sem_wait(&sem);
-	}
+  for (unsigned i = 0; i < n_signals; ++i) {
+    zix_sem_wait(&sem);
+  }
 
-	printf("Reader finished\n");
-	return NULL;
+  printf("Reader finished\n");
+  return NULL;
 }
 
 static void*
 writer(void* ZIX_UNUSED(arg))
 {
-	printf("Writer starting\n");
+  printf("Writer starting\n");
 
-	for (unsigned i = 0; i < n_signals; ++i) {
-		zix_sem_post(&sem);
-	}
+  for (unsigned i = 0; i < n_signals; ++i) {
+    zix_sem_post(&sem);
+  }
 
-	printf("Writer finished\n");
-	return NULL;
+  printf("Writer finished\n");
+  return NULL;
 }
 
 int
 main(int argc, char** argv)
 {
-	if (argc > 2) {
-		printf("Usage: %s N_SIGNALS\n", argv[0]);
-		return 1;
-	}
+  if (argc > 2) {
+    printf("Usage: %s N_SIGNALS\n", argv[0]);
+    return 1;
+  }
 
-	if (argc > 1) {
-		n_signals = (unsigned)atoi(argv[1]);
-	}
+  if (argc > 1) {
+    n_signals = (unsigned)atoi(argv[1]);
+  }
 
-	printf("Testing %u signals...\n", n_signals);
+  printf("Testing %u signals...\n", n_signals);
 
-	if (zix_sem_init(&sem, 0)) {
-		fprintf(stderr, "Failed to create semaphore.\n");
-		return 1;
-	}
+  if (zix_sem_init(&sem, 0)) {
+    fprintf(stderr, "Failed to create semaphore.\n");
+    return 1;
+  }
 
-	ZixThread reader_thread;
-	if (zix_thread_create(&reader_thread, 128, reader, NULL)) {
-		fprintf(stderr, "Failed to create reader thread\n");
-		return 1;
-	}
+  ZixThread reader_thread;
+  if (zix_thread_create(&reader_thread, 128, reader, NULL)) {
+    fprintf(stderr, "Failed to create reader thread\n");
+    return 1;
+  }
 
-	ZixThread writer_thread;
-	if (zix_thread_create(&writer_thread, 128, writer, NULL)) {
-		fprintf(stderr, "Failed to create writer thread\n");
-		return 1;
-	}
+  ZixThread writer_thread;
+  if (zix_thread_create(&writer_thread, 128, writer, NULL)) {
+    fprintf(stderr, "Failed to create writer thread\n");
+    return 1;
+  }
 
-	zix_thread_join(reader_thread, NULL);
-	zix_thread_join(writer_thread, NULL);
+  zix_thread_join(reader_thread, NULL);
+  zix_thread_join(writer_thread, NULL);
 
-	zix_sem_destroy(&sem);
-	return 0;
+  zix_sem_destroy(&sem);
+  return 0;
 }

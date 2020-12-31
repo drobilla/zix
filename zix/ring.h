@@ -135,7 +135,7 @@ zix_ring_write(ZixRing* ring, const void* src, uint32_t size);
 */
 
 #ifdef __cplusplus
-}  /* extern "C" */
+} /* extern "C" */
 #endif
 
-#endif  /* ZIX_RING_H */
+#endif /* ZIX_RING_H */

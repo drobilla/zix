@@ -56,4 +56,4 @@ zix_strindex_find(ZixStrindex* strindex, const char* str, char** match);
    @}
 */
 
-#endif  /* ZIX_STRINDEX_H */
+#endif /* ZIX_STRINDEX_H */

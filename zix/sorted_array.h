@@ -48,8 +48,10 @@ typedef void* ZixSortedArrayIter;
 */
 ZIX_API
 ZixSortedArray*
-zix_sorted_array_new(bool allow_duplicates, ZixComparator cmp, void* cmp_data,
-                     size_t elem_size);
+zix_sorted_array_new(bool          allow_duplicates,
+                     ZixComparator cmp,
+                     void*         cmp_data,
+                     size_t        elem_size);
 
 /**
    Free `a`.
@@ -139,7 +141,7 @@ zix_sorted_array_iter_next(ZixSortedArray* a, ZixSortedArrayIter i);
 */
 
 #ifdef __cplusplus
-}  /* extern "C" */
+} /* extern "C" */
 #endif
 
-#endif  /* ZIX_SORTED_ARRAY_H */
+#endif /* ZIX_SORTED_ARRAY_H */

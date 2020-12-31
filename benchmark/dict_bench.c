@@ -35,138 +35,139 @@ ZIX_LOG_FUNC(1, 2)
 static int
 test_fail(const char* fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	fprintf(stderr, "error: ");
-	vfprintf(stderr, fmt, args);
-	va_end(args);
-	return 1;
+  va_list args;
+  va_start(args, fmt);
+  fprintf(stderr, "error: ");
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+  return 1;
 }
 
 int
 main(int argc, char** argv)
 {
-	if (argc != 2) {
-		return test_fail("Usage: %s INPUT_FILE\n", argv[0]);
-	}
+  if (argc != 2) {
+    return test_fail("Usage: %s INPUT_FILE\n", argv[0]);
+  }
 
-	const char* file = argv[1];
-	FILE*       fd   = fopen(file, "r");
-	if (!fd) {
-		return test_fail("Failed to open file %s\n", file);
-	}
+  const char* file = argv[1];
+  FILE*       fd   = fopen(file, "r");
+  if (!fd) {
+    return test_fail("Failed to open file %s\n", file);
+  }
 
-	size_t max_n_strings = 100000000;
+  size_t max_n_strings = 100000000;
 
-	/* Read input strings */
-	char**  strings      = NULL;
-	size_t* lengths      = NULL;
-	size_t  n_strings    = 0;
-	char*   buf          = (char*)calloc(1, 1);
-	size_t  buf_len      = 1;
-	size_t  this_str_len = 0;
-	for (int c; (c = fgetc(fd)) != EOF;) {
-		if (isspace(c)) {
-			if (this_str_len == 0) {
-				continue;
-			}
-			strings = (char**)realloc(strings, (n_strings + 1) * sizeof(char*));
-			lengths = (size_t*)realloc(lengths, (n_strings + 1) * sizeof(size_t));
-			strings[n_strings] = (char*)malloc(buf_len);
-			lengths[n_strings] = this_str_len;
-			memcpy(strings[n_strings], buf, buf_len);
-			this_str_len = 0;
-			if (++n_strings == max_n_strings) {
-				break;
-			}
-		} else {
-			++this_str_len;
-			if (buf_len < this_str_len + 1) {
-				buf_len = this_str_len + 1;
-				buf = (char*)realloc(buf, buf_len);
-			}
-			buf[this_str_len - 1] = (char)c;
-			buf[this_str_len] = '\0';
-		}
-	}
+  /* Read input strings */
+  char**  strings      = NULL;
+  size_t* lengths      = NULL;
+  size_t  n_strings    = 0;
+  char*   buf          = (char*)calloc(1, 1);
+  size_t  buf_len      = 1;
+  size_t  this_str_len = 0;
+  for (int c; (c = fgetc(fd)) != EOF;) {
+    if (isspace(c)) {
+      if (this_str_len == 0) {
+        continue;
+      }
+      strings = (char**)realloc(strings, (n_strings + 1) * sizeof(char*));
+      lengths = (size_t*)realloc(lengths, (n_strings + 1) * sizeof(size_t));
+      strings[n_strings] = (char*)malloc(buf_len);
+      lengths[n_strings] = this_str_len;
+      memcpy(strings[n_strings], buf, buf_len);
+      this_str_len = 0;
+      if (++n_strings == max_n_strings) {
+        break;
+      }
+    } else {
+      ++this_str_len;
+      if (buf_len < this_str_len + 1) {
+        buf_len = this_str_len + 1;
+        buf     = (char*)realloc(buf, buf_len);
+      }
+      buf[this_str_len - 1] = (char)c;
+      buf[this_str_len]     = '\0';
+    }
+  }
 
-	fclose(fd);
+  fclose(fd);
 
-	FILE* insert_dat = fopen("dict_insert.txt", "w");
-	FILE* search_dat = fopen("dict_search.txt", "w");
-	fprintf(insert_dat, "# n\tGHashTable\tZixHash\n");
-	fprintf(search_dat, "# n\tGHashTable\tZixHash\n");
+  FILE* insert_dat = fopen("dict_insert.txt", "w");
+  FILE* search_dat = fopen("dict_search.txt", "w");
+  fprintf(insert_dat, "# n\tGHashTable\tZixHash\n");
+  fprintf(search_dat, "# n\tGHashTable\tZixHash\n");
 
-	for (size_t n = n_strings / 16; n <= n_strings; n *= 2) {
-		printf("Benchmarking n = %zu\n", n);
-		GHashTable*  hash     = g_hash_table_new(g_str_hash, g_str_equal);
-		ZixHash*     zhash    = zix_hash_new((ZixHashFunc)zix_chunk_hash,
-		                                     (ZixEqualFunc)zix_chunk_equal,
-		                                     sizeof(ZixChunk));
-		fprintf(insert_dat, "%zu", n);
-		fprintf(search_dat, "%zu", n);
+  for (size_t n = n_strings / 16; n <= n_strings; n *= 2) {
+    printf("Benchmarking n = %zu\n", n);
+    GHashTable* hash  = g_hash_table_new(g_str_hash, g_str_equal);
+    ZixHash*    zhash = zix_hash_new((ZixHashFunc)zix_chunk_hash,
+                                  (ZixEqualFunc)zix_chunk_equal,
+                                  sizeof(ZixChunk));
+    fprintf(insert_dat, "%zu", n);
+    fprintf(search_dat, "%zu", n);
 
-		// Benchmark insertion
+    // Benchmark insertion
 
-		// GHashTable
-		struct timespec insert_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			g_hash_table_insert(hash, strings[i], strings[i]);
-		}
-		fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
+    // GHashTable
+    struct timespec insert_start = bench_start();
+    for (size_t i = 0; i < n; ++i) {
+      g_hash_table_insert(hash, strings[i], strings[i]);
+    }
+    fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
 
-		// ZixHash
-		insert_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			const ZixChunk chunk = { strings[i], lengths[i] + 1 };
-			ZixStatus st = zix_hash_insert(zhash, &chunk, NULL);
-			if (st && st != ZIX_STATUS_EXISTS) {
-				return test_fail("Failed to insert `%s'\n", strings[i]);
-			}
-		}
-		fprintf(insert_dat, "\t%lf\n", bench_end(&insert_start));
+    // ZixHash
+    insert_start = bench_start();
+    for (size_t i = 0; i < n; ++i) {
+      const ZixChunk chunk = {strings[i], lengths[i] + 1};
+      ZixStatus      st    = zix_hash_insert(zhash, &chunk, NULL);
+      if (st && st != ZIX_STATUS_EXISTS) {
+        return test_fail("Failed to insert `%s'\n", strings[i]);
+      }
+    }
+    fprintf(insert_dat, "\t%lf\n", bench_end(&insert_start));
 
-		// Benchmark search
+    // Benchmark search
 
-		// GHashTable
-		srand(seed);
-		struct timespec search_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			const size_t index = rand() % n;
-			char* match = (char*)g_hash_table_lookup(hash, strings[index]);
-			if (strcmp(match, strings[index])) {
-				return test_fail("Bad match for `%s'\n", strings[index]);
-			}
-		}
-		fprintf(search_dat, "\t%lf", bench_end(&search_start));
+    // GHashTable
+    srand(seed);
+    struct timespec search_start = bench_start();
+    for (size_t i = 0; i < n; ++i) {
+      const size_t index = rand() % n;
+      char*        match = (char*)g_hash_table_lookup(hash, strings[index]);
+      if (strcmp(match, strings[index])) {
+        return test_fail("Bad match for `%s'\n", strings[index]);
+      }
+    }
+    fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
-		// ZixHash
-		srand(seed);
-		search_start = bench_start();
-		for (size_t i = 0; i < n; ++i) {
-			const size_t    index = rand() % n;
-			const ZixChunk  key   = { strings[index], lengths[index] + 1 };
-			const ZixChunk* match = NULL;
-			if (!(match = (const ZixChunk*)zix_hash_find(zhash, &key))) {
-				return test_fail("Hash: Failed to find `%s'\n", strings[index]);
-			}
-			if (strcmp((const char*)match->buf, strings[index])) {
-				return test_fail("Hash: Bad match %p for `%s': `%s'\n",
-				                 (const void*)match,
-				                 strings[index],
-				                 (const char*)match->buf);
-			}
-		}
-		fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
+    // ZixHash
+    srand(seed);
+    search_start = bench_start();
+    for (size_t i = 0; i < n; ++i) {
+      const size_t    index = rand() % n;
+      const ZixChunk  key   = {strings[index], lengths[index] + 1};
+      const ZixChunk* match = NULL;
+      if (!(match = (const ZixChunk*)zix_hash_find(zhash, &key))) {
+        return test_fail("Hash: Failed to find `%s'\n", strings[index]);
+      }
 
-		zix_hash_free(zhash);
-		g_hash_table_unref(hash);
-	}
+      if (strcmp((const char*)match->buf, strings[index])) {
+        return test_fail("Hash: Bad match %p for `%s': `%s'\n",
+                         (const void*)match,
+                         strings[index],
+                         (const char*)match->buf);
+      }
+    }
+    fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
 
-	fclose(insert_dat);
-	fclose(search_dat);
+    zix_hash_free(zhash);
+    g_hash_table_unref(hash);
+  }
 
-	fprintf(stderr, "Wrote dict_insert.txt dict_search.txt\n");
+  fclose(insert_dat);
+  fclose(search_dat);
 
-	return 0;
+  fprintf(stderr, "Wrote dict_insert.txt dict_search.txt\n");
+
+  return 0;
 }

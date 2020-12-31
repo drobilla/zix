@@ -31,18 +31,20 @@ extern "C" {
    A chunk of memory.
 */
 typedef struct {
-	void*  buf;  /**< Start of memory chunk */
-	size_t len;  /**< Length of memory chunk */
+  void*  buf; /**< Start of memory chunk */
+  size_t len; /**< Length of memory chunk */
 } ZixChunk;
 
-ZIX_PURE_API uint32_t
+ZIX_PURE_API
+uint32_t
 zix_chunk_hash(const ZixChunk* chunk);
 
-ZIX_PURE_API bool
+ZIX_PURE_API
+bool
 zix_chunk_equal(const ZixChunk* a, const ZixChunk* b);
 
 #ifdef __cplusplus
-}  /* extern "C" */
+} /* extern "C" */
 #endif
 
-#endif  /* ZIX_CHUNK_H */
+#endif /* ZIX_CHUNK_H */

@@ -1,0 +1,26 @@
+---
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignEscapedNewlinesLeft: true
+BasedOnStyle: Mozilla
+BraceWrapping:
+  AfterEnum: false
+  AfterExternBlock: false
+  AfterFunction: true
+  AfterStruct: false
+  AfterUnion: false
+BreakBeforeBraces: Custom
+Cpp11BracedListStyle: true
+IndentCaseLabels: false
+IndentPPDirectives: AfterHash
+KeepEmptyLinesAtTheStartOfBlocks: false
+SpacesInContainerLiterals: false
+StatementMacros:
+  - ZIX_API
+  - ZIX_CONST_API
+  - ZIX_CONST_API
+  - ZIX_MALLOC_API
+  - ZIX_PRIVATE
+  - ZIX_PURE_API
+  - ZIX_UNUSED
+...

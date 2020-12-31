@@ -32,4 +32,4 @@
    @}
 */
 
-#endif  /* ZIX_ZIX_H */
+#endif /* ZIX_ZIX_H */
