@@ -1,3 +1,6 @@
+option('benchmarks', type: 'feature', value: 'auto',
+       description: 'Build benchmarks')
+
 option('strict', type: 'boolean', value: false,
        description: 'Enable ultra-strict warnings')
 
@@ -6,6 +9,3 @@ option('test_malloc', type: 'boolean', value: true,
 
 option('tests', type: 'boolean', value: true,
        description: 'Build tests')
-
-option('benchmarks', type: 'feature', value: 'auto',
-       description: 'Build benchmarks')
