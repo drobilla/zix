@@ -279,7 +279,9 @@ if not get_option('benchmarks').disabled()
                         version: '>= 2.0.0',
                         required: get_option('benchmarks'))
 
-  if glib_dep.found()
+  build_benchmarks = glib_dep.found()
+
+  if build_benchmarks
     foreach benchmark : benchmarks
       benchmark(benchmark,
                 executable(benchmark,
@@ -290,4 +292,13 @@ if not get_option('benchmarks').disabled()
   else
     warning('Not building benchmarks because glib was not found')
   endif
+endif
+
+if meson.version().version_compare('>=0.53.0')
+  summary('Benchmarks', build_benchmarks, bool_yn: true)
+  summary('Tests', get_option('tests'), bool_yn: true)
+
+  summary('Install prefix', get_option('prefix'))
+  summary('Headers', get_option('prefix') / get_option('includedir'))
+  summary('Libraries', get_option('prefix') / get_option('libdir'))
 endif
