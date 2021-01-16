@@ -37,6 +37,8 @@ test_fail(const char* fmt, ...)
 int
 main(void)
 {
+  zix_strindex_free(NULL);
+
   const char*  str      = "BANANA";
   const size_t str_len  = strlen(str);
   ZixStrindex* strindex = zix_strindex_new(str);

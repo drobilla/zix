@@ -82,10 +82,12 @@ zix_strindex_free_rec(ZixStrindexNode* n)
 void
 zix_strindex_free(ZixStrindex* strindex)
 {
-  zix_strindex_free_rec(strindex->root);
-  free(strindex->s);
-  free(strindex->root);
-  free(strindex);
+  if (strindex) {
+    zix_strindex_free_rec(strindex->root);
+    free(strindex->s);
+    free(strindex->root);
+    free(strindex);
+  }
 }
 
 static inline int

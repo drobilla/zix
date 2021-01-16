@@ -129,6 +129,8 @@ main(int argc, char** argv)
     n_writes = (unsigned)atoi(argv[2]);
   }
 
+  zix_ring_free(NULL);
+
   printf("Testing %u writes of %d ints to a %u int ring...\n",
          n_writes,
          MSG_SIZE,
