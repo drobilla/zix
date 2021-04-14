@@ -45,7 +45,7 @@ unique_rand(size_t i)
   }
 
   const uint64_t residue = ((uint64_t)i * i) % prime;
-  return (i <= prime / 2) ? residue : prime - residue;
+  return (uintptr_t)((i <= prime / 2) ? residue : prime - residue);
 }
 
 static int
