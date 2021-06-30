@@ -125,6 +125,7 @@ zix_btree_node_new(const bool leaf)
   return node;
 }
 
+ZIX_PURE_FUNC
 static void*
 zix_btree_value(const ZixBTreeNode* const node, const unsigned i)
 {
@@ -132,6 +133,7 @@ zix_btree_value(const ZixBTreeNode* const node, const unsigned i)
   return node->is_leaf ? node->data.leaf.vals[i] : node->data.inode.vals[i];
 }
 
+ZIX_PURE_FUNC
 static ZixBTreeNode*
 zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 {
@@ -424,6 +426,7 @@ zix_btree_iter_set_frame(ZixBTreeIter* const ti,
   }
 }
 
+ZIX_PURE_FUNC
 static bool
 zix_btree_node_is_minimal(ZixBTreeNode* const n)
 {
