@@ -200,6 +200,7 @@ zix_hash_remove(ZixHash* hash, const void* value)
     if (h_nomod == e->hash && hash->equal_func(zix_hash_value(e), value)) {
       *next_ptr = e->next;
       free(e);
+      --hash->count;
       return ZIX_STATUS_SUCCESS;
     }
     next_ptr = &e->next;
@@ -214,7 +215,6 @@ zix_hash_remove(ZixHash* hash, const void* value)
     }
   }
 
-  --hash->count;
   return ZIX_STATUS_NOT_FOUND;
 }
 

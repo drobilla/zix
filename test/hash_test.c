@@ -158,10 +158,17 @@ stress(void)
 
   // Remove strings
   for (size_t i = 0; i < n_strings; ++i) {
+    const size_t initial_size = zix_hash_size(hash);
+
     // Remove string
     ZixStatus st = zix_hash_remove(hash, &strings[i]);
     if (st) {
       return test_fail("Failed to remove `%s'\n", strings[i]);
+    }
+
+    // Ensure size is updated
+    if (zix_hash_size(hash) != initial_size - 1) {
+      return test_fail("Removing node did not decrease hash size\n");
     }
 
     // Ensure second removal fails
