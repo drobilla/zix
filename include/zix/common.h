@@ -112,21 +112,15 @@ zix_strerror(const ZixStatus status)
   return "Unknown error";
 }
 
-/**
-   Function for comparing two elements.
-*/
+/// Function for comparing two elements
 typedef int (*ZixComparator)(const void* a,
                              const void* b,
                              const void* user_data);
 
-/**
-   Function for testing equality of two elements.
-*/
+/// Function for testing equality of two elements
 typedef bool (*ZixEqualFunc)(const void* a, const void* b);
 
-/**
-   Function to destroy an element.
-*/
+/// Function to destroy an element
 typedef void (*ZixDestroyFunc)(void* ptr);
 
 /**

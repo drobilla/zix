@@ -50,9 +50,7 @@ ZIX_MALLOC_API
 ZixRing*
 zix_ring_new(uint32_t size);
 
-/**
-   Destroy a ring.
-*/
+/// Destroy a ring
 ZIX_API
 void
 zix_ring_free(ZixRing* ring);
@@ -80,51 +78,37 @@ ZIX_API
 void
 zix_ring_reset(ZixRing* ring);
 
-/**
-   Return the number of bytes of space available for reading.
-*/
+/// Return the number of bytes of space available for reading
 ZIX_CONST_API
 uint32_t
 zix_ring_read_space(const ZixRing* ring);
 
-/**
-   Return the number of bytes of space available for writing.
-*/
+/// Return the number of bytes of space available for writing
 ZIX_CONST_API
 uint32_t
 zix_ring_write_space(const ZixRing* ring);
 
-/**
-   Return the capacity (i.e. total write space when empty).
-*/
+/// Return the capacity (i.e. total write space when empty)
 ZIX_CONST_API
 uint32_t
 zix_ring_capacity(const ZixRing* ring);
 
-/**
-   Read from the ring without advancing the read head.
-*/
+/// Read from the ring without advancing the read head
 ZIX_API
 uint32_t
 zix_ring_peek(ZixRing* ring, void* dst, uint32_t size);
 
-/**
-   Read from the ring and advance the read head.
-*/
+/// Read from the ring and advance the read head
 ZIX_API
 uint32_t
 zix_ring_read(ZixRing* ring, void* dst, uint32_t size);
 
-/**
-   Skip data in the ring (advance read head without reading).
-*/
+/// Skip data in the ring (advance read head without reading)
 ZIX_API
 uint32_t
 zix_ring_skip(ZixRing* ring, uint32_t size);
 
-/**
-   Write data to the ring.
-*/
+/// Write data to the ring
 ZIX_API
 uint32_t
 zix_ring_write(ZixRing* ring, const void* src, uint32_t size);

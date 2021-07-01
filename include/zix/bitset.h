@@ -31,59 +31,41 @@
    @{
 */
 
-/**
-   A bitset (always referred to by pointer, actually an array).
-*/
+/// A bitset (always referred to by pointer, actually an array)
 typedef unsigned long ZixBitset;
 
-/**
-   Tally of the number of bits in one ZixBitset element.
-*/
+/// Tally of the number of bits in one ZixBitset element
 typedef uint8_t ZixBitsetTally;
 
-/**
-   The number of bits per ZixBitset array element.
-*/
+/// The number of bits per ZixBitset array element
 #define ZIX_BITSET_BITS_PER_ELEM (CHAR_BIT * sizeof(ZixBitset))
 
-/**
-   The number of bitset elements needed for the given number of bits.
-*/
+/// The number of bitset elements needed for the given number of bits
 #define ZIX_BITSET_ELEMS(n_bits)           \
   (((n_bits) / ZIX_BITSET_BITS_PER_ELEM) + \
    ((n_bits) % ZIX_BITSET_BITS_PER_ELEM ? 1 : 0))
 
-/**
-   Clear a Bitset.
-*/
+/// Clear a Bitset
 ZIX_API
 void
 zix_bitset_clear(ZixBitset* b, ZixBitsetTally* t, size_t n_bits);
 
-/**
-   Set bit `i` in `t` to 1.
-*/
+/// Set bit `i` in `t` to 1
 ZIX_API
 void
 zix_bitset_set(ZixBitset* b, ZixBitsetTally* t, size_t i);
 
-/**
-   Clear bit `i` in `t` (set to 0).
-*/
+/// Clear bit `i` in `t` (set to 0)
 ZIX_API
 void
 zix_bitset_reset(ZixBitset* b, ZixBitsetTally* t, size_t i);
 
-/**
-   Return the `i`th bit in `t`.
-*/
+/// Return the `i`th bit in `t`
 ZIX_PURE_API
 bool
 zix_bitset_get(const ZixBitset* b, size_t i);
 
-/**
-   Return the number of set bits in `b` up to bit `i` (non-inclusive).
-*/
+/// Return the number of set bits in `b` up to bit `i` (non-inclusive)
 ZIX_PURE_API
 size_t
 zix_bitset_count_up_to(const ZixBitset* b, const ZixBitsetTally* t, size_t i);

@@ -35,14 +35,10 @@ extern "C" {
 
 typedef struct ZixHashImpl ZixHash;
 
-/**
-   Function for computing the hash of an element.
-*/
+/// Function for computing the hash of an element
 typedef uint32_t (*ZixHashFunc)(const void* value);
 
-/**
-   Function to visit a hash element.
-*/
+/// Function to visit a hash element
 typedef void (*ZixHashVisitFunc)(void* value, void* user_data);
 
 /**
@@ -62,16 +58,12 @@ ZIX_API
 ZixHash*
 zix_hash_new(ZixHashFunc hash_func, ZixEqualFunc equal_func, size_t value_size);
 
-/**
-   Free `hash`.
-*/
+/// Free `hash`
 ZIX_API
 void
 zix_hash_free(ZixHash* hash);
 
-/**
-   Return the number of elements in `hash`.
-*/
+/// Return the number of elements in `hash`
 ZIX_PURE_API
 size_t
 zix_hash_size(const ZixHash* hash);

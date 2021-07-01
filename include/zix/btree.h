@@ -33,14 +33,10 @@ extern "C" {
    @{
 */
 
-/**
-   A B-Tree.
-*/
+/// A B-Tree
 typedef struct ZixBTreeImpl ZixBTree;
 
-/**
-   A B-Tree node (opaque).
-*/
+/// A B-Tree node (opaque)
 typedef struct ZixBTreeNodeImpl ZixBTreeNode;
 
 /**
@@ -51,30 +47,22 @@ typedef struct ZixBTreeNodeImpl ZixBTreeNode;
 */
 typedef struct ZixBTreeIterImpl ZixBTreeIter;
 
-/**
-   Create a new (empty) B-Tree.
-*/
+/// Create a new (empty) B-Tree
 ZIX_API
 ZixBTree*
 zix_btree_new(ZixComparator cmp, const void* cmp_data, ZixDestroyFunc destroy);
 
-/**
-   Free `t`.
-*/
+/// Free `t`
 ZIX_API
 void
 zix_btree_free(ZixBTree* t);
 
-/**
-   Return the number of elements in `t`.
-*/
+/// Return the number of elements in `t`
 ZIX_PURE_API
 size_t
 zix_btree_size(const ZixBTree* t);
 
-/**
-   Insert the element `e` into `t`.
-*/
+/// Insert the element `e` into `t`
 ZIX_API
 ZixStatus
 zix_btree_insert(ZixBTree* t, void* e);
@@ -98,6 +86,7 @@ zix_btree_remove(ZixBTree* t, const void* e, void** out, ZixBTreeIter** next);
 
 /**
    Set `ti` to an element equal to `e` in `t`.
+
    If no such item exists, `ti` is set to NULL.
 */
 ZIX_API
@@ -115,9 +104,7 @@ ZIX_API
 ZixStatus
 zix_btree_lower_bound(const ZixBTree* t, const void* e, ZixBTreeIter** ti);
 
-/**
-   Return the data associated with the given tree item.
-*/
+/// Return the data associated with the given tree item
 ZIX_PURE_API
 void*
 zix_btree_get(const ZixBTreeIter* ti);
@@ -140,37 +127,27 @@ ZIX_API
 ZixBTreeIter*
 zix_btree_end(const ZixBTree* t);
 
-/**
-   Return a new copy of `i`.
-*/
+/// Return a new copy of `i`
 ZIX_API
 ZixBTreeIter*
 zix_btree_iter_copy(const ZixBTreeIter* i);
 
-/**
-   Return true iff `lhs` is equal to `rhs`.
-*/
+/// Return true iff `lhs` is equal to `rhs`
 ZIX_PURE_API
 bool
 zix_btree_iter_equals(const ZixBTreeIter* lhs, const ZixBTreeIter* rhs);
 
-/**
-   Return true iff `i` is an iterator to the end of its tree.
-*/
+/// Return true iff `i` is an iterator to the end of its tree
 ZIX_PURE_API
 bool
 zix_btree_iter_is_end(const ZixBTreeIter* i);
 
-/**
-   Increment `i` to point to the next element in the tree.
-*/
+/// Increment `i` to point to the next element in the tree
 ZIX_API
 void
 zix_btree_iter_increment(ZixBTreeIter* i);
 
-/**
-   Free `i`.
-*/
+/// Free `i`
 ZIX_API
 void
 zix_btree_iter_free(ZixBTreeIter* i);

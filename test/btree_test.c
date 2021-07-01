@@ -86,7 +86,7 @@ wildcard_cut(unsigned test_num, size_t n_elems)
   return ith_elem(test_num, n_elems, n_elems / 3);
 }
 
-/** Wildcard comparator where 0 matches anything >= wildcard_cut(n_elems). */
+/// Wildcard comparator where 0 matches anything >= wildcard_cut(n_elems)
 static int
 wildcard_cmp(const void* a, const void* b, const void* user_data)
 {

@@ -33,19 +33,13 @@ extern "C" {
    @{
 */
 
-/**
-   A sorted array.
-*/
+/// A sorted array
 typedef struct ZixSortedArrayImpl ZixSortedArray;
 
-/**
-   An iterator over a ZixSortedArray.
-*/
+/// An iterator over a ZixSortedArray
 typedef void* ZixSortedArrayIter;
 
-/**
-   Create a new (empty) sorted array.
-*/
+/// Create a new (empty) sorted array
 ZIX_API
 ZixSortedArray*
 zix_sorted_array_new(bool          allow_duplicates,
@@ -53,38 +47,31 @@ zix_sorted_array_new(bool          allow_duplicates,
                      void*         cmp_data,
                      size_t        elem_size);
 
-/**
-   Free `a`.
-*/
+/// Free `a`
 ZIX_API
 void
 zix_sorted_array_free(ZixSortedArray* a);
 
-/**
-   Return the number of elements in `a`.
-*/
+/// Return the number of elements in `a`
 ZIX_PURE_API
 size_t
 zix_sorted_array_size(const ZixSortedArray* a);
 
-/**
-   Insert the element `e` into `a` and point `ai` at the new element.
-*/
+/// Insert the element `e` into `a` and point `ai` at the new element
 ZIX_API
 ZixStatus
 zix_sorted_array_insert(ZixSortedArray*     a,
                         const void*         e,
                         ZixSortedArrayIter* ai);
 
-/**
-   Remove the item pointed at by `ai` from `a`.
-*/
+/// Remove the item pointed at by `ai` from `a`
 ZIX_API
 ZixStatus
 zix_sorted_array_remove(ZixSortedArray* a, ZixSortedArrayIter ai);
 
 /**
    Set `ai` to be the largest element <= `e` in `a`.
+
    If no such item exists, `ai` is set to NULL.
 */
 ZIX_API
@@ -93,44 +80,32 @@ zix_sorted_array_find(const ZixSortedArray* a,
                       const void*           e,
                       ZixSortedArrayIter*   ai);
 
-/**
-   Return the element at index `index`.
-*/
+/// Return the element at index `index`
 ZIX_PURE_API
 void*
 zix_sorted_array_index(const ZixSortedArray* a, size_t index);
 
-/**
-   Return the data associated with the given array item.
-*/
+/// Return the data associated with the given array item
 ZIX_CONST_API
 void*
 zix_sorted_array_get_data(ZixSortedArrayIter ai);
 
-/**
-   Return an iterator to the first (smallest) element in `a`.
-*/
+/// Return an iterator to the first (smallest) element in `a`
 ZIX_PURE_API
 ZixSortedArrayIter
 zix_sorted_array_begin(ZixSortedArray* a);
 
-/**
-   Return an iterator the the element one past the last element in `a`.
-*/
+/// Return an iterator the the element one past the last element in `a`
 ZIX_PURE_API
 ZixSortedArrayIter
 zix_sorted_array_end(ZixSortedArray* a);
 
-/**
-   Return true iff `a` is an iterator to the end of its tree.
-*/
+/// Return true iff `a` is an iterator to the end of its tree
 ZIX_PURE_API
 bool
 zix_sorted_array_iter_is_end(ZixSortedArray* a, ZixSortedArrayIter i);
 
-/**
-   Return an iterator that points to the element one past `a`.
-*/
+/// Return an iterator that points to the element one past `a`
 ZIX_PURE_API
 ZixSortedArrayIter
 zix_sorted_array_iter_next(ZixSortedArray* a, ZixSortedArrayIter i);

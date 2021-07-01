@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2020 David Robillard <d@drobilla.net>
+  Copyright 2011-2021 David Robillard <d@drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -216,7 +216,7 @@ zix_btree_min_vals(const ZixBTreeNode* const node)
   return (uint16_t)(((zix_btree_max_vals(node) + 1U) / 2U) - 1U);
 }
 
-/** Shift pointers in `array` of length `n` right starting at `i`. */
+/// Shift pointers in `array` of length `n` right starting at `i`
 static void
 zix_btree_ainsert(void** const   array,
                   const unsigned n,
@@ -227,7 +227,7 @@ zix_btree_ainsert(void** const   array,
   array[i] = e;
 }
 
-/** Erase element `i` in `array` of length `n` and return erased element. */
+/// Erase element `i` in `array` of length `n` and return erased element
 static void*
 zix_btree_aerase(void** const array, const unsigned n, const unsigned i)
 {
@@ -236,7 +236,7 @@ zix_btree_aerase(void** const array, const unsigned n, const unsigned i)
   return ret;
 }
 
-/** Split lhs, the i'th child of `n`, into two nodes. */
+/// Split lhs, the i'th child of `n`, into two nodes
 static ZixBTreeNode*
 zix_btree_split_child(ZixBTreeNode* const n,
                       const unsigned      i,
@@ -287,7 +287,7 @@ zix_btree_split_child(ZixBTreeNode* const n,
 }
 
 #ifdef ZIX_BTREE_SORTED_CHECK
-/** Check that `n` is sorted with respect to search key `e`. */
+/// Check that `n` is sorted with respect to search key `e`
 static bool
 zix_btree_node_is_sorted_with_respect_to(const ZixBTree* const     t,
                                          const ZixBTreeNode* const n,
@@ -310,7 +310,7 @@ zix_btree_node_is_sorted_with_respect_to(const ZixBTree* const     t,
 }
 #endif
 
-/** Find the first value in `n` that is not less than `e` (lower bound). */
+/// Find the first value in `n` that is not less than `e` (lower bound)
 static unsigned
 zix_btree_node_find(const ZixBTree* const     t,
                     const ZixBTreeNode* const n,
@@ -434,7 +434,7 @@ zix_btree_node_is_minimal(ZixBTreeNode* const n)
   return n->n_vals == zix_btree_min_vals(n);
 }
 
-/** Enlarge left child by stealing a value from its right sibling. */
+/// Enlarge left child by stealing a value from its right sibling
 static ZixBTreeNode*
 zix_btree_rotate_left(ZixBTreeNode* const parent, const unsigned i)
 {
@@ -468,7 +468,7 @@ zix_btree_rotate_left(ZixBTreeNode* const parent, const unsigned i)
   return lhs;
 }
 
-/** Enlarge right child by stealing a value from its left sibling. */
+/// Enlarge right child by stealing a value from its left sibling
 static ZixBTreeNode*
 zix_btree_rotate_right(ZixBTreeNode* const parent, const unsigned i)
 {
@@ -502,7 +502,7 @@ zix_btree_rotate_right(ZixBTreeNode* const parent, const unsigned i)
   return rhs;
 }
 
-/** Move n[i] down, merge the left and right child, return the merged node. */
+/// Move n[i] down, merge the left and right child, return the merged node
 static ZixBTreeNode*
 zix_btree_merge(ZixBTree* const t, ZixBTreeNode* const n, const unsigned i)
 {
@@ -552,7 +552,7 @@ zix_btree_merge(ZixBTree* const t, ZixBTreeNode* const n, const unsigned i)
   return lhs;
 }
 
-/** Remove and return the min value from the subtree rooted at `n`. */
+/// Remove and return the min value from the subtree rooted at `n`
 static void*
 zix_btree_remove_min(ZixBTree* const t, ZixBTreeNode* n)
 {
@@ -574,7 +574,7 @@ zix_btree_remove_min(ZixBTree* const t, ZixBTreeNode* n)
   return zix_btree_aerase(n->data.leaf.vals, --n->n_vals, 0);
 }
 
-/** Remove and return the max value from the subtree rooted at `n`. */
+/// Remove and return the max value from the subtree rooted at `n`
 static void*
 zix_btree_remove_max(ZixBTree* const t, ZixBTreeNode* n)
 {

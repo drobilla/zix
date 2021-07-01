@@ -26,9 +26,7 @@
 extern "C" {
 #endif
 
-/**
-   Return an initial empty digest value.
-*/
+/// Return an initial empty digest value
 ZIX_CONST_API
 uint32_t
 zix_digest_start(void);

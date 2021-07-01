@@ -22,7 +22,7 @@
 
 #include <string.h>
 
-/** Number of bits per ZixBitset element (ala CHAR_BIT). */
+/// Number of bits per ZixBitset element (ala CHAR_BIT)
 #define ZIX_BITSET_ELEM_BIT (CHAR_BIT * sizeof(ZixBitset))
 
 static inline size_t

@@ -63,20 +63,17 @@ struct ZixSemImpl;
 */
 typedef struct ZixSemImpl ZixSem;
 
-/**
-   Create and initialize `sem` to `initial`.
-*/
+/// Create and initialize `sem` to `initial`
 static inline ZixStatus
 zix_sem_init(ZixSem* sem, unsigned initial);
 
-/**
-   Destroy `sem`.
-*/
+/// Destroy `sem`
 static inline void
 zix_sem_destroy(ZixSem* sem);
 
 /**
-   Increment (and signal any waiters).
+   Increment and signal any waiters.
+
    Realtime safe.
 */
 static inline void
@@ -84,6 +81,7 @@ zix_sem_post(ZixSem* sem);
 
 /**
    Wait until count is > 0, then decrement.
+
    Obviously not realtime safe.
 */
 static inline ZixStatus
