@@ -226,7 +226,7 @@ zix_strindex_find(ZixStrindex* strindex, const char* const str, char** match)
         assert((*match)[0] == orig_p[0]);
       }
 
-      if (strncmp(p, label_first, max_len)) {
+      if (!!strncmp(p, label_first, max_len)) {
         /* no match */
         *match = NULL;
         return ZIX_STATUS_NOT_FOUND;

@@ -3,7 +3,6 @@ Checks: >
   -*-magic-numbers,
   -*-uppercase-literal-suffix,
   -bugprone-reserved-identifier,
-  -bugprone-suspicious-string-compare,
   -cert-dcl37-c,
   -cert-dcl51-cpp,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,

@@ -165,7 +165,7 @@ main(int argc, char** argv)
     for (size_t i = 0; i < n; ++i) {
       const size_t index = lcg64(seed + i) % n;
       char*        match = (char*)g_hash_table_lookup(hash, strings[index]);
-      if (strcmp(match, strings[index])) {
+      if (!!strcmp(match, strings[index])) {
         return test_fail("Bad match for `%s'\n", strings[index]);
       }
     }
@@ -181,7 +181,7 @@ main(int argc, char** argv)
         return test_fail("Hash: Failed to find `%s'\n", strings[index]);
       }
 
-      if (strcmp((const char*)match->buf, strings[index])) {
+      if (!!strcmp((const char*)match->buf, strings[index])) {
         return test_fail("Hash: Bad match %p for `%s': `%s'\n",
                          (const void*)match,
                          strings[index],

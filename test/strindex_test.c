@@ -52,7 +52,7 @@ main(void)
           "No match for substring at %" PRIuPTR " length %" PRIuPTR "\n", i, l);
       }
 
-      if (strncmp(str + i, match, l)) {
+      if (!!strncmp(str + i, match, l)) {
         return test_fail("Bad match for substring at %" PRIuPTR
                          " length %" PRIuPTR "\n",
                          i,
