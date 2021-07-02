@@ -274,7 +274,7 @@ benchmarks = [
   'tree_bench',
 ]
 
-# Build benchmarks
+build_benchmarks = false
 if not get_option('benchmarks').disabled()
   glib_dep = dependency('glib-2.0',
                         version: '>= 2.0.0',
