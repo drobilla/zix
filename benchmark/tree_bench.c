@@ -393,8 +393,8 @@ main(int argc, char** argv)
     return 1;
   }
 
-  const size_t min_n = atol(argv[1]);
-  const size_t max_n = atol(argv[2]);
+  const size_t min_n = strtoul(argv[1], NULL, 10);
+  const size_t max_n = strtoul(argv[2], NULL, 10);
 
   fprintf(stderr, "Benchmarking %zu .. %zu elements\n", min_n, max_n);
 

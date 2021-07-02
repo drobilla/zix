@@ -58,7 +58,7 @@ main(int argc, char** argv)
   }
 
   if (argc > 1) {
-    n_signals = (unsigned)atoi(argv[1]);
+    n_signals = (unsigned)strtol(argv[1], NULL, 10);
   }
 
   printf("Testing %u signals...\n", n_signals);

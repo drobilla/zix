@@ -527,10 +527,10 @@ main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  const unsigned n_tests = 3;
-  unsigned       n_elems = (argc > 1) ? (unsigned)atol(argv[1]) : 524288u;
+  const unsigned n_tests = 3u;
+  const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 524288u;
 
-  printf("Running %u tests with %u elements", n_tests, n_elems);
+  printf("Running %u tests with %lu elements", n_tests, n_elems);
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");
     fflush(stdout);

@@ -7,7 +7,6 @@ Checks: >
   -bugprone-suspicious-string-compare,
   -cert-dcl37-c,
   -cert-dcl51-cpp,
-  -cert-err34-c,
   -cert-msc30-c,
   -cert-msc32-c,
   -cert-msc50-cpp,

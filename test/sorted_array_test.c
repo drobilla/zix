@@ -192,9 +192,9 @@ main(int argc, char** argv)
   if (argc == 1) {
     n_elems = 4096;
   } else {
-    n_elems = (unsigned)atol(argv[1]);
+    n_elems = (unsigned)strtoul(argv[1], NULL, 10);
     if (argc > 2) {
-      seed = (unsigned)atol(argv[2]);
+      seed = (unsigned)strtoul(argv[2], NULL, 10);
     } else {
       seed = (unsigned)time(NULL);
     }

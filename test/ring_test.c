@@ -121,12 +121,12 @@ main(int argc, char** argv)
 
   unsigned size = 1024;
   if (argc > 1) {
-    size = (unsigned)atoi(argv[1]);
+    size = (unsigned)strtoul(argv[1], NULL, 10);
   }
 
   n_writes = size * 1024;
   if (argc > 2) {
-    n_writes = (unsigned)atoi(argv[2]);
+    n_writes = (unsigned)strtoul(argv[2], NULL, 10);
   }
 
   zix_ring_free(NULL);
