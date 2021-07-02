@@ -17,6 +17,8 @@
 #include "bench.h"
 #include "warnings.h"
 
+#include "../test/test_data.h"
+
 #include "zix/btree.h"
 #include "zix/common.h"
 #include "zix/tree.h"
@@ -34,22 +36,6 @@ ZIX_RESTORE_WARNINGS
 #include <time.h>
 
 // #define BENCH_SORTED_ARRAY 1
-
-// Return a pseudo-pseudo-pseudo-random-ish integer with no duplicates
-static size_t
-unique_rand(size_t i)
-{
-  i ^= 0x5CA1AB1Eu; // Juggle bits to avoid linear clumps
-
-  // Largest prime < 2^32 which satisfies (2^32 = 3 mod 4)
-  static const size_t prime = 4294967291;
-  if (i >= prime) {
-    return i; // Values >= prime are mapped to themselves
-  }
-
-  const size_t residue = ((uint64_t)i * i) % prime;
-  return (i <= prime / 2) ? residue : prime - residue;
-}
 
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))

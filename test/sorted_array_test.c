@@ -14,6 +14,8 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "test_data.h"
+
 #include "zix/common.h"
 #include "zix/sorted_array.h"
 
@@ -45,7 +47,7 @@ ith_elem(unsigned test_num, unsigned n_elems, unsigned i)
     return n_elems - i; // Decreasing (worse case)
   case 2:
   default:
-    return rand() % 100; // Random
+    return lcg64(seed + i) % 100u; // Pseudo-random
   }
 }
 
@@ -63,8 +65,6 @@ stress(unsigned test_num, unsigned n_elems)
 
   ZixSortedArray* t =
     zix_sorted_array_new(true, int_cmp, NULL, sizeof(intptr_t));
-
-  srand(seed);
 
   // Insert n_elems elements
   for (unsigned i = 0; i < n_elems; ++i) {
@@ -84,8 +84,6 @@ stress(unsigned test_num, unsigned n_elems)
     }
   }
 
-  srand(seed);
-
   // Search for all elements
   for (unsigned i = 0; i < n_elems; ++i) {
     r = ith_elem(test_num, n_elems, i);
@@ -102,8 +100,6 @@ stress(unsigned test_num, unsigned n_elems)
       return test_fail();
     }
   }
-
-  srand(seed);
 
   // Iterate over all elements
   unsigned i    = 0;
@@ -137,8 +133,6 @@ stress(unsigned test_num, unsigned n_elems)
     return test_fail();
   }
 
-  srand(seed);
-
   // Iterate over all elements by index
   last = -1;
   for (i = 0; i < zix_sorted_array_size(t); ++i) {
@@ -155,8 +149,6 @@ stress(unsigned test_num, unsigned n_elems)
 
     last = iter_data;
   }
-
-  srand(seed);
 
   // Delete all elements
   for (unsigned e = 0; e < n_elems; e++) {
@@ -205,7 +197,8 @@ main(int argc, char** argv)
     return 1;
   }
 
-  printf("Running %u tests with %u elements (seed %u)\n", n_tests, n_elems, seed);
+  printf(
+    "Running %u tests with %u elements (seed %u)\n", n_tests, n_elems, seed);
 
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");

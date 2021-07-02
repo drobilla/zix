@@ -39,6 +39,16 @@ typedef struct {
   size_t len;
 } ZixChunk;
 
+/// Linear Congruential Generator for making random 64-bit integers
+static inline uint64_t
+lcg64(const uint64_t i)
+{
+  static const uint64_t a = 6364136223846793005ull;
+  static const uint64_t c = 1ull;
+
+  return (a * i) + c;
+}
+
 static uint32_t
 zix_chunk_hash(const ZixChunk* const chunk)
 {
@@ -151,10 +161,9 @@ main(int argc, char** argv)
     // Benchmark search
 
     // GHashTable
-    srand(seed);
     struct timespec search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      const size_t index = rand() % n;
+      const size_t index = lcg64(seed + i) % n;
       char*        match = (char*)g_hash_table_lookup(hash, strings[index]);
       if (strcmp(match, strings[index])) {
         return test_fail("Bad match for `%s'\n", strings[index]);
@@ -163,10 +172,9 @@ main(int argc, char** argv)
     fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
     // ZixHash
-    srand(seed);
     search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      const size_t    index = rand() % n;
+      const size_t    index = lcg64(seed + i) % n;
       const ZixChunk  key   = {strings[index], lengths[index] + 1};
       const ZixChunk* match = NULL;
       if (!(match = (const ZixChunk*)zix_hash_find(zhash, &key))) {

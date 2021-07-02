@@ -14,9 +14,10 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include "zix/tree.h"
+#include "test_data.h"
 
 #include "zix/common.h"
+#include "zix/tree.h"
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -46,7 +47,7 @@ ith_elem(unsigned test_num, size_t n_elems, size_t i)
     return n_elems - i; // Decreasing (worse case)
   case 2:
   default:
-    return rand() % 100; // Random
+    return lcg64(seed + i) % 100; // Random
   }
 }
 
@@ -62,8 +63,6 @@ stress(unsigned test_num, size_t n_elems)
   intptr_t     r  = 0;
   ZixTreeIter* ti = NULL;
   ZixTree*     t  = zix_tree_new(true, int_cmp, NULL, NULL);
-
-  srand(seed);
 
   // Insert n_elems elements
   for (size_t i = 0; i < n_elems; ++i) {
@@ -91,8 +90,6 @@ stress(unsigned test_num, size_t n_elems)
     return test_fail();
   }
 
-  srand(seed);
-
   // Search for all elements
   for (size_t i = 0; i < n_elems; ++i) {
     r = ith_elem(test_num, n_elems, i);
@@ -108,8 +105,6 @@ stress(unsigned test_num, size_t n_elems)
       return test_fail();
     }
   }
-
-  srand(seed);
 
   // Iterate over all elements
   size_t   i    = 0;
@@ -134,8 +129,6 @@ stress(unsigned test_num, size_t n_elems)
     return test_fail();
   }
 
-  srand(seed);
-
   // Iterate over all elements backwards
   i    = 0;
   last = INTPTR_MAX;
@@ -151,8 +144,6 @@ stress(unsigned test_num, size_t n_elems)
     }
     last = iter_data;
   }
-
-  srand(seed);
 
   // Delete all elements
   for (size_t e = 0; e < n_elems; e++) {
@@ -173,8 +164,6 @@ stress(unsigned test_num, size_t n_elems)
     fprintf(stderr, "Tree size %" PRIuPTR " != 0\n", zix_tree_size(t));
     return test_fail();
   }
-
-  srand(seed);
 
   // Insert n_elems elements again (to test non-empty destruction)
   for (size_t e = 0; e < n_elems; ++e) {

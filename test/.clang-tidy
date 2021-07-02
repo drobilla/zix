@@ -8,8 +8,6 @@ Checks: >
   -bugprone-suspicious-string-compare,
   -cert-dcl37-c,
   -cert-dcl51-cpp,
-  -cert-msc30-c,
-  -cert-msc50-cpp,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -google-readability-casting,

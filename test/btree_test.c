@@ -18,6 +18,7 @@
 
 #include "zix/btree.h"
 
+#include "test_data.h"
 #include "test_malloc.h"
 
 #include "zix/common.h"
@@ -31,22 +32,6 @@
 #include <stdlib.h>
 
 static bool expect_failure = false;
-
-// Return a pseudo-pseudo-pseudo-random-ish integer with no duplicates
-static uintptr_t
-unique_rand(size_t i)
-{
-  i ^= 0x00005CA1Eu; // Juggle bits to avoid linear clumps
-
-  // Largest prime < 2^32 which satisfies (2^32 = 3 mod 4)
-  static const uint32_t prime = 4294967291;
-  if (i >= prime) {
-    return i; // Values >= prime are mapped to themselves
-  }
-
-  const uint64_t residue = ((uint64_t)i * i) % prime;
-  return (uintptr_t)((i <= prime / 2) ? residue : prime - residue);
-}
 
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
@@ -413,7 +398,7 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Delete some elements in a random order
   for (size_t e = 0; e < zix_btree_size(t) / 2; e++) {
-    r = ith_elem(test_num, n_elems, rand() % n_elems);
+    r = ith_elem(test_num, n_elems, unique_rand(e) % n_elems);
 
     uintptr_t removed = 0;
     ZixStatus rst     = zix_btree_remove(t, (void*)r, (void**)&removed, &next);
