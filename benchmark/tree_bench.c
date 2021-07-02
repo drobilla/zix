@@ -35,8 +35,6 @@ ZIX_RESTORE_WARNINGS
 #include <stdlib.h>
 #include <time.h>
 
-// #define BENCH_SORTED_ARRAY 1
-
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
@@ -210,106 +208,6 @@ bench_zix_btree(size_t n_elems,
   return EXIT_SUCCESS;
 }
 
-#ifdef BENCH_SORTED_ARRAY
-
-static int
-int_ptr_cmp(const void* a, const void* b, void* user_data)
-{
-  const intptr_t ia = *(const intptr_t*)a;
-  const intptr_t ib = *(const intptr_t*)b;
-  return ia - ib;
-}
-
-static int
-bench_zix_sorted_array(size_t n_elems,
-                       FILE*  insert_dat,
-                       FILE*  search_dat,
-                       FILE*  iter_dat,
-                       FILE*  del_dat)
-{
-  start_test("ZixSortedArray");
-
-  intptr_t           r  = 0;
-  ZixSortedArrayIter ti = NULL;
-  ZixSortedArray*    t =
-    zix_sorted_array_new(true, int_ptr_cmp, NULL, sizeof(intptr_t));
-
-  // Insert n_elems elements
-  struct timespec insert_start = bench_start();
-  for (size_t i = 0; i < n_elems; ++i) {
-    r          = unique_rand(i);
-    int status = zix_sorted_array_insert(t, &r, &ti);
-    if (status) {
-      return test_fail("Insert failed\n");
-    }
-
-    if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
-      return test_fail("Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
-                       *(intptr_t*)zix_sorted_array_get_data(ti),
-                       r);
-    }
-  }
-  fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
-
-  // Search for all elements
-  struct timespec search_start = bench_start();
-  for (size_t i = 0; i < n_elems; ++i) {
-    r = unique_rand(i);
-    if (zix_sorted_array_find(t, &r, &ti)) {
-      return test_fail("Find failed\n");
-    }
-
-    if (*(intptr_t*)zix_sorted_array_get_data(ti) != r) {
-      return test_fail("Data corrupt (saw %" PRIdPTR ", expected %zu)\n",
-                       *(intptr_t*)zix_sorted_array_get_data(ti),
-                       r);
-    }
-  }
-  fprintf(search_dat, "\t%lf", bench_end(&search_start));
-
-  // Iterate over all elements
-  struct timespec iter_start = bench_start();
-  size_t          i          = 0;
-  intptr_t        last       = -1;
-  for (ZixSortedArrayIter iter = zix_sorted_array_begin(t);
-       !zix_sorted_array_iter_is_end(t, iter);
-       iter = zix_sorted_array_iter_next(t, iter), ++i) {
-    r                        = unique_rand(i);
-    const intptr_t iter_data = *(intptr_t*)zix_sorted_array_get_data(iter);
-    if (iter_data < last) {
-      return test_fail("Iter corrupt (%" PRIdPTR " < %zu)\n", iter_data, last);
-    }
-
-    last = iter_data;
-  }
-  fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
-
-  // Delete all elements
-  struct timespec del_start = bench_start();
-  for (i = 0; i < n_elems; i++) {
-    r = unique_rand(i);
-    ZixSortedArrayIter item;
-    if (zix_sorted_array_find(t, &r, &item) != ZIX_STATUS_SUCCESS) {
-      return test_fail("Failed to find item to remove\n");
-    }
-
-    if (zix_sorted_array_remove(t, item)) {
-      return test_fail("Error removing item\n");
-    }
-  }
-  fprintf(del_dat, "\t%lf", bench_end(&del_start));
-
-  if (zix_sorted_array_size(t) != 0) {
-    return test_fail("Array is not empty after removing all items\n");
-  }
-
-  zix_sorted_array_free(t);
-
-  return EXIT_SUCCESS;
-}
-
-#endif // BENCH_SORTED_ARRAY
-
 static int
 bench_glib(size_t n_elems,
            FILE*  insert_dat,
@@ -401,9 +299,6 @@ main(int argc, char** argv)
     fprintf(iter_dat, "%zu", n);
     fprintf(del_dat, "%zu", n);
     bench_zix_tree(n, insert_dat, search_dat, iter_dat, del_dat);
-#ifdef BENCH_SORTED_ARRAY
-    bench_zix_sorted_array(n, insert_dat, search_dat, iter_dat, del_dat);
-#endif
     bench_zix_btree(n, insert_dat, search_dat, iter_dat, del_dat);
     bench_glib(n, insert_dat, search_dat, iter_dat, del_dat);
     fprintf(insert_dat, "\n");
