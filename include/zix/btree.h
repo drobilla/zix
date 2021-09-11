@@ -17,6 +17,7 @@
 #ifndef ZIX_BTREE_H
 #define ZIX_BTREE_H
 
+#include "zix/attributes.h"
 #include "zix/common.h"
 
 #include <stdbool.h>

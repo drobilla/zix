@@ -17,6 +17,7 @@
 #include "bench.h"
 #include "warnings.h"
 
+#include "zix/attributes.h"
 #include "zix/common.h"
 #include "zix/digest.h"
 #include "zix/hash.h"

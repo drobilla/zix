@@ -22,6 +22,7 @@
 #include "test_data.h"
 #include "test_malloc.h"
 
+#include "zix/attributes.h"
 #include "zix/common.h"
 #include "zix/digest.h"
 #include "zix/hash.h"

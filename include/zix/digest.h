@@ -17,7 +17,7 @@
 #ifndef ZIX_DIGEST_H
 #define ZIX_DIGEST_H
 
-#include "zix/common.h"
+#include "zix/attributes.h"
 
 #include <stddef.h>
 #include <stdint.h>

@@ -14,8 +14,8 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#include "zix/attributes.h"
 #include "zix/bitset.h"
-#include "zix/common.h"
 
 #include <inttypes.h>
 #include <stdarg.h>

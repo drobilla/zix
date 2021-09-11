@@ -16,6 +16,7 @@
 
 #include "test_data.h"
 
+#include "zix/attributes.h"
 #include "zix/common.h"
 #include "zix/tree.h"
 

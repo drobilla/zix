@@ -14,7 +14,7 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-#include "zix/common.h"
+#include "zix/attributes.h"
 #include "zix/ring.h"
 #include "zix/thread.h"
 

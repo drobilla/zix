@@ -17,6 +17,7 @@
 #ifndef ZIX_TREE_H
 #define ZIX_TREE_H
 
+#include "zix/attributes.h"
 #include "zix/common.h"
 
 #include <stdbool.h>

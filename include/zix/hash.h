@@ -17,6 +17,7 @@
 #ifndef ZIX_HASH_H
 #define ZIX_HASH_H
 
+#include "zix/attributes.h"
 #include "zix/common.h"
 
 #include <stdbool.h>

@@ -17,7 +17,7 @@
 #ifndef ZIX_BITSET_H
 #define ZIX_BITSET_H
 
-#include "zix/common.h"
+#include "zix/attributes.h"
 
 #include <limits.h>
 #include <stdbool.h>

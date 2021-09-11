@@ -19,6 +19,7 @@
 
 #include "../test/test_data.h"
 
+#include "zix/attributes.h"
 #include "zix/btree.h"
 #include "zix/common.h"
 #include "zix/tree.h"
