@@ -2,6 +2,7 @@ Checks: >
   *,
   -*-magic-numbers,
   -*-uppercase-literal-suffix,
+  -altera-struct-pack-align,
   -bugprone-reserved-identifier,
   -cert-dcl37-c,
   -cert-dcl51-cpp,
@@ -9,6 +10,7 @@ Checks: >
   -hicpp-multiway-paths-covered,
   -llvmlibc-*,
   -misc-no-recursion,
+  -readability-function-cognitive-complexity,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file

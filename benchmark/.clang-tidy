@@ -2,6 +2,7 @@ Checks: >
   *,
   -*-magic-numbers,
   -*-uppercase-literal-suffix,
+  -altera-struct-pack-align,
   -android-cloexec-fopen,
   -bugprone-reserved-identifier,
   -cert-dcl37-c,
@@ -10,6 +11,8 @@ Checks: >
   -hicpp-multiway-paths-covered,
   -llvm-header-guard,
   -llvmlibc-*,
+  -performance-no-int-to-ptr,
+  -readability-function-cognitive-complexity,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
