@@ -160,6 +160,49 @@ test_free(void)
   zix_btree_free(t, destroy);
 }
 
+static void
+test_iter_comparison(void)
+{
+  static const size_t n_elems = 4096u;
+
+  ZixBTree* const t = zix_btree_new(int_cmp, NULL);
+
+  // Store increasing numbers from 1 (jammed into the pointers themselves)
+  for (uintptr_t r = 1u; r < n_elems; ++r) {
+    assert(!zix_btree_insert(t, (void*)r));
+  }
+
+  // Check that begin and end work sensibly
+  const ZixBTreeIter begin = zix_btree_begin(t);
+  const ZixBTreeIter end   = zix_btree_end(t);
+  assert(!zix_btree_iter_is_end(begin));
+  assert(zix_btree_iter_is_end(end));
+  assert(!zix_btree_iter_equals(begin, end));
+  assert(!zix_btree_iter_equals(end, begin));
+
+  // Make another begin iterator
+  ZixBTreeIter j = zix_btree_begin(t);
+  assert(zix_btree_iter_equals(begin, j));
+
+  // Advance it and check that they are no longer equal
+  for (size_t r = 1u; r < n_elems - 1u; ++r) {
+    j = zix_btree_iter_next(j);
+    assert(!zix_btree_iter_is_end(j));
+    assert(!zix_btree_iter_equals(begin, j));
+    assert(!zix_btree_iter_equals(end, j));
+    assert(!zix_btree_iter_equals(j, end));
+  }
+
+  // Advance it to the end
+  zix_btree_iter_increment(&j);
+  assert(zix_btree_iter_is_end(j));
+  assert(!zix_btree_iter_equals(begin, j));
+  assert(zix_btree_iter_equals(end, j));
+  assert(zix_btree_iter_equals(j, end));
+
+  zix_btree_free(t, NULL);
+}
+
 static int
 stress(const unsigned test_num, const size_t n_elems)
 {
@@ -513,6 +556,7 @@ main(int argc, char** argv)
 
   test_clear();
   test_free();
+  test_iter_comparison();
 
   const unsigned n_tests = 3u;
   const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 524288u;
