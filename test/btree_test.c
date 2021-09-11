@@ -33,11 +33,15 @@
 
 static bool expect_failure = false;
 
+ZIX_PURE_FUNC
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
   const uintptr_t ia = (uintptr_t)a;
   const uintptr_t ib = (uintptr_t)b;
+
+  assert(ia != 0u); // No wildcards
+  assert(ib != 0u); // No wildcards
 
   return ia < ib ? -1 : ia > ib ? 1 : 0;
 }
@@ -51,7 +55,7 @@ ith_elem(const unsigned test_num, const size_t n_elems, const size_t i)
   case 1:
     return n_elems - i; // Decreasing
   default:
-    return unique_rand(i); // Pseudo-random
+    return 1u + unique_rand(i); // Pseudo-random
   }
 }
 
@@ -455,13 +459,9 @@ stress(const unsigned test_num, const size_t n_elems)
   // Insert n_elems elements
   for (i = 0; i < n_elems; ++i) {
     r = ith_elem(test_num, n_elems, i);
-    if (r != 0) { // Can't insert wildcards
-      if ((st = zix_btree_insert(t, (void*)r))) {
-        return test_fail(t,
-                         "Insert %" PRIuPTR " failed (%s)\n",
-                         (uintptr_t)r,
-                         zix_strerror(st));
-      }
+    if ((st = zix_btree_insert(t, (void*)r))) {
+      return test_fail(
+        t, "Insert %" PRIuPTR " failed (%s)\n", (uintptr_t)r, zix_strerror(st));
     }
   }
 
