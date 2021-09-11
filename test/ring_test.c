@@ -25,7 +25,6 @@
 
 #include <assert.h>
 #include <limits.h>
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -37,20 +36,8 @@ static ZixRing* ring       = 0;
 static unsigned n_writes   = 0;
 static bool     read_error = false;
 
-ZIX_LOG_FUNC(1, 2)
 static int
-failure(const char* fmt, ...)
-{
-  va_list args;
-  va_start(args, fmt);
-  fprintf(stderr, "error: ");
-  vfprintf(stderr, fmt, args);
-  va_end(args);
-  return 1;
-}
-
-static int
-gen_msg(int* msg, int start)
+gen_msg(int* const msg, int start)
 {
   for (unsigned i = 0u; i < MSG_SIZE; ++i) {
     msg[i] = start;
@@ -60,12 +47,10 @@ gen_msg(int* msg, int start)
 }
 
 static int
-cmp_msg(int* msg1, int* msg2)
+cmp_msg(const int* const msg1, const int* const msg2)
 {
   for (unsigned i = 0u; i < MSG_SIZE; ++i) {
-    if (msg1[i] != msg2[i]) {
-      return !failure("%d != %d @ %u\n", msg1[i], msg2[i], i);
-    }
+    assert(msg1[i] == msg2[i]);
   }
 
   return 1;
@@ -83,11 +68,7 @@ reader(void* ZIX_UNUSED(arg))
   for (unsigned i = 0; i < n_writes; ++i) {
     if (zix_ring_read_space(ring) >= MSG_SIZE * sizeof(int)) {
       if (zix_ring_read(ring, read_msg, MSG_SIZE * sizeof(int))) {
-        if (!cmp_msg(ref_msg, read_msg)) {
-          printf("FAIL: Message %u is corrupt\n", count);
-          read_error = true;
-          return NULL;
-        }
+        assert(cmp_msg(ref_msg, read_msg));
         start = gen_msg(ref_msg, start);
         ++count;
       }
@@ -129,101 +110,60 @@ test_ring(const unsigned size)
 
   ring = zix_ring_new(NULL, size);
   assert(ring);
-  if (zix_ring_read_space(ring) != 0) {
-    return failure("New ring is not empty\n");
-  }
-  if (zix_ring_write_space(ring) != zix_ring_capacity(ring)) {
-    return failure("New ring write space != capacity\n");
-  }
+  assert(zix_ring_read_space(ring) == 0);
+  assert(zix_ring_write_space(ring) == zix_ring_capacity(ring));
 
   zix_ring_mlock(ring);
 
   ZixThread reader_thread; // NOLINT
-  if (zix_thread_create(&reader_thread, MSG_SIZE * 4, reader, NULL)) {
-    return failure("Failed to create reader thread\n");
-  }
+  assert(!zix_thread_create(&reader_thread, MSG_SIZE * 4, reader, NULL));
 
   ZixThread writer_thread; // NOLINT
-  if (zix_thread_create(&writer_thread, MSG_SIZE * 4, writer, NULL)) {
-    return failure("Failed to create writer thread\n");
-  }
+  assert(!zix_thread_create(&writer_thread, MSG_SIZE * 4, writer, NULL));
 
   zix_thread_join(reader_thread, NULL);
   zix_thread_join(writer_thread, NULL);
 
-  if (read_error) {
-    return failure("Read error\n");
-  }
-
+  assert(!read_error);
   assert(ring);
   zix_ring_reset(ring);
-  if (zix_ring_read_space(ring) > 0) {
-    return failure("Reset did not empty ring.\n");
-  }
-  if (zix_ring_write_space(ring) != zix_ring_capacity(ring)) {
-    return failure("Empty write space != capacity\n");
-  }
+  assert(zix_ring_read_space(ring) == 0);
+  assert(zix_ring_write_space(ring) == zix_ring_capacity(ring));
 
   zix_ring_write(ring, "a", 1);
   zix_ring_write(ring, "b", 1);
 
   char     buf = 0;
   uint32_t n   = zix_ring_peek(ring, &buf, 1);
-  if (n != 1) {
-    return failure("Peek n (%u) != 1\n", n);
-  }
-  if (buf != 'a') {
-    return failure("Peek error: '%c' != 'a'\n", buf);
-  }
+  assert(n == 1);
+  assert(buf == 'a');
 
   n = zix_ring_skip(ring, 1);
-  if (n != 1) {
-    return failure("Skip n (%u) != 1\n", n);
-  }
+  assert(n == 1);
 
-  if (zix_ring_read_space(ring) != 1) {
-    return failure("Read space %u != 1\n", zix_ring_read_space(ring));
-  }
+  assert(zix_ring_read_space(ring) == 1);
 
   n = zix_ring_read(ring, &buf, 1);
-  if (n != 1) {
-    return failure("Peek n (%u) != 1\n", n);
-  }
-  if (buf != 'b') {
-    return failure("Peek error: '%c' != 'b'\n", buf);
-  }
+  assert(n == 1);
+  assert(buf == 'b');
 
-  if (zix_ring_read_space(ring) != 0) {
-    return failure("Read space %u != 0\n", zix_ring_read_space(ring));
-  }
+  assert(zix_ring_read_space(ring) == 0);
 
   n = zix_ring_peek(ring, &buf, 1);
-  if (n > 0) {
-    return failure("Successful underrun peak\n");
-  }
+  assert(n == 0);
 
   n = zix_ring_read(ring, &buf, 1);
-  if (n > 0) {
-    return failure("Successful underrun read\n");
-  }
+  assert(n == 0);
 
   n = zix_ring_skip(ring, 1);
-  if (n > 0) {
-    return failure("Successful underrun read\n");
-  }
+  assert(n == 0);
 
   char* big_buf = (char*)calloc(size, 1);
   n             = zix_ring_write(ring, big_buf, size - 1);
-  if (n != (uint32_t)size - 1) {
-    free(big_buf);
-    return failure("Maximum size write failed (wrote %u)\n", n);
-  }
+  assert(n == (uint32_t)size - 1);
 
   n = zix_ring_write(ring, big_buf, size);
-  if (n != 0) {
-    free(big_buf);
-    return failure("Successful overrun write (size %u)\n", n);
-  }
+  assert(n == 0);
 
   free(big_buf);
   zix_ring_free(ring);
@@ -258,15 +198,10 @@ main(int argc, char** argv)
     return 1;
   }
 
-  unsigned size = 1024;
-  if (argc > 1) {
-    size = (unsigned)strtoul(argv[1], NULL, 10);
-  }
+  const unsigned size =
+    (argc > 1) ? (unsigned)strtoul(argv[1], NULL, 10) : 1024;
 
-  n_writes = size * 1024;
-  if (argc > 2) {
-    n_writes = (unsigned)strtoul(argv[2], NULL, 10);
-  }
+  n_writes = (argc > 2) ? (unsigned)strtoul(argv[2], NULL, 10) : size * 1024;
 
   test_failed_alloc();
   test_ring(size);
