@@ -88,7 +88,7 @@ zix_btree_new(const ZixAllocator* ZIX_NULLABLE allocator,
 */
 ZIX_API
 void
-zix_btree_free(ZixBTree* ZIX_NONNULL       t,
+zix_btree_free(ZixBTree* ZIX_NULLABLE      t,
                ZixDestroyFunc ZIX_NULLABLE destroy,
                const void* ZIX_NULLABLE    destroy_user_data);
 
