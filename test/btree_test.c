@@ -222,6 +222,44 @@ test_insert_split_value(void)
   zix_btree_free(t, NULL);
 }
 
+static void
+test_remove_cases(void)
+{
+  /* Insert and remove in several "phases" with different strides that are not
+     even multiples.  This spreads the load around to hit as many cases as
+     possible. */
+
+  static const uintptr_t s1           = 2u;
+  static const uintptr_t s2           = 255u;
+  static const size_t    n_insertions = s1 * s2 * 1000u;
+
+  ZixBTree* const t = zix_btree_new(int_cmp, NULL);
+
+  // Insert in s1-sized chunks
+  for (uintptr_t phase = 0u; phase < s1; ++phase) {
+    for (uintptr_t r = 0u; r < n_insertions / s1; ++r) {
+      const uintptr_t value = (s1 * r) + phase + 1u;
+
+      assert(!zix_btree_insert(t, (void*)value));
+    }
+  }
+
+  // Remove in s2-sized chunks
+  ZixBTreeIter next = zix_btree_end(t);
+  for (uintptr_t phase = 0u; phase < s2; ++phase) {
+    for (uintptr_t r = 0u; r < n_insertions / s2; ++r) {
+      const uintptr_t value = (s2 * r) + phase + 1u;
+      void*           out   = NULL;
+
+      assert(!zix_btree_remove(t, (void*)value, &out, &next));
+      assert((uintptr_t)out == value);
+    }
+  }
+
+  assert(!zix_btree_size(t));
+  zix_btree_free(t, NULL);
+}
+
 static int
 stress(const unsigned test_num, const size_t n_elems)
 {
@@ -577,6 +615,7 @@ main(int argc, char** argv)
   test_free();
   test_iter_comparison();
   test_insert_split_value();
+  test_remove_cases();
 
   const unsigned n_tests = 3u;
   const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 524288u;
