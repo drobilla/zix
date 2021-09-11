@@ -33,6 +33,30 @@ zix_digest_start(void)
   return 1;
 }
 
+static inline uint64_t
+load64(const void* const mem)
+{
+  uint64_t r = 0u;
+  memcpy(&r, mem, sizeof(r));
+  return r;
+}
+
+static inline uint32_t
+load32(const void* const mem)
+{
+  uint32_t r = 0u;
+  memcpy(&r, mem, sizeof(r));
+  return r;
+}
+
+static inline uint16_t
+load16(const void* const mem)
+{
+  uint16_t r = 0u;
+  memcpy(&r, mem, sizeof(r));
+  return r;
+}
+
 uint32_t
 zix_digest_add(uint32_t hash, const void* const buf, const size_t len)
 {
@@ -40,25 +64,25 @@ zix_digest_add(uint32_t hash, const void* const buf, const size_t len)
 
 #  ifdef __x86_64__
   for (size_t i = 0; i < (len / sizeof(uint64_t)); ++i) {
-    hash = (uint32_t)_mm_crc32_u64(hash, *(const uint64_t*)str);
+    hash = (uint32_t)_mm_crc32_u64(hash, load64(str));
     str += sizeof(uint64_t);
   }
   if (len & sizeof(uint32_t)) {
-    hash = _mm_crc32_u32(hash, *(const uint32_t*)str);
+    hash = _mm_crc32_u32(hash, load32(str));
     str += sizeof(uint32_t);
   }
 #  else
   for (size_t i = 0; i < (len / sizeof(uint32_t)); ++i) {
-    hash = _mm_crc32_u32(hash, *(const uint32_t*)str);
+    hash = _mm_crc32_u32(hash, load32(str));
     str += sizeof(uint32_t);
   }
 #  endif
   if (len & sizeof(uint16_t)) {
-    hash = _mm_crc32_u16(hash, *(const uint16_t*)str);
+    hash = _mm_crc32_u16(hash, load16(str));
     str += sizeof(uint16_t);
   }
   if (len & sizeof(uint8_t)) {
-    hash = _mm_crc32_u8(hash, *(const uint8_t*)str);
+    hash = _mm_crc32_u8(hash, *str);
   }
 
   return hash;
