@@ -87,7 +87,8 @@ typedef enum {
   ZIX_STATUS_NOT_FOUND,
   ZIX_STATUS_EXISTS,
   ZIX_STATUS_BAD_ARG,
-  ZIX_STATUS_BAD_PERMS
+  ZIX_STATUS_BAD_PERMS,
+  ZIX_STATUS_REACHED_END
 } ZixStatus;
 
 static inline const char*
@@ -108,6 +109,8 @@ zix_strerror(const ZixStatus status)
     return "Bad argument";
   case ZIX_STATUS_BAD_PERMS:
     return "Bad permissions";
+  case ZIX_STATUS_REACHED_END:
+    return "Reached end";
   }
   return "Unknown error";
 }

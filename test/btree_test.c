@@ -172,11 +172,8 @@ stress(const unsigned test_num, const size_t n_elems)
   }
 
   // Ensure begin iterator is end on empty tree
-  ZixBTreeIter* ti  = zix_btree_begin(t);
-  ZixBTreeIter* end = zix_btree_end(t);
-  if (!ti) {
-    return test_fail(t, "Failed to allocate iterator\n");
-  }
+  ZixBTreeIter ti  = zix_btree_begin(t);
+  ZixBTreeIter end = zix_btree_end(t);
 
   if (!zix_btree_iter_is_end(ti)) {
     return test_fail(t, "Begin iterator on empty tree is not end\n");
@@ -184,13 +181,6 @@ stress(const unsigned test_num, const size_t n_elems)
 
   if (!zix_btree_iter_equals(ti, end)) {
     return test_fail(t, "Begin and end of empty tree are not equal\n");
-  }
-
-  zix_btree_iter_free(end);
-  zix_btree_iter_free(ti);
-
-  if (zix_btree_iter_copy(NULL)) {
-    return test_fail(t, "Copy of null iterator returned non-null\n");
   }
 
   // Insert n_elems elements
@@ -220,15 +210,6 @@ stress(const unsigned test_num, const size_t n_elems)
   if (zix_btree_iter_equals(ti, end)) {
     return test_fail(t, "Begin and end of non-empty tree are equal\n");
   }
-  zix_btree_iter_free(end);
-
-  // Ensure non-null iterator copying works
-  ZixBTreeIter* begin_copy = zix_btree_iter_copy(ti);
-  if (!zix_btree_iter_equals(ti, begin_copy)) {
-    return test_fail(t, "Iterator copy is not equal to original\n");
-  }
-  zix_btree_iter_free(begin_copy);
-  zix_btree_iter_free(ti);
 
   // Search for all elements
   for (size_t i = 0; i < n_elems; ++i) {
@@ -244,12 +225,6 @@ stress(const unsigned test_num, const size_t n_elems)
                        (uintptr_t)zix_btree_get(ti),
                        r);
     }
-
-    zix_btree_iter_free(ti);
-  }
-
-  if (zix_btree_lower_bound(NULL, (void*)r, &ti) != ZIX_STATUS_BAD_ARG) {
-    return test_fail(t, "Lower bound on NULL tree succeeded\n");
   }
 
   // Find the lower bound of all elements and ensure it's exact
@@ -273,8 +248,6 @@ stress(const unsigned test_num, const size_t n_elems)
                        (uintptr_t)zix_btree_get(ti),
                        r);
     }
-
-    zix_btree_iter_free(ti);
   }
 
   // Search for elements that don't exist
@@ -289,7 +262,7 @@ stress(const unsigned test_num, const size_t n_elems)
   size_t    i    = 0;
   uintptr_t last = 0;
   for (ti = zix_btree_begin(t); !zix_btree_iter_is_end(ti);
-       zix_btree_iter_increment(ti), ++i) {
+       zix_btree_iter_increment(&ti), ++i) {
     const uintptr_t iter_data = (uintptr_t)zix_btree_get(ti);
     if (iter_data < last) {
       return test_fail(t,
@@ -301,7 +274,7 @@ stress(const unsigned test_num, const size_t n_elems)
     }
     last = iter_data;
   }
-  zix_btree_iter_free(ti);
+
   if (i != n_elems) {
     return test_fail(t,
                      "Iteration stopped at %" PRIuPTR "/%" PRIuPTR
@@ -324,18 +297,17 @@ stress(const unsigned test_num, const size_t n_elems)
     return test_fail(t, "Find %" PRIuPTR " failed\n", (uintptr_t)r);
   }
   last = (uintptr_t)zix_btree_get(ti);
-  zix_btree_iter_increment(ti);
-  for (i = 1; !zix_btree_iter_is_end(ti); zix_btree_iter_increment(ti), ++i) {
+  zix_btree_iter_increment(&ti);
+  for (i = 1; !zix_btree_iter_is_end(ti); zix_btree_iter_increment(&ti), ++i) {
     if ((uintptr_t)zix_btree_get(ti) == last) {
       return test_fail(
         t, "Duplicate element @ %" PRIuPTR " %" PRIuPTR "\n", i, last);
     }
     last = (uintptr_t)zix_btree_get(ti);
   }
-  zix_btree_iter_free(ti);
 
   // Delete all elements
-  ZixBTreeIter* next = NULL;
+  ZixBTreeIter next = zix_btree_end_iter;
   for (size_t e = 0; e < n_elems; e++) {
     r = ith_elem(test_num, n_elems, e);
 
@@ -363,8 +335,6 @@ stress(const unsigned test_num, const size_t n_elems)
       }
     }
   }
-  zix_btree_iter_free(next);
-  next = NULL;
 
   // Ensure the tree is empty
   if (zix_btree_size(t) != 0) {
@@ -388,8 +358,6 @@ stress(const unsigned test_num, const size_t n_elems)
         t, "Non-existant deletion of %" PRIuPTR " succeeded\n", (uintptr_t)r);
     }
   }
-  zix_btree_iter_free(next);
-  next = NULL;
 
   // Ensure tree size is still correct
   if (zix_btree_size(t) != n_elems) {
@@ -425,8 +393,6 @@ stress(const unsigned test_num, const size_t n_elems)
       }
     }
   }
-  zix_btree_iter_free(next);
-  next = NULL;
 
   // Check tree size
   if (zix_btree_size(t) != n_elems - (n_elems / 4)) {
@@ -446,8 +412,6 @@ stress(const unsigned test_num, const size_t n_elems)
       return test_fail(t, "Error deleting %" PRIuPTR "\n", (uintptr_t)r);
     }
   }
-  zix_btree_iter_free(next);
-  next = NULL;
 
   // Delete all remaining elements via next iterator
   next                 = zix_btree_begin(t);
@@ -477,10 +441,8 @@ stress(const unsigned test_num, const size_t n_elems)
 
     last_value = removed;
   }
-  assert(!next || zix_btree_size(t) == 0);
-  zix_btree_iter_free(next);
-  next = NULL;
 
+  assert(zix_btree_size(t) == 0);
   zix_btree_free(t, NULL);
 
   // Test lower_bound with wildcard comparator
@@ -526,8 +488,6 @@ stress(const unsigned test_num, const size_t n_elems)
       t, "Wildcard lower bound %" PRIuPTR " != %" PRIuPTR "\n", iter_data, cut);
   }
 
-  zix_btree_iter_free(ti);
-
   // Find lower bound of value past end
   const uintptr_t max = (uintptr_t)-1;
   if (zix_btree_lower_bound(t, (void*)max, &ti)) {
@@ -538,7 +498,6 @@ stress(const unsigned test_num, const size_t n_elems)
     return test_fail(t, "Lower bound of maximum value is not end\n");
   }
 
-  zix_btree_iter_free(ti);
   zix_btree_free(t, NULL);
 
   return EXIT_SUCCESS;

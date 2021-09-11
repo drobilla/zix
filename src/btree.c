@@ -43,7 +43,6 @@ struct ZixBTreeImpl {
   ZixComparator cmp;
   const void*   cmp_data;
   size_t        size;
-  unsigned      height; ///< Number of levels, i.e. root only has height 1
 };
 
 struct ZixBTreeNodeImpl {
@@ -83,7 +82,9 @@ zix_btree_node_new(const bool leaf)
 {
 #if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112l) || \
       (defined(__cplusplus) && __cplusplus >= 201103L))
-  assert(sizeof(ZixBTreeNode) == ZIX_BTREE_PAGE_SIZE);
+  assert(sizeof(ZixBTreeNode) <= ZIX_BTREE_PAGE_SIZE);
+  assert(sizeof(ZixBTreeNode) >=
+         ZIX_BTREE_PAGE_SIZE - 2u * sizeof(ZixBTreeNode*));
 #endif
 
   ZixBTreeNode* node = (ZixBTreeNode*)malloc(sizeof(ZixBTreeNode));
@@ -120,7 +121,6 @@ zix_btree_new(const ZixComparator cmp, const void* const cmp_data)
     t->cmp      = cmp;
     t->cmp_data = cmp_data;
     t->size     = 0;
-    t->height   = 1;
     if (!t->root) {
       free(t);
       return NULL;
@@ -172,7 +172,6 @@ zix_btree_clear(ZixBTree* const t, ZixDestroyFunc destroy)
   memset(t->root, 0, sizeof(ZixBTreeNode));
   t->root->is_leaf = true;
   t->size          = 0u;
-  t->height        = 1u;
 }
 
 size_t
@@ -336,7 +335,6 @@ zix_btree_insert(ZixBTree* const t, void* const e)
         }
         t->root                        = parent;
         parent->data.inode.children[0] = n;
-        ++t->height;
       }
 
       ZixBTreeNode* const rhs = zix_btree_split_child(parent, i, n);
@@ -380,27 +378,35 @@ zix_btree_insert(ZixBTree* const t, void* const e)
   return ZIX_STATUS_SUCCESS;
 }
 
-static ZixBTreeIter*
-zix_btree_iter_new(const ZixBTree* const t)
-{
-  const size_t s = t->height * sizeof(ZixBTreeIterFrame);
-
-  ZixBTreeIter* i = (ZixBTreeIter*)calloc(1, sizeof(ZixBTreeIter) + s);
-  if (i) {
-    i->n_levels = t->height;
-  }
-  return i;
-}
-
 static void
 zix_btree_iter_set_frame(ZixBTreeIter* const ti,
                          ZixBTreeNode* const n,
-                         const unsigned      i)
+                         const ZixShort      i)
 {
-  if (ti) {
-    ti->stack[ti->level].node  = n;
-    ti->stack[ti->level].index = i;
-  }
+  assert(i <= ZIX_BTREE_LEAF_VALS);
+
+  ti->nodes[ti->level]   = n;
+  ti->indexes[ti->level] = (uint16_t)i;
+}
+
+static void
+zix_btree_iter_push(ZixBTreeIter* const ti,
+                    ZixBTreeNode* const n,
+                    const ZixShort      i)
+{
+  assert(ti->level < ZIX_BTREE_MAX_HEIGHT);
+  ++ti->level;
+  ti->nodes[ti->level]   = n;
+  ti->indexes[ti->level] = (uint16_t)i;
+}
+
+static void
+zix_btree_iter_pop(ZixBTreeIter* const ti)
+{
+  assert(ti->level > 0u);
+  ti->nodes[ti->level]   = NULL;
+  ti->indexes[ti->level] = 0u;
+  --ti->level;
 }
 
 ZIX_PURE_FUNC
@@ -574,21 +580,15 @@ zix_btree_remove_max(ZixBTree* const t, ZixBTreeNode* n)
 }
 
 ZixStatus
-zix_btree_remove(ZixBTree* const      t,
-                 const void* const    e,
-                 void** const         out,
-                 ZixBTreeIter** const next)
+zix_btree_remove(ZixBTree* const     t,
+                 const void* const   e,
+                 void** const        out,
+                 ZixBTreeIter* const next)
 {
-  ZixBTreeNode* n         = t->root;
-  ZixBTreeIter* ti        = NULL;
-  const bool    user_iter = next && *next;
-  if (next) {
-    if (!*next && !(*next = zix_btree_iter_new(t))) {
-      return ZIX_STATUS_NO_MEM;
-    }
-    ti        = *next;
-    ti->level = 0;
-  }
+  ZixBTreeNode* n  = t->root;
+  ZixBTreeIter* ti = next;
+
+  *ti = zix_btree_end_iter;
 
   while (true) {
     /* To remove in a single walk down, the tree is adjusted along the way
@@ -606,10 +606,10 @@ zix_btree_remove(ZixBTree* const      t,
         *out = zix_btree_aerase(n->data.leaf.vals, --n->n_vals, i);
         if (ti && i == n->n_vals) {
           if (i == 0) {
-            ti->level         = 0;
-            ti->stack[0].node = NULL;
+            ti->level    = 0;
+            ti->nodes[0] = NULL;
           } else {
-            --ti->stack[ti->level].index;
+            --ti->indexes[ti->level];
             zix_btree_iter_increment(ti);
           }
         }
@@ -618,11 +618,7 @@ zix_btree_remove(ZixBTree* const      t,
       }
 
       // Not found in leaf node, or tree
-      if (ti && !user_iter) {
-        zix_btree_iter_free(ti);
-        *next = NULL;
-      }
-
+      *next = zix_btree_end_iter;
       return ZIX_STATUS_NOT_FOUND;
     }
 
@@ -666,11 +662,9 @@ zix_btree_remove(ZixBTree* const      t,
           const ZixShort counts[2] = {zix_btree_child(n, 0)->n_vals,
                                       zix_btree_child(n, 1)->n_vals};
 
-          n = zix_btree_merge(t, n, 0);
-          if (ti) {
-            ti->stack[ti->level].node  = n;
-            ti->stack[ti->level].index = counts[i];
-          }
+          n                      = zix_btree_merge(t, n, 0);
+          ti->nodes[ti->level]   = n;
+          ti->indexes[ti->level] = (uint16_t)counts[i];
         } else {
           // Both child's siblings are minimal, merge them
           if (i < n->n_vals) {
@@ -678,7 +672,7 @@ zix_btree_remove(ZixBTree* const      t,
           } else {
             n = zix_btree_merge(t, n, i - 1U);
             if (ti) {
-              --ti->stack[ti->level].index;
+              --ti->indexes[ti->level];
             }
           }
         }
@@ -698,18 +692,17 @@ zix_btree_remove(ZixBTree* const      t,
 ZixStatus
 zix_btree_find(const ZixBTree* const t,
                const void* const     e,
-               ZixBTreeIter** const  ti)
+               ZixBTreeIter* const   ti)
 {
   ZixBTreeNode* n = t->root;
-  if (!(*ti = zix_btree_iter_new(t))) {
-    return ZIX_STATUS_NO_MEM;
-  }
+
+  *ti = zix_btree_end_iter;
 
   while (n) {
     bool           equal = false;
     const unsigned i     = zix_btree_node_find(t, n, e, &equal);
 
-    zix_btree_iter_set_frame(*ti, n, i);
+    zix_btree_iter_set_frame(ti, n, (uint16_t)i);
 
     if (equal) {
       return ZIX_STATUS_SUCCESS;
@@ -719,45 +712,33 @@ zix_btree_find(const ZixBTree* const t,
       break;
     }
 
-    ++(*ti)->level;
+    ++ti->level;
     n = zix_btree_child(n, i);
   }
 
-  zix_btree_iter_free(*ti);
-  *ti = NULL;
+  *ti = zix_btree_end_iter;
   return ZIX_STATUS_NOT_FOUND;
 }
 
 ZixStatus
 zix_btree_lower_bound(const ZixBTree* const t,
                       const void* const     e,
-                      ZixBTreeIter** const  ti)
+                      ZixBTreeIter* const   ti)
 {
-  if (!t) {
-    *ti = NULL;
-    return ZIX_STATUS_BAD_ARG;
-  }
-
-  if (!t->root) {
-    *ti = NULL;
-    return ZIX_STATUS_SUCCESS;
-  }
-
   ZixBTreeNode* n           = t->root;
   bool          found       = false;
   unsigned      found_level = 0;
-  if (!(*ti = zix_btree_iter_new(t))) {
-    return ZIX_STATUS_NO_MEM;
-  }
+
+  *ti = zix_btree_end_iter;
 
   while (n) {
     bool           equal = false;
     const unsigned i     = zix_btree_node_find(t, n, e, &equal);
 
-    zix_btree_iter_set_frame(*ti, n, i);
+    zix_btree_iter_set_frame(ti, n, (uint16_t)i);
 
     if (equal) {
-      found_level = (*ti)->level;
+      found_level = ti->level;
       found       = true;
     }
 
@@ -765,21 +746,18 @@ zix_btree_lower_bound(const ZixBTree* const t,
       break;
     }
 
-    ++(*ti)->level;
+    ++ti->level;
     n = zix_btree_child(n, i);
     assert(n);
   }
 
-  const ZixBTreeIterFrame* const frame = &(*ti)->stack[(*ti)->level];
-  assert(frame->node);
-  if (frame->index == frame->node->n_vals) {
+  if (ti->indexes[ti->level] == ti->nodes[ti->level]->n_vals) {
     if (found) {
       // Found on a previous level but went too far
-      (*ti)->level = found_level;
+      ti->level = (uint16_t)found_level;
     } else {
       // Reached end (key is greater than everything in tree)
-      (*ti)->level         = 0;
-      (*ti)->stack[0].node = NULL;
+      *ti = zix_btree_end_iter;
     }
   }
 
@@ -787,130 +765,86 @@ zix_btree_lower_bound(const ZixBTree* const t,
 }
 
 void*
-zix_btree_get(const ZixBTreeIter* const ti)
+zix_btree_get(const ZixBTreeIter ti)
 {
-  const ZixBTreeIterFrame* const frame = &ti->stack[ti->level];
-  assert(frame->node);
-  assert(frame->index < frame->node->n_vals);
-  return zix_btree_value(frame->node, frame->index);
+  const ZixBTreeNode* const node  = ti.nodes[ti.level];
+  const unsigned            index = ti.indexes[ti.level];
+
+  assert(node);
+  assert(index < node->n_vals);
+
+  return node->is_leaf ? node->data.leaf.vals[index]
+                       : node->data.inode.vals[index];
 }
 
-ZixBTreeIter*
+ZixBTreeIter
 zix_btree_begin(const ZixBTree* const t)
 {
-  ZixBTreeIter* const i = zix_btree_iter_new(t);
-  if (!i) {
-    return NULL;
-  }
+  ZixBTreeIter iter = zix_btree_end_iter;
 
-  if (t->size == 0) {
-    i->level         = 0;
-    i->stack[0].node = NULL;
-  } else {
-    ZixBTreeNode* n   = t->root;
-    i->stack[0].node  = n;
-    i->stack[0].index = 0;
+  if (t->size > 0u) {
+    ZixBTreeNode* n = t->root;
+    zix_btree_iter_set_frame(&iter, n, 0u);
+
     while (!n->is_leaf) {
       n = zix_btree_child(n, 0);
-      ++i->level;
-      i->stack[i->level].node  = n;
-      i->stack[i->level].index = 0;
+      zix_btree_iter_push(&iter, n, 0u);
     }
   }
 
-  return i;
+  return iter;
 }
 
-ZixBTreeIter*
+ZixBTreeIter
 zix_btree_end(const ZixBTree* const t)
 {
-  return zix_btree_iter_new(t);
-}
+  (void)t;
 
-ZixBTreeIter*
-zix_btree_iter_copy(const ZixBTreeIter* const i)
-{
-  if (!i) {
-    return NULL;
-  }
-
-  const size_t  s = i->n_levels * sizeof(ZixBTreeIterFrame);
-  ZixBTreeIter* j = (ZixBTreeIter*)calloc(1, sizeof(ZixBTreeIter) + s);
-  if (j) {
-    memcpy(j, i, sizeof(ZixBTreeIter) + s);
-  }
-
-  return j;
+  return zix_btree_end_iter;
 }
 
 bool
-zix_btree_iter_is_end(const ZixBTreeIter* const i)
+zix_btree_iter_equals(const ZixBTreeIter lhs, const ZixBTreeIter rhs)
 {
-  return !i || (i->level == 0 && i->stack[0].node == NULL);
+  const size_t indexes_size = (lhs.level + 1u) * sizeof(uint16_t);
+
+  return (lhs.level == rhs.level) && (lhs.nodes[0] == rhs.nodes[0]) &&
+         (!lhs.nodes[0] || !memcmp(lhs.indexes, rhs.indexes, indexes_size));
 }
 
-bool
-zix_btree_iter_equals(const ZixBTreeIter* const lhs,
-                      const ZixBTreeIter* const rhs)
-{
-  if (zix_btree_iter_is_end(lhs) && zix_btree_iter_is_end(rhs)) {
-    return true;
-  }
-
-  if (zix_btree_iter_is_end(lhs) || zix_btree_iter_is_end(rhs) ||
-      lhs->level != rhs->level) {
-    return false;
-  }
-
-  return !memcmp(lhs,
-                 rhs,
-                 sizeof(ZixBTreeIter) +
-                   (lhs->level + 1) * sizeof(ZixBTreeIterFrame));
-}
-
-void
+ZixStatus
 zix_btree_iter_increment(ZixBTreeIter* const i)
 {
-  ZixBTreeIterFrame* f = &i->stack[i->level];
-  if (f->node->is_leaf) {
-    // Leaf, move right
-    assert(f->index < f->node->n_vals);
-    if (++f->index == f->node->n_vals) {
-      // Reached end of leaf, move up
-      f = &i->stack[i->level];
-      while (i->level > 0 && f->index == f->node->n_vals) {
-        f = &i->stack[--i->level];
-        assert(f->index <= f->node->n_vals);
+  assert(!zix_btree_iter_is_end(*i));
+
+  // Move to the next value in the current node
+  const uint16_t index = ++i->indexes[i->level];
+
+  if (i->nodes[i->level]->is_leaf) {
+    // Leaf, move up if necessary until we're not at the end of the node
+    while (i->indexes[i->level] >= i->nodes[i->level]->n_vals) {
+      if (i->level == 0) {
+        // End of root, end of tree
+        i->nodes[0] = NULL;
+        return ZIX_STATUS_REACHED_END;
       }
 
-      if (f->index == f->node->n_vals) {
-        // Reached end of tree
-        assert(i->level == 0);
-        f->node  = NULL;
-        f->index = 0;
-      }
+      // At end of internal node, move up
+      zix_btree_iter_pop(i);
     }
+
   } else {
     // Internal node, move down to next child
-    assert(f->index < f->node->n_vals);
-    ZixBTreeNode* child = zix_btree_child(f->node, ++f->index);
+    const ZixBTreeNode* const node  = i->nodes[i->level];
+    ZixBTreeNode* const       child = node->data.inode.children[index];
 
-    f        = &i->stack[++i->level];
-    f->node  = child;
-    f->index = 0;
+    zix_btree_iter_push(i, child, 0u);
 
     // Move down and left until we hit a leaf
-    while (!f->node->is_leaf) {
-      child    = zix_btree_child(f->node, 0);
-      f        = &i->stack[++i->level];
-      f->node  = child;
-      f->index = 0;
+    while (!i->nodes[i->level]->is_leaf) {
+      zix_btree_iter_push(i, i->nodes[i->level]->data.inode.children[0], 0u);
     }
   }
-}
 
-void
-zix_btree_iter_free(ZixBTreeIter* const i)
-{
-  free(i);
+  return ZIX_STATUS_SUCCESS;
 }

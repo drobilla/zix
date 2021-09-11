@@ -154,9 +154,9 @@ bench_zix_btree(size_t n_elems,
 {
   start_test("ZixBTree");
 
-  uintptr_t     r  = 0u;
-  ZixBTreeIter* ti = NULL;
-  ZixBTree*     t  = zix_btree_new(int_cmp, NULL);
+  uintptr_t    r  = 0u;
+  ZixBTreeIter ti = zix_btree_end_iter;
+  ZixBTree*    t  = zix_btree_new(int_cmp, NULL);
 
   // Insert n_elems elements
   struct timespec insert_start = bench_start();
@@ -185,12 +185,11 @@ bench_zix_btree(size_t n_elems,
 
   // Iterate over all elements
   struct timespec iter_start = bench_start();
-  ZixBTreeIter*   iter       = zix_btree_begin(t);
-  for (; !zix_btree_iter_is_end(iter); zix_btree_iter_increment(iter)) {
+  ZixBTreeIter    iter       = zix_btree_begin(t);
+  for (; !zix_btree_iter_is_end(iter); zix_btree_iter_increment(&iter)) {
     volatile void* const value = zix_btree_get(iter);
     (void)value;
   }
-  zix_btree_iter_free(iter);
   fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
 
   // Delete all elements

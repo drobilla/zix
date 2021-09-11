@@ -1,5 +1,6 @@
 Checks: >
   *,
+  -*-uppercase-literal-suffix,
   -altera-struct-pack-align,
   -clang-diagnostic-unused-function,
   -clang-diagnostic-unused-macros,
