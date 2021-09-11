@@ -48,27 +48,35 @@ typedef uint8_t ZixBitsetTally;
 /// Clear a Bitset
 ZIX_API
 void
-zix_bitset_clear(ZixBitset* b, ZixBitsetTally* t, size_t n_bits);
+zix_bitset_clear(ZixBitset* ZIX_NONNULL      b,
+                 ZixBitsetTally* ZIX_NONNULL t,
+                 size_t                      n_bits);
 
 /// Set bit `i` in `t` to 1
 ZIX_API
 void
-zix_bitset_set(ZixBitset* b, ZixBitsetTally* t, size_t i);
+zix_bitset_set(ZixBitset* ZIX_NONNULL      b,
+               ZixBitsetTally* ZIX_NONNULL t,
+               size_t                      i);
 
 /// Clear bit `i` in `t` (set to 0)
 ZIX_API
 void
-zix_bitset_reset(ZixBitset* b, ZixBitsetTally* t, size_t i);
+zix_bitset_reset(ZixBitset* ZIX_NONNULL      b,
+                 ZixBitsetTally* ZIX_NONNULL t,
+                 size_t                      i);
 
 /// Return the `i`th bit in `t`
 ZIX_PURE_API
 bool
-zix_bitset_get(const ZixBitset* b, size_t i);
+zix_bitset_get(const ZixBitset* ZIX_NONNULL b, size_t i);
 
 /// Return the number of set bits in `b` up to bit `i` (non-inclusive)
 ZIX_PURE_API
 size_t
-zix_bitset_count_up_to(const ZixBitset* b, const ZixBitsetTally* t, size_t i);
+zix_bitset_count_up_to(const ZixBitset* ZIX_NONNULL      b,
+                       const ZixBitsetTally* ZIX_NONNULL t,
+                       size_t                            i);
 
 /**
    Return the number of set bits in `b` up to bit `i` (non-inclusive) if bit
@@ -76,9 +84,9 @@ zix_bitset_count_up_to(const ZixBitset* b, const ZixBitsetTally* t, size_t i);
 */
 ZIX_PURE_API
 size_t
-zix_bitset_count_up_to_if(const ZixBitset*      b,
-                          const ZixBitsetTally* t,
-                          size_t                i);
+zix_bitset_count_up_to_if(const ZixBitset* ZIX_NONNULL      b,
+                          const ZixBitsetTally* ZIX_NONNULL t,
+                          size_t                            i);
 
 /**
    @}

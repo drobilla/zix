@@ -47,13 +47,13 @@ typedef struct ZixRingImpl ZixRing;
    At most `size` - 1 bytes may be stored in the ring at once.
 */
 ZIX_MALLOC_API
-ZixRing*
+ZixRing* ZIX_ALLOCATED
 zix_ring_new(uint32_t size);
 
 /// Destroy a ring
 ZIX_API
 void
-zix_ring_free(ZixRing* ring);
+zix_ring_free(ZixRing* ZIX_NULLABLE ring);
 
 /**
    Lock the ring data into physical memory.
@@ -66,7 +66,7 @@ zix_ring_free(ZixRing* ring);
 */
 ZIX_API
 void
-zix_ring_mlock(ZixRing* ring);
+zix_ring_mlock(ZixRing* ZIX_NONNULL ring);
 
 /**
    Reset (empty) a ring.
@@ -76,42 +76,44 @@ zix_ring_mlock(ZixRing* ring);
 */
 ZIX_API
 void
-zix_ring_reset(ZixRing* ring);
+zix_ring_reset(ZixRing* ZIX_NONNULL ring);
 
 /// Return the number of bytes of space available for reading
 ZIX_CONST_API
 uint32_t
-zix_ring_read_space(const ZixRing* ring);
+zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
 
 /// Return the number of bytes of space available for writing
 ZIX_CONST_API
 uint32_t
-zix_ring_write_space(const ZixRing* ring);
+zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
 
 /// Return the capacity (i.e. total write space when empty)
 ZIX_CONST_API
 uint32_t
-zix_ring_capacity(const ZixRing* ring);
+zix_ring_capacity(const ZixRing* ZIX_NONNULL ring);
 
 /// Read from the ring without advancing the read head
 ZIX_API
 uint32_t
-zix_ring_peek(ZixRing* ring, void* dst, uint32_t size);
+zix_ring_peek(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
 /// Read from the ring and advance the read head
 ZIX_API
 uint32_t
-zix_ring_read(ZixRing* ring, void* dst, uint32_t size);
+zix_ring_read(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
 /// Skip data in the ring (advance read head without reading)
 ZIX_API
 uint32_t
-zix_ring_skip(ZixRing* ring, uint32_t size);
+zix_ring_skip(ZixRing* ZIX_NONNULL ring, uint32_t size);
 
 /// Write data to the ring
 ZIX_API
 uint32_t
-zix_ring_write(ZixRing* ring, const void* src, uint32_t size);
+zix_ring_write(ZixRing* ZIX_NONNULL    ring,
+               const void* ZIX_NONNULL src,
+               uint32_t                size);
 
 /**
    @}

@@ -18,6 +18,7 @@
 #include "zix/ring.h"
 #include "zix/thread.h"
 
+#include <assert.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -137,6 +138,7 @@ main(int argc, char** argv)
          size);
 
   ring = zix_ring_new(size);
+  assert(ring);
   if (zix_ring_read_space(ring) != 0) {
     return failure("New ring is not empty\n");
   }
@@ -163,6 +165,7 @@ main(int argc, char** argv)
     return failure("Read error\n");
   }
 
+  assert(ring);
   zix_ring_reset(ring);
   if (zix_ring_read_space(ring) > 0) {
     return failure("Reset did not empty ring.\n");

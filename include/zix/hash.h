@@ -96,17 +96,20 @@ typedef size_t ZixHashCode;
 typedef size_t ZixHashIter;
 
 /// User function for computing the hash of a key
-typedef ZixHashCode (*ZixHashFunc)(const ZixHashKey* key);
+typedef ZixHashCode (*ZixHashFunc)(const ZixHashKey* ZIX_NONNULL key);
 
 /// User function for determining if two keys are truly equal
-typedef bool (*ZixKeyEqualFunc)(const ZixHashKey* a, const ZixHashKey* b);
+typedef bool (*ZixKeyEqualFunc)(const ZixHashKey* ZIX_NONNULL a,
+                                const ZixHashKey* ZIX_NONNULL b);
 
 /// User function for determining if a key matches in a custom search
-typedef bool (*ZixKeyMatchFunc)(const ZixHashKey*        key,
-                                const ZixHashSearchData* user_data);
+typedef bool (*ZixKeyMatchFunc)(const ZixHashKey* ZIX_NONNULL key,
+                                const ZixHashSearchData* ZIX_NULLABLE
+                                  user_data);
 
 /// User function for getting the key of a record
-typedef const ZixHashKey* (*ZixKeyFunc)(const ZixHashRecord* record);
+typedef const ZixHashKey* ZIX_NONNULL (*ZixKeyFunc)(
+  const ZixHashRecord* ZIX_NONNULL record);
 
 /**
    A "plan" (position) to insert a record in a hash table.
@@ -129,40 +132,40 @@ typedef struct {
    @param equal_func A function to test keys for equality.
 */
 ZIX_API
-ZixHash*
-zix_hash_new(ZixKeyFunc      key_func,
-             ZixHashFunc     hash_func,
-             ZixKeyEqualFunc equal_func);
+ZixHash* ZIX_ALLOCATED
+zix_hash_new(ZixKeyFunc ZIX_NONNULL      key_func,
+             ZixHashFunc ZIX_NONNULL     hash_func,
+             ZixKeyEqualFunc ZIX_NONNULL equal_func);
 
 /// Free `hash`
 ZIX_API
 void
-zix_hash_free(ZixHash* hash);
+zix_hash_free(ZixHash* ZIX_NULLABLE hash);
 
 /// Return an iterator to the first record in a hash, or the end if it is empty
 ZIX_PURE_API
 ZixHashIter
-zix_hash_begin(const ZixHash* hash);
+zix_hash_begin(const ZixHash* ZIX_NONNULL hash);
 
 /// Return an iterator one past the last possible record in a hash
 ZIX_PURE_API
 ZixHashIter
-zix_hash_end(const ZixHash* hash);
+zix_hash_end(const ZixHash* ZIX_NONNULL hash);
 
 /// Return the record pointed to by an iterator
 ZIX_PURE_API
-ZixHashRecord*
-zix_hash_get(const ZixHash* hash, ZixHashIter i);
+ZixHashRecord* ZIX_NULLABLE
+zix_hash_get(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
 /// Return an iterator that has been advanced to the next record in a hash
 ZIX_PURE_API
 ZixHashIter
-zix_hash_next(const ZixHash* hash, ZixHashIter i);
+zix_hash_next(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
 /// Return the number of elements in a hash
 ZIX_PURE_API
 size_t
-zix_hash_size(const ZixHash* hash);
+zix_hash_size(const ZixHash* ZIX_NONNULL hash);
 
 /**
    Find the best position to insert a record with the given key.
@@ -177,7 +180,8 @@ zix_hash_size(const ZixHash* hash);
 */
 ZIX_API
 ZixHashInsertPlan
-zix_hash_plan_insert(const ZixHash* hash, const ZixHashKey* key);
+zix_hash_plan_insert(const ZixHash* ZIX_NONNULL    hash,
+                     const ZixHashKey* ZIX_NONNULL key);
 
 /**
    Find the best position to insert a record with a custom search.
@@ -201,10 +205,10 @@ zix_hash_plan_insert(const ZixHash* hash, const ZixHashKey* key);
 */
 ZIX_API
 ZixHashInsertPlan
-zix_hash_plan_insert_prehashed(const ZixHash*           hash,
-                               ZixHashCode              code,
-                               ZixKeyMatchFunc          predicate,
-                               const ZixHashSearchData* user_data);
+zix_hash_plan_insert_prehashed(const ZixHash* ZIX_NONNULL            hash,
+                               ZixHashCode                           code,
+                               ZixKeyMatchFunc ZIX_NONNULL           predicate,
+                               const ZixHashSearchData* ZIX_NULLABLE user_data);
 
 /**
    Return the record at the given position, or null.
@@ -214,8 +218,8 @@ zix_hash_plan_insert_prehashed(const ZixHash*           hash,
    record.
 */
 ZIX_PURE_API
-ZixHashRecord*
-zix_hash_record_at(const ZixHash* hash, ZixHashInsertPlan position);
+ZixHashRecord* ZIX_NULLABLE
+zix_hash_record_at(const ZixHash* ZIX_NONNULL hash, ZixHashInsertPlan position);
 
 /**
    Insert a record at a specific position.
@@ -236,9 +240,9 @@ zix_hash_record_at(const ZixHash* hash, ZixHashInsertPlan position);
 */
 ZIX_API
 ZixStatus
-zix_hash_insert_at(ZixHash*          hash,
-                   ZixHashInsertPlan position,
-                   ZixHashRecord*    record);
+zix_hash_insert_at(ZixHash* ZIX_NONNULL       hash,
+                   ZixHashInsertPlan          position,
+                   ZixHashRecord* ZIX_NONNULL record);
 
 /**
    Insert a record.
@@ -256,7 +260,7 @@ zix_hash_insert_at(ZixHash*          hash,
 */
 ZIX_API
 ZixStatus
-zix_hash_insert(ZixHash* hash, ZixHashRecord* record);
+zix_hash_insert(ZixHash* ZIX_NONNULL hash, ZixHashRecord* ZIX_NONNULL record);
 
 /**
    Erase a record at a specific position.
@@ -274,7 +278,9 @@ zix_hash_insert(ZixHash* hash, ZixHashRecord* record);
 */
 ZIX_API
 ZixStatus
-zix_hash_erase(ZixHash* hash, ZixHashIter i, ZixHashRecord** removed);
+zix_hash_erase(ZixHash* ZIX_NONNULL hash,
+               ZixHashIter          i,
+               ZixHashRecord* ZIX_NULLABLE* ZIX_NONNULL removed);
 
 /**
    Remove a record.
@@ -286,7 +292,9 @@ zix_hash_erase(ZixHash* hash, ZixHashIter i, ZixHashRecord** removed);
 */
 ZIX_API
 ZixStatus
-zix_hash_remove(ZixHash* hash, const ZixHashKey* key, ZixHashRecord** removed);
+zix_hash_remove(ZixHash* ZIX_NONNULL          hash,
+                const ZixHashKey* ZIX_NONNULL key,
+                ZixHashRecord* ZIX_NULLABLE* ZIX_NONNULL removed);
 
 /**
    Find the position of a record with a given key.
@@ -300,7 +308,8 @@ zix_hash_remove(ZixHash* hash, const ZixHashKey* key, ZixHashRecord** removed);
 */
 ZIX_API
 ZixHashIter
-zix_hash_find(const ZixHash* hash, const ZixHashKey* key);
+zix_hash_find(const ZixHash* ZIX_NONNULL    hash,
+              const ZixHashKey* ZIX_NONNULL key);
 
 /**
    Find a record with a given key.
@@ -315,8 +324,9 @@ zix_hash_find(const ZixHash* hash, const ZixHashKey* key);
    @return A pointer to the matching record, of null if no such record exists.
 */
 ZIX_API
-ZixHashRecord*
-zix_hash_find_record(const ZixHash* hash, const ZixHashKey* key);
+ZixHashRecord* ZIX_NULLABLE
+zix_hash_find_record(const ZixHash* ZIX_NONNULL    hash,
+                     const ZixHashKey* ZIX_NONNULL key);
 
 /**
    @}

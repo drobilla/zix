@@ -74,6 +74,17 @@
 #  define ZIX_UNUSED(name) name
 #endif
 
+// Clang nullability annotations
+#if defined(__clang__) && __clang_major__ >= 7
+#  define ZIX_NONNULL _Nonnull
+#  define ZIX_NULLABLE _Nullable
+#  define ZIX_ALLOCATED _Null_unspecified
+#else
+#  define ZIX_NONNULL
+#  define ZIX_NULLABLE
+#  define ZIX_ALLOCATED
+#endif
+
 /**
    @}
 */

@@ -198,8 +198,9 @@ bench_zix_btree(size_t n_elems,
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
 
-    void* removed = NULL;
-    if (zix_btree_remove(t, (void*)r, &removed, NULL)) {
+    void*        removed = NULL;
+    ZixBTreeIter next    = zix_btree_end(t);
+    if (zix_btree_remove(t, (void*)r, &removed, &next)) {
       return test_fail("Failed to remove %" PRIuPTR "\n", r);
     }
   }

@@ -42,32 +42,34 @@ typedef struct ZixTreeNodeImpl ZixTreeIter;
 
 /// Create a new (empty) tree
 ZIX_API
-ZixTree*
-zix_tree_new(bool           allow_duplicates,
-             ZixComparator  cmp,
-             void*          cmp_data,
-             ZixDestroyFunc destroy,
-             const void*    destroy_user_data);
+ZixTree* ZIX_ALLOCATED
+zix_tree_new(bool                        allow_duplicates,
+             ZixComparator ZIX_NONNULL   cmp,
+             void* ZIX_NULLABLE          cmp_data,
+             ZixDestroyFunc ZIX_NULLABLE destroy,
+             const void* ZIX_NULLABLE    destroy_user_data);
 
 /// Free `t`
 ZIX_API
 void
-zix_tree_free(ZixTree* t);
+zix_tree_free(ZixTree* ZIX_NULLABLE t);
 
 /// Return the number of elements in `t`
 ZIX_PURE_API
 size_t
-zix_tree_size(const ZixTree* t);
+zix_tree_size(const ZixTree* ZIX_NONNULL t);
 
 /// Insert the element `e` into `t` and point `ti` at the new element
 ZIX_API
 ZixStatus
-zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti);
+zix_tree_insert(ZixTree* ZIX_NONNULL t,
+                void* ZIX_NULLABLE   e,
+                ZixTreeIter* ZIX_NULLABLE* ZIX_NULLABLE ti);
 
 /// Remove the item pointed at by `ti` from `t`
 ZIX_API
 ZixStatus
-zix_tree_remove(ZixTree* t, ZixTreeIter* ti);
+zix_tree_remove(ZixTree* ZIX_NONNULL t, ZixTreeIter* ZIX_NONNULL ti);
 
 /**
    Set `ti` to an element equal to `e` in `t`.
@@ -76,52 +78,54 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti);
 */
 ZIX_API
 ZixStatus
-zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti);
+zix_tree_find(const ZixTree* ZIX_NONNULL t,
+              const void* ZIX_NULLABLE   e,
+              ZixTreeIter* ZIX_NULLABLE* ZIX_NONNULL ti);
 
 /// Return the data associated with the given tree item
 ZIX_PURE_API
-void*
-zix_tree_get(const ZixTreeIter* ti);
+void* ZIX_NULLABLE
+zix_tree_get(const ZixTreeIter* ZIX_NULLABLE ti);
 
 /// Return an iterator to the first (smallest) element in `t`
 ZIX_PURE_API
-ZixTreeIter*
-zix_tree_begin(ZixTree* t);
+ZixTreeIter* ZIX_NULLABLE
+zix_tree_begin(ZixTree* ZIX_NONNULL t);
 
 /// Return an iterator the the element one past the last element in `t`
 ZIX_CONST_API
-ZixTreeIter*
-zix_tree_end(ZixTree* t);
+ZixTreeIter* ZIX_NULLABLE
+zix_tree_end(ZixTree* ZIX_NONNULL t);
 
 /// Return true iff `i` is an iterator to the end of its tree
 ZIX_CONST_API
 bool
-zix_tree_iter_is_end(const ZixTreeIter* i);
+zix_tree_iter_is_end(const ZixTreeIter* ZIX_NULLABLE i);
 
 /// Return an iterator to the last (largest) element in `t`
 ZIX_PURE_API
-ZixTreeIter*
-zix_tree_rbegin(ZixTree* t);
+ZixTreeIter* ZIX_NULLABLE
+zix_tree_rbegin(ZixTree* ZIX_NONNULL t);
 
 /// Return an iterator the the element one before the first element in `t`
 ZIX_CONST_API
-ZixTreeIter*
-zix_tree_rend(ZixTree* t);
+ZixTreeIter* ZIX_NULLABLE
+zix_tree_rend(ZixTree* ZIX_NONNULL t);
 
 /// Return true iff `i` is an iterator to the reverse end of its tree
 ZIX_CONST_API
 bool
-zix_tree_iter_is_rend(const ZixTreeIter* i);
+zix_tree_iter_is_rend(const ZixTreeIter* ZIX_NULLABLE i);
 
 /// Return an iterator that points to the element one past `i`
 ZIX_PURE_API
-ZixTreeIter*
-zix_tree_iter_next(ZixTreeIter* i);
+ZixTreeIter* ZIX_NULLABLE
+zix_tree_iter_next(ZixTreeIter* ZIX_NULLABLE i);
 
 /// Return an iterator that points to the element one before `i`
 ZIX_PURE_API
-ZixTreeIter*
-zix_tree_iter_prev(ZixTreeIter* i);
+ZixTreeIter* ZIX_NULLABLE
+zix_tree_iter_prev(ZixTreeIter* ZIX_NULLABLE i);
 
 /**
    @}

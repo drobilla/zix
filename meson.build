@@ -28,6 +28,7 @@ if get_option('strict')
     c_warnings = [
       '-Weverything',
       '-Wno-bad-function-cast',
+      '-Wno-nullability-extension',
       '-Wno-padded',
       '-Wno-reserved-id-macro',
     ]

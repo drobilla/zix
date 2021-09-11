@@ -44,6 +44,10 @@ zix_hash_new(const ZixKeyFunc      key_func,
              const ZixHashFunc     hash_func,
              const ZixKeyEqualFunc equal_func)
 {
+  assert(key_func);
+  assert(hash_func);
+  assert(equal_func);
+
   ZixHash* const hash = (ZixHash*)malloc(sizeof(ZixHash));
   if (!hash) {
     return NULL;
@@ -77,18 +81,21 @@ zix_hash_free(ZixHash* const hash)
 ZixHashIter
 zix_hash_begin(const ZixHash* const hash)
 {
+  assert(hash);
   return hash->entries[0u].value ? 0u : zix_hash_next(hash, 0u);
 }
 
 ZixHashIter
 zix_hash_end(const ZixHash* const hash)
 {
+  assert(hash);
   return hash->n_entries;
 }
 
 ZixHashRecord*
 zix_hash_get(const ZixHash* hash, const ZixHashIter i)
 {
+  assert(hash);
   assert(i < hash->n_entries);
 
   return hash->entries[i].value;
@@ -97,6 +104,7 @@ zix_hash_get(const ZixHash* hash, const ZixHashIter i)
 ZixHashIter
 zix_hash_next(const ZixHash* const hash, ZixHashIter i)
 {
+  assert(hash);
   do {
     ++i;
   } while (i < hash->n_entries && !hash->entries[i].value);
@@ -107,6 +115,7 @@ zix_hash_next(const ZixHash* const hash, ZixHashIter i)
 size_t
 zix_hash_size(const ZixHash* const hash)
 {
+  assert(hash);
   return hash->count;
 }
 
@@ -215,6 +224,9 @@ shrink(ZixHash* const hash)
 ZixHashIter
 zix_hash_find(const ZixHash* const hash, const ZixHashKey* const key)
 {
+  assert(hash);
+  assert(key);
+
   const ZixHashCode h_nomod = hash->hash_func(key);
   const size_t      h       = fold_hash(h_nomod, hash->mask);
   const ZixHashIter i       = find_entry(hash, key, h, h_nomod);
@@ -225,6 +237,9 @@ zix_hash_find(const ZixHash* const hash, const ZixHashKey* const key)
 ZixHashRecord*
 zix_hash_find_record(const ZixHash* const hash, const ZixHashKey* const key)
 {
+  assert(hash);
+  assert(key);
+
   const ZixHashCode h_nomod = hash->hash_func(key);
   const size_t      h       = fold_hash(h_nomod, hash->mask);
 
@@ -237,6 +252,9 @@ zix_hash_plan_insert_prehashed(const ZixHash* const  hash,
                                const ZixKeyMatchFunc predicate,
                                const void* const     user_data)
 {
+  assert(hash);
+  assert(predicate);
+
   // Calculate an ideal initial position
   ZixHashInsertPlan pos = {code, fold_hash(code, hash->mask)};
 
@@ -269,6 +287,9 @@ zix_hash_plan_insert_prehashed(const ZixHash* const  hash,
 ZixHashInsertPlan
 zix_hash_plan_insert(const ZixHash* const hash, const ZixHashKey* const key)
 {
+  assert(hash);
+  assert(key);
+
   return zix_hash_plan_insert_prehashed(
     hash, hash->hash_func(key), hash->equal_func, key);
 }
@@ -276,6 +297,7 @@ zix_hash_plan_insert(const ZixHash* const hash, const ZixHashKey* const key)
 ZixHashRecord*
 zix_hash_record_at(const ZixHash* const hash, const ZixHashInsertPlan position)
 {
+  assert(hash);
   return hash->entries[position.index].value;
 }
 
@@ -284,6 +306,9 @@ zix_hash_insert_at(ZixHash* const          hash,
                    const ZixHashInsertPlan position,
                    ZixHashRecord* const    record)
 {
+  assert(hash);
+  assert(record);
+
   if (hash->entries[position.index].value) {
     return ZIX_STATUS_EXISTS;
   }
@@ -306,6 +331,9 @@ zix_hash_insert_at(ZixHash* const          hash,
 ZixStatus
 zix_hash_insert(ZixHash* const hash, ZixHashRecord* const record)
 {
+  assert(hash);
+  assert(record);
+
   const ZixHashKey* const key      = hash->key_func(record);
   const ZixHashInsertPlan position = zix_hash_plan_insert(hash, key);
 
@@ -317,6 +345,9 @@ zix_hash_erase(ZixHash* const        hash,
                const ZixHashIter     i,
                ZixHashRecord** const removed)
 {
+  assert(hash);
+  assert(removed);
+
   // Replace entry with a tombstone
   *removed               = hash->entries[i].value;
   hash->entries[i].hash  = tombstone;
@@ -336,6 +367,10 @@ zix_hash_remove(ZixHash* const          hash,
                 const ZixHashKey* const key,
                 ZixHashRecord** const   removed)
 {
+  assert(hash);
+  assert(key);
+  assert(removed);
+
   const ZixHashIter i = zix_hash_find(hash, key);
 
   return i == hash->n_entries ? ZIX_STATUS_NOT_FOUND

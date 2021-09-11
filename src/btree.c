@@ -97,6 +97,8 @@ zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 ZixBTree*
 zix_btree_new(const ZixComparator cmp, const void* const cmp_data)
 {
+  assert(cmp);
+
   ZixBTree* const t = (ZixBTree*)malloc(sizeof(ZixBTree));
   if (!t) {
     return NULL;
@@ -168,6 +170,7 @@ zix_btree_clear(ZixBTree* const t,
 size_t
 zix_btree_size(const ZixBTree* const t)
 {
+  assert(t);
   return t->size;
 }
 
@@ -422,6 +425,8 @@ zix_btree_grow_up(ZixBTree* const t)
 ZixStatus
 zix_btree_insert(ZixBTree* const t, void* const e)
 {
+  assert(t);
+
   ZixStatus st = ZIX_STATUS_SUCCESS;
 
   // Grow up if necessary to ensure the root is not full
@@ -723,6 +728,9 @@ zix_btree_remove(ZixBTree* const     t,
                  void** const        out,
                  ZixBTreeIter* const next)
 {
+  assert(t);
+  assert(out);
+
   ZixBTreeNode* n  = t->root;
   ZixBTreeIter* ti = next;
   ZixStatus     st = ZIX_STATUS_SUCCESS;
@@ -806,6 +814,9 @@ zix_btree_find(const ZixBTree* const t,
                const void* const     e,
                ZixBTreeIter* const   ti)
 {
+  assert(t);
+  assert(ti);
+
   ZixBTreeNode* n = t->root;
 
   *ti = zix_btree_end_iter;
@@ -842,6 +853,9 @@ zix_btree_lower_bound(const ZixBTree* const t,
                       const void* const     key,
                       ZixBTreeIter* const   ti)
 {
+  assert(t);
+  assert(ti);
+
   *ti = zix_btree_end_iter;
 
   ZixBTreeNode* n           = t->root; // Current node
@@ -911,6 +925,8 @@ zix_btree_get(const ZixBTreeIter ti)
 ZixBTreeIter
 zix_btree_begin(const ZixBTree* const t)
 {
+  assert(t);
+
   ZixBTreeIter iter = zix_btree_end_iter;
 
   if (t->size > 0u) {
@@ -946,6 +962,7 @@ zix_btree_iter_equals(const ZixBTreeIter lhs, const ZixBTreeIter rhs)
 ZixStatus
 zix_btree_iter_increment(ZixBTreeIter* const i)
 {
+  assert(i);
   assert(!zix_btree_iter_is_end(*i));
 
   // Move to the next value in the current node

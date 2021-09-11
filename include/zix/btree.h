@@ -64,9 +64,11 @@ typedef struct ZixBTreeNodeImpl ZixBTreeNode;
    iterators can be allocated on the stack.
 */
 typedef struct {
-  ZixBTreeNode* nodes[ZIX_BTREE_MAX_HEIGHT];   ///< Parallel node pointer stack
-  uint16_t      indexes[ZIX_BTREE_MAX_HEIGHT]; ///< Parallel child index stack
-  uint16_t      level;                         ///< Current level in stack
+  ZixBTreeNode* ZIX_NULLABLE
+    nodes[ZIX_BTREE_MAX_HEIGHT]; ///< Parallel node pointer stacky
+
+  uint16_t indexes[ZIX_BTREE_MAX_HEIGHT]; ///< Parallel child index stack
+  uint16_t level;                         ///< Current level in stack
 } ZixBTreeIter;
 
 /// A static end iterator for convenience
@@ -85,8 +87,8 @@ static const ZixBTreeIter zix_btree_end_iter = {
    zix_btree_lower_bound() for details.
 */
 ZIX_API
-ZixBTree*
-zix_btree_new(ZixComparator cmp, const void* cmp_data);
+ZixBTree* ZIX_ALLOCATED
+zix_btree_new(ZixComparator ZIX_NONNULL cmp, const void* ZIX_NULLABLE cmp_data);
 
 /**
    Free `t` and all the nodes it contains.
@@ -96,9 +98,9 @@ zix_btree_new(ZixComparator cmp, const void* cmp_data);
 */
 ZIX_API
 void
-zix_btree_free(ZixBTree*      t,
-               ZixDestroyFunc destroy,
-               const void*    destroy_user_data);
+zix_btree_free(ZixBTree* ZIX_NONNULL       t,
+               ZixDestroyFunc ZIX_NULLABLE destroy,
+               const void* ZIX_NULLABLE    destroy_user_data);
 
 /**
    Clear everything from `t`, leaving it empty.
@@ -108,19 +110,19 @@ zix_btree_free(ZixBTree*      t,
 */
 ZIX_API
 void
-zix_btree_clear(ZixBTree*      t,
-                ZixDestroyFunc destroy,
-                const void*    destroy_user_data);
+zix_btree_clear(ZixBTree* ZIX_NONNULL       t,
+                ZixDestroyFunc ZIX_NULLABLE destroy,
+                const void* ZIX_NULLABLE    destroy_user_data);
 
 /// Return the number of elements in `t`
 ZIX_PURE_API
 size_t
-zix_btree_size(const ZixBTree* t);
+zix_btree_size(const ZixBTree* ZIX_NONNULL t);
 
 /// Insert the element `e` into `t`
 ZIX_API
 ZixStatus
-zix_btree_insert(ZixBTree* t, void* e);
+zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_NULLABLE e);
 
 /**
    Remove the value `e` from `t`.
@@ -136,7 +138,10 @@ zix_btree_insert(ZixBTree* t, void* e);
 */
 ZIX_API
 ZixStatus
-zix_btree_remove(ZixBTree* t, const void* e, void** out, ZixBTreeIter* next);
+zix_btree_remove(ZixBTree* ZIX_NONNULL    t,
+                 const void* ZIX_NULLABLE e,
+                 void* ZIX_NULLABLE* ZIX_NONNULL out,
+                 ZixBTreeIter* ZIX_NONNULL       next);
 
 /**
    Set `ti` to an element exactly equal to `e` in `t`.
@@ -145,7 +150,9 @@ zix_btree_remove(ZixBTree* t, const void* e, void** out, ZixBTreeIter* next);
 */
 ZIX_API
 ZixStatus
-zix_btree_find(const ZixBTree* t, const void* e, ZixBTreeIter* ti);
+zix_btree_find(const ZixBTree* ZIX_NONNULL t,
+               const void* ZIX_NULLABLE    e,
+               ZixBTreeIter* ZIX_NONNULL   ti);
 
 /**
    Set `ti` to the smallest element in `t` that is not less than `e`.
@@ -163,26 +170,26 @@ zix_btree_find(const ZixBTree* t, const void* e, ZixBTreeIter* ti);
 */
 ZIX_API
 ZixStatus
-zix_btree_lower_bound(const ZixBTree* t,
-                      ZixComparator   compare_key,
-                      const void*     compare_key_user_data,
-                      const void*     key,
-                      ZixBTreeIter*   ti);
+zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL t,
+                      ZixComparator ZIX_NULLABLE  compare_key,
+                      const void* ZIX_NULLABLE    compare_key_user_data,
+                      const void* ZIX_NULLABLE    key,
+                      ZixBTreeIter* ZIX_NONNULL   ti);
 
 /// Return the data at the given position in the tree
 ZIX_PURE_API
-void*
+void* ZIX_NULLABLE
 zix_btree_get(ZixBTreeIter ti);
 
 /// Return an iterator to the first (smallest) element in `t`
 ZIX_PURE_API
 ZixBTreeIter
-zix_btree_begin(const ZixBTree* t);
+zix_btree_begin(const ZixBTree* ZIX_NONNULL t);
 
 /// Return an iterator to the end of `t` (one past the last element)
 ZIX_CONST_API
 ZixBTreeIter
-zix_btree_end(const ZixBTree* t);
+zix_btree_end(const ZixBTree* ZIX_NULLABLE t);
 
 /// Return true iff `lhs` is equal to `rhs`
 ZIX_PURE_API
@@ -199,7 +206,7 @@ zix_btree_iter_is_end(const ZixBTreeIter i)
 /// Increment `i` to point to the next element in the tree
 ZIX_API
 ZixStatus
-zix_btree_iter_increment(ZixBTreeIter* i);
+zix_btree_iter_increment(ZixBTreeIter* ZIX_NONNULL i);
 
 /// Return an iterator one past `iter`
 ZIX_API

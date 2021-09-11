@@ -45,7 +45,7 @@ extern "C" {
 */
 ZIX_PURE_API
 uint32_t
-zix_digest32(uint32_t seed, const void* buf, size_t len);
+zix_digest32(uint32_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
    Return a 32-bit hash of an aligned buffer.
@@ -55,7 +55,7 @@ zix_digest32(uint32_t seed, const void* buf, size_t len);
 */
 ZIX_PURE_API
 uint32_t
-zix_digest32_aligned(uint32_t seed, const void* buf, size_t len);
+zix_digest32_aligned(uint32_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
    Return a 64-bit hash of a buffer.
@@ -64,7 +64,7 @@ zix_digest32_aligned(uint32_t seed, const void* buf, size_t len);
 */
 ZIX_PURE_API
 uint64_t
-zix_digest64(uint64_t seed, const void* buf, size_t len);
+zix_digest64(uint64_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
    Return a 64-bit hash of an aligned buffer.
@@ -74,7 +74,7 @@ zix_digest64(uint64_t seed, const void* buf, size_t len);
 */
 ZIX_PURE_API
 uint64_t
-zix_digest64_aligned(uint64_t seed, const void* buf, size_t len);
+zix_digest64_aligned(uint64_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
    Return a pointer-sized hash of a buffer.
@@ -86,7 +86,7 @@ zix_digest64_aligned(uint64_t seed, const void* buf, size_t len);
 */
 ZIX_PURE_API
 size_t
-zix_digest(size_t seed, const void* buf, size_t len);
+zix_digest(size_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
    Return a pointer-sized hash of an aligned buffer.
@@ -100,7 +100,7 @@ zix_digest(size_t seed, const void* buf, size_t len);
 */
 ZIX_PURE_API
 size_t
-zix_digest_aligned(size_t seed, const void* buf, size_t len);
+zix_digest_aligned(size_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 #ifdef __cplusplus
 } /* extern "C" */
