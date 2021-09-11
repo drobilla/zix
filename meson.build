@@ -177,7 +177,6 @@ sources = [
   'src/digest.c',
   'src/hash.c',
   'src/ring.c',
-  'src/strindex.c',
   'src/tree.c',
 ]
 
@@ -215,7 +214,6 @@ headers = [
   'include/zix/hash.h',
   'include/zix/ring.h',
   'include/zix/sem.h',
-  'include/zix/strindex.h',
   'include/zix/thread.h',
   'include/zix/tree.h',
 ]
@@ -234,7 +232,6 @@ tests = [
   'hash_test',
   'ring_test',
   'sem_test',
-  'strindex_test',
   'tree_test',
 ]
 
