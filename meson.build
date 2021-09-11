@@ -37,14 +37,14 @@ endif
 # Set ultra strict warnings for developers, if requested
 if get_option('strict')
   if cc.get_id() == 'clang'
-    c_warnings = [
+    c_warnings += [
       '-Weverything',
       '-Wno-bad-function-cast',
       '-Wno-padded',
       '-Wno-reserved-id-macro',
     ]
   elif cc.get_id() == 'gcc'
-    c_warnings = [
+    c_warnings += [
       # '-Waggregate-return',
       '-Walloc-size-larger-than=16384',
       '-Walloc-zero',
@@ -112,7 +112,7 @@ if get_option('strict')
       '-Wwrite-strings',
     ]
   elif cc.get_id() == 'msvc'
-    c_warnings = [
+    c_warnings += [
       '/Wall',    # everything, except...
       '/wd4191',  # unsafe function conversion
       '/wd4200',  # zero-sized array in struct/union
@@ -126,8 +126,6 @@ if get_option('strict')
       '/wd4820',  # padding added after construct
       '/wd5045',  # will insert Spectre mitigation for memory load
     ]
-  else
-    c_warnings = []
   endif
 
   if cc.get_id() == 'gcc' and host_machine.system() == 'windows'
