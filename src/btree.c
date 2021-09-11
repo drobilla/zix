@@ -895,13 +895,14 @@ zix_btree_lower_bound(const ZixBTree* const t,
     return ZIX_STATUS_SUCCESS;
   }
 
-  assert(ti->indexes[ti->level] == ti->nodes[ti->level]->n_vals);
-  if (found) {
-    // Found on a previous level but went too far
-    ti->level = found_level;
-  } else {
-    // Reached end (key is greater than everything in tree)
-    *ti = zix_btree_end_iter;
+  if (ti->indexes[ti->level] == ti->nodes[ti->level]->n_vals) {
+    if (found) {
+      // Found on a previous level but went too far
+      ti->level = found_level;
+    } else {
+      // Reached end (key is greater than everything in tree)
+      *ti = zix_btree_end_iter;
+    }
   }
 
   return ZIX_STATUS_SUCCESS;
