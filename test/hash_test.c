@@ -14,36 +14,28 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#undef NDEBUG
+
+#define ZIX_HASH_KEY_TYPE const char
+#define ZIX_HASH_RECORD_TYPE const char
+
+#include "test_data.h"
 #include "test_malloc.h"
 
 #include "zix/common.h"
 #include "zix/digest.h"
 #include "zix/hash.h"
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static bool expect_failure = false;
-
-static const char* strings[] = {
-  "one",  "two",  "three",  "four",  "five",  "six",  "seven",  "eight",
-  "2one", "2two", "2three", "2four", "2five", "2six", "2seven", "2eight",
-  "3one", "3two", "3three", "3four", "3five", "3six", "3seven", "3eight",
-  "4one", "4two", "4three", "4four", "4five", "4six", "4seven", "4eight",
-  "5one", "5two", "5three", "5four", "5five", "5six", "5seven", "5eight",
-  "6one", "6two", "6three", "6four", "6five", "6six", "6seven", "6eight",
-  "7one", "7two", "7three", "7four", "7five", "7six", "7seven", "7eight",
-  "8one", "8two", "8three", "8four", "8five", "8six", "8seven", "8eight",
-  "9one", "9two", "9three", "9four", "9five", "9six", "9seven", "9eight",
-  "Aone", "Atwo", "Athree", "Afour", "Afive", "Asix", "Aseven", "Aeight",
-  "Bone", "Btwo", "Bthree", "Bfour", "Bfive", "Bsix", "Bseven", "Beight",
-  "Cone", "Ctwo", "Cthree", "Cfour", "Cfive", "Csix", "Cseven", "Ceight",
-  "Done", "Dtwo", "Dthree", "Dfour", "Dfive", "Dsix", "Dseven", "Deight",
-};
 
 ZIX_LOG_FUNC(1, 2)
 static int
@@ -60,110 +52,173 @@ test_fail(const char* fmt, ...)
   return 1;
 }
 
-static unsigned n_checked = 0;
-
-static void
-check(void* value, void* ZIX_UNUSED(user_data))
+ZIX_PURE_FUNC static const char*
+identity(const char* record)
 {
-  if (strlen(*(const char* const*)value) >= 3) {
-    ++n_checked;
-  } else {
-    fprintf(stderr, "ERROR: %s\n", (const char*)value);
+  return record;
+}
+
+/// Decent hash function using zix_digest (murmur2)
+ZIX_PURE_FUNC static size_t
+decent_string_hash(const char* const str)
+{
+  return zix_digest(0u, str, strlen(str));
+}
+
+/// Terrible hash function from K&R first edition
+ZIX_PURE_FUNC static size_t
+terrible_string_hash(const char* str)
+{
+  size_t  hash = 0u;
+  uint8_t c    = 0u;
+
+  while ((c = (uint8_t)*str++)) {
+    hash += c;
   }
+
+  return hash;
 }
 
-static uint32_t
-string_ptr_hash(const void* value)
+ZIX_PURE_FUNC static size_t
+string_hash_aligned(const char* const str)
 {
-  const char* const str = *(const char* const*)value;
+  size_t length = strlen(str);
 
-  return zix_digest32(0u, str, strlen(str));
+  length = (length + (sizeof(size_t) - 1)) / sizeof(size_t) * sizeof(size_t);
+  return zix_digest_aligned(0u, str, length);
 }
+
+ZIX_PURE_FUNC static size_t
+string_hash32(const char* const str)
+{
+  return (size_t)zix_digest32(0u, str, strlen(str));
+}
+
+ZIX_PURE_FUNC static size_t
+string_hash64(const char* const str)
+{
+  return (size_t)zix_digest64(0u, str, strlen(str));
+}
+
+ZIX_PURE_FUNC static size_t
+string_hash32_aligned(const char* const str)
+{
+  size_t length = strlen(str);
+
+  length = (length + 3u) / 4u * 4u;
+  return (size_t)zix_digest32_aligned(0u, str, length);
+}
+
+#if UINTPTR_MAX >= UINT64_MAX
+
+ZIX_PURE_FUNC static size_t
+string_hash64_aligned(const char* const str)
+{
+  size_t length = strlen(str);
+
+  length = (length + 7u) / 8u * 8u;
+  return (size_t)zix_digest64_aligned(0u, str, length);
+}
+
+#endif
 
 static bool
-string_ptr_equal(const void* a, const void* b)
+string_equal(const char* const a, const char* const b)
 {
-  return !strcmp(*(const char* const*)a, *(const char* const*)b);
+  return !strcmp(a, b);
 }
 
 static int
-stress(void)
+stress_with(const ZixHashFunc hash_func, const size_t n_elems)
 {
-  ZixHash* hash =
-    zix_hash_new(string_ptr_hash, string_ptr_equal, sizeof(const char*));
+  ZixHash* hash = zix_hash_new(identity, hash_func, string_equal);
   if (!hash) {
     return test_fail("Failed to allocate hash\n");
   }
 
-  const size_t n_strings = sizeof(strings) / sizeof(const char*);
+  static const size_t string_length = 15;
+
+  char* const  buffer  = (char*)calloc(1, n_elems * (string_length + 1));
+  char** const strings = (char**)calloc(sizeof(char*), n_elems);
+  if (!buffer || !strings) {
+    free(buffer);
+    free(strings);
+    return test_fail("Failed to allocate strings\n");
+  }
+
+  uint32_t seed = 1u;
+  for (size_t i = 0u; i < n_elems; ++i) {
+    strings[i] = buffer + i * (string_length + 1);
+    assert((uintptr_t)strings[i] % sizeof(size_t) == 0);
+    assert((uintptr_t)strings[i] % sizeof(uint32_t) == 0);
+
+    for (size_t j = 0u; j < string_length; ++j) {
+      seed          = lcg32(seed);
+      strings[i][j] = (char)('!' + (seed % 92));
+    }
+  }
 
   // Insert each string
-  for (size_t i = 0; i < n_strings; ++i) {
-    void*     inserted = NULL;
-    ZixStatus st       = zix_hash_insert(hash, &strings[i], &inserted);
+  for (size_t i = 0; i < n_elems; ++i) {
+    ZixStatus st = zix_hash_insert(hash, strings[i]);
     if (st) {
       return test_fail("Failed to insert `%s'\n", strings[i]);
-    }
-
-    if (*(const void* const*)inserted != strings[i]) {
-      return test_fail("Corrupt insertion %s != %s\n",
-                       strings[i],
-                       *(const char* const*)inserted);
     }
   }
 
   // Ensure hash size is correct
-  if (zix_hash_size(hash) != n_strings) {
-    return test_fail("Hash size %" PRIuPTR " != %" PRIuPTR "\n",
-                     zix_hash_size(hash),
-                     n_strings);
+  if (zix_hash_size(hash) != n_elems) {
+    return test_fail(
+      "Hash size %" PRIuPTR " != %" PRIuPTR "\n", zix_hash_size(hash), n_elems);
   }
 
-  // zix_hash_print_dot(hash, stdout);
-
   // Attempt to insert each string again
-  for (size_t i = 0; i < n_strings; ++i) {
-    void*     inserted = NULL;
-    ZixStatus st       = zix_hash_insert(hash, &strings[i], &inserted);
+  for (size_t i = 0; i < n_elems; ++i) {
+    ZixStatus st = zix_hash_insert(hash, strings[i]);
     if (st != ZIX_STATUS_EXISTS) {
-      return test_fail("Double inserted `%s'\n", strings[i]);
+      return test_fail(
+        "Double inserted `%s' (%s)\n", strings[i], zix_strerror(st));
     }
   }
 
   // Search for each string
-  for (size_t i = 0; i < n_strings; ++i) {
-    const char* const* match =
-      (const char* const*)zix_hash_find(hash, &strings[i]);
+  for (size_t i = 0; i < n_elems; ++i) {
+    const char* match = (const char*)zix_hash_find_record(hash, strings[i]);
     if (!match) {
       return test_fail("Failed to find `%s'\n", strings[i]);
     }
-    if (*match != strings[i]) {
-      return test_fail("Bad match for `%s': `%s'\n", strings[i], *match);
+    if (match != strings[i]) {
+      return test_fail("Bad match for `%s': `%s'\n", strings[i], match);
     }
   }
 
-  // Try some false matches
-  const char*  not_indexed[] = {"ftp://example.org/not-there-at-all",
-                               "http://example.org/foobar",
-                               "http://",
-                               "http://otherdomain.com"};
-  const size_t n_not_indexed = sizeof(not_indexed) / sizeof(char*);
-  for (size_t i = 0; i < n_not_indexed; ++i) {
-    const char* const* match =
-      (const char* const*)zix_hash_find(hash, &not_indexed[i]);
+  static const char* const not_indexed_string = "__not__indexed__";
+
+  // Do a quick smoke test to ensure that false matches don't succeed
+  char* const not_indexed = (char*)calloc(1, strlen(not_indexed_string) + 1);
+  if (not_indexed) {
+    memcpy(not_indexed, not_indexed_string, strlen(not_indexed_string) + 1);
+    const char* match = (const char*)zix_hash_find_record(hash, not_indexed);
     if (match) {
-      return test_fail("Unexpectedly found `%s'\n", not_indexed[i]);
+      return test_fail("Unexpectedly found `%s'\n", not_indexed);
     }
+    free(not_indexed);
   }
 
   // Remove strings
-  for (size_t i = 0; i < n_strings; ++i) {
+  for (size_t i = 0; i < n_elems; ++i) {
     const size_t initial_size = zix_hash_size(hash);
 
     // Remove string
-    ZixStatus st = zix_hash_remove(hash, &strings[i]);
+    const char* removed = NULL;
+    ZixStatus   st      = zix_hash_remove(hash, strings[i], &removed);
     if (st) {
       return test_fail("Failed to remove `%s'\n", strings[i]);
+    }
+
+    // Ensure the removed value is what we expected
+    if (removed != strings[i]) {
+      return test_fail("Removed `%s` instead of `%s`\n", removed, strings[i]);
     }
 
     // Ensure size is updated
@@ -172,49 +227,148 @@ stress(void)
     }
 
     // Ensure second removal fails
-    st = zix_hash_remove(hash, &strings[i]);
+    st = zix_hash_remove(hash, strings[i], &removed);
     if (st != ZIX_STATUS_NOT_FOUND) {
       return test_fail("Unexpectedly removed `%s' twice\n", strings[i]);
     }
 
+    // Ensure value can no longer be found
+    assert(zix_hash_find(hash, strings[i]) == zix_hash_end(hash));
+
     // Check to ensure remaining strings are still present
-    for (size_t j = i + 1; j < n_strings; ++j) {
-      const char* const* match =
-        (const char* const*)zix_hash_find(hash, &strings[j]);
+    for (size_t j = i + 1; j < n_elems; ++j) {
+      const char* match = (const char*)zix_hash_find_record(hash, strings[j]);
       if (!match) {
         return test_fail("Failed to find `%s' after remove\n", strings[j]);
       }
-      if (*match != strings[j]) {
+      if (match != strings[j]) {
         return test_fail("Bad match for `%s' after remove\n", strings[j]);
       }
     }
   }
 
   // Insert each string again (to check non-empty destruction)
-  for (size_t i = 0; i < n_strings; ++i) {
-    ZixStatus st = zix_hash_insert(hash, &strings[i], NULL);
+  for (size_t i = 0; i < n_elems; ++i) {
+    ZixHashInsertPlan plan = zix_hash_plan_insert(hash, strings[i]);
+
+    assert(!zix_hash_record_at(hash, plan));
+    ZixStatus st = zix_hash_insert_at(hash, plan, strings[i]);
     if (st) {
       return test_fail("Failed to insert `%s'\n", strings[i]);
     }
   }
 
   // Check key == value (and test zix_hash_foreach)
-  zix_hash_foreach(hash, check, NULL);
-  if (n_checked != n_strings) {
+  size_t n_checked = 0u;
+  for (ZixHashIter i = zix_hash_begin(hash); i != zix_hash_end(hash);
+       i             = zix_hash_next(hash, i)) {
+    const char* const string = (const char*)zix_hash_get(hash, i);
+    assert(string);
+    if (strlen(string) < 3) {
+      return test_fail("Corrupt value `%s'\n", string);
+    }
+
+    ++n_checked;
+  }
+  if (n_checked != n_elems) {
     return test_fail("Check failed\n");
+  }
+
+  free(strings);
+  free(buffer);
+  zix_hash_free(hash);
+
+  return 0;
+}
+
+static int
+stress(const size_t n_elems)
+{
+  if (stress_with(decent_string_hash, n_elems) ||
+      stress_with(terrible_string_hash, n_elems / 4) ||
+      stress_with(string_hash_aligned, n_elems / 4) ||
+      stress_with(string_hash32, n_elems / 4) ||
+      stress_with(string_hash64, n_elems / 4) ||
+      stress_with(string_hash32_aligned, n_elems / 4)) {
+    return 1;
+  }
+
+#if UINTPTR_MAX >= UINT64_MAX
+  if (stress_with(string_hash64_aligned, n_elems / 4)) {
+    return 1;
+  }
+#endif
+
+  return 0;
+}
+
+/// Identity hash function for numeric strings for explicitly hitting cases
+ZIX_PURE_FUNC static size_t
+identity_index_hash(const char* const str)
+{
+  return strtoul(str, NULL, 10);
+}
+
+static void
+test_all_tombstones(void)
+{
+  /* This tests an edge case where a minimum-sized table can be entirely full
+     of tombstones.  If the search loop is not written carefully, then this can
+     result in a hang.  This has been seen to occur in real code, though it's
+     very hard to hit with a decent hash function.  So, we use the above
+     degenerate index hashing function to explicitly place elements exactly
+     where we want to hit this case. */
+
+#define N_STRINGS 4
+
+  static const char* original_strings[N_STRINGS] = {
+    "0 a",
+    "1 a",
+    "2 a",
+    "3 a",
+  };
+
+  static const char* collision_strings[N_STRINGS] = {
+    "0 b",
+    "1 b",
+    "2 b",
+    "3 b",
+  };
+
+  ZixStatus st   = ZIX_STATUS_SUCCESS;
+  ZixHash*  hash = zix_hash_new(identity, identity_index_hash, string_equal);
+
+  // Insert each element then immediately remove it
+  for (unsigned i = 0u; i < N_STRINGS; ++i) {
+    const char* removed = NULL;
+
+    assert(!zix_hash_insert(hash, original_strings[i]));
+    assert(!zix_hash_remove(hash, original_strings[i], &removed));
+  }
+
+  // Now the table should be "empty" but contain tombstones
+  assert(zix_hash_size(hash) == 0);
+
+  // Insert clashing elements which should hit the "all tombstones" case
+  for (unsigned i = 0u; i < N_STRINGS; ++i) {
+    assert(!zix_hash_insert(hash, collision_strings[i]));
+    assert(!st);
   }
 
   zix_hash_free(hash);
 
-  return 0;
+#undef N_STRINGS
 }
 
 int
 main(void)
 {
   zix_hash_free(NULL);
+  test_all_tombstones();
 
-  if (stress()) {
+  static const size_t n_elems = 1024u;
+
+  if (stress(n_elems)) {
     return 1;
   }
 
@@ -224,7 +378,7 @@ main(void)
   expect_failure = true;
   for (size_t i = 0; i < total_n_allocs; ++i) {
     test_malloc_reset(i);
-    stress();
+    stress(n_elems);
   }
 
   test_malloc_reset((size_t)-1);

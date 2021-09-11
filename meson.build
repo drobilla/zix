@@ -34,7 +34,7 @@ if get_option('strict')
   elif cc.get_id() == 'gcc'
     c_warnings = [
       # '-Waggregate-return',
-      '-Walloc-size-larger-than=4096',
+      '-Walloc-size-larger-than=16384',
       '-Walloc-zero',
       '-Walloca',
       '-Wanalyzer-too-complex',

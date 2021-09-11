@@ -5,6 +5,7 @@ Checks: >
   -clang-diagnostic-unused-function,
   -clang-diagnostic-unused-macros,
   -hicpp-multiway-paths-covered,
+  -hicpp-uppercase-literal-suffix,
   -llvmlibc-*,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'

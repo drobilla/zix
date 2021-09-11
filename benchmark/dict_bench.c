@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2020 David Robillard <d@drobilla.net>
+  Copyright 2011-2021 David Robillard <d@drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -25,7 +25,6 @@ ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>
 ZIX_RESTORE_WARNINGS
 
-#include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -35,7 +34,7 @@ ZIX_RESTORE_WARNINGS
 #include <time.h>
 
 typedef struct {
-  void*  buf;
+  char*  buf;
   size_t len;
 } ZixChunk;
 
@@ -49,10 +48,16 @@ lcg64(const uint64_t i)
   return (a * i) + c;
 }
 
-static uint32_t
+ZIX_PURE_FUNC static const void*
+identity(const void* record)
+{
+  return record;
+}
+
+static size_t
 zix_chunk_hash(const ZixChunk* const chunk)
 {
-  return zix_digest32(0u, chunk->buf, chunk->len);
+  return zix_digest(0u, chunk->buf, chunk->len);
 }
 
 static bool
@@ -88,27 +93,27 @@ main(int argc, char** argv)
     return test_fail("Failed to open file %s\n", file);
   }
 
-  size_t max_n_strings = 100000000;
+  size_t max_n_strings = 1u << 20u;
 
   /* Read input strings */
-  char**  strings      = NULL;
-  size_t* lengths      = NULL;
-  size_t  n_strings    = 0;
-  char*   buf          = (char*)calloc(1, 1);
-  size_t  buf_len      = 1;
-  size_t  this_str_len = 0;
+  ZixChunk* chunks       = NULL;
+  size_t    n_chunks     = 0;
+  char*     buf          = (char*)calloc(1, 1);
+  size_t    buf_len      = 1;
+  size_t    this_str_len = 0;
   for (int c = 0; (c = fgetc(fd)) != EOF;) {
-    if (isspace(c)) {
+    if (c == '\n') {
       if (this_str_len == 0) {
         continue;
       }
-      strings = (char**)realloc(strings, (n_strings + 1) * sizeof(char*));
-      lengths = (size_t*)realloc(lengths, (n_strings + 1) * sizeof(size_t));
-      strings[n_strings] = (char*)malloc(buf_len);
-      lengths[n_strings] = this_str_len;
-      memcpy(strings[n_strings], buf, buf_len);
+
+      chunks = (ZixChunk*)realloc(chunks, (n_chunks + 1) * sizeof(ZixChunk));
+
+      chunks[n_chunks].buf = (char*)malloc(buf_len);
+      chunks[n_chunks].len = this_str_len;
+      memcpy(chunks[n_chunks].buf, buf, buf_len);
       this_str_len = 0;
-      if (++n_strings == max_n_strings) {
+      if (++n_chunks == max_n_strings) {
         break;
       }
     } else {
@@ -129,12 +134,13 @@ main(int argc, char** argv)
   fprintf(insert_dat, "# n\tGHashTable\tZixHash\n");
   fprintf(search_dat, "# n\tGHashTable\tZixHash\n");
 
-  for (size_t n = n_strings / 16; n <= n_strings; n *= 2) {
+  for (size_t n = n_chunks / 16; n <= n_chunks; n *= 2) {
     printf("Benchmarking n = %zu\n", n);
-    GHashTable* hash  = g_hash_table_new(g_str_hash, g_str_equal);
-    ZixHash*    zhash = zix_hash_new((ZixHashFunc)zix_chunk_hash,
-                                  (ZixEqualFunc)zix_chunk_equal,
-                                  sizeof(ZixChunk));
+    GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
+
+    ZixHash* zhash = zix_hash_new(
+      identity, (ZixHashFunc)zix_chunk_hash, (ZixEqualFunc)zix_chunk_equal);
+
     fprintf(insert_dat, "%zu", n);
     fprintf(search_dat, "%zu", n);
 
@@ -143,17 +149,16 @@ main(int argc, char** argv)
     // GHashTable
     struct timespec insert_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      g_hash_table_insert(hash, strings[i], strings[i]);
+      g_hash_table_insert(hash, chunks[i].buf, chunks[i].buf);
     }
     fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
 
     // ZixHash
     insert_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      const ZixChunk chunk = {strings[i], lengths[i] + 1};
-      ZixStatus      st    = zix_hash_insert(zhash, &chunk, NULL);
+      ZixStatus st = zix_hash_insert(zhash, &chunks[i]);
       if (st && st != ZIX_STATUS_EXISTS) {
-        return test_fail("Failed to insert `%s'\n", strings[i]);
+        return test_fail("Failed to insert `%s'\n", (const char*)chunks[i].buf);
       }
     }
     fprintf(insert_dat, "\t%lf\n", bench_end(&insert_start));
@@ -164,9 +169,10 @@ main(int argc, char** argv)
     struct timespec search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       const size_t index = (size_t)(lcg64(seed + i) % n);
-      char*        match = (char*)g_hash_table_lookup(hash, strings[index]);
-      if (!!strcmp(match, strings[index])) {
-        return test_fail("Bad match for `%s'\n", strings[index]);
+      char*        match = (char*)g_hash_table_lookup(hash, chunks[index].buf);
+      if (!!strcmp(match, chunks[index].buf)) {
+        return test_fail(
+          "GHashTable: Bad match `%s' for `%s'\n", match, chunks[index].buf);
       }
     }
     fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -175,17 +181,15 @@ main(int argc, char** argv)
     search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       const size_t    index = (size_t)(lcg64(seed + i) % n);
-      const ZixChunk  key   = {strings[index], lengths[index] + 1};
       const ZixChunk* match = NULL;
-      if (!(match = (const ZixChunk*)zix_hash_find(zhash, &key))) {
-        return test_fail("Hash: Failed to find `%s'\n", strings[index]);
+      if (!(match =
+              (const ZixChunk*)zix_hash_find_record(zhash, &chunks[index]))) {
+        return test_fail("Hash: Failed to find `%s'\n", chunks[index].buf);
       }
 
-      if (!!strcmp((const char*)match->buf, strings[index])) {
-        return test_fail("Hash: Bad match %p for `%s': `%s'\n",
-                         (const void*)match,
-                         strings[index],
-                         (const char*)match->buf);
+      if (!!strcmp(match->buf, chunks[index].buf)) {
+        return test_fail(
+          "ZixHash: Bad match `%s' for `%s'\n", match->buf, chunks[index].buf);
       }
     }
     fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
