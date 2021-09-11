@@ -24,11 +24,18 @@
 // #define ZIX_BTREE_DEBUG 1
 // #define ZIX_BTREE_SORTED_CHECK 1
 
+// Define ZixShort as an integer type half the size of a pointer
+#if UINTPTR_MAX >= UINT32_MAX
+typedef uint32_t ZixShort;
+#else
+typedef uint16_t ZixShort;
+#endif
+
 #ifndef ZIX_BTREE_PAGE_SIZE
 #  define ZIX_BTREE_PAGE_SIZE 4096u
 #endif
 
-#define ZIX_BTREE_NODE_SPACE (ZIX_BTREE_PAGE_SIZE - 2u * sizeof(uint16_t))
+#define ZIX_BTREE_NODE_SPACE (ZIX_BTREE_PAGE_SIZE - 2u * sizeof(ZixShort))
 #define ZIX_BTREE_LEAF_VALS ((ZIX_BTREE_NODE_SPACE / sizeof(void*)) - 1u)
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2u)
 
@@ -42,9 +49,9 @@ struct ZixBTreeImpl {
 };
 
 struct ZixBTreeNodeImpl {
-  uint16_t is_leaf;
-  uint16_t n_vals;
-  // On 64-bit we rely on some padding here to get page-sized nodes
+  ZixShort is_leaf;
+  ZixShort n_vals;
+
   union {
     struct {
       void* vals[ZIX_BTREE_LEAF_VALS];
@@ -169,18 +176,18 @@ zix_btree_free_rec(ZixBTree* const t, ZixBTreeNode* const n)
   if (n) {
     if (n->is_leaf) {
       if (t->destroy) {
-        for (uint16_t i = 0; i < n->n_vals; ++i) {
+        for (ZixShort i = 0u; i < n->n_vals; ++i) {
           t->destroy(n->data.leaf.vals[i]);
         }
       }
     } else {
       if (t->destroy) {
-        for (uint16_t i = 0; i < n->n_vals; ++i) {
+        for (ZixShort i = 0u; i < n->n_vals; ++i) {
           t->destroy(n->data.inode.vals[i]);
         }
       }
 
-      for (uint16_t i = 0; i < n->n_vals + 1; ++i) {
+      for (ZixShort i = 0u; i < n->n_vals + 1u; ++i) {
         zix_btree_free_rec(t, zix_btree_child(n, i));
       }
     }
@@ -686,7 +693,7 @@ zix_btree_remove(ZixBTree* const      t,
         } else if (n == t->root && n->n_vals == 1) {
           // Root has two children, both minimal, delete it
           assert(i == 0 || i == 1);
-          const uint16_t counts[2] = {zix_btree_child(n, 0)->n_vals,
+          const ZixShort counts[2] = {zix_btree_child(n, 0)->n_vals,
                                       zix_btree_child(n, 1)->n_vals};
 
           n = zix_btree_merge(t, n, 0);
