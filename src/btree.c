@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// #define ZIX_BTREE_DEBUG 1
 // #define ZIX_BTREE_SORTED_CHECK 1
 
 // Define ZixShort as an integer type half the size of a pointer
@@ -79,42 +78,6 @@ struct ZixBTreeIterImpl {
   unsigned          level;    ///< Current level in stack
   ZixBTreeIterFrame stack[];  ///< Position stack
 };
-
-#ifdef ZIX_BTREE_DEBUG
-
-static void
-print_node(const ZixBTreeNode* n, const char* prefix)
-{
-  printf("%s[", prefix);
-  for (uint16_t v = 0; v < n->n_vals; ++v) {
-    printf(" %lu", (uintptr_t)n->vals[v]);
-  }
-  printf(" ]\n");
-}
-
-static void
-print_tree(const ZixBTreeNode* parent, const ZixBTreeNode* node, int level)
-{
-  if (node) {
-    if (!parent) {
-      printf("TREE {\n");
-    }
-    for (int i = 0; i < level + 1; ++i) {
-      printf("  ");
-    }
-    print_node(node, "");
-    if (!node->is_leaf) {
-      for (uint16_t i = 0; i < node->n_vals + 1; ++i) {
-        print_tree(node, node->data.inode.children[i], level + 1);
-      }
-    }
-    if (!parent) {
-      printf("}\n");
-    }
-  }
-}
-
-#endif // ZIX_BTREE_DEBUG
 
 static ZixBTreeNode*
 zix_btree_node_new(const bool leaf)
