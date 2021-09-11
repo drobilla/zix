@@ -31,8 +31,8 @@ static unsigned seed = 1;
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
-  const intptr_t ia = (intptr_t)a;
-  const intptr_t ib = (intptr_t)b;
+  const uintptr_t ia = (uintptr_t)a;
+  const uintptr_t ib = (uintptr_t)b;
 
   return ia < ib ? -1 : ia > ib ? 1 : 0;
 }
@@ -47,7 +47,7 @@ ith_elem(unsigned test_num, size_t n_elems, size_t i)
     return n_elems - i; // Decreasing (worse case)
   case 2:
   default:
-    return lcg64(seed + i) % 100; // Random
+    return lcg(seed + i) % 100u; // Random
   }
 }
 
@@ -60,22 +60,24 @@ test_fail(void)
 static int
 stress(unsigned test_num, size_t n_elems)
 {
-  intptr_t     r  = 0;
+  uintptr_t    r  = 0u;
   ZixTreeIter* ti = NULL;
   ZixTree*     t  = zix_tree_new(true, int_cmp, NULL, NULL);
 
   // Insert n_elems elements
   for (size_t i = 0; i < n_elems; ++i) {
-    r          = ith_elem(test_num, n_elems, i);
-    int status = zix_tree_insert(t, (void*)r, &ti);
+    r = ith_elem(test_num, n_elems, i);
+
+    ZixStatus status = zix_tree_insert(t, (void*)r, &ti);
     if (status) {
       fprintf(stderr, "Insert failed\n");
       return test_fail();
     }
-    if ((intptr_t)zix_tree_get(ti) != r) {
+
+    if ((uintptr_t)zix_tree_get(ti) != r) {
       fprintf(stderr,
-              "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
-              (intptr_t)zix_tree_get(ti),
+              "Data corrupt (%" PRIuPTR " != %" PRIuPTR ")\n",
+              (uintptr_t)zix_tree_get(ti),
               r);
       return test_fail();
     }
@@ -97,24 +99,24 @@ stress(unsigned test_num, size_t n_elems)
       fprintf(stderr, "Find failed\n");
       return test_fail();
     }
-    if ((intptr_t)zix_tree_get(ti) != r) {
+    if ((uintptr_t)zix_tree_get(ti) != r) {
       fprintf(stderr,
-              "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
-              (intptr_t)zix_tree_get(ti),
+              "Data corrupt (%" PRIuPTR " != %" PRIuPTR ")\n",
+              (uintptr_t)zix_tree_get(ti),
               r);
       return test_fail();
     }
   }
 
   // Iterate over all elements
-  size_t   i    = 0;
-  intptr_t last = -1;
+  size_t    i    = 0;
+  uintptr_t last = 0;
   for (ZixTreeIter* iter = zix_tree_begin(t); !zix_tree_iter_is_end(iter);
        iter              = zix_tree_iter_next(iter), ++i) {
-    const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
+    const uintptr_t iter_data = (uintptr_t)zix_tree_get(iter);
     if (iter_data < last) {
       fprintf(stderr,
-              "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
+              "Iter corrupt (%" PRIuPTR " < %" PRIuPTR ")\n",
               iter_data,
               last);
       return test_fail();
@@ -134,10 +136,10 @@ stress(unsigned test_num, size_t n_elems)
   last = INTPTR_MAX;
   for (ZixTreeIter* iter = zix_tree_rbegin(t); !zix_tree_iter_is_rend(iter);
        iter              = zix_tree_iter_prev(iter), ++i) {
-    const intptr_t iter_data = (intptr_t)zix_tree_get(iter);
+    const uintptr_t iter_data = (uintptr_t)zix_tree_get(iter);
     if (iter_data > last) {
       fprintf(stderr,
-              "Iter corrupt (%" PRIdPTR " < %" PRIdPTR ")\n",
+              "Iter corrupt (%" PRIuPTR " < %" PRIuPTR ")\n",
               iter_data,
               last);
       return test_fail();
@@ -167,16 +169,18 @@ stress(unsigned test_num, size_t n_elems)
 
   // Insert n_elems elements again (to test non-empty destruction)
   for (size_t e = 0; e < n_elems; ++e) {
-    r          = ith_elem(test_num, n_elems, e);
-    int status = zix_tree_insert(t, (void*)r, &ti);
+    r = ith_elem(test_num, n_elems, e);
+
+    ZixStatus status = zix_tree_insert(t, (void*)r, &ti);
     if (status) {
       fprintf(stderr, "Insert failed\n");
       return test_fail();
     }
-    if ((intptr_t)zix_tree_get(ti) != r) {
+
+    if ((uintptr_t)zix_tree_get(ti) != r) {
       fprintf(stderr,
-              "Data corrupt (%" PRIdPTR " != %" PRIdPTR ")\n",
-              (intptr_t)zix_tree_get(ti),
+              "Data corrupt (%" PRIuPTR " != %" PRIuPTR ")\n",
+              (uintptr_t)zix_tree_get(ti),
               r);
       return test_fail();
     }

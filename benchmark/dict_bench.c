@@ -163,7 +163,7 @@ main(int argc, char** argv)
     // GHashTable
     struct timespec search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      const size_t index = lcg64(seed + i) % n;
+      const size_t index = (size_t)(lcg64(seed + i) % n);
       char*        match = (char*)g_hash_table_lookup(hash, strings[index]);
       if (!!strcmp(match, strings[index])) {
         return test_fail("Bad match for `%s'\n", strings[index]);
@@ -174,7 +174,7 @@ main(int argc, char** argv)
     // ZixHash
     search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      const size_t    index = lcg64(seed + i) % n;
+      const size_t    index = (size_t)(lcg64(seed + i) % n);
       const ZixChunk  key   = {strings[index], lengths[index] + 1};
       const ZixChunk* match = NULL;
       if (!(match = (const ZixChunk*)zix_hash_find(zhash, &key))) {

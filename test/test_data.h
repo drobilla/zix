@@ -40,6 +40,17 @@ lcg64(const uint64_t i)
   return (a * i) + c;
 }
 
+/// Linear Congruential Generator for making random pointer-sized integers
+static inline uintptr_t
+lcg(const uintptr_t i)
+{
+#if UINTPTR_MAX >= UINT64_MAX
+  return lcg64(i);
+#else
+  return lcg32(i);
+#endif
+}
+
 /// Return a pseudo-pseudo-pseudo-random-ish integer with no duplicates
 static inline size_t
 unique_rand(size_t i)
@@ -52,7 +63,7 @@ unique_rand(size_t i)
     return i; // Values >= prime are mapped to themselves
   }
 
-  const size_t residue = ((uint64_t)i * i) % prime;
+  const size_t residue = (size_t)(((uint64_t)i * i) % prime);
   return (i <= prime / 2) ? residue : prime - residue;
 }
 

@@ -28,7 +28,6 @@ if get_option('strict')
     c_warnings = [
       '-Weverything',
       '-Wno-bad-function-cast',
-      '-Wno-conversion',
       '-Wno-padded',
       '-Wno-reserved-id-macro',
     ]
@@ -44,7 +43,7 @@ if get_option('strict')
       '-Wattribute-alias=2',
       '-Wcast-align=strict',
       '-Wcast-qual',
-      # '-Wconversion',
+      '-Wconversion',
       '-Wdate-time',
       '-Wdisabled-optimization',
       '-Wdouble-promotion',

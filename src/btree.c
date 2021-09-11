@@ -581,7 +581,7 @@ zix_btree_remove_max(ZixBTree* const t, ZixBTreeNode* n)
   while (!n->is_leaf) {
     if (zix_btree_node_is_minimal(zix_btree_child(n, n->n_vals))) {
       // Leftmost child is minimal, must expand
-      if (!zix_btree_node_is_minimal(zix_btree_child(n, n->n_vals - 1))) {
+      if (!zix_btree_node_is_minimal(zix_btree_child(n, n->n_vals - 1u))) {
         // Child's left sibling has at least one key to steal
         n = zix_btree_rotate_right(n, n->n_vals);
       } else {
