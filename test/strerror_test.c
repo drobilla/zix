@@ -7,10 +7,11 @@
 #include "zix/common.h"
 
 #include <assert.h>
+#include <stdio.h>
 #include <string.h>
 
-static void
-test_strerror(void)
+int
+main(void)
 {
   const char* msg = zix_strerror(ZIX_STATUS_SUCCESS);
   assert(!strcmp(msg, "Success"));
@@ -25,12 +26,7 @@ test_strerror(void)
 
   msg = zix_strerror((ZixStatus)1000000);
   assert(!strcmp(msg, "Unknown error"));
-}
 
-ZIX_PURE_FUNC
-int
-main(void)
-{
-  test_strerror();
+  printf("Success\n");
   return 0;
 }
