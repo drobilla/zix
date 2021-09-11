@@ -45,7 +45,8 @@ ZixTree*
 zix_tree_new(bool           allow_duplicates,
              ZixComparator  cmp,
              void*          cmp_data,
-             ZixDestroyFunc destroy);
+             ZixDestroyFunc destroy,
+             const void*    destroy_user_data);
 
 /// Free `t`
 ZIX_API

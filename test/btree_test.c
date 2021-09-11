@@ -103,7 +103,7 @@ ZIX_LOG_FUNC(2, 3)
 static int
 test_fail(ZixBTree* t, const char* fmt, ...)
 {
-  zix_btree_free(t, NULL);
+  zix_btree_free(t, NULL, NULL);
   if (expect_failure) {
     return EXIT_SUCCESS;
   }
@@ -119,15 +119,17 @@ test_fail(ZixBTree* t, const char* fmt, ...)
 static const size_t n_clear_insertions = 1024u;
 
 static void
-destroy(void* const ptr)
+destroy(void* const ptr, const void* const user_data)
 {
+  (void)user_data;
   assert(ptr);
   assert((uintptr_t)ptr <= n_clear_insertions);
 }
 
 static void
-no_destroy(void* const ptr)
+no_destroy(void* const ptr, const void* const user_data)
 {
+  (void)user_data;
   assert(!ptr);
 }
 
@@ -140,10 +142,10 @@ test_clear(void)
     assert(!zix_btree_insert(t, (void*)(r + 1u)));
   }
 
-  zix_btree_clear(t, destroy);
+  zix_btree_clear(t, destroy, NULL);
   assert(zix_btree_size(t) == 0);
 
-  zix_btree_free(t, no_destroy);
+  zix_btree_free(t, no_destroy, NULL);
 }
 
 static void
@@ -157,7 +159,7 @@ test_free(void)
 
   assert(zix_btree_size(t) == n_clear_insertions);
 
-  zix_btree_free(t, destroy);
+  zix_btree_free(t, destroy, NULL);
 }
 
 static void
@@ -200,7 +202,7 @@ test_iter_comparison(void)
   assert(zix_btree_iter_equals(end, j));
   assert(zix_btree_iter_equals(j, end));
 
-  zix_btree_free(t, NULL);
+  zix_btree_free(t, NULL, NULL);
 }
 
 static void
@@ -219,7 +221,7 @@ test_insert_split_value(void)
   // Insert the element that will be chosen as the split pivot
   assert(zix_btree_insert(t, (void*)split_value) == ZIX_STATUS_EXISTS);
 
-  zix_btree_free(t, NULL);
+  zix_btree_free(t, NULL, NULL);
 }
 
 static void
@@ -257,7 +259,7 @@ test_remove_cases(void)
   }
 
   assert(!zix_btree_size(t));
-  zix_btree_free(t, NULL);
+  zix_btree_free(t, NULL, NULL);
 }
 
 static int
@@ -547,7 +549,7 @@ stress(const unsigned test_num, const size_t n_elems)
   }
 
   assert(zix_btree_size(t) == 0);
-  zix_btree_free(t, NULL);
+  zix_btree_free(t, NULL, NULL);
 
   // Test lower_bound with wildcard comparator
 
@@ -598,7 +600,7 @@ stress(const unsigned test_num, const size_t n_elems)
     return test_fail(t, "Lower bound of maximum value is not end\n");
   }
 
-  zix_btree_free(t, NULL);
+  zix_btree_free(t, NULL, NULL);
 
   return EXIT_SUCCESS;
 }

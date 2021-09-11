@@ -27,6 +27,7 @@ typedef struct ZixTreeNodeImpl ZixTreeNode;
 struct ZixTreeImpl {
   ZixTreeNode*   root;
   ZixDestroyFunc destroy;
+  const void*    destroy_user_data;
   ZixComparator  cmp;
   void*          cmp_data;
   size_t         size;
@@ -69,15 +70,17 @@ ZixTree*
 zix_tree_new(bool           allow_duplicates,
              ZixComparator  cmp,
              void*          cmp_data,
-             ZixDestroyFunc destroy)
+             ZixDestroyFunc destroy,
+             const void*    destroy_user_data)
 {
-  ZixTree* t          = (ZixTree*)malloc(sizeof(ZixTree));
-  t->root             = NULL;
-  t->destroy          = destroy;
-  t->cmp              = cmp;
-  t->cmp_data         = cmp_data;
-  t->size             = 0;
-  t->allow_duplicates = allow_duplicates;
+  ZixTree* t           = (ZixTree*)malloc(sizeof(ZixTree));
+  t->root              = NULL;
+  t->destroy           = destroy;
+  t->destroy_user_data = destroy_user_data;
+  t->cmp               = cmp;
+  t->cmp_data          = cmp_data;
+  t->size              = 0;
+  t->allow_duplicates  = allow_duplicates;
   return t;
 }
 
@@ -88,7 +91,7 @@ zix_tree_free_rec(ZixTree* t, ZixTreeNode* n)
     zix_tree_free_rec(t, n->left);
     zix_tree_free_rec(t, n->right);
     if (t->destroy) {
-      t->destroy(n->data);
+      t->destroy(n->data, t->destroy_user_data);
     }
     free(n);
   }
@@ -451,7 +454,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
   if ((n == t->root) && !n->left && !n->right) {
     t->root = NULL;
     if (t->destroy) {
-      t->destroy(n->data);
+      t->destroy(n->data, t->destroy_user_data);
     }
     free(n);
     --t->size;
@@ -583,7 +586,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
   DUMP(t);
 
   if (t->destroy) {
-    t->destroy(n->data);
+    t->destroy(n->data, t->destroy_user_data);
   }
   free(n);
 
