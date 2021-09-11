@@ -74,7 +74,15 @@ static const ZixBTreeIter zix_btree_end_iter = {
   {0u, 0u, 0u, 0u, 0u, 0u},
   0u};
 
-/// Create a new (empty) B-Tree
+/**
+   Create a new (empty) B-Tree.
+
+   The given comparator must be a total ordering and is used to internally
+   organize the tree and look for values exactly.
+
+   Searching can be done with a custom comparator that supports wildcards, see
+   zix_btree_lower_bound() for details.
+*/
 ZIX_API
 ZixBTree*
 zix_btree_new(ZixComparator cmp, const void* cmp_data);
@@ -126,7 +134,7 @@ ZixStatus
 zix_btree_remove(ZixBTree* t, const void* e, void** out, ZixBTreeIter* next);
 
 /**
-   Set `ti` to an element equal to `e` in `t`.
+   Set `ti` to an element exactly equal to `e` in `t`.
 
    If no such item exists, `ti` is set to the end.
 */
@@ -137,15 +145,26 @@ zix_btree_find(const ZixBTree* t, const void* e, ZixBTreeIter* ti);
 /**
    Set `ti` to the smallest element in `t` that is not less than `e`.
 
-   Wildcards are supported, so if the search key `e` compares equal to many
-   values in the tree, `ti` will be set to the least such element.  The search
-   key `e` is always passed as the second argument to the comparator.
+   The given comparator must be compatible with the tree comparator, that is,
+   any two values must have the same ordering according to both.  Within this
+   constraint, it may implement fuzzier searching by handling special search
+   key values, for example with wildcards.
+
+   If the search key `e` compares equal to many values in the tree, then `ti`
+   will be set to the least such element.
+
+   The comparator is always called with an actual value in the tree as the
+   first argument, and `key` as the second argument.
 */
 ZIX_API
 ZixStatus
-zix_btree_lower_bound(const ZixBTree* t, const void* e, ZixBTreeIter* ti);
+zix_btree_lower_bound(const ZixBTree* t,
+                      ZixComparator   compare_key,
+                      const void*     compare_key_user_data,
+                      const void*     key,
+                      ZixBTreeIter*   ti);
 
-/// Return the data associated with the given tree item
+/// Return the data at the given position in the tree
 ZIX_PURE_API
 void*
 zix_btree_get(ZixBTreeIter ti);
@@ -176,6 +195,11 @@ zix_btree_iter_is_end(const ZixBTreeIter i)
 ZIX_API
 ZixStatus
 zix_btree_iter_increment(ZixBTreeIter* i);
+
+/// Return an iterator one past `iter`
+ZIX_API
+ZixBTreeIter
+zix_btree_iter_next(ZixBTreeIter iter);
 
 /**
    @}

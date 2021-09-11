@@ -234,7 +234,7 @@ stress(const unsigned test_num, const size_t n_elems)
   // Find the lower bound of all elements and ensure it's exact
   for (size_t i = 0; i < n_elems; ++i) {
     r = ith_elem(test_num, n_elems, i);
-    if (zix_btree_lower_bound(t, (void*)r, &ti)) {
+    if (zix_btree_lower_bound(t, int_cmp, NULL, (void*)r, &ti)) {
       return test_fail(
         t, "Lower bound %" PRIuPTR " @ %" PRIuPTR " failed\n", (uintptr_t)r, i);
     }
@@ -467,7 +467,7 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Find lower bound of wildcard
   const uintptr_t wildcard = 0;
-  if (zix_btree_lower_bound(t, (void*)wildcard, &ti)) {
+  if (zix_btree_lower_bound(t, wildcard_cmp, &ctx, (void*)wildcard, &ti)) {
     return test_fail(t, "Lower bound failed\n");
   }
 
@@ -490,7 +490,7 @@ stress(const unsigned test_num, const size_t n_elems)
 
   // Find lower bound of value past end
   const uintptr_t max = (uintptr_t)-1;
-  if (zix_btree_lower_bound(t, (void*)max, &ti)) {
+  if (zix_btree_lower_bound(t, wildcard_cmp, &ctx, (void*)max, &ti)) {
     return test_fail(t, "Lower bound failed\n");
   }
 
