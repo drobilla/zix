@@ -9,11 +9,9 @@ import random
 import string
 import subprocess
 
-os.chdir("build")
-
 # Benchmark trees
 
-subprocess.call(["benchmark/tree_bench", "40000", "640000"])
+subprocess.call(["./tree_bench", "40000", "640000"])
 subprocess.call(
     [
         "../scripts/plot.py",
@@ -49,7 +47,7 @@ if not os.path.exists(FILENAME):
         for i in range(1 << 20):
             out.write(random_word() + "\n")
 
-subprocess.call(["benchmark/dict_bench", "gibberish.txt"])
+subprocess.call(["./dict_bench", "gibberish.txt"])
 subprocess.call(
     [
         "../scripts/plot.py",
