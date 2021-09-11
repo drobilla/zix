@@ -1,3 +1,6 @@
+# Copyright 2020-2021 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: CC0-1.0 OR ISC
+
 project('zix', ['c'],
         version: '0.0.3',
         license: 'ISC',
@@ -240,6 +243,14 @@ tests = [
 
 # Build and run tests
 if get_option('tests')
+  # Check licensing metadata
+  reuse = find_program('reuse', required: false)
+  if reuse.found()
+    test('REUSE', reuse,
+         args: ['--root', meson.current_source_dir(), 'lint'],
+         suite: 'data')
+  endif
+
   thread_dep = dependency('threads')
   dl_dep = cc.find_library('dl', required: false)
 

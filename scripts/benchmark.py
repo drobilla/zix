@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# Copyright 2011-2021 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: ISC
+
 """
 Benchmark Zix data structures.
 """

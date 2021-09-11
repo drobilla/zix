@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# Copyright 2011-2020 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: ISC
+
 import math
 import os
 import sys
