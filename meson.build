@@ -195,7 +195,7 @@ libzix = build_target(
   install: true,
   target_type: library_type)
 
-libzix_dep = declare_dependency(link_with: libzix)
+zix_dep = declare_dependency(link_with: libzix)
 
 #
 # Installation
@@ -268,7 +268,7 @@ if get_option('tests')
                     sources,
                     include_directories: include_directories(['include']),
                     c_args: c_args,
-                    dependencies: [dl_dep, libzix_dep, thread_dep]),
+                    dependencies: [dl_dep, zix_dep, thread_dep]),
          timeout: 120)
   endforeach
 endif
@@ -296,7 +296,7 @@ if not get_option('benchmarks').disabled()
                 executable(benchmark,
                            'benchmark/@0@.c'.format(benchmark),
                            include_directories: include_directories(['include']),
-                           dependencies: [libzix_dep, glib_dep]))
+                           dependencies: [zix_dep, glib_dep]))
     endforeach
   else
     warning('Not building benchmarks because glib was not found')
