@@ -55,11 +55,6 @@ ith_elem(const unsigned test_num, const size_t n_elems, const size_t i)
   }
 }
 
-static void
-destroy(void* ZIX_UNUSED(ptr))
-{
-}
-
 typedef struct {
   unsigned test_num;
   size_t   n_elems;
@@ -104,16 +99,61 @@ ZIX_LOG_FUNC(2, 3)
 static int
 test_fail(ZixBTree* t, const char* fmt, ...)
 {
-  zix_btree_free(t);
+  zix_btree_free(t, NULL);
   if (expect_failure) {
     return EXIT_SUCCESS;
   }
+
   va_list args;
   va_start(args, fmt);
   fprintf(stderr, "error: ");
   vfprintf(stderr, fmt, args);
   va_end(args);
   return EXIT_FAILURE;
+}
+
+static const size_t n_clear_insertions = 1024u;
+
+static void
+destroy(void* const ptr)
+{
+  assert(ptr);
+  assert((uintptr_t)ptr <= n_clear_insertions);
+}
+
+static void
+no_destroy(void* const ptr)
+{
+  assert(!ptr);
+}
+
+static void
+test_clear(void)
+{
+  ZixBTree* t = zix_btree_new(int_cmp, NULL);
+
+  for (uintptr_t r = 0u; r < n_clear_insertions; ++r) {
+    assert(!zix_btree_insert(t, (void*)(r + 1u)));
+  }
+
+  zix_btree_clear(t, destroy);
+  assert(zix_btree_size(t) == 0);
+
+  zix_btree_free(t, no_destroy);
+}
+
+static void
+test_free(void)
+{
+  ZixBTree* t = zix_btree_new(int_cmp, NULL);
+
+  for (uintptr_t r = 0u; r < n_clear_insertions; ++r) {
+    assert(!zix_btree_insert(t, (void*)(r + 1u)));
+  }
+
+  assert(zix_btree_size(t) == n_clear_insertions);
+
+  zix_btree_free(t, destroy);
 }
 
 static int
@@ -124,7 +164,7 @@ stress(const unsigned test_num, const size_t n_elems)
   }
 
   uintptr_t r  = 0;
-  ZixBTree* t  = zix_btree_new(int_cmp, NULL, NULL);
+  ZixBTree* t  = zix_btree_new(int_cmp, NULL);
   ZixStatus st = ZIX_STATUS_SUCCESS;
 
   if (!t) {
@@ -441,12 +481,12 @@ stress(const unsigned test_num, const size_t n_elems)
   zix_btree_iter_free(next);
   next = NULL;
 
-  zix_btree_free(t);
+  zix_btree_free(t, NULL);
 
   // Test lower_bound with wildcard comparator
 
   TestContext ctx = {test_num, n_elems};
-  if (!(t = zix_btree_new(wildcard_cmp, &ctx, destroy))) {
+  if (!(t = zix_btree_new(wildcard_cmp, &ctx))) {
     return test_fail(t, "Failed to allocate tree\n");
   }
 
@@ -499,7 +539,7 @@ stress(const unsigned test_num, const size_t n_elems)
   }
 
   zix_btree_iter_free(ti);
-  zix_btree_free(t);
+  zix_btree_free(t, NULL);
 
   return EXIT_SUCCESS;
 }
@@ -511,6 +551,9 @@ main(int argc, char** argv)
     fprintf(stderr, "Usage: %s [N_ELEMS]\n", argv[0]);
     return EXIT_FAILURE;
   }
+
+  test_clear();
+  test_free();
 
   const unsigned n_tests = 3u;
   const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 524288u;

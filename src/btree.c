@@ -39,12 +39,11 @@ typedef uint16_t ZixShort;
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2u)
 
 struct ZixBTreeImpl {
-  ZixBTreeNode*  root;
-  ZixDestroyFunc destroy;
-  ZixComparator  cmp;
-  const void*    cmp_data;
-  size_t         size;
-  unsigned       height; ///< Number of levels, i.e. root only has height 1
+  ZixBTreeNode* root;
+  ZixComparator cmp;
+  const void*   cmp_data;
+  size_t        size;
+  unsigned      height; ///< Number of levels, i.e. root only has height 1
 };
 
 struct ZixBTreeNodeImpl {
@@ -113,14 +112,11 @@ zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 }
 
 ZixBTree*
-zix_btree_new(const ZixComparator  cmp,
-              const void* const    cmp_data,
-              const ZixDestroyFunc destroy)
+zix_btree_new(const ZixComparator cmp, const void* const cmp_data)
 {
   ZixBTree* t = (ZixBTree*)malloc(sizeof(ZixBTree));
   if (t) {
     t->root     = zix_btree_node_new(true);
-    t->destroy  = destroy;
     t->cmp      = cmp;
     t->cmp_data = cmp_data;
     t->size     = 0;
@@ -134,38 +130,49 @@ zix_btree_new(const ZixComparator  cmp,
 }
 
 static void
-zix_btree_free_rec(ZixBTree* const t, ZixBTreeNode* const n)
+zix_btree_free_children(ZixBTree* const     t,
+                        ZixBTreeNode* const n,
+                        ZixDestroyFunc      destroy)
 {
-  if (n) {
+  if (!n->is_leaf) {
+    for (ZixShort i = 0; i < n->n_vals + 1u; ++i) {
+      zix_btree_free_children(t, zix_btree_child(n, i), destroy);
+      free(zix_btree_child(n, i));
+    }
+  }
+
+  if (destroy) {
     if (n->is_leaf) {
-      if (t->destroy) {
-        for (ZixShort i = 0u; i < n->n_vals; ++i) {
-          t->destroy(n->data.leaf.vals[i]);
-        }
+      for (ZixShort i = 0u; i < n->n_vals; ++i) {
+        destroy(n->data.leaf.vals[i]);
       }
     } else {
-      if (t->destroy) {
-        for (ZixShort i = 0u; i < n->n_vals; ++i) {
-          t->destroy(n->data.inode.vals[i]);
-        }
-      }
-
-      for (ZixShort i = 0u; i < n->n_vals + 1u; ++i) {
-        zix_btree_free_rec(t, zix_btree_child(n, i));
+      for (ZixShort i = 0u; i < n->n_vals; ++i) {
+        destroy(n->data.inode.vals[i]);
       }
     }
-
-    free(n);
   }
 }
 
 void
-zix_btree_free(ZixBTree* const t)
+zix_btree_free(ZixBTree* const t, ZixDestroyFunc destroy)
 {
   if (t) {
-    zix_btree_free_rec(t, t->root);
+    zix_btree_clear(t, destroy);
+    free(t->root);
     free(t);
   }
+}
+
+void
+zix_btree_clear(ZixBTree* const t, ZixDestroyFunc destroy)
+{
+  zix_btree_free_children(t, t->root, destroy);
+
+  memset(t->root, 0, sizeof(ZixBTreeNode));
+  t->root->is_leaf = true;
+  t->size          = 0u;
+  t->height        = 1u;
 }
 
 size_t

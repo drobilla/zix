@@ -50,12 +50,27 @@ typedef struct ZixBTreeIterImpl ZixBTreeIter;
 /// Create a new (empty) B-Tree
 ZIX_API
 ZixBTree*
-zix_btree_new(ZixComparator cmp, const void* cmp_data, ZixDestroyFunc destroy);
+zix_btree_new(ZixComparator cmp, const void* cmp_data);
 
-/// Free `t`
+/**
+   Free `t` and all the nodes it contains.
+
+   @param destroy Function to call once for every value in the tree.  This can
+   be used to free values if they are dynamically allocated.
+*/
 ZIX_API
 void
-zix_btree_free(ZixBTree* t);
+zix_btree_free(ZixBTree* t, ZixDestroyFunc destroy);
+
+/**
+   Clear everything from `t`, leaving it empty.
+
+   @param destroy Function called exactly once for every value in the tree,
+   just before that value is removed from the tree.
+*/
+ZIX_API
+void
+zix_btree_clear(ZixBTree* t, ZixDestroyFunc destroy);
 
 /// Return the number of elements in `t`
 ZIX_PURE_API
