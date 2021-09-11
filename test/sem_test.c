@@ -1,5 +1,5 @@
 /*
-  Copyright 2012-2020 David Robillard <d@drobilla.net>
+  Copyright 2012-2021 David Robillard <d@drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -14,10 +14,13 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#undef NDEBUG
+
 #include "zix/attributes.h"
 #include "zix/sem.h"
 #include "zix/thread.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -64,22 +67,13 @@ main(int argc, char** argv)
 
   printf("Testing %u signals...\n", n_signals);
 
-  if (zix_sem_init(&sem, 0)) {
-    fprintf(stderr, "Failed to create semaphore.\n");
-    return 1;
-  }
+  assert(!zix_sem_init(&sem, 0));
 
   ZixThread reader_thread; // NOLINT
-  if (zix_thread_create(&reader_thread, 128, reader, NULL)) {
-    fprintf(stderr, "Failed to create reader thread\n");
-    return 1;
-  }
+  assert(!zix_thread_create(&reader_thread, 128, reader, NULL));
 
   ZixThread writer_thread; // NOLINT
-  if (zix_thread_create(&writer_thread, 128, writer, NULL)) {
-    fprintf(stderr, "Failed to create writer thread\n");
-    return 1;
-  }
+  assert(!zix_thread_create(&writer_thread, 128, writer, NULL));
 
   zix_thread_join(reader_thread, NULL);
   zix_thread_join(writer_thread, NULL);
