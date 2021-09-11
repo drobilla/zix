@@ -1,11 +1,11 @@
-option('benchmarks', type: 'feature', value: 'auto',
+option('benchmarks', type: 'feature', value: 'auto', yield: true,
        description: 'Build benchmarks')
 
-option('strict', type: 'boolean', value: false,
+option('strict', type: 'boolean', value: false, yield: true,
        description: 'Enable ultra-strict warnings')
 
 option('test_malloc', type: 'boolean', value: true,
        description: 'Test allocation failure')
 
-option('tests', type: 'boolean', value: true,
+option('tests', type: 'boolean', value: true, yield: true,
        description: 'Build tests')

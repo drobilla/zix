@@ -25,13 +25,21 @@ versioned_name = 'zix' + version_suffix
 pkg = import('pkgconfig')
 cc = meson.get_compiler('c')
 
+# Suppress unavoidable present even in default build
+c_warnings = []
+c_suppressions = []
+if cc.get_id() == 'clang'
+  c_warnings = [
+    '-Wno-nullability-extension',
+  ]
+endif
+
 # Set ultra strict warnings for developers, if requested
 if get_option('strict')
   if cc.get_id() == 'clang'
     c_warnings = [
       '-Weverything',
       '-Wno-bad-function-cast',
-      '-Wno-nullability-extension',
       '-Wno-padded',
       '-Wno-reserved-id-macro',
     ]
