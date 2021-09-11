@@ -77,7 +77,7 @@ string_ptr_hash(const void* value)
 {
   const char* const str = *(const char* const*)value;
 
-  return zix_digest_add(zix_digest_start(), str, strlen(str));
+  return zix_digest32(0u, str, strlen(str));
 }
 
 static bool

@@ -1,5 +1,5 @@
 /*
-  Copyright 2020 David Robillard <d@drobilla.net>
+  Copyright 2020-2021 David Robillard <d@drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -21,71 +21,122 @@
 #include <assert.h>
 #include <stddef.h>
 
+// Just basic smoke tests to ensure the hash functions are reacting to data
+
 static void
-test_bytes(void)
+test_digest(void)
+{
+  static const uint8_t data[] = {
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+
+  size_t last = 0u;
+
+  for (size_t offset = 0; offset < 7; ++offset) {
+    const size_t len = 8u - offset;
+    for (size_t i = offset; i < 8; ++i) {
+      const size_t h = zix_digest(0u, &data[i], len);
+      assert(h != last);
+      last = h;
+    }
+  }
+}
+
+static void
+test_digest32(void)
 {
   static const uint8_t data[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
-  for (size_t offset = 0; offset < 7; ++offset) {
-    const size_t len = 8 - offset;
+  uint32_t last = 0u;
 
-    uint32_t d = zix_digest_start();
-    for (size_t i = offset; i < 8; ++i) {
-      const uint32_t new_d = zix_digest_add(d, &data[i], 1);
-      assert(new_d != d);
-      d = new_d;
+  for (size_t offset = 0; offset < 3; ++offset) {
+    for (size_t i = offset; i < 4; ++i) {
+      const uint32_t h = zix_digest32(0u, &data[i], 4);
+      assert(h != last);
+      last = h;
     }
-
-    assert(zix_digest_add(zix_digest_start(), &data[offset], len) == d);
   }
 }
 
 static void
-test_64(void)
+test_digest64(void)
+{
+  static const uint8_t data[] = {
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
+
+  uint64_t last = 0u;
+
+  for (size_t offset = 0; offset < 7; ++offset) {
+    for (size_t i = offset; i < 8; ++i) {
+      const uint64_t h = zix_digest64(0u, &data[i], 8);
+      assert(h != last);
+      last = h;
+    }
+  }
+}
+
+static void
+test_digest32_aligned(void)
+{
+  static const uint32_t data[] = {1, 2, 3, 4, 5, 6, 7, 8};
+
+  uint32_t last = 0u;
+
+  for (size_t offset = 0; offset < 3; ++offset) {
+    const size_t len = 4u - offset;
+    for (size_t i = offset; i < 4; ++i) {
+      const uint32_t h =
+        zix_digest32_aligned(0u, &data[i], len * sizeof(uint32_t));
+      assert(h != last);
+      last = h;
+    }
+  }
+}
+
+static void
+test_digest64_aligned(void)
 {
   static const uint64_t data[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
-  uint32_t d = zix_digest_start();
-  for (size_t i = 0; i < 8; ++i) {
-    const uint32_t new_d = zix_digest_add_64(d, &data[i], sizeof(uint64_t));
-    assert(new_d != d);
-    d = new_d;
-  }
+  uint64_t last = 0u;
 
-  assert(zix_digest_add(zix_digest_start(), data, 8 * sizeof(uint64_t)) == d);
+  for (size_t offset = 0; offset < 3; ++offset) {
+    const size_t len = 4u - offset;
+    for (size_t i = offset; i < 4; ++i) {
+      const uint64_t h =
+        zix_digest64_aligned(0u, &data[i], len * sizeof(uint64_t));
+      assert(h != last);
+      last = h;
+    }
+  }
 }
 
 static void
-test_ptr(void)
+test_digest_aligned(void)
 {
-  static const uint64_t pointees[] = {1, 2, 3, 4, 5, 6, 7, 8};
+  static const size_t data[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
-  static const void* data[] = {&pointees[0],
-                               &pointees[1],
-                               &pointees[2],
-                               &pointees[3],
-                               &pointees[4],
-                               &pointees[5],
-                               &pointees[6],
-                               &pointees[7],
-                               &pointees[8]};
+  size_t last = 0u;
 
-  uint32_t d = zix_digest_start();
-  for (size_t i = 0; i < 8; ++i) {
-    const uint32_t new_d = zix_digest_add_ptr(d, data[i]);
-    assert(new_d != d);
-    d = new_d;
+  for (size_t offset = 0; offset < 3; ++offset) {
+    const size_t len = 4u - offset;
+    for (size_t i = offset; i < 4; ++i) {
+      const size_t h = zix_digest_aligned(0u, &data[i], len * sizeof(size_t));
+      assert(h != last);
+      last = h;
+    }
   }
-
-  assert(zix_digest_add(zix_digest_start(), data, 8 * sizeof(void*)) == d);
 }
 
 ZIX_PURE_FUNC int
 main(void)
 {
-  test_bytes();
-  test_64();
-  test_ptr();
+  test_digest32();
+  test_digest64();
+  test_digest();
+
+  test_digest32_aligned();
+  test_digest64_aligned();
+  test_digest_aligned();
 
   return 0;
 }

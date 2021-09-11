@@ -52,7 +52,7 @@ lcg64(const uint64_t i)
 static uint32_t
 zix_chunk_hash(const ZixChunk* const chunk)
 {
-  return zix_digest_add(zix_digest_start(), chunk->buf, chunk->len);
+  return zix_digest32(0u, chunk->buf, chunk->len);
 }
 
 static bool
