@@ -201,7 +201,9 @@ libzix = build_target(
   install: true,
   target_type: library_type)
 
-zix_dep = declare_dependency(link_with: libzix)
+zix_dep = declare_dependency(
+  link_with: libzix,
+  include_directories: include_directories(['include']))
 
 #
 # Installation
