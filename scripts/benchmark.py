@@ -26,18 +26,29 @@ subprocess.call(
 # Benchmark dictionaries
 
 FILENAME = "gibberish.txt"
-CHARACTERS = string.ascii_letters + string.digits
+CHARACTERS = string.ascii_letters + string.digits + " '."
+WORDS = open("/usr/share/dict/words", "r").readlines()
+SCHEMES = ["http", "https"]
+DOMAINS = ["example.org", "drobilla.net", "lv2plug.in", "gitlab.com"]
+NAMES = ["ns", "foo", "bar", "stuff", "things"]
 
 
 def random_word():
     """Return a random word with ASCII letters and digits"""
 
-    wordlen = random.randrange(1, 64)
-    word = ""
-    for _ in range(wordlen):
-        word += random.choice(CHARACTERS)
+    if random.randint(0, 1):
+        # Generate a URI
+        result = "%s://%s/" % (random.choice(SCHEMES), random.choice(DOMAINS))
+        for _ in range(random.randrange(1, 6)):
+            result += random.choice(NAMES) + "/"
+    else:
+        result = ""
+        for _ in range(random.randrange(1, 7)):
+            result += random.choice(WORDS).strip() + " "
 
-    return word
+        result += random.choice(WORDS).strip()
+
+    return result
 
 
 if not os.path.exists(FILENAME):
@@ -45,7 +56,8 @@ if not os.path.exists(FILENAME):
 
     with open(FILENAME, "w") as out:
         for i in range(1 << 20):
-            out.write(random_word() + "\n")
+            out.write(random_word())
+            out.write("\n")
 
 subprocess.call(["./dict_bench", "gibberish.txt"])
 subprocess.call(
