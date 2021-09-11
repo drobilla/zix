@@ -33,6 +33,7 @@ gen_msg(int* const msg, int start)
   return start;
 }
 
+ZIX_PURE_FUNC
 static int
 cmp_msg(const int* const msg1, const int* const msg2)
 {

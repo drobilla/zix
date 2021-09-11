@@ -3,6 +3,7 @@
 
 #undef NDEBUG
 
+#include "zix/attributes.h"
 #include "zix/common.h"
 
 #include <assert.h>
@@ -26,6 +27,7 @@ test_strerror(void)
   assert(!strcmp(msg, "Unknown error"));
 }
 
+ZIX_PURE_FUNC
 int
 main(void)
 {
