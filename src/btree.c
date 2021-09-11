@@ -18,7 +18,6 @@
 
 #include <assert.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 
 // #define ZIX_BTREE_SORTED_CHECK 1
@@ -39,10 +38,11 @@ typedef uint16_t ZixShort;
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2u)
 
 struct ZixBTreeImpl {
-  ZixBTreeNode* root;
-  ZixComparator cmp;
-  const void*   cmp_data;
-  size_t        size;
+  const ZixAllocator* allocator;
+  ZixBTreeNode*       root;
+  ZixComparator       cmp;
+  const void*         cmp_data;
+  size_t              size;
 };
 
 struct ZixBTreeNodeImpl {
@@ -67,7 +67,7 @@ static_assert(sizeof(ZixBTreeNode) == ZIX_BTREE_PAGE_SIZE, "");
 #endif
 
 static ZixBTreeNode*
-zix_btree_node_new(const bool leaf)
+zix_btree_node_new(const ZixAllocator* const allocator, const bool leaf)
 {
 #if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112l) || \
       (defined(__cplusplus) && __cplusplus >= 201103L))
@@ -76,7 +76,9 @@ zix_btree_node_new(const bool leaf)
          ZIX_BTREE_PAGE_SIZE - 2u * sizeof(ZixBTreeNode*));
 #endif
 
-  ZixBTreeNode* const node = (ZixBTreeNode*)malloc(sizeof(ZixBTreeNode));
+  ZixBTreeNode* const node =
+    (ZixBTreeNode*)zix_malloc(allocator, sizeof(ZixBTreeNode));
+
   if (node) {
     node->is_leaf = leaf;
     node->n_vals  = 0u;
@@ -95,23 +97,26 @@ zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 }
 
 ZixBTree*
-zix_btree_new(const ZixComparator cmp, const void* const cmp_data)
+zix_btree_new(const ZixAllocator* const allocator,
+              const ZixComparator       cmp,
+              const void* const         cmp_data)
 {
   assert(cmp);
 
-  ZixBTree* const t = (ZixBTree*)malloc(sizeof(ZixBTree));
+  ZixBTree* const t = (ZixBTree*)zix_malloc(allocator, sizeof(ZixBTree));
   if (!t) {
     return NULL;
   }
 
-  if (!(t->root = zix_btree_node_new(true))) {
-    free(t);
+  if (!(t->root = zix_btree_node_new(allocator, true))) {
+    zix_free(allocator, t);
     return NULL;
   }
 
-  t->cmp      = cmp;
-  t->cmp_data = cmp_data;
-  t->size     = 0;
+  t->allocator = allocator;
+  t->cmp       = cmp;
+  t->cmp_data  = cmp_data;
+  t->size      = 0;
 
   return t;
 }
@@ -126,7 +131,7 @@ zix_btree_free_children(ZixBTree* const      t,
     for (ZixShort i = 0; i < n->n_vals + 1u; ++i) {
       zix_btree_free_children(
         t, zix_btree_child(n, i), destroy, destroy_user_data);
-      free(zix_btree_child(n, i));
+      zix_free(t->allocator, zix_btree_child(n, i));
     }
   }
 
@@ -150,8 +155,8 @@ zix_btree_free(ZixBTree* const      t,
 {
   if (t) {
     zix_btree_clear(t, destroy, destroy_user_data);
-    free(t->root);
-    free(t);
+    zix_free(t->allocator, t->root);
+    zix_free(t->allocator, t);
   }
 }
 
@@ -208,9 +213,10 @@ zix_btree_aerase(void** const array, const unsigned n, const unsigned i)
 
 /// Split lhs, the i'th child of `n`, into two nodes
 static ZixBTreeNode*
-zix_btree_split_child(ZixBTreeNode* const n,
-                      const unsigned      i,
-                      ZixBTreeNode* const lhs)
+zix_btree_split_child(const ZixAllocator* const allocator,
+                      ZixBTreeNode* const       n,
+                      const unsigned            i,
+                      ZixBTreeNode* const       lhs)
 {
   assert(lhs->n_vals == zix_btree_max_vals(lhs));
   assert(n->n_vals < ZIX_BTREE_INODE_VALS);
@@ -218,7 +224,7 @@ zix_btree_split_child(ZixBTreeNode* const n,
   assert(zix_btree_child(n, i) == lhs);
 
   const ZixShort max_n_vals = zix_btree_max_vals(lhs);
-  ZixBTreeNode*  rhs        = zix_btree_node_new(lhs->is_leaf);
+  ZixBTreeNode*  rhs        = zix_btree_node_new(allocator, lhs->is_leaf);
   if (!rhs) {
     return NULL;
   }
@@ -407,7 +413,7 @@ zix_btree_is_full(const ZixBTreeNode* const n)
 static ZixStatus
 zix_btree_grow_up(ZixBTree* const t)
 {
-  ZixBTreeNode* const new_root = zix_btree_node_new(false);
+  ZixBTreeNode* const new_root = zix_btree_node_new(t->allocator, false);
   if (!new_root) {
     return ZIX_STATUS_NO_MEM;
   }
@@ -416,7 +422,7 @@ zix_btree_grow_up(ZixBTree* const t)
   new_root->data.inode.children[0] = t->root;
 
   // Split the old root to get two balanced siblings
-  zix_btree_split_child(new_root, 0, t->root);
+  zix_btree_split_child(t->allocator, new_root, 0, t->root);
   t->root = new_root;
 
   return ZIX_STATUS_SUCCESS;
@@ -450,7 +456,9 @@ zix_btree_insert(ZixBTree* const t, void* const e)
     ZixBTreeNode* child = node->data.inode.children[i];
     if (zix_btree_is_full(child)) {
       // The child is full, split it before continuing
-      ZixBTreeNode* const rhs = zix_btree_split_child(node, i, child);
+      ZixBTreeNode* const rhs =
+        zix_btree_split_child(t->allocator, node, i, child);
+
       if (!rhs) {
         return ZIX_STATUS_NO_MEM;
       }
@@ -620,10 +628,10 @@ zix_btree_merge(ZixBTree* const t, ZixBTreeNode* const n, const unsigned i)
     // Root is now empty, replace it with its only child
     assert(n == t->root);
     t->root = lhs;
-    free(n);
+    zix_free(t->allocator, n);
   }
 
-  free(rhs);
+  zix_free(t->allocator, rhs);
   return lhs;
 }
 

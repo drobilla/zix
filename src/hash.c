@@ -19,7 +19,6 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 typedef struct ZixHashEntry {
   ZixHashCode    hash;  ///< Non-folded hash value
@@ -27,32 +26,35 @@ typedef struct ZixHashEntry {
 } ZixHashEntry;
 
 struct ZixHashImpl {
-  ZixKeyFunc      key_func;   ///< User-provided key accessor
-  ZixHashFunc     hash_func;  ///< User-provided hashing function
-  ZixKeyEqualFunc equal_func; ///< User-provided equality comparison function
-  size_t          count;      ///< Number of records stored in the table
-  size_t          mask;       ///< Bit mask for fast modulo (n_entries - 1)
-  size_t          n_entries;  ///< Power of two table size
-  ZixHashEntry*   entries;    ///< Pointer to dynamically allocated table
+  const ZixAllocator* allocator;  ///< User allocator
+  ZixKeyFunc          key_func;   ///< User key accessor
+  ZixHashFunc         hash_func;  ///< User hashing function
+  ZixKeyEqualFunc     equal_func; ///< User equality comparison function
+  size_t              count;      ///< Number of records stored in the table
+  size_t              mask;       ///< Bit mask for fast modulo (n_entries - 1)
+  size_t              n_entries;  ///< Power of two table size
+  ZixHashEntry*       entries;    ///< Pointer to dynamically allocated table
 };
 
 static const size_t min_n_entries = 4u;
 static const size_t tombstone     = 0xDEADu;
 
 ZixHash*
-zix_hash_new(const ZixKeyFunc      key_func,
-             const ZixHashFunc     hash_func,
-             const ZixKeyEqualFunc equal_func)
+zix_hash_new(const ZixAllocator* const allocator,
+             const ZixKeyFunc          key_func,
+             const ZixHashFunc         hash_func,
+             const ZixKeyEqualFunc     equal_func)
 {
   assert(key_func);
   assert(hash_func);
   assert(equal_func);
 
-  ZixHash* const hash = (ZixHash*)malloc(sizeof(ZixHash));
+  ZixHash* const hash = (ZixHash*)zix_malloc(allocator, sizeof(ZixHash));
   if (!hash) {
     return NULL;
   }
 
+  hash->allocator  = allocator;
   hash->key_func   = key_func;
   hash->hash_func  = hash_func;
   hash->equal_func = equal_func;
@@ -60,9 +62,11 @@ zix_hash_new(const ZixKeyFunc      key_func,
   hash->n_entries  = min_n_entries;
   hash->mask       = hash->n_entries - 1u;
 
-  hash->entries = (ZixHashEntry*)calloc(hash->n_entries, sizeof(ZixHashEntry));
+  hash->entries =
+    (ZixHashEntry*)zix_calloc(allocator, hash->n_entries, sizeof(ZixHashEntry));
+
   if (!hash->entries) {
-    free(hash);
+    zix_free(allocator, hash);
     return NULL;
   }
 
@@ -73,8 +77,8 @@ void
 zix_hash_free(ZixHash* const hash)
 {
   if (hash) {
-    free(hash->entries);
-    free(hash);
+    zix_free(hash->allocator, hash->entries);
+    zix_free(hash->allocator, hash);
   }
 }
 
@@ -173,7 +177,9 @@ rehash(ZixHash* const hash, const size_t old_n_entries)
   const size_t        new_n_entries = hash->n_entries;
 
   // Replace the array in the hash first so we can use find_entry() normally
-  hash->entries = (ZixHashEntry*)calloc(new_n_entries, sizeof(ZixHashEntry));
+  hash->entries = (ZixHashEntry*)zix_calloc(
+    hash->allocator, new_n_entries, sizeof(ZixHashEntry));
+
   if (!hash->entries) {
     return ZIX_STATUS_NO_MEM;
   }
@@ -191,7 +197,7 @@ rehash(ZixHash* const hash, const size_t old_n_entries)
     }
   }
 
-  free(old_entries);
+  zix_free(hash->allocator, old_entries);
   return ZIX_STATUS_SUCCESS;
 }
 

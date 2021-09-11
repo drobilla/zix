@@ -44,11 +44,12 @@
 #endif
 
 struct ZixRingImpl {
-  uint32_t write_head; ///< Read index into buf
-  uint32_t read_head;  ///< Write index into buf
-  uint32_t size;       ///< Size (capacity) in bytes
-  uint32_t size_mask;  ///< Mask for fast modulo
-  char*    buf;        ///< Contents
+  const ZixAllocator* allocator;  ///< User allocator
+  uint32_t            write_head; ///< Read index into buf
+  uint32_t            read_head;  ///< Write index into buf
+  uint32_t            size;       ///< Size (capacity) in bytes
+  uint32_t            size_mask;  ///< Mask for fast modulo
+  char*               buf;        ///< Contents
 };
 
 static inline uint32_t
@@ -66,14 +67,23 @@ next_power_of_two(uint32_t size)
 }
 
 ZixRing*
-zix_ring_new(uint32_t size)
+zix_ring_new(const ZixAllocator* const allocator, uint32_t size)
 {
-  ZixRing* ring    = (ZixRing*)malloc(sizeof(ZixRing));
-  ring->write_head = 0;
-  ring->read_head  = 0;
-  ring->size       = next_power_of_two(size);
-  ring->size_mask  = ring->size - 1;
-  ring->buf        = (char*)malloc(ring->size);
+  ZixRing* ring = (ZixRing*)zix_malloc(allocator, sizeof(ZixRing));
+
+  if (ring) {
+    ring->allocator  = allocator;
+    ring->write_head = 0;
+    ring->read_head  = 0;
+    ring->size       = next_power_of_two(size);
+    ring->size_mask  = ring->size - 1;
+
+    if (!(ring->buf = (char*)zix_malloc(allocator, ring->size))) {
+      zix_free(allocator, ring);
+      return NULL;
+    }
+  }
+
   return ring;
 }
 
@@ -81,8 +91,8 @@ void
 zix_ring_free(ZixRing* ring)
 {
   if (ring) {
-    free(ring->buf);
-    free(ring);
+    zix_free(ring->allocator, ring->buf);
+    zix_free(ring->allocator, ring);
   }
 }
 

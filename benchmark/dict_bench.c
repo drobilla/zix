@@ -139,8 +139,10 @@ main(int argc, char** argv)
     printf("Benchmarking n = %zu\n", n);
     GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-    ZixHash* zhash = zix_hash_new(
-      identity, (ZixHashFunc)zix_chunk_hash, (ZixEqualFunc)zix_chunk_equal);
+    ZixHash* zhash = zix_hash_new(NULL,
+                                  identity,
+                                  (ZixHashFunc)zix_chunk_hash,
+                                  (ZixEqualFunc)zix_chunk_equal);
 
     fprintf(insert_dat, "%zu", n);
     fprintf(search_dat, "%zu", n);

@@ -136,7 +136,7 @@ no_destroy(void* const ptr, const void* const user_data)
 static void
 test_clear(void)
 {
-  ZixBTree* t = zix_btree_new(int_cmp, NULL);
+  ZixBTree* t = zix_btree_new(NULL, int_cmp, NULL);
 
   for (uintptr_t r = 0u; r < n_clear_insertions; ++r) {
     assert(!zix_btree_insert(t, (void*)(r + 1u)));
@@ -151,7 +151,7 @@ test_clear(void)
 static void
 test_free(void)
 {
-  ZixBTree* t = zix_btree_new(int_cmp, NULL);
+  ZixBTree* t = zix_btree_new(NULL, int_cmp, NULL);
 
   for (uintptr_t r = 0u; r < n_clear_insertions; ++r) {
     assert(!zix_btree_insert(t, (void*)(r + 1u)));
@@ -167,7 +167,7 @@ test_iter_comparison(void)
 {
   static const size_t n_elems = 4096u;
 
-  ZixBTree* const t = zix_btree_new(int_cmp, NULL);
+  ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
   // Store increasing numbers from 1 (jammed into the pointers themselves)
   for (uintptr_t r = 1u; r < n_elems; ++r) {
@@ -211,7 +211,7 @@ test_insert_split_value(void)
   static const size_t    n_insertions = 767u; // Number of insertions to split
   static const uintptr_t split_value  = 512u; // Value that will be pulled up
 
-  ZixBTree* const t = zix_btree_new(int_cmp, NULL);
+  ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
   // Insert right up until it would cause a split
   for (uintptr_t r = 1u; r < n_insertions; ++r) {
@@ -235,7 +235,7 @@ test_remove_cases(void)
   static const uintptr_t s2           = 255u;
   static const size_t    n_insertions = s1 * s2 * 1000u;
 
-  ZixBTree* const t = zix_btree_new(int_cmp, NULL);
+  ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
   // Insert in s1-sized chunks
   for (uintptr_t phase = 0u; phase < s1; ++phase) {
@@ -270,7 +270,7 @@ stress(const unsigned test_num, const size_t n_elems)
   }
 
   uintptr_t r  = 0;
-  ZixBTree* t  = zix_btree_new(int_cmp, NULL);
+  ZixBTree* t  = zix_btree_new(NULL, int_cmp, NULL);
   ZixStatus st = ZIX_STATUS_SUCCESS;
 
   if (!t) {
@@ -554,7 +554,7 @@ stress(const unsigned test_num, const size_t n_elems)
   // Test lower_bound with wildcard comparator
 
   TestContext ctx = {test_num, n_elems};
-  if (!(t = zix_btree_new(wildcard_cmp, &ctx))) {
+  if (!(t = zix_btree_new(NULL, wildcard_cmp, &ctx))) {
     return test_fail(t, "Failed to allocate tree\n");
   }
 

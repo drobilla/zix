@@ -63,7 +63,7 @@ stress(unsigned test_num, size_t n_elems)
 {
   uintptr_t    r  = 0u;
   ZixTreeIter* ti = NULL;
-  ZixTree*     t  = zix_tree_new(true, int_cmp, NULL, NULL, NULL);
+  ZixTree*     t  = zix_tree_new(NULL, true, int_cmp, NULL, NULL, NULL);
 
   // Insert n_elems elements
   for (size_t i = 0; i < n_elems; ++i) {

@@ -17,6 +17,7 @@
 #ifndef ZIX_BTREE_H
 #define ZIX_BTREE_H
 
+#include "zix/allocator.h"
 #include "zix/attributes.h"
 #include "zix/common.h"
 
@@ -88,7 +89,9 @@ static const ZixBTreeIter zix_btree_end_iter = {
 */
 ZIX_API
 ZixBTree* ZIX_ALLOCATED
-zix_btree_new(ZixComparator ZIX_NONNULL cmp, const void* ZIX_NULLABLE cmp_data);
+zix_btree_new(const ZixAllocator* ZIX_NULLABLE allocator,
+              ZixComparator ZIX_NONNULL        cmp,
+              const void* ZIX_NULLABLE         cmp_data);
 
 /**
    Free `t` and all the nodes it contains.

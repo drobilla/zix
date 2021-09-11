@@ -137,7 +137,7 @@ main(int argc, char** argv)
          MSG_SIZE,
          size);
 
-  ring = zix_ring_new(size);
+  ring = zix_ring_new(NULL, size);
   assert(ring);
   if (zix_ring_read_space(ring) != 0) {
     return failure("New ring is not empty\n");

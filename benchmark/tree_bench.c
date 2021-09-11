@@ -90,7 +90,7 @@ bench_zix_tree(size_t n_elems,
 
   uintptr_t    r  = 0;
   ZixTreeIter* ti = NULL;
-  ZixTree*     t  = zix_tree_new(false, int_cmp, NULL, NULL, NULL);
+  ZixTree*     t  = zix_tree_new(NULL, false, int_cmp, NULL, NULL, NULL);
 
   // Insert n_elems elements
   struct timespec insert_start = bench_start();
@@ -157,7 +157,7 @@ bench_zix_btree(size_t n_elems,
 
   uintptr_t    r  = 0u;
   ZixBTreeIter ti = zix_btree_end_iter;
-  ZixBTree*    t  = zix_btree_new(int_cmp, NULL);
+  ZixBTree*    t  = zix_btree_new(NULL, int_cmp, NULL);
 
   // Insert n_elems elements
   struct timespec insert_start = bench_start();

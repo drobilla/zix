@@ -17,6 +17,7 @@
 #ifndef ZIX_HASH_H
 #define ZIX_HASH_H
 
+#include "zix/allocator.h"
 #include "zix/attributes.h"
 #include "zix/common.h"
 
@@ -133,9 +134,10 @@ typedef struct {
 */
 ZIX_API
 ZixHash* ZIX_ALLOCATED
-zix_hash_new(ZixKeyFunc ZIX_NONNULL      key_func,
-             ZixHashFunc ZIX_NONNULL     hash_func,
-             ZixKeyEqualFunc ZIX_NONNULL equal_func);
+zix_hash_new(const ZixAllocator* ZIX_NULLABLE allocator,
+             ZixKeyFunc ZIX_NONNULL           key_func,
+             ZixHashFunc ZIX_NONNULL          hash_func,
+             ZixKeyEqualFunc ZIX_NONNULL      equal_func);
 
 /// Free `hash`
 ZIX_API

@@ -172,6 +172,7 @@ endif
 #
 
 sources = [
+  'src/allocator.c',
   'src/bitset.c',
   'src/btree.c',
   'src/digest.c',
@@ -226,6 +227,7 @@ install_headers(headers, subdir: versioned_name / 'zix')
 #
 
 tests = [
+  'allocator_test',
   'bitset_test',
   'btree_test',
   'digest_test',

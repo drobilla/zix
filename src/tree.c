@@ -19,19 +19,19 @@
 #include "zix/common.h"
 
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
 
 typedef struct ZixTreeNodeImpl ZixTreeNode;
 
 struct ZixTreeImpl {
-  ZixTreeNode*   root;
-  ZixDestroyFunc destroy;
-  const void*    destroy_user_data;
-  ZixComparator  cmp;
-  void*          cmp_data;
-  size_t         size;
-  bool           allow_duplicates;
+  const ZixAllocator* allocator;
+  ZixTreeNode*        root;
+  ZixDestroyFunc      destroy;
+  const void*         destroy_user_data;
+  ZixComparator       cmp;
+  void*               cmp_data;
+  size_t              size;
+  bool                allow_duplicates;
 };
 
 struct ZixTreeNodeImpl {
@@ -67,20 +67,26 @@ struct ZixTreeNodeImpl {
 #endif
 
 ZixTree*
-zix_tree_new(bool           allow_duplicates,
-             ZixComparator  cmp,
-             void*          cmp_data,
-             ZixDestroyFunc destroy,
-             const void*    destroy_user_data)
+zix_tree_new(const ZixAllocator* const allocator,
+             bool                      allow_duplicates,
+             ZixComparator             cmp,
+             void*                     cmp_data,
+             ZixDestroyFunc            destroy,
+             const void*               destroy_user_data)
 {
-  ZixTree* t           = (ZixTree*)malloc(sizeof(ZixTree));
-  t->root              = NULL;
-  t->destroy           = destroy;
-  t->destroy_user_data = destroy_user_data;
-  t->cmp               = cmp;
-  t->cmp_data          = cmp_data;
-  t->size              = 0;
-  t->allow_duplicates  = allow_duplicates;
+  ZixTree* t = (ZixTree*)zix_malloc(allocator, sizeof(ZixTree));
+
+  if (t) {
+    t->allocator         = allocator;
+    t->root              = NULL;
+    t->destroy           = destroy;
+    t->destroy_user_data = destroy_user_data;
+    t->cmp               = cmp;
+    t->cmp_data          = cmp_data;
+    t->size              = 0;
+    t->allow_duplicates  = allow_duplicates;
+  }
+
   return t;
 }
 
@@ -93,7 +99,8 @@ zix_tree_free_rec(ZixTree* t, ZixTreeNode* n)
     if (t->destroy) {
       t->destroy(n->data, t->destroy_user_data);
     }
-    free(n);
+
+    zix_free(t->allocator, n);
   }
 }
 
@@ -102,7 +109,7 @@ zix_tree_free(ZixTree* t)
 {
   if (t) {
     zix_tree_free_rec(t, t->root);
-    free(t);
+    zix_free(t->allocator, t);
   }
 }
 
@@ -370,7 +377,7 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
   }
 
   // Allocate a new node n
-  if (!(n = (ZixTreeNode*)malloc(sizeof(ZixTreeNode)))) {
+  if (!(n = (ZixTreeNode*)zix_malloc(t->allocator, sizeof(ZixTreeNode)))) {
     return ZIX_STATUS_NO_MEM;
   }
   memset(n, '\0', sizeof(ZixTreeNode));
@@ -456,7 +463,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
     if (t->destroy) {
       t->destroy(n->data, t->destroy_user_data);
     }
-    free(n);
+    zix_free(t->allocator, n);
     --t->size;
     assert(t->size == 0);
     return ZIX_STATUS_SUCCESS;
@@ -588,7 +595,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
   if (t->destroy) {
     t->destroy(n->data, t->destroy_user_data);
   }
-  free(n);
+  zix_free(t->allocator, n);
 
   --t->size;
 

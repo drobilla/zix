@@ -132,7 +132,7 @@ string_equal(const char* const a, const char* const b)
 static int
 stress_with(const ZixHashFunc hash_func, const size_t n_elems)
 {
-  ZixHash* hash = zix_hash_new(identity, hash_func, string_equal);
+  ZixHash* hash = zix_hash_new(NULL, identity, hash_func, string_equal);
   if (!hash) {
     return test_fail("Failed to allocate hash\n");
   }
@@ -336,8 +336,9 @@ test_all_tombstones(void)
     "3 b",
   };
 
-  ZixStatus st   = ZIX_STATUS_SUCCESS;
-  ZixHash*  hash = zix_hash_new(identity, identity_index_hash, string_equal);
+  ZixStatus st = ZIX_STATUS_SUCCESS;
+  ZixHash*  hash =
+    zix_hash_new(NULL, identity, identity_index_hash, string_equal);
 
   // Insert each element then immediately remove it
   for (unsigned i = 0u; i < N_STRINGS; ++i) {
