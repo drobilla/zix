@@ -234,6 +234,7 @@ tests = [
   'hash_test',
   'ring_test',
   'sem_test',
+  'strerror_test',
   'tree_test',
 ]
 
