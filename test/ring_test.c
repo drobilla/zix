@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MSG_SIZE 20
+#define MSG_SIZE 20u
 
 static ZixRing* ring       = 0;
 static unsigned n_writes   = 0;
@@ -46,7 +46,7 @@ failure(const char* fmt, ...)
 static int
 gen_msg(int* msg, int start)
 {
-  for (int i = 0; i < MSG_SIZE; ++i) {
+  for (unsigned i = 0u; i < MSG_SIZE; ++i) {
     msg[i] = start;
     start  = (start + 1) % INT_MAX;
   }
@@ -56,9 +56,9 @@ gen_msg(int* msg, int start)
 static int
 cmp_msg(int* msg1, int* msg2)
 {
-  for (int i = 0; i < MSG_SIZE; ++i) {
+  for (unsigned i = 0u; i < MSG_SIZE; ++i) {
     if (msg1[i] != msg2[i]) {
-      return !failure("%d != %d @ %d\n", msg1[i], msg2[i], i);
+      return !failure("%d != %d @ %u\n", msg1[i], msg2[i], i);
     }
   }
 
@@ -131,7 +131,7 @@ main(int argc, char** argv)
 
   zix_ring_free(NULL);
 
-  printf("Testing %u writes of %d ints to a %u int ring...\n",
+  printf("Testing %u writes of %u ints to a %u int ring...\n",
          n_writes,
          MSG_SIZE,
          size);

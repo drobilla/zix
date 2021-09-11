@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#define N_BITS 256
+#define N_BITS 256u
 #define N_ELEMS (ZIX_BITSET_ELEMS(N_BITS))
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
