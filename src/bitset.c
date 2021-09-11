@@ -45,28 +45,24 @@ zix_bitset_clear(ZixBitset* b, ZixBitsetTally* t, size_t n_bits)
 void
 zix_bitset_set(ZixBitset* b, ZixBitsetTally* t, size_t i)
 {
-  const size_t    e    = i / ZIX_BITSET_ELEM_BIT;
-  const size_t    ebit = i & (ZIX_BITSET_ELEM_BIT - 1); // i % ELEM_BIT
-  const ZixBitset mask = (ZixBitset)1 << ebit;
+  const size_t    e      = i / ZIX_BITSET_ELEM_BIT;
+  const size_t    ebit   = i & (ZIX_BITSET_ELEM_BIT - 1); // i % ELEM_BIT
+  const ZixBitset mask   = (ZixBitset)1 << ebit;
+  const bool      is_set = (b[e] & mask);
 
-  if (!(b[e] & mask)) {
-    ++t[e];
-  }
-
+  t[e] = (ZixBitsetTally)(t[e] + !is_set);
   b[e] |= mask;
 }
 
 void
 zix_bitset_reset(ZixBitset* b, ZixBitsetTally* t, size_t i)
 {
-  const size_t    e    = i / ZIX_BITSET_ELEM_BIT;
-  const size_t    ebit = i & (ZIX_BITSET_ELEM_BIT - 1); // i % ELEM_BIT
-  const ZixBitset mask = (ZixBitset)1 << ebit;
+  const size_t    e      = i / ZIX_BITSET_ELEM_BIT;
+  const size_t    ebit   = i & (ZIX_BITSET_ELEM_BIT - 1); // i % ELEM_BIT
+  const ZixBitset mask   = (ZixBitset)1 << ebit;
+  const bool      is_set = b[e] & mask;
 
-  if (b[e] & mask) {
-    --t[e];
-  }
-
+  t[e] = (ZixBitsetTally)(t[e] - is_set);
   b[e] &= ~mask;
 }
 
