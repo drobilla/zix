@@ -203,6 +203,25 @@ test_iter_comparison(void)
   zix_btree_free(t, NULL);
 }
 
+static void
+test_insert_split_value(void)
+{
+  static const size_t    n_insertions = 767u; // Number of insertions to split
+  static const uintptr_t split_value  = 512u; // Value that will be pulled up
+
+  ZixBTree* const t = zix_btree_new(int_cmp, NULL);
+
+  // Insert right up until it would cause a split
+  for (uintptr_t r = 1u; r < n_insertions; ++r) {
+    assert(!zix_btree_insert(t, (void*)r));
+  }
+
+  // Insert the element that will be chosen as the split pivot
+  assert(zix_btree_insert(t, (void*)split_value) == ZIX_STATUS_EXISTS);
+
+  zix_btree_free(t, NULL);
+}
+
 static int
 stress(const unsigned test_num, const size_t n_elems)
 {
@@ -557,6 +576,7 @@ main(int argc, char** argv)
   test_clear();
   test_free();
   test_iter_comparison();
+  test_insert_split_value();
 
   const unsigned n_tests = 3u;
   const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 524288u;
