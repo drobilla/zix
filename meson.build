@@ -244,7 +244,7 @@ if get_option('tests')
 
   foreach test : tests
     c_args = []
-    sources = ['test/@0@.c'.format(test)]
+    sources = files('test/@0@.c'.format(test), 'test/failing_allocator.c')
 
     if get_option('test_malloc') and host_machine.system() != 'windows'
       sources += ['test/test_malloc.c']

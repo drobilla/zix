@@ -1,5 +1,5 @@
 /*
-  Copyright 2011-2020 David Robillard <d@drobilla.net>
+  Copyright 2011-2021 David Robillard <d@drobilla.net>
 
   Permission to use, copy, modify, and/or distribute this software for any
   purpose with or without fee is hereby granted, provided that the above
@@ -14,6 +14,11 @@
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
+#undef NDEBUG
+
+#include "failing_allocator.h"
+
+#include "zix/allocator.h"
 #include "zix/attributes.h"
 #include "zix/ring.h"
 #include "zix/thread.h"
@@ -112,24 +117,9 @@ writer(void* ZIX_UNUSED(arg))
   return NULL;
 }
 
-int
-main(int argc, char** argv)
+static int
+test_ring(const unsigned size)
 {
-  if (argc > 1 && argv[1][0] == '-') {
-    printf("Usage: %s SIZE N_WRITES\n", argv[0]);
-    return 1;
-  }
-
-  unsigned size = 1024;
-  if (argc > 1) {
-    size = (unsigned)strtoul(argv[1], NULL, 10);
-  }
-
-  n_writes = size * 1024;
-  if (argc > 2) {
-    n_writes = (unsigned)strtoul(argv[2], NULL, 10);
-  }
-
   zix_ring_free(NULL);
 
   printf("Testing %u writes of %u ints to a %u int ring...\n",
@@ -237,5 +227,48 @@ main(int argc, char** argv)
 
   free(big_buf);
   zix_ring_free(ring);
+  return 0;
+}
+
+static void
+test_failed_alloc(void)
+{
+  ZixFailingAllocatorState state     = {0u, SIZE_MAX};
+  ZixAllocator             allocator = zix_failing_allocator(&state);
+
+  // Successfully allocate a ring to count the number of allocations
+  ring = zix_ring_new(&allocator, 512);
+  assert(ring);
+
+  // Test that each allocation failing is handled gracefully
+  const size_t n_new_allocs = state.n_allocations;
+  for (size_t i = 0u; i < n_new_allocs; ++i) {
+    state.n_remaining = i;
+    assert(!zix_ring_new(&allocator, 512));
+  }
+
+  zix_ring_free(ring);
+}
+
+int
+main(int argc, char** argv)
+{
+  if (argc > 1 && argv[1][0] == '-') {
+    printf("Usage: %s SIZE N_WRITES\n", argv[0]);
+    return 1;
+  }
+
+  unsigned size = 1024;
+  if (argc > 1) {
+    size = (unsigned)strtoul(argv[1], NULL, 10);
+  }
+
+  n_writes = size * 1024;
+  if (argc > 2) {
+    n_writes = (unsigned)strtoul(argv[2], NULL, 10);
+  }
+
+  test_failed_alloc();
+  test_ring(size);
   return 0;
 }
