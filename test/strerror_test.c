@@ -3,7 +3,6 @@
 
 #undef NDEBUG
 
-#include "zix/attributes.h"
 #include "zix/common.h"
 
 #include <assert.h>
