@@ -163,13 +163,16 @@ rehash(ZixHash* const hash, const size_t old_n_entries)
   ZixHashEntry* const old_entries   = hash->entries;
   const size_t        new_n_entries = hash->n_entries;
 
-  // Replace the array in the hash first so we can use find_entry() normally
-  hash->entries = (ZixHashEntry*)zix_calloc(
+  // Allocate a new entries array
+  ZixHashEntry* const new_entries = (ZixHashEntry*)zix_calloc(
     hash->allocator, new_n_entries, sizeof(ZixHashEntry));
 
-  if (!hash->entries) {
+  if (!new_entries) {
     return ZIX_STATUS_NO_MEM;
   }
+
+  // Replace the array in the hash first so we can use find_entry() normally
+  hash->entries = new_entries;
 
   // Reinsert every element into the new array
   for (size_t i = 0u; i < old_n_entries; ++i) {
@@ -192,11 +195,18 @@ static ZixStatus
 grow(ZixHash* const hash)
 {
   const size_t old_n_entries = hash->n_entries;
+  const size_t old_mask      = hash->mask;
 
   hash->n_entries <<= 1u;
   hash->mask = hash->n_entries - 1u;
 
-  return rehash(hash, old_n_entries);
+  const ZixStatus st = rehash(hash, old_n_entries);
+  if (st) {
+    hash->n_entries = old_n_entries;
+    hash->mask      = old_mask;
+  }
+
+  return st;
 }
 
 static ZixStatus
@@ -307,17 +317,24 @@ zix_hash_insert_at(ZixHash* const          hash,
   }
 
   // Set entry to new value
-  ZixHashEntry* const entry = &hash->entries[position.index];
+  ZixHashEntry* const entry      = &hash->entries[position.index];
+  const ZixHashEntry  orig_entry = *entry;
   assert(!entry->value);
   entry->hash  = position.code;
   entry->value = record;
 
   // Update size and rehash if we exceeded the maximum load
-  const size_t max_load = hash->n_entries / 2u + hash->n_entries / 8u;
-  if (++hash->count >= max_load) {
-    return grow(hash);
+  const size_t max_load  = hash->n_entries / 2u + hash->n_entries / 8u;
+  const size_t new_count = hash->count + 1;
+  if (new_count >= max_load) {
+    const ZixStatus st = grow(hash);
+    if (st) {
+      *entry = orig_entry;
+      return st;
+    }
   }
 
+  hash->count = new_count;
   return ZIX_STATUS_SUCCESS;
 }
 
