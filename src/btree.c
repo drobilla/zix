@@ -25,11 +25,11 @@ typedef uint16_t ZixShort;
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2u)
 
 struct ZixBTreeImpl {
-  const ZixAllocator* allocator;
-  ZixBTreeNode*       root;
-  ZixComparator       cmp;
-  const void*         cmp_data;
-  size_t              size;
+  ZixAllocator* allocator;
+  ZixBTreeNode* root;
+  ZixComparator cmp;
+  const void*   cmp_data;
+  size_t        size;
 };
 
 struct ZixBTreeNodeImpl {
@@ -57,7 +57,7 @@ static_assert(sizeof(ZixBTreeNode) >=
 #endif
 
 static ZixBTreeNode*
-zix_btree_node_new(const ZixAllocator* const allocator, const bool leaf)
+zix_btree_node_new(ZixAllocator* const allocator, const bool leaf)
 {
 #if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112l) || \
       (defined(__cplusplus) && __cplusplus >= 201103L))
@@ -87,9 +87,9 @@ zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 }
 
 ZixBTree*
-zix_btree_new(const ZixAllocator* const allocator,
-              const ZixComparator       cmp,
-              const void* const         cmp_data)
+zix_btree_new(ZixAllocator* const allocator,
+              const ZixComparator cmp,
+              const void* const   cmp_data)
 {
   assert(cmp);
 
@@ -203,10 +203,10 @@ zix_btree_aerase(void** const array, const unsigned n, const unsigned i)
 
 /// Split lhs, the i'th child of `n`, into two nodes
 static ZixBTreeNode*
-zix_btree_split_child(const ZixAllocator* const allocator,
-                      ZixBTreeNode* const       n,
-                      const unsigned            i,
-                      ZixBTreeNode* const       lhs)
+zix_btree_split_child(ZixAllocator* const allocator,
+                      ZixBTreeNode* const n,
+                      const unsigned      i,
+                      ZixBTreeNode* const lhs)
 {
   assert(lhs->n_vals == zix_btree_max_vals(lhs));
   assert(n->n_vals < ZIX_BTREE_INODE_VALS);

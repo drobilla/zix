@@ -10,11 +10,12 @@
 
 /// An allocator that fails after some number of successes for testing
 typedef struct {
-  size_t n_allocations; ///< The number of allocations that have been attempted
-  size_t n_remaining;   ///< The number of remaining successful allocations
-} ZixFailingAllocatorState;
+  ZixAllocator base;          ///< Base allocator instance
+  size_t       n_allocations; ///< Number of attempted allocations
+  size_t       n_remaining;   ///< Number of remaining successful allocations
+} ZixFailingAllocator;
 
-ZixAllocator
-zix_failing_allocator(ZixFailingAllocatorState* state);
+ZixFailingAllocator
+zix_failing_allocator(void);
 
 #endif // ZIX_FAILING_ALLOCATOR_H

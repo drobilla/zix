@@ -161,18 +161,17 @@ test_ring(const unsigned size)
 static void
 test_failed_alloc(void)
 {
-  ZixFailingAllocatorState state     = {0u, SIZE_MAX};
-  ZixAllocator             allocator = zix_failing_allocator(&state);
+  ZixFailingAllocator allocator = zix_failing_allocator();
 
   // Successfully allocate a ring to count the number of allocations
-  ring = zix_ring_new(&allocator, 512);
+  ring = zix_ring_new(&allocator.base, 512);
   assert(ring);
 
   // Test that each allocation failing is handled gracefully
-  const size_t n_new_allocs = state.n_allocations;
+  const size_t n_new_allocs = allocator.n_allocations;
   for (size_t i = 0u; i < n_new_allocs; ++i) {
-    state.n_remaining = i;
-    assert(!zix_ring_new(&allocator, 512));
+    allocator.n_remaining = i;
+    assert(!zix_ring_new(&allocator.base, 512));
   }
 
   zix_ring_free(ring);

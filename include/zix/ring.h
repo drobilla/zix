@@ -36,7 +36,7 @@ typedef struct ZixRingImpl ZixRing;
 */
 ZIX_MALLOC_API
 ZixRing* ZIX_ALLOCATED
-zix_ring_new(const ZixAllocator* ZIX_NULLABLE allocator, uint32_t size);
+zix_ring_new(ZixAllocator* ZIX_NULLABLE allocator, uint32_t size);
 
 /// Destroy a ring
 ZIX_API

@@ -31,12 +31,12 @@
 #endif
 
 struct ZixRingImpl {
-  const ZixAllocator* allocator;  ///< User allocator
-  uint32_t            write_head; ///< Read index into buf
-  uint32_t            read_head;  ///< Write index into buf
-  uint32_t            size;       ///< Size (capacity) in bytes
-  uint32_t            size_mask;  ///< Mask for fast modulo
-  char*               buf;        ///< Contents
+  ZixAllocator* allocator;  ///< User allocator
+  uint32_t      write_head; ///< Read index into buf
+  uint32_t      read_head;  ///< Write index into buf
+  uint32_t      size;       ///< Size (capacity) in bytes
+  uint32_t      size_mask;  ///< Mask for fast modulo
+  char*         buf;        ///< Contents
 };
 
 static inline uint32_t
@@ -54,7 +54,7 @@ next_power_of_two(uint32_t size)
 }
 
 ZixRing*
-zix_ring_new(const ZixAllocator* const allocator, uint32_t size)
+zix_ring_new(ZixAllocator* const allocator, uint32_t size)
 {
   ZixRing* ring = (ZixRing*)zix_malloc(allocator, sizeof(ZixRing));
 

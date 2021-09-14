@@ -19,8 +19,16 @@ extern "C" {
    @{
 */
 
-/// Opaque user data for allocation functions
-typedef void ZixAllocatorHandle;
+/**
+   A memory allocator.
+
+   This object-like structure provides an interface like the standard C
+   functions malloc(), calloc(), realloc(), and free().  It contains function
+   pointers that differ from their standard counterparts by taking a context
+   parameter (a pointer to this struct), which allows the user to implement
+   custom stateful allocators.
+*/
+typedef struct ZixAllocatorImpl ZixAllocator;
 
 /**
    General malloc-like memory allocation function.
@@ -29,7 +37,7 @@ typedef void ZixAllocatorHandle;
    parameter for implementing stateful allocators without static data.
 */
 typedef void* ZIX_ALLOCATED (
-  *ZixMallocFunc)(ZixAllocatorHandle* ZIX_NULLABLE handle, size_t size);
+  *ZixMallocFunc)(ZixAllocator* ZIX_NULLABLE allocator, size_t size);
 
 /**
    General calloc-like memory allocation function.
@@ -37,8 +45,8 @@ typedef void* ZIX_ALLOCATED (
    This works like the standard C calloc(), except has an additional handle
    parameter for implementing stateful allocators without static data.
 */
-typedef void* ZIX_ALLOCATED (*ZixCallocFunc)(ZixAllocatorHandle* ZIX_NULLABLE
-                                                    handle,
+typedef void* ZIX_ALLOCATED (*ZixCallocFunc)(ZixAllocator* ZIX_NULLABLE
+                                                    allocator,
                                              size_t nmemb,
                                              size_t size);
 
@@ -48,8 +56,8 @@ typedef void* ZIX_ALLOCATED (*ZixCallocFunc)(ZixAllocatorHandle* ZIX_NULLABLE
    This works like the standard C remalloc(), except has an additional handle
    parameter for implementing stateful allocators without static data.
 */
-typedef void* ZIX_ALLOCATED (*ZixReallocFunc)(ZixAllocatorHandle* ZIX_NULLABLE
-                                                                 handle,
+typedef void* ZIX_ALLOCATED (*ZixReallocFunc)(ZixAllocator* ZIX_NULLABLE
+                                                                 allocator,
                                               void* ZIX_NULLABLE ptr,
                                               size_t             size);
 
@@ -59,72 +67,61 @@ typedef void* ZIX_ALLOCATED (*ZixReallocFunc)(ZixAllocatorHandle* ZIX_NULLABLE
    This works like the standard C remalloc(), except has an additional handle
    parameter for implementing stateful allocators without static data.
 */
-typedef void (*ZixFreeFunc)(ZixAllocatorHandle* ZIX_NULLABLE handle,
-                            void* ZIX_NULLABLE               ptr);
+typedef void (*ZixFreeFunc)(ZixAllocator* ZIX_NULLABLE allocator,
+                            void* ZIX_NULLABLE         ptr);
 
-/**
-   A memory allocator.
-
-   This object-like structure provides an interface like the standard C
-   functions malloc(), calloc(), realloc(), and free().  It allows the user to
-   pass a custom allocator to be used by data structures.
-*/
-typedef struct {
-  ZixAllocatorHandle* ZIX_NULLABLE handle;
-  ZixMallocFunc ZIX_NONNULL        malloc;
-  ZixCallocFunc ZIX_NONNULL        calloc;
-  ZixReallocFunc ZIX_NONNULL       realloc;
-  ZixFreeFunc ZIX_NONNULL          free;
-} ZixAllocator;
+/// Definition of ZixAllocator
+struct ZixAllocatorImpl {
+  ZixMallocFunc ZIX_NONNULL  malloc;
+  ZixCallocFunc ZIX_NONNULL  calloc;
+  ZixReallocFunc ZIX_NONNULL realloc;
+  ZixFreeFunc ZIX_NONNULL    free;
+};
 
 /// Return the default allocator which simply uses the system allocator
 ZIX_CONST_API
-const ZixAllocator* ZIX_NONNULL
+ZixAllocator* ZIX_NONNULL
 zix_default_allocator(void);
 
 /// Convenience wrapper that defers to malloc() if allocator is null
 static inline void* ZIX_ALLOCATED
-zix_malloc(const ZixAllocator* const ZIX_NULLABLE allocator, const size_t size)
+zix_malloc(ZixAllocator* const ZIX_NULLABLE allocator, const size_t size)
 {
-  const ZixAllocator* const actual =
-    allocator ? allocator : zix_default_allocator();
+  ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
 
-  return actual->malloc(actual->handle, size);
+  return actual->malloc(actual, size);
 }
 
 /// Convenience wrapper that defers to calloc() if allocator is null
 static inline void* ZIX_ALLOCATED
-zix_calloc(const ZixAllocator* const ZIX_NULLABLE allocator,
-           const size_t                           nmemb,
-           const size_t                           size)
+zix_calloc(ZixAllocator* const ZIX_NULLABLE allocator,
+           const size_t                     nmemb,
+           const size_t                     size)
 {
-  const ZixAllocator* const actual =
-    allocator ? allocator : zix_default_allocator();
+  ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
 
-  return actual->calloc(actual->handle, nmemb, size);
+  return actual->calloc(actual, nmemb, size);
 }
 
 /// Convenience wrapper that defers to realloc() if allocator is null
 static inline void* ZIX_ALLOCATED
-zix_realloc(const ZixAllocator* const ZIX_NULLABLE allocator,
-            void* const ZIX_NULLABLE               ptr,
-            const size_t                           size)
+zix_realloc(ZixAllocator* const ZIX_NULLABLE allocator,
+            void* const ZIX_NULLABLE         ptr,
+            const size_t                     size)
 {
-  const ZixAllocator* const actual =
-    allocator ? allocator : zix_default_allocator();
+  ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
 
-  return actual->realloc(actual->handle, ptr, size);
+  return actual->realloc(actual, ptr, size);
 }
 
 /// Convenience wrapper that defers to free() if allocator is null
 static inline void
-zix_free(const ZixAllocator* const ZIX_NULLABLE allocator,
-         void* const ZIX_NULLABLE               ptr)
+zix_free(ZixAllocator* const ZIX_NULLABLE allocator,
+         void* const ZIX_NULLABLE         ptr)
 {
-  const ZixAllocator* const actual =
-    allocator ? allocator : zix_default_allocator();
+  ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
 
-  actual->free(actual->handle, ptr);
+  actual->free(actual, ptr);
 }
 
 /**

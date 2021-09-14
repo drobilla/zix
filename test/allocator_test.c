@@ -12,7 +12,7 @@ test_allocator(void)
 {
   // Just a basic smoke test to check that things seem to be working
 
-  const ZixAllocator* const allocator = zix_default_allocator();
+  ZixAllocator* const allocator = zix_default_allocator();
 
   char* const malloced = (char*)zix_malloc(allocator, 4);
   malloced[0]          = 0;

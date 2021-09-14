@@ -121,10 +121,10 @@ typedef struct {
 */
 ZIX_API
 ZixHash* ZIX_ALLOCATED
-zix_hash_new(const ZixAllocator* ZIX_NULLABLE allocator,
-             ZixKeyFunc ZIX_NONNULL           key_func,
-             ZixHashFunc ZIX_NONNULL          hash_func,
-             ZixKeyEqualFunc ZIX_NONNULL      equal_func);
+zix_hash_new(ZixAllocator* ZIX_NULLABLE  allocator,
+             ZixKeyFunc ZIX_NONNULL      key_func,
+             ZixHashFunc ZIX_NONNULL     hash_func,
+             ZixKeyEqualFunc ZIX_NONNULL equal_func);
 
 /// Free `hash`
 ZIX_API

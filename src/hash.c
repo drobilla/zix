@@ -13,24 +13,24 @@ typedef struct ZixHashEntry {
 } ZixHashEntry;
 
 struct ZixHashImpl {
-  const ZixAllocator* allocator;  ///< User allocator
-  ZixKeyFunc          key_func;   ///< User key accessor
-  ZixHashFunc         hash_func;  ///< User hashing function
-  ZixKeyEqualFunc     equal_func; ///< User equality comparison function
-  size_t              count;      ///< Number of records stored in the table
-  size_t              mask;       ///< Bit mask for fast modulo (n_entries - 1)
-  size_t              n_entries;  ///< Power of two table size
-  ZixHashEntry*       entries;    ///< Pointer to dynamically allocated table
+  ZixAllocator*   allocator;  ///< User allocator
+  ZixKeyFunc      key_func;   ///< User key accessor
+  ZixHashFunc     hash_func;  ///< User hashing function
+  ZixKeyEqualFunc equal_func; ///< User equality comparison function
+  size_t          count;      ///< Number of records stored in the table
+  size_t          mask;       ///< Bit mask for fast modulo (n_entries - 1)
+  size_t          n_entries;  ///< Power of two table size
+  ZixHashEntry*   entries;    ///< Pointer to dynamically allocated table
 };
 
 static const size_t min_n_entries = 4u;
 static const size_t tombstone     = 0xDEADu;
 
 ZixHash*
-zix_hash_new(const ZixAllocator* const allocator,
-             const ZixKeyFunc          key_func,
-             const ZixHashFunc         hash_func,
-             const ZixKeyEqualFunc     equal_func)
+zix_hash_new(ZixAllocator* const   allocator,
+             const ZixKeyFunc      key_func,
+             const ZixHashFunc     hash_func,
+             const ZixKeyEqualFunc equal_func)
 {
   assert(key_func);
   assert(hash_func);

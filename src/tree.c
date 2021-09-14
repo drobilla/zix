@@ -11,14 +11,14 @@
 typedef struct ZixTreeNodeImpl ZixTreeNode;
 
 struct ZixTreeImpl {
-  const ZixAllocator* allocator;
-  ZixTreeNode*        root;
-  ZixDestroyFunc      destroy;
-  const void*         destroy_user_data;
-  ZixComparator       cmp;
-  void*               cmp_data;
-  size_t              size;
-  bool                allow_duplicates;
+  ZixAllocator*  allocator;
+  ZixTreeNode*   root;
+  ZixDestroyFunc destroy;
+  const void*    destroy_user_data;
+  ZixComparator  cmp;
+  void*          cmp_data;
+  size_t         size;
+  bool           allow_duplicates;
 };
 
 struct ZixTreeNodeImpl {
@@ -54,12 +54,12 @@ struct ZixTreeNodeImpl {
 #endif
 
 ZixTree*
-zix_tree_new(const ZixAllocator* const allocator,
-             bool                      allow_duplicates,
-             ZixComparator             cmp,
-             void*                     cmp_data,
-             ZixDestroyFunc            destroy,
-             const void*               destroy_user_data)
+zix_tree_new(ZixAllocator* const allocator,
+             bool                allow_duplicates,
+             ZixComparator       cmp,
+             void*               cmp_data,
+             ZixDestroyFunc      destroy,
+             const void*         destroy_user_data)
 {
   ZixTree* t = (ZixTree*)zix_malloc(allocator, sizeof(ZixTree));
 

@@ -76,7 +76,7 @@ static const ZixBTreeIter zix_btree_end_iter = {
 */
 ZIX_API
 ZixBTree* ZIX_ALLOCATED
-zix_btree_new(const ZixAllocator* ZIX_NULLABLE allocator,
+zix_btree_new(ZixAllocator* ZIX_NULLABLE allocator,
               ZixComparator ZIX_NONNULL        cmp,
               const void* ZIX_NULLABLE         cmp_data);
 

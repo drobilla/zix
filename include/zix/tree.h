@@ -31,12 +31,12 @@ typedef struct ZixTreeNodeImpl ZixTreeIter;
 /// Create a new (empty) tree
 ZIX_API
 ZixTree* ZIX_ALLOCATED
-zix_tree_new(const ZixAllocator* ZIX_NULLABLE allocator,
-             bool                             allow_duplicates,
-             ZixComparator ZIX_NONNULL        cmp,
-             void* ZIX_NULLABLE               cmp_data,
-             ZixDestroyFunc ZIX_NULLABLE      destroy,
-             const void* ZIX_NULLABLE         destroy_user_data);
+zix_tree_new(ZixAllocator* ZIX_NULLABLE  allocator,
+             bool                        allow_duplicates,
+             ZixComparator ZIX_NONNULL   cmp,
+             void* ZIX_NULLABLE          cmp_data,
+             ZixDestroyFunc ZIX_NULLABLE destroy,
+             const void* ZIX_NULLABLE    destroy_user_data);
 
 /// Free `t`
 ZIX_API
