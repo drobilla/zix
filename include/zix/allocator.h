@@ -36,8 +36,9 @@ typedef struct ZixAllocatorImpl ZixAllocator;
    This works like the standard C malloc(), except has an additional handle
    parameter for implementing stateful allocators without static data.
 */
-typedef void* ZIX_ALLOCATED (
-  *ZixMallocFunc)(ZixAllocator* ZIX_NULLABLE allocator, size_t size);
+typedef void* ZIX_ALLOCATED (*ZixMallocFunc)( //
+  ZixAllocator* ZIX_NULLABLE allocator,
+  size_t                     size);
 
 /**
    General calloc-like memory allocation function.
@@ -45,10 +46,10 @@ typedef void* ZIX_ALLOCATED (
    This works like the standard C calloc(), except has an additional handle
    parameter for implementing stateful allocators without static data.
 */
-typedef void* ZIX_ALLOCATED (*ZixCallocFunc)(ZixAllocator* ZIX_NULLABLE
-                                                    allocator,
-                                             size_t nmemb,
-                                             size_t size);
+typedef void* ZIX_ALLOCATED (*ZixCallocFunc)( //
+  ZixAllocator* ZIX_NULLABLE allocator,
+  size_t                     nmemb,
+  size_t                     size);
 
 /**
    General realloc-like memory reallocation function.
@@ -56,10 +57,10 @@ typedef void* ZIX_ALLOCATED (*ZixCallocFunc)(ZixAllocator* ZIX_NULLABLE
    This works like the standard C remalloc(), except has an additional handle
    parameter for implementing stateful allocators without static data.
 */
-typedef void* ZIX_ALLOCATED (*ZixReallocFunc)(ZixAllocator* ZIX_NULLABLE
-                                                                 allocator,
-                                              void* ZIX_NULLABLE ptr,
-                                              size_t             size);
+typedef void* ZIX_ALLOCATED (*ZixReallocFunc)( //
+  ZixAllocator* ZIX_NULLABLE allocator,
+  void* ZIX_NULLABLE         ptr,
+  size_t                     size);
 
 /**
    General free-like memory deallocation function.
@@ -67,8 +68,9 @@ typedef void* ZIX_ALLOCATED (*ZixReallocFunc)(ZixAllocator* ZIX_NULLABLE
    This works like the standard C remalloc(), except has an additional handle
    parameter for implementing stateful allocators without static data.
 */
-typedef void (*ZixFreeFunc)(ZixAllocator* ZIX_NULLABLE allocator,
-                            void* ZIX_NULLABLE         ptr);
+typedef void (*ZixFreeFunc)( //
+  ZixAllocator* ZIX_NULLABLE allocator,
+  void* ZIX_NULLABLE         ptr);
 
 /// Definition of ZixAllocator
 struct ZixAllocatorImpl {
