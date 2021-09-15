@@ -1,12 +1,12 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2021 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
 
 #include "zix/btree.h"
 
+#include "failing_allocator.h"
 #include "test_data.h"
-#include "test_malloc.h"
 
 #include "zix/common.h"
 
@@ -250,14 +250,16 @@ test_remove_cases(void)
 }
 
 static int
-stress(const unsigned test_num, const size_t n_elems)
+stress(ZixAllocator* const allocator,
+       const unsigned      test_num,
+       const size_t        n_elems)
 {
   if (n_elems == 0) {
     return 0;
   }
 
   uintptr_t r  = 0;
-  ZixBTree* t  = zix_btree_new(NULL, int_cmp, NULL);
+  ZixBTree* t  = zix_btree_new(allocator, int_cmp, NULL);
   ZixStatus st = ZIX_STATUS_SUCCESS;
 
   if (!t) {
@@ -592,6 +594,22 @@ stress(const unsigned test_num, const size_t n_elems)
   return EXIT_SUCCESS;
 }
 
+static void
+test_failed_alloc(void)
+{
+  ZixFailingAllocator allocator = zix_failing_allocator();
+
+  // Successfully stress test the tree to count the number of allocations
+  assert(!stress(&allocator.base, 0, 4096));
+
+  // Test that each allocation failing is handled gracefully
+  const size_t n_new_allocs = allocator.n_allocations;
+  for (size_t i = 0u; i < n_new_allocs; ++i) {
+    allocator.n_remaining = i;
+    assert(stress(&allocator.base, 0, 4096));
+  }
+}
+
 int
 main(int argc, char** argv)
 {
@@ -605,6 +623,7 @@ main(int argc, char** argv)
   test_iter_comparison();
   test_insert_split_value();
   test_remove_cases();
+  test_failed_alloc();
 
   const unsigned n_tests = 3u;
   const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 524288u;
@@ -613,27 +632,11 @@ main(int argc, char** argv)
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");
     fflush(stdout);
-    if (stress(i, n_elems)) {
+    if (stress(NULL, i, n_elems)) {
       return EXIT_FAILURE;
     }
   }
   printf("\n");
-
-#ifdef ZIX_WITH_TEST_MALLOC
-  const size_t total_n_allocs = test_malloc_get_n_allocs();
-  const size_t fail_n_elems   = 1000;
-  printf("Testing 0 ... %" PRIuPTR " failed allocations\n", total_n_allocs);
-  expect_failure = true;
-  for (size_t i = 0; i < total_n_allocs; ++i) {
-    test_malloc_reset(i);
-    stress(0, fail_n_elems);
-    if (i > test_malloc_get_n_allocs()) {
-      break;
-    }
-  }
-
-  test_malloc_reset((size_t)-1);
-#endif
 
   return EXIT_SUCCESS;
 }

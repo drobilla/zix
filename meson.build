@@ -266,11 +266,6 @@ if get_option('tests')
     c_args = []
     sources = files('test/@0@.c'.format(test), 'test/failing_allocator.c')
 
-    if get_option('test_malloc') and host_machine.system() != 'windows'
-      sources += ['test/test_malloc.c']
-      c_args += ['-DZIX_WITH_TEST_MALLOC']
-    endif
-
     test(test,
          executable(test,
                     sources,

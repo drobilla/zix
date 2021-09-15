@@ -67,7 +67,7 @@ x64_sanitize:
   <<: *build_definition
   image: lv2plugin/debian-x64-clang
   script:
-    - meson . build -Db_lundef=false -Dbuildtype=plain -Dtest_malloc=false -Dstrict=true -Dwerror=true
+    - meson . build -Db_lundef=false -Dbuildtype=plain -Dstrict=true -Dwerror=true
     - ninja -C build test
   variables:
     CC: "clang"
@@ -124,14 +124,14 @@ win_dbg:
   <<: *build_definition
   tags: [windows,meson]
   script:
-    - meson . build -Dbuildtype=debug -Dstrict=true -Dwerror=true -Dtest_malloc=false
+    - meson . build -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 win_rel:
   <<: *build_definition
   tags: [windows,meson]
   script:
-    - meson . build -Dbuildtype=release -Dstrict=true -Dwerror=true -Dtest_malloc=false
+    - meson . build -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
