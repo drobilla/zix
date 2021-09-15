@@ -66,6 +66,28 @@ zix_failing_free(ZixAllocator* const allocator, void* const ptr)
   base->free(base, ptr);
 }
 
+ZIX_MALLOC_FUNC
+static void*
+zix_failing_aligned_alloc(ZixAllocator* const allocator,
+                          const size_t        alignment,
+                          const size_t        size)
+{
+  ZixFailingAllocator* const state = (ZixFailingAllocator*)allocator;
+  ZixAllocator* const        base  = zix_default_allocator();
+
+  return attempt(state) ? base->aligned_alloc(base, alignment, size) : NULL;
+}
+
+static void
+zix_failing_aligned_free(ZixAllocator* const allocator, void* const ptr)
+{
+  (void)allocator;
+
+  ZixAllocator* const base = zix_default_allocator();
+
+  base->aligned_free(base, ptr);
+}
+
 ZIX_CONST_FUNC
 ZixFailingAllocator
 zix_failing_allocator(void)
@@ -76,6 +98,8 @@ zix_failing_allocator(void)
       zix_failing_calloc,
       zix_failing_realloc,
       zix_failing_free,
+      zix_failing_aligned_alloc,
+      zix_failing_aligned_free,
     },
     0,
     SIZE_MAX,

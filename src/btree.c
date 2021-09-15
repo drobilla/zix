@@ -50,6 +50,7 @@ struct ZixBTreeNodeImpl {
 
 #if ((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112l) || \
      (defined(__cplusplus) && __cplusplus >= 201103L))
+static_assert(sizeof(ZixBTree) <= ZIX_BTREE_PAGE_SIZE, "");
 static_assert(sizeof(ZixBTreeNode) <= ZIX_BTREE_PAGE_SIZE, "");
 static_assert(sizeof(ZixBTreeNode) >=
                 ZIX_BTREE_PAGE_SIZE - 2u * sizeof(ZixBTreeNode*),
@@ -66,8 +67,8 @@ zix_btree_node_new(ZixAllocator* const allocator, const bool leaf)
          ZIX_BTREE_PAGE_SIZE - 2u * sizeof(ZixBTreeNode*));
 #endif
 
-  ZixBTreeNode* const node =
-    (ZixBTreeNode*)zix_malloc(allocator, sizeof(ZixBTreeNode));
+  ZixBTreeNode* const node = (ZixBTreeNode*)zix_aligned_alloc(
+    allocator, ZIX_BTREE_PAGE_SIZE, ZIX_BTREE_PAGE_SIZE);
 
   if (node) {
     node->is_leaf = leaf;
@@ -91,15 +92,22 @@ zix_btree_new(ZixAllocator* const allocator,
               const ZixComparator cmp,
               const void* const   cmp_data)
 {
+#if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112l) || \
+      (defined(__cplusplus) && __cplusplus >= 201103L))
+  assert(sizeof(ZixBTree) <= ZIX_BTREE_PAGE_SIZE);
+#endif
+
   assert(cmp);
 
-  ZixBTree* const t = (ZixBTree*)zix_malloc(allocator, sizeof(ZixBTree));
+  ZixBTree* const t = (ZixBTree*)zix_aligned_alloc(
+    allocator, ZIX_BTREE_PAGE_SIZE, ZIX_BTREE_PAGE_SIZE);
+
   if (!t) {
     return NULL;
   }
 
   if (!(t->root = zix_btree_node_new(allocator, true))) {
-    zix_free(allocator, t);
+    zix_aligned_free(allocator, t);
     return NULL;
   }
 
@@ -121,7 +129,7 @@ zix_btree_free_children(ZixBTree* const      t,
     for (ZixShort i = 0; i < n->n_vals + 1u; ++i) {
       zix_btree_free_children(
         t, zix_btree_child(n, i), destroy, destroy_user_data);
-      zix_free(t->allocator, zix_btree_child(n, i));
+      zix_aligned_free(t->allocator, zix_btree_child(n, i));
     }
   }
 
@@ -145,8 +153,8 @@ zix_btree_free(ZixBTree* const      t,
 {
   if (t) {
     zix_btree_clear(t, destroy, destroy_user_data);
-    zix_free(t->allocator, t->root);
-    zix_free(t->allocator, t);
+    zix_aligned_free(t->allocator, t->root);
+    zix_aligned_free(t->allocator, t);
   }
 }
 
@@ -618,10 +626,10 @@ zix_btree_merge(ZixBTree* const t, ZixBTreeNode* const n, const unsigned i)
     // Root is now empty, replace it with its only child
     assert(n == t->root);
     t->root = lhs;
-    zix_free(t->allocator, n);
+    zix_aligned_free(t->allocator, n);
   }
 
-  zix_free(t->allocator, rhs);
+  zix_aligned_free(t->allocator, rhs);
   return lhs;
 }
 

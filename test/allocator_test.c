@@ -6,6 +6,7 @@
 #include "zix/allocator.h"
 
 #include <assert.h>
+#include <stdint.h>
 
 static void
 test_allocator(void)
@@ -40,6 +41,14 @@ test_allocator(void)
   assert(realloced[6] == 6);
   assert(realloced[7] == 7);
 
+  char* const aligned = (char*)zix_aligned_alloc(allocator, 4096, 4096);
+  assert((uintptr_t)aligned % 4096 == 0);
+  aligned[0] = 0;
+  aligned[3] = 3;
+  assert(aligned[0] == 0);
+  assert(aligned[3] == 3);
+
+  zix_aligned_free(allocator, aligned);
   zix_free(allocator, realloced);
   zix_free(allocator, malloced);
 }

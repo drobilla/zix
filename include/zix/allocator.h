@@ -23,10 +23,10 @@ extern "C" {
    A memory allocator.
 
    This object-like structure provides an interface like the standard C
-   functions malloc(), calloc(), realloc(), and free().  It contains function
-   pointers that differ from their standard counterparts by taking a context
-   parameter (a pointer to this struct), which allows the user to implement
-   custom stateful allocators.
+   functions malloc(), calloc(), realloc(), free(), and aligned_alloc().  It
+   contains function pointers that differ from their standard counterparts by
+   taking a context parameter (a pointer to this struct), which allows the user
+   to implement custom stateful allocators.
 */
 typedef struct ZixAllocatorImpl ZixAllocator;
 
@@ -72,12 +72,37 @@ typedef void (*ZixFreeFunc)( //
   ZixAllocator* ZIX_NULLABLE allocator,
   void* ZIX_NULLABLE         ptr);
 
+/**
+   General aligned_alloc-like memory deallocation function.
+
+   This works like the standard C aligned_alloc(), except has an additional
+   handle parameter for implementing stateful allocators without static data.
+*/
+typedef void* ZIX_ALLOCATED (*ZixAlignedAllocFunc)( //
+  ZixAllocator* ZIX_NULLABLE allocator,
+  size_t                     alignment,
+  size_t                     size);
+
+/**
+   General aligned memory deallocation function.
+
+   This works like the standard C free(), but must be used to free memory
+   allocated with the aligned_alloc() method of the allocator.  This allows
+   portability to systems (like Windows) that can not use the same free function
+   in these cases.
+*/
+typedef void (*ZixAlignedFreeFunc)( //
+  ZixAllocator* ZIX_NULLABLE allocator,
+  void* ZIX_NULLABLE         ptr);
+
 /// Definition of ZixAllocator
 struct ZixAllocatorImpl {
-  ZixMallocFunc ZIX_NONNULL  malloc;
-  ZixCallocFunc ZIX_NONNULL  calloc;
-  ZixReallocFunc ZIX_NONNULL realloc;
-  ZixFreeFunc ZIX_NONNULL    free;
+  ZixMallocFunc ZIX_NONNULL       malloc;
+  ZixCallocFunc ZIX_NONNULL       calloc;
+  ZixReallocFunc ZIX_NONNULL      realloc;
+  ZixFreeFunc ZIX_NONNULL         free;
+  ZixAlignedAllocFunc ZIX_NONNULL aligned_alloc;
+  ZixAlignedFreeFunc ZIX_NONNULL  aligned_free;
 };
 
 /// Return the default allocator which simply uses the system allocator
@@ -124,6 +149,27 @@ zix_free(ZixAllocator* const ZIX_NULLABLE allocator,
   ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
 
   actual->free(actual, ptr);
+}
+
+/// Convenience wrapper that defers to the system allocator if allocator is null
+static inline void* ZIX_ALLOCATED
+zix_aligned_alloc(ZixAllocator* const ZIX_NULLABLE allocator,
+                  const size_t                     alignment,
+                  const size_t                     size)
+{
+  ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
+
+  return actual->aligned_alloc(actual, alignment, size);
+}
+
+/// Convenience wrapper that defers to the system allocator if allocator is null
+static inline void
+zix_aligned_free(ZixAllocator* const ZIX_NULLABLE allocator,
+                 void* const ZIX_NULLABLE         ptr)
+{
+  ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
+
+  actual->aligned_free(actual, ptr);
 }
 
 /**

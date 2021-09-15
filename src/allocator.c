@@ -1,7 +1,18 @@
 // Copyright 2011-2021 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
+#define _POSIX_C_SOURCE 200809L
+
+#include "zix_config.h"
+
 #include "zix/allocator.h"
+#include "zix/attributes.h"
+
+#ifdef _WIN32
+#  define WIN32_LEAN_AND_MEAN 1
+#  include <malloc.h>
+#  include <windows.h>
+#endif
 
 #include <stdlib.h>
 
@@ -39,6 +50,37 @@ zix_default_free(ZixAllocator* const allocator, void* const ptr)
   free(ptr);
 }
 
+ZIX_MALLOC_FUNC
+static void*
+zix_default_aligned_alloc(ZixAllocator* const allocator,
+                          const size_t        alignment,
+                          const size_t        size)
+{
+  (void)allocator;
+
+#if defined(_WIN32)
+  return _aligned_malloc(size, alignment);
+#elif USE_POSIX_MEMALIGN
+  void*     ptr = NULL;
+  const int ret = posix_memalign(&ptr, alignment, size);
+  return ret ? NULL : ptr;
+#else
+#  error No aligned memory allocation available
+#endif
+}
+
+static void
+zix_default_aligned_free(ZixAllocator* const allocator, void* const ptr)
+{
+  (void)allocator;
+
+#if defined(_WIN32)
+  _aligned_free(ptr);
+#else
+  free(ptr);
+#endif
+}
+
 ZixAllocator*
 zix_default_allocator(void)
 {
@@ -47,6 +89,8 @@ zix_default_allocator(void)
     zix_default_calloc,
     zix_default_realloc,
     zix_default_free,
+    zix_default_aligned_alloc,
+    zix_default_aligned_free,
   };
 
   return &default_allocator;
