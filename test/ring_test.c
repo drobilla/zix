@@ -5,7 +5,6 @@
 
 #include "failing_allocator.h"
 
-#include "zix/allocator.h"
 #include "zix/attributes.h"
 #include "zix/ring.h"
 #include "zix/thread.h"

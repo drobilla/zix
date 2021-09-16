@@ -4,6 +4,7 @@
 #undef NDEBUG
 
 #include "zix/allocator.h"
+#include "zix/bump_allocator.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -53,9 +54,68 @@ test_allocator(void)
   zix_free(allocator, malloced);
 }
 
+static void
+test_bump_allocator(void)
+{
+  char             buffer[1024] = {0};
+  ZixBumpAllocator allocator    = zix_bump_allocator(sizeof(buffer), buffer);
+
+  assert(!zix_malloc(&allocator.base, 1025));
+
+  char* const malloced = (char*)zix_malloc(&allocator.base, 3);
+  assert(malloced >= buffer);
+  assert(malloced <= buffer + sizeof(buffer));
+  assert((uintptr_t)malloced % sizeof(uintmax_t) == 0u);
+
+  assert(!zix_calloc(&allocator.base, 1017, 1));
+
+  char* const calloced = (char*)zix_calloc(&allocator.base, 4, 1);
+  assert(calloced > malloced);
+  assert(calloced <= buffer + sizeof(buffer));
+  assert((uintptr_t)calloced % sizeof(uintmax_t) == 0u);
+  assert(!calloced[0]);
+  assert(!calloced[1]);
+  assert(!calloced[2]);
+  assert(!calloced[3]);
+
+  char* const realloced = (char*)zix_realloc(&allocator.base, calloced, 8);
+  assert(realloced == calloced);
+
+  assert(!zix_realloc(&allocator.base, malloced, 8));     // Not the top
+  assert(!zix_realloc(&allocator.base, realloced, 4089)); // No space
+
+  zix_free(&allocator.base, realloced);
+
+  char* const reclaimed = (char*)zix_malloc(&allocator.base, 512);
+  assert(reclaimed);
+  assert(reclaimed == realloced);
+
+  assert(!zix_aligned_alloc(&allocator.base, sizeof(uintmax_t), 1024));
+  assert(!zix_aligned_alloc(&allocator.base, 1024, 1024));
+  assert(!zix_aligned_alloc(&allocator.base, 2048, 2048));
+  assert(!zix_aligned_alloc(&allocator.base, 4096, 4096));
+  assert(!zix_aligned_alloc(&allocator.base, 8192, 8192));
+  assert(!zix_aligned_alloc(&allocator.base, 4096, 4096));
+  assert(!zix_aligned_alloc(&allocator.base, 2048, 2048));
+  assert(!zix_aligned_alloc(&allocator.base, 1024, 1024));
+  assert(!zix_aligned_alloc(&allocator.base, 512, 512));
+
+  char* const aligned = (char*)zix_aligned_alloc(&allocator.base, 128, 128);
+  assert(aligned);
+  assert(aligned >= reclaimed);
+  assert(aligned <= buffer + sizeof(buffer));
+  assert((uintptr_t)aligned % 128 == 0u);
+
+  zix_aligned_free(&allocator.base, aligned);
+  zix_free(&allocator.base, reclaimed); // Correct, but a noop
+  zix_free(&allocator.base, malloced);  // Correct, but a noop
+}
+
 int
 main(void)
 {
   test_allocator();
+  test_bump_allocator();
+
   return 0;
 }
