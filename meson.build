@@ -46,6 +46,7 @@ if get_option('strict')
       '-Wno-bad-function-cast',
       '-Wno-padded',
       '-Wno-reserved-id-macro',
+      '-Wno-implicit-fallthrough', # Really for clang < 12
     ]
   elif cc.get_id() == 'gcc'
     c_warnings += [
