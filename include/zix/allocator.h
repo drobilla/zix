@@ -19,6 +19,8 @@ extern "C" {
    @{
 */
 
+struct ZixAllocatorImpl;
+
 /**
    A memory allocator.
 
