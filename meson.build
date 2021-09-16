@@ -32,6 +32,10 @@ if cc.get_id() == 'clang'
   c_warnings = [
     '-Wno-nullability-extension',
   ]
+elif cc.get_id() == 'msvc'
+  c_warnings += [
+    '/wd4706',  # assignment within conditional expression
+  ]
 endif
 
 # Set ultra strict warnings for developers, if requested
@@ -118,7 +122,6 @@ if get_option('strict')
       '/wd4200',  # zero-sized array in struct/union
       '/wd4365',  # signed/unsigned mismatch
       '/wd4514',  # unreferenced inline function has been removed
-      '/wd4706',  # assignment within conditional expression
       '/wd4710',  # function not inlined
       '/wd4711',  # function selected for automatic inline expansion
       '/wd4777',  # format string and argument mismatch
@@ -135,8 +138,9 @@ if get_option('strict')
     ]
   endif
 
-  add_project_arguments(cc.get_supported_arguments(c_warnings), language: ['c'])
 endif
+
+add_project_arguments(cc.get_supported_arguments(c_warnings), language: ['c'])
 
 if cc.get_id() == 'msvc'
   # Build as C++
