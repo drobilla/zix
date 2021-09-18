@@ -52,11 +52,9 @@ typedef struct ZixBTreeNodeImpl ZixBTreeNode;
    iterators can be allocated on the stack.
 */
 typedef struct {
-  ZixBTreeNode* ZIX_NULLABLE
-    nodes[ZIX_BTREE_MAX_HEIGHT]; ///< Parallel node pointer stacky
-
-  uint16_t indexes[ZIX_BTREE_MAX_HEIGHT]; ///< Parallel child index stack
-  uint16_t level;                         ///< Current level in stack
+  ZixBTreeNode* ZIX_NULLABLE nodes[ZIX_BTREE_MAX_HEIGHT];   ///< Node stack
+  uint16_t                   indexes[ZIX_BTREE_MAX_HEIGHT]; ///< Index stack
+  uint16_t                   level;                         ///< Current level
 } ZixBTreeIter;
 
 /// A static end iterator for convenience
@@ -77,8 +75,8 @@ static const ZixBTreeIter zix_btree_end_iter = {
 ZIX_API
 ZixBTree* ZIX_ALLOCATED
 zix_btree_new(ZixAllocator* ZIX_NULLABLE allocator,
-              ZixComparator ZIX_NONNULL        cmp,
-              const void* ZIX_NULLABLE         cmp_data);
+              ZixComparator ZIX_NONNULL  cmp,
+              const void* ZIX_NULLABLE   cmp_data);
 
 /**
    Free `t` and all the nodes it contains.
