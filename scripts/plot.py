@@ -8,8 +8,8 @@ import os
 import sys
 
 import matplotlib
+
 from matplotlib import pyplot
-from matplotlib.pyplot import *
 
 matplotlib.rc('text', **{
     'usetex': True})
@@ -28,9 +28,9 @@ class SensibleScalarFormatter(matplotlib.ticker.ScalarFormatter):
         self.set_powerlimits([-6, 6])
         self.set_scientific(True)
 
-    def _set_orderOfMagnitude(self, range):
+    def _set_orderOfMagnitude(self, value_range):
         # Calculate "best" order in the usual way
-        matplotlib.ticker.ScalarFormatter._set_orderOfMagnitude(self, range)
+        matplotlib.ticker.ScalarFormatter._set_orderOfMagnitude(self, value_range)
 
         # Round down to sensible (millions, billions, etc) order
         self.orderOfMagnitude = self.orderOfMagnitude - (self.orderOfMagnitude % 3)
@@ -66,7 +66,7 @@ for i in range(n_plots):
         times.append([])
     for line in file:
         if line[0] == '#':
-            continue;
+            continue
 
         fields = line.split()
         num    = 0
