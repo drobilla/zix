@@ -69,18 +69,8 @@ test_fail(const char* fmt, ...)
 }
 
 int
-main(int argc, char** argv)
+run(FILE* const fd)
 {
-  if (argc != 2) {
-    return test_fail("Usage: %s INPUT_FILE\n", argv[0]);
-  }
-
-  const char* file = argv[1];
-  FILE*       fd   = fopen(file, "r");
-  if (!fd) {
-    return test_fail("Failed to open file %s\n", file);
-  }
-
   size_t max_n_strings = 1u << 20u;
 
   /* Read input strings */
@@ -192,6 +182,21 @@ main(int argc, char** argv)
   fclose(search_dat);
 
   fprintf(stderr, "Wrote dict_insert.txt dict_search.txt\n");
-
   return 0;
+}
+
+int
+main(int argc, char** argv)
+{
+  if (argc != 2) {
+    return test_fail("Usage: %s INPUT_FILE\n", argv[0]);
+  }
+
+  const char* file = argv[1];
+  FILE*       fd   = fopen(file, "r");
+  if (!fd) {
+    return test_fail("Failed to open file %s\n", file);
+  }
+
+  return run(fd);
 }
