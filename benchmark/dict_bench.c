@@ -126,6 +126,7 @@ run(FILE* const fd)
     for (size_t i = 0; i < n; ++i) {
       ZixStatus st = zix_hash_insert(zhash, &chunks[i]);
       assert(!st || st == ZIX_STATUS_EXISTS);
+      (void)st;
     }
     fprintf(insert_dat, "\t%lf\n", bench_end(&insert_start));
 
@@ -135,8 +136,11 @@ run(FILE* const fd)
     struct timespec search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       const size_t index = (size_t)(lcg64(seed + i) % n);
-      char*        match = (char*)g_hash_table_lookup(hash, chunks[index].buf);
+      char* volatile match =
+        (char*)g_hash_table_lookup(hash, chunks[index].buf);
+
       assert(!strcmp(match, chunks[index].buf));
+      (void)match;
     }
     fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
@@ -144,11 +148,12 @@ run(FILE* const fd)
     search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       const size_t    index = (size_t)(lcg64(seed + i) % n);
-      const ZixChunk* match =
+      const ZixChunk* volatile match =
         (const ZixChunk*)zix_hash_find_record(zhash, &chunks[index]);
 
       assert(match);
       assert(!strcmp(match->buf, chunks[index].buf));
+      (void)match;
     }
     fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
 
