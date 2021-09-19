@@ -13,7 +13,7 @@ ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>
 ZIX_RESTORE_WARNINGS
 
-#include <stdarg.h>
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -56,19 +56,7 @@ zix_chunk_equal(const ZixChunk* a, const ZixChunk* b)
 
 static const unsigned seed = 1;
 
-ZIX_LOG_FUNC(1, 2)
 static int
-test_fail(const char* fmt, ...)
-{
-  va_list args;
-  va_start(args, fmt);
-  fprintf(stderr, "error: ");
-  vfprintf(stderr, fmt, args);
-  va_end(args);
-  return 1;
-}
-
-int
 run(FILE* const fd)
 {
   size_t max_n_strings = 1u << 20u;
@@ -137,9 +125,7 @@ run(FILE* const fd)
     insert_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       ZixStatus st = zix_hash_insert(zhash, &chunks[i]);
-      if (st && st != ZIX_STATUS_EXISTS) {
-        return test_fail("Failed to insert `%s'\n", (const char*)chunks[i].buf);
-      }
+      assert(!st || st == ZIX_STATUS_EXISTS);
     }
     fprintf(insert_dat, "\t%lf\n", bench_end(&insert_start));
 
@@ -150,10 +136,7 @@ run(FILE* const fd)
     for (size_t i = 0; i < n; ++i) {
       const size_t index = (size_t)(lcg64(seed + i) % n);
       char*        match = (char*)g_hash_table_lookup(hash, chunks[index].buf);
-      if (!!strcmp(match, chunks[index].buf)) {
-        return test_fail(
-          "GHashTable: Bad match `%s' for `%s'\n", match, chunks[index].buf);
-      }
+      assert(!strcmp(match, chunks[index].buf));
     }
     fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
@@ -161,16 +144,11 @@ run(FILE* const fd)
     search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       const size_t    index = (size_t)(lcg64(seed + i) % n);
-      const ZixChunk* match = NULL;
-      if (!(match =
-              (const ZixChunk*)zix_hash_find_record(zhash, &chunks[index]))) {
-        return test_fail("Hash: Failed to find `%s'\n", chunks[index].buf);
-      }
+      const ZixChunk* match =
+        (const ZixChunk*)zix_hash_find_record(zhash, &chunks[index]);
 
-      if (!!strcmp(match->buf, chunks[index].buf)) {
-        return test_fail(
-          "ZixHash: Bad match `%s' for `%s'\n", match->buf, chunks[index].buf);
-      }
+      assert(match);
+      assert(!strcmp(match->buf, chunks[index].buf));
     }
     fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
 
@@ -189,13 +167,15 @@ int
 main(int argc, char** argv)
 {
   if (argc != 2) {
-    return test_fail("Usage: %s INPUT_FILE\n", argv[0]);
+    fprintf(stderr, "Usage: %s INPUT_FILE\n", argv[0]);
+    return 1;
   }
 
   const char* file = argv[1];
   FILE*       fd   = fopen(file, "r");
   if (!fd) {
-    return test_fail("Failed to open file %s\n", file);
+    fprintf(stderr, "error: Failed to open file %s\n", file);
+    return 1;
   }
 
   return run(fd);
