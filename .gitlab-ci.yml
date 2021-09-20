@@ -124,6 +124,19 @@ win_rel:
     - ninja -C build test
 
 
+wasm_dbg:
+  image: lv2plugin/debian-wasm
+  script:
+    - meson setup build --cross-file=/usr/share/meson/cross/wasm.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddefault_library=static
+    - ninja -C build test
+
+wasm_rel:
+  image: lv2plugin/debian-wasm
+  script:
+    - meson setup build --cross-file=/usr/share/meson/cross/wasm.ini -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddefault_library=static
+    - ninja -C build test
+
+
 pages:
   script:
     - mkdir -p .public

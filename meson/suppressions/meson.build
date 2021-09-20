@@ -15,7 +15,7 @@ if is_variable('cc')
   c_suppressions = []
 
   if get_option('strict')
-    if cc.get_id() == 'clang'
+    if cc.get_id() in ['clang', 'emscripten']
       c_suppressions += [
         '-Wno-bad-function-cast',
         '-Wno-c11-extensions', # Glib
@@ -61,6 +61,11 @@ if is_variable('cc')
 
   if cc.get_id() == 'clang'
     c_suppressions += [
+      '-Wno-nullability-extension',
+    ]
+  elif cc.get_id() == 'emscripten'
+    c_suppressions += [
+      '-Wno-format',
       '-Wno-nullability-extension',
     ]
   elif cc.get_id() == 'msvc'

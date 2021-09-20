@@ -80,14 +80,44 @@ if get_option('default_library') == 'static'
   add_project_arguments(['-DZIX_STATIC'], language: ['c'])
 endif
 
+# Set any additional arguments required for building libraries or programs
+library_c_args = ['-DZIX_INTERNAL']
+library_link_args = []
+program_c_args = []
+program_link_args = []
+if cc.get_id() == 'emscripten'
+  wasm_c_args = [
+    '-matomics',
+    '-mbulk-memory',
+    '-pthread',
+  ]
+
+  wasm_link_args = [
+    '-matomics',
+    '-mbulk-memory',
+    '-pthread',
+    ['-s', 'ENVIRONMENT=node,worker'],
+  ]
+
+  library_c_args += wasm_c_args
+  program_c_args += wasm_c_args
+  library_link_args += wasm_link_args
+  program_link_args += wasm_link_args
+  program_link_args += [
+    ['-s', 'EXIT_RUNTIME'],
+    ['-s', 'PROXY_TO_PTHREAD'],
+  ]
+endif
+
 # Build shared and/or static library
 libzix = library(
   meson.project_name() + library_suffix,
   sources,
-  c_args: ['-DZIX_INTERNAL'],
+  c_args: library_c_args,
   gnu_symbol_visibility: 'hidden',
   include_directories: include_dirs,
   install: true,
+  link_args: library_link_args,
   version: meson.project_version())
 
 # Declare dependency for internal meson dependants
@@ -144,8 +174,10 @@ if not get_option('tests').disabled()
     test(test,
          executable(test,
                     sources,
+                    c_args: program_c_args,
                     dependencies: [zix_dep],
-                    include_directories: include_dirs),
+                    include_directories: include_dirs,
+                    link_args: program_link_args),
          timeout: 120)
   endforeach
 
@@ -157,8 +189,10 @@ if not get_option('tests').disabled()
       test(test,
            executable(test,
                       sources,
+                      c_args: program_c_args,
                       dependencies: [zix_dep, thread_dep],
-                      include_directories: include_dirs),
+                      include_directories: include_dirs,
+                      link_args: program_link_args),
            timeout: 120)
     endforeach
   endif
