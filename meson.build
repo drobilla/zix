@@ -225,8 +225,11 @@ pkg.generate(
   description: 'A lightweight portability and data structure C library')
 
 headers = [
+  'include/zix/allocator.h',
+  'include/zix/attributes.h',
   'include/zix/bitset.h',
   'include/zix/btree.h',
+  'include/zix/bump_allocator.h',
   'include/zix/common.h',
   'include/zix/digest.h',
   'include/zix/hash.h',
