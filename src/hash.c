@@ -149,8 +149,8 @@ find_entry(const ZixHash* const    hash,
 {
   size_t i = h;
 
-  while (!is_match(hash, code, i, hash->equal_func, key) &&
-         !is_empty(&hash->entries[i])) {
+  while (!is_empty(&hash->entries[i]) &&
+         !is_match(hash, code, i, hash->equal_func, key)) {
     i = next_index(hash, i);
   }
 
@@ -263,13 +263,14 @@ zix_hash_plan_insert_prehashed(const ZixHash* const  hash,
 
   // Search for a free position starting at the ideal one
   const size_t start_index     = pos.index;
-  size_t       first_tombstone = SIZE_MAX;
+  size_t       first_tombstone = 0;
+  bool         found_tombstone = false;
   while (!is_empty(&hash->entries[pos.index])) {
     if (is_match(hash, code, pos.index, predicate, user_data)) {
       return pos;
     }
 
-    if (first_tombstone == SIZE_MAX && !hash->entries[pos.index].value) {
+    if (!found_tombstone && !hash->entries[pos.index].value) {
       assert(hash->entries[pos.index].hash == tombstone);
       first_tombstone = pos.index; // Remember the first/best free index
     }
@@ -281,9 +282,11 @@ zix_hash_plan_insert_prehashed(const ZixHash* const  hash,
   }
 
   // If we found a tombstone before an empty slot, place the new element there
-  pos.index = first_tombstone < SIZE_MAX ? first_tombstone : pos.index;
-  assert(!hash->entries[pos.index].value);
+  if (found_tombstone) {
+    pos.index = first_tombstone;
+  }
 
+  assert(!hash->entries[pos.index].value);
   return pos;
 }
 
