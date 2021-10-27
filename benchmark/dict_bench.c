@@ -147,7 +147,7 @@ run(FILE* const fd)
     // ZixHash
     search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      const size_t    index = (size_t)(lcg64(seed + i) % n);
+      const size_t index = (size_t)(lcg64(seed + i) % n);
       const ZixChunk* volatile match =
         (const ZixChunk*)zix_hash_find_record(zhash, &chunks[index]);
 
