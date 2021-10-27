@@ -34,12 +34,12 @@ zix_digest64(const uint64_t seed, const void* const key, const size_t len)
 {
   static const uint64_t m = 0x880355F21E6D1965ull;
 
+  // Process as many 64-bit blocks as possible
   const size_t         n_blocks   = len / sizeof(uint64_t);
-  const uint8_t* const data       = (const uint8_t*)key;
+  const uint8_t*       data       = (const uint8_t*)key;
   const uint8_t* const blocks_end = data + (n_blocks * sizeof(uint64_t));
-
-  uint64_t h = seed ^ (len * m);
-  for (size_t i = 0u; i < n_blocks; ++i) {
+  uint64_t             h          = seed ^ (len * m);
+  for (; data != blocks_end; data += sizeof(uint64_t)) {
     uint64_t k = 0u;
     memcpy(&k, data, sizeof(uint64_t));
 
@@ -47,9 +47,9 @@ zix_digest64(const uint64_t seed, const void* const key, const size_t len)
     h *= m;
   }
 
+  // Process any trailing bytes
   const uint8_t* const tail = blocks_end;
   uint64_t             v    = 0u;
-
   switch (len & 7u) {
   case 7:
     v |= (uint64_t)tail[6] << 48u;
