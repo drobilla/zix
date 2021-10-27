@@ -65,7 +65,7 @@ zix_default_aligned_alloc(ZixAllocator* const allocator,
   const int ret = posix_memalign(&ptr, alignment, size);
   return ret ? NULL : ptr;
 #else
-#  error No aligned memory allocation available
+  return NULL;
 #endif
 }
 
