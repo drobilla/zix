@@ -73,8 +73,15 @@ run(FILE* const fd)
         continue;
       }
 
-      chunks = (ZixChunk*)realloc(chunks, (n_chunks + 1) * sizeof(ZixChunk));
+      ZixChunk* const new_chunks =
+        (ZixChunk*)realloc(chunks, (n_chunks + 1) * sizeof(ZixChunk));
 
+      if (!new_chunks) {
+        free(chunks);
+        return 1;
+      }
+
+      chunks               = new_chunks;
       chunks[n_chunks].buf = (char*)malloc(buf_len);
       chunks[n_chunks].len = this_str_len;
       memcpy(chunks[n_chunks].buf, buf, buf_len);
@@ -86,7 +93,14 @@ run(FILE* const fd)
       ++this_str_len;
       if (buf_len < this_str_len + 1) {
         buf_len = this_str_len + 1;
-        buf     = (char*)realloc(buf, buf_len);
+
+        char* const new_buf = (char*)realloc(buf, buf_len);
+        if (!new_buf) {
+          free(buf);
+          return 1;
+        }
+
+        buf = new_buf;
       }
       buf[this_str_len - 1] = (char)c;
       buf[this_str_len]     = '\0';
