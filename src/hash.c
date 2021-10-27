@@ -5,7 +5,6 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 typedef struct ZixHashEntry {
   ZixHashCode    hash;  ///< Non-folded hash value
