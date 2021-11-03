@@ -315,7 +315,7 @@ if not get_option('benchmarks').disabled()
   endif
 endif
 
-if meson.version().version_compare('>=0.53.0')
+if not meson.is_subproject() and meson.version().version_compare('>=0.53.0')
   summary('Benchmarks', build_benchmarks, bool_yn: true)
   summary('Tests', get_option('tests'), bool_yn: true)
 
