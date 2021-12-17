@@ -26,6 +26,12 @@ typedef struct {
   size_t len;
 } ZixChunk;
 
+typedef struct {
+  ZixChunk* chunks;
+  size_t    n_chunks;
+  char*     buf;
+} Inputs;
+
 /// Linear Congruential Generator for making random 64-bit integers
 static inline uint64_t
 lcg64(const uint64_t i)
@@ -56,38 +62,36 @@ zix_chunk_equal(const ZixChunk* a, const ZixChunk* b)
 
 static const unsigned seed = 1;
 
-static int
-run(FILE* const fd)
+static Inputs
+read_inputs(FILE* const fd)
 {
-  size_t max_n_strings = 1u << 20u;
+  static const size_t max_n_strings = 1u << 20u;
+  static const Inputs no_inputs     = {NULL, 0u, NULL};
 
-  /* Read input strings */
-  ZixChunk* chunks       = NULL;
-  size_t    n_chunks     = 0;
-  char*     buf          = (char*)calloc(1, 1);
-  size_t    buf_len      = 1;
-  size_t    this_str_len = 0;
+  Inputs inputs       = {NULL, 0u, NULL};
+  size_t buf_len      = 1;
+  size_t this_str_len = 0;
   for (int c = 0; (c = fgetc(fd)) != EOF;) {
     if (c == '\n') {
       if (this_str_len == 0) {
         continue;
       }
 
-      ZixChunk* const new_chunks =
-        (ZixChunk*)realloc(chunks, (n_chunks + 1) * sizeof(ZixChunk));
+      ZixChunk* const new_chunks = (ZixChunk*)realloc(
+        inputs.chunks, (inputs.n_chunks + 1) * sizeof(ZixChunk));
 
       if (!new_chunks) {
-        free(chunks);
-        free(buf);
-        return 1;
+        free(inputs.chunks);
+        free(inputs.buf);
+        return no_inputs;
       }
 
-      chunks               = new_chunks;
-      chunks[n_chunks].buf = (char*)malloc(buf_len);
-      chunks[n_chunks].len = this_str_len;
-      memcpy(chunks[n_chunks].buf, buf, buf_len);
+      inputs.chunks                      = new_chunks;
+      inputs.chunks[inputs.n_chunks].buf = (char*)malloc(buf_len);
+      inputs.chunks[inputs.n_chunks].len = this_str_len;
+      memcpy(inputs.chunks[inputs.n_chunks].buf, inputs.buf, buf_len);
       this_str_len = 0;
-      if (++n_chunks == max_n_strings) {
+      if (++inputs.n_chunks == max_n_strings) {
         break;
       }
     } else {
@@ -95,19 +99,27 @@ run(FILE* const fd)
       if (buf_len < this_str_len + 1) {
         buf_len = this_str_len + 1;
 
-        char* const new_buf = (char*)realloc(buf, buf_len);
+        char* const new_buf = (char*)realloc(inputs.buf, buf_len);
         if (!new_buf) {
-          free(chunks);
-          free(buf);
-          return 1;
+          free(inputs.chunks);
+          free(inputs.buf);
+          return no_inputs;
         }
 
-        buf = new_buf;
+        inputs.buf = new_buf;
       }
-      buf[this_str_len - 1] = (char)c;
-      buf[this_str_len]     = '\0';
+      inputs.buf[this_str_len - 1] = (char)c;
+      inputs.buf[this_str_len]     = '\0';
     }
   }
+
+  return inputs;
+}
+
+static int
+run(FILE* const fd)
+{
+  Inputs inputs = read_inputs(fd);
 
   fclose(fd);
 
@@ -116,7 +128,7 @@ run(FILE* const fd)
   fprintf(insert_dat, "# n\tGHashTable\tZixHash\n");
   fprintf(search_dat, "# n\tGHashTable\tZixHash\n");
 
-  for (size_t n = n_chunks / 16; n <= n_chunks; n *= 2) {
+  for (size_t n = inputs.n_chunks / 16; n <= inputs.n_chunks; n *= 2) {
     printf("Benchmarking n = %zu\n", n);
     GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
 
@@ -133,14 +145,14 @@ run(FILE* const fd)
     // GHashTable
     struct timespec insert_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      g_hash_table_insert(hash, chunks[i].buf, chunks[i].buf);
+      g_hash_table_insert(hash, inputs.chunks[i].buf, inputs.chunks[i].buf);
     }
     fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
 
     // ZixHash
     insert_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
-      ZixStatus st = zix_hash_insert(zhash, &chunks[i]);
+      ZixStatus st = zix_hash_insert(zhash, &inputs.chunks[i]);
       assert(!st || st == ZIX_STATUS_EXISTS);
       (void)st;
     }
@@ -153,9 +165,9 @@ run(FILE* const fd)
     for (size_t i = 0; i < n; ++i) {
       const size_t index = (size_t)(lcg64(seed + i) % n);
       char* volatile match =
-        (char*)g_hash_table_lookup(hash, chunks[index].buf);
+        (char*)g_hash_table_lookup(hash, inputs.chunks[index].buf);
 
-      assert(!strcmp(match, chunks[index].buf));
+      assert(!strcmp(match, inputs.chunks[index].buf));
       (void)match;
     }
     fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -165,10 +177,10 @@ run(FILE* const fd)
     for (size_t i = 0; i < n; ++i) {
       const size_t index = (size_t)(lcg64(seed + i) % n);
       const ZixChunk* volatile match =
-        (const ZixChunk*)zix_hash_find_record(zhash, &chunks[index]);
+        (const ZixChunk*)zix_hash_find_record(zhash, &inputs.chunks[index]);
 
       assert(match);
-      assert(!strcmp(match->buf, chunks[index].buf));
+      assert(!strcmp(match->buf, inputs.chunks[index].buf));
       (void)match;
     }
     fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
@@ -180,12 +192,12 @@ run(FILE* const fd)
   fclose(insert_dat);
   fclose(search_dat);
 
-  for (size_t i = 0; i < n_chunks; ++i) {
-    free(chunks[i].buf);
+  for (size_t i = 0; i < inputs.n_chunks; ++i) {
+    free(inputs.chunks[i].buf);
   }
 
-  free(chunks);
-  free(buf);
+  free(inputs.chunks);
+  free(inputs.buf);
 
   fprintf(stderr, "Wrote dict_insert.txt dict_search.txt\n");
   return 0;
