@@ -1,7 +1,7 @@
 Checks: >
   *,
   -*-uppercase-literal-suffix,
-  -altera-struct-pack-align,
+  -altera-*,
   -clang-diagnostic-unused-function,
   -clang-diagnostic-unused-macros,
   -hicpp-multiway-paths-covered,

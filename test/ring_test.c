@@ -103,10 +103,10 @@ test_ring(const unsigned size)
   zix_ring_mlock(ring);
 
   ZixThread reader_thread; // NOLINT
-  assert(!zix_thread_create(&reader_thread, MSG_SIZE * 4, reader, NULL));
+  assert(!zix_thread_create(&reader_thread, MSG_SIZE * 4ul, reader, NULL));
 
   ZixThread writer_thread; // NOLINT
-  assert(!zix_thread_create(&writer_thread, MSG_SIZE * 4, writer, NULL));
+  assert(!zix_thread_create(&writer_thread, MSG_SIZE * 4ul, writer, NULL));
 
   zix_thread_join(reader_thread, NULL);
   zix_thread_join(writer_thread, NULL);
