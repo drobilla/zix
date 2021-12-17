@@ -44,9 +44,10 @@ if get_option('strict')
     c_warnings += [
       '-Weverything',
       '-Wno-bad-function-cast',
+      '-Wno-c11-extensions', # Glib
+      '-Wno-implicit-fallthrough', # Really for clang < 12
       '-Wno-padded',
       '-Wno-reserved-id-macro',
-      '-Wno-implicit-fallthrough', # Really for clang < 12
     ]
   elif cc.get_id() == 'gcc'
     c_warnings += [
