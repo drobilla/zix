@@ -302,12 +302,22 @@ if not get_option('benchmarks').disabled()
 
   build_benchmarks = glib_dep.found()
 
+  benchmark_c_args = []
+  if cc.get_id() == 'clang'
+    benchmark_c_args += [
+      '-Wno-reserved-identifier',
+    ]
+  endif
+
+  benchmark_c_args = cc.get_supported_arguments(benchmark_c_args)
+
   if build_benchmarks
     foreach benchmark : benchmarks
       benchmark(benchmark,
                 executable(benchmark,
                            'benchmark/@0@.c'.format(benchmark),
                            include_directories: include_directories(['include']),
+                           c_args: benchmark_c_args,
                            dependencies: [zix_dep, glib_dep]))
     endforeach
   else
