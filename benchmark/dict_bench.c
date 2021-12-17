@@ -78,6 +78,7 @@ run(FILE* const fd)
 
       if (!new_chunks) {
         free(chunks);
+        free(buf);
         return 1;
       }
 
@@ -96,6 +97,7 @@ run(FILE* const fd)
 
         char* const new_buf = (char*)realloc(buf, buf_len);
         if (!new_buf) {
+          free(chunks);
           free(buf);
           return 1;
         }
@@ -177,6 +179,13 @@ run(FILE* const fd)
 
   fclose(insert_dat);
   fclose(search_dat);
+
+  for (size_t i = 0; i < n_chunks; ++i) {
+    free(chunks[i].buf);
+  }
+
+  free(chunks);
+  free(buf);
 
   fprintf(stderr, "Wrote dict_insert.txt dict_search.txt\n");
   return 0;
