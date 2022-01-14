@@ -272,6 +272,7 @@ zix_hash_plan_insert_prehashed(const ZixHash* const  hash,
     if (!found_tombstone && !hash->entries[pos.index].value) {
       assert(hash->entries[pos.index].hash == tombstone);
       first_tombstone = pos.index; // Remember the first/best free index
+      found_tombstone = true;
     }
 
     pos.index = next_index(hash, pos.index);
