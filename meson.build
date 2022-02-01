@@ -163,12 +163,15 @@ if get_option('default_library') == 'both'
 
   library_type = 'both_libraries'
   library_args = ['-DZIX_INTERNAL']
+  prog_args = []
 elif get_option('default_library') == 'shared'
   library_type = 'shared_library'
   library_args = ['-DZIX_INTERNAL']
+  prog_args = []
 else
   library_type = 'static_library'
   library_args = ['-DZIX_INTERNAL', '-DZIX_STATIC']
+  prog_args = ['-DZIX_STATIC']
 endif
 
 #
@@ -273,14 +276,13 @@ if get_option('tests')
   dl_dep = cc.find_library('dl', required: false)
 
   foreach test : tests
-    c_args = []
     sources = files('test/@0@.c'.format(test), 'test/failing_allocator.c')
 
     test(test,
          executable(test,
                     sources,
                     include_directories: include_directories(['include']),
-                    c_args: c_args,
+                    c_args: prog_args,
                     dependencies: [dl_dep, zix_dep, thread_dep]),
          timeout: 120)
   endforeach
