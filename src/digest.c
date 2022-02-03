@@ -9,7 +9,7 @@
 
 #if defined(__clang__) && __clang_major__ >= 12
 #  define FALLTHROUGH() __attribute__((fallthrough))
-#elif defined(__GNUC__) && !defined(__clang__)
+#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 7
 #  define FALLTHROUGH() __attribute__((fallthrough))
 #else
 #  define FALLTHROUGH()
