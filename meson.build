@@ -137,6 +137,8 @@ if get_option('strict')
     c_warnings += [
       '-Wno-cast-function-type',
       '-Wno-format',
+      '-Wno-suggest-attribute=format',
+      '-Wno-suggest-attribute=pure',
     ]
   endif
 
