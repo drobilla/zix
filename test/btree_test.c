@@ -626,7 +626,7 @@ main(int argc, char** argv)
   test_failed_alloc();
 
   const unsigned n_tests = 3u;
-  const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 524288u;
+  const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 131072u;
 
   printf("Running %u tests with %" PRIuPTR " elements", n_tests, n_elems);
   for (unsigned i = 0; i < n_tests; ++i) {
