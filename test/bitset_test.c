@@ -7,7 +7,7 @@
 
 #include <assert.h>
 
-#define N_BITS 256u
+#define N_BITS 256U
 #define N_ELEMS (ZIX_BITSET_ELEMS(N_BITS))
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))

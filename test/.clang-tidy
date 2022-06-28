@@ -4,7 +4,6 @@
 Checks: >
   *,
   -*-magic-numbers,
-  -*-uppercase-literal-suffix,
   -altera-*,
   -android-cloexec-fopen,
   -bugprone-easily-swappable-parameters,
@@ -12,7 +11,6 @@ Checks: >
   -cppcoreguidelines-avoid-non-const-global-variables,
   -google-readability-casting,
   -hicpp-multiway-paths-covered,
-  -hicpp-uppercase-literal-suffix,
   -llvm-header-guard,
   -llvmlibc-*,
   -misc-no-recursion,

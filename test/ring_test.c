@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MSG_SIZE 20u
+#define MSG_SIZE 20U
 
 static ZixRing* ring       = 0;
 static unsigned n_writes   = 0;
@@ -25,7 +25,7 @@ static bool     read_error = false;
 static int
 gen_msg(int* const msg, int start)
 {
-  for (unsigned i = 0u; i < MSG_SIZE; ++i) {
+  for (unsigned i = 0U; i < MSG_SIZE; ++i) {
     msg[i] = start;
     start  = (start + 1) % INT_MAX;
   }
@@ -36,7 +36,7 @@ ZIX_PURE_FUNC
 static int
 cmp_msg(const int* const msg1, const int* const msg2)
 {
-  for (unsigned i = 0u; i < MSG_SIZE; ++i) {
+  for (unsigned i = 0U; i < MSG_SIZE; ++i) {
     assert(msg1[i] == msg2[i]);
   }
 
@@ -103,10 +103,10 @@ test_ring(const unsigned size)
   zix_ring_mlock(ring);
 
   ZixThread reader_thread; // NOLINT
-  assert(!zix_thread_create(&reader_thread, MSG_SIZE * 4ul, reader, NULL));
+  assert(!zix_thread_create(&reader_thread, MSG_SIZE * 4UL, reader, NULL));
 
   ZixThread writer_thread; // NOLINT
-  assert(!zix_thread_create(&writer_thread, MSG_SIZE * 4ul, writer, NULL));
+  assert(!zix_thread_create(&writer_thread, MSG_SIZE * 4UL, writer, NULL));
 
   zix_thread_join(reader_thread, NULL);
   zix_thread_join(writer_thread, NULL);
@@ -168,7 +168,7 @@ test_failed_alloc(void)
 
   // Test that each allocation failing is handled gracefully
   const size_t n_new_allocs = allocator.n_allocations;
-  for (size_t i = 0u; i < n_new_allocs; ++i) {
+  for (size_t i = 0U; i < n_new_allocs; ++i) {
     allocator.n_remaining = i;
     assert(!zix_ring_new(&allocator.base, 512));
   }

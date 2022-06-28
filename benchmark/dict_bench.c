@@ -36,8 +36,8 @@ typedef struct {
 static inline uint64_t
 lcg64(const uint64_t i)
 {
-  static const uint64_t a = 6364136223846793005ull;
-  static const uint64_t c = 1ull;
+  static const uint64_t a = 6364136223846793005ULL;
+  static const uint64_t c = 1ULL;
 
   return (a * i) + c;
 }
@@ -51,7 +51,7 @@ identity(const void* record)
 static size_t
 zix_chunk_hash(const ZixChunk* const chunk)
 {
-  return zix_digest(0u, chunk->buf, chunk->len);
+  return zix_digest(0U, chunk->buf, chunk->len);
 }
 
 static bool
@@ -65,10 +65,10 @@ static const unsigned seed = 1;
 static Inputs
 read_inputs(FILE* const fd)
 {
-  static const size_t max_n_strings = 1u << 20u;
-  static const Inputs no_inputs     = {NULL, 0u, NULL};
+  static const size_t max_n_strings = 1U << 20U;
+  static const Inputs no_inputs     = {NULL, 0U, NULL};
 
-  Inputs inputs       = {NULL, 0u, NULL};
+  Inputs inputs       = {NULL, 0U, NULL};
   size_t buf_len      = 1;
   size_t this_str_len = 0;
   for (int c = 0; (c = fgetc(fd)) != EOF;) {

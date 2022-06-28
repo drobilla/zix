@@ -34,7 +34,7 @@ ith_elem(unsigned test_num, size_t n_elems, size_t i)
     return n_elems - i; // Decreasing (worse case)
   case 2:
   default:
-    return lcg(seed + i) % 100u; // Random
+    return lcg(seed + i) % 100U; // Random
   }
 }
 
@@ -47,7 +47,7 @@ test_fail(void)
 static int
 stress(unsigned test_num, size_t n_elems)
 {
-  uintptr_t    r  = 0u;
+  uintptr_t    r  = 0U;
   ZixTreeIter* ti = NULL;
   ZixTree*     t  = zix_tree_new(NULL, true, int_cmp, NULL, NULL, NULL);
 

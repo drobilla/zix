@@ -46,11 +46,11 @@ next_power_of_two(uint32_t size)
 {
   // http://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
   size--;
-  size |= size >> 1u;
-  size |= size >> 2u;
-  size |= size >> 4u;
-  size |= size >> 8u;
-  size |= size >> 16u;
+  size |= size >> 1U;
+  size |= size >> 2U;
+  size |= size >> 4U;
+  size |= size >> 8U;
+  size |= size >> 16U;
   size++;
   return size;
 }

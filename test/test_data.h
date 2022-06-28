@@ -11,8 +11,8 @@
 static inline uint32_t
 lcg32(const uint32_t i)
 {
-  static const uint32_t a = 134775813u;
-  static const uint32_t c = 1u;
+  static const uint32_t a = 134775813U;
+  static const uint32_t c = 1U;
 
   return (a * i) + c;
 }
@@ -21,8 +21,8 @@ lcg32(const uint32_t i)
 static inline uint64_t
 lcg64(const uint64_t i)
 {
-  static const uint64_t a = 6364136223846793005ull;
-  static const uint64_t c = 1ull;
+  static const uint64_t a = 6364136223846793005ULL;
+  static const uint64_t c = 1ULL;
 
   return (a * i) + c;
 }
@@ -42,10 +42,10 @@ lcg(const uintptr_t i)
 static inline size_t
 unique_rand(size_t i)
 {
-  i ^= 0x5CA1AB1Eu; // Juggle bits to avoid linear clumps
+  i ^= 0x5CA1AB1EU; // Juggle bits to avoid linear clumps
 
   // Largest prime < 2^32 which satisfies (2^32 = 3 mod 4)
-  static const size_t prime = 4294967291u;
+  static const size_t prime = 4294967291U;
   if (i >= prime) {
     return i; // Values >= prime are mapped to themselves
   }

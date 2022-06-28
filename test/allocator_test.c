@@ -65,14 +65,14 @@ test_bump_allocator(void)
   char* const malloced = (char*)zix_malloc(&allocator.base, 3);
   assert(malloced >= buffer);
   assert(malloced <= buffer + sizeof(buffer));
-  assert((uintptr_t)malloced % sizeof(uintmax_t) == 0u);
+  assert((uintptr_t)malloced % sizeof(uintmax_t) == 0U);
 
   assert(!zix_calloc(&allocator.base, 1017, 1));
 
   char* const calloced = (char*)zix_calloc(&allocator.base, 4, 1);
   assert(calloced > malloced);
   assert(calloced <= buffer + sizeof(buffer));
-  assert((uintptr_t)calloced % sizeof(uintmax_t) == 0u);
+  assert((uintptr_t)calloced % sizeof(uintmax_t) == 0U);
   assert(!calloced[0]);
   assert(!calloced[1]);
   assert(!calloced[2]);
@@ -104,7 +104,7 @@ test_bump_allocator(void)
   assert(aligned);
   assert(aligned >= reclaimed);
   assert(aligned <= buffer + sizeof(buffer));
-  assert((uintptr_t)aligned % 128 == 0u);
+  assert((uintptr_t)aligned % 128 == 0U);
 
   zix_aligned_free(&allocator.base, aligned);
   zix_free(&allocator.base, reclaimed); // Correct, but a noop

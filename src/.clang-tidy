@@ -4,7 +4,6 @@
 Checks: >
   *,
   -*-magic-numbers,
-  -*-uppercase-literal-suffix,
   -altera-*,
   -bugprone-easily-swappable-parameters,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,

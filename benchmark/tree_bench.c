@@ -141,7 +141,7 @@ bench_zix_btree(size_t n_elems,
 {
   start_test("ZixBTree");
 
-  uintptr_t    r  = 0u;
+  uintptr_t    r  = 0U;
   ZixBTreeIter ti = zix_btree_end_iter;
   ZixBTree*    t  = zix_btree_new(NULL, int_cmp, NULL);
 
@@ -206,7 +206,7 @@ bench_glib(size_t n_elems,
 {
   start_test("GSequence");
 
-  uintptr_t  r = 0u;
+  uintptr_t  r = 0U;
   GSequence* t = g_sequence_new(NULL);
 
   // Insert n_elems elements

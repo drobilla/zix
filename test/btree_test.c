@@ -27,8 +27,8 @@ int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
   const uintptr_t ia = (uintptr_t)a;
   const uintptr_t ib = (uintptr_t)b;
 
-  assert(ia != 0u); // No wildcards
-  assert(ib != 0u); // No wildcards
+  assert(ia != 0U); // No wildcards
+  assert(ib != 0U); // No wildcards
 
   return ia < ib ? -1 : ia > ib ? 1 : 0;
 }
@@ -42,7 +42,7 @@ ith_elem(const unsigned test_num, const size_t n_elems, const size_t i)
   case 1:
     return n_elems - i; // Decreasing
   default:
-    return 1u + unique_rand(i); // Pseudo-random
+    return 1U + unique_rand(i); // Pseudo-random
   }
 }
 
@@ -103,7 +103,7 @@ test_fail(ZixBTree* t, const char* fmt, ...)
   return EXIT_FAILURE;
 }
 
-static const size_t n_clear_insertions = 1024u;
+static const size_t n_clear_insertions = 1024U;
 
 static void
 destroy(void* const ptr, const void* const user_data)
@@ -125,8 +125,8 @@ test_clear(void)
 {
   ZixBTree* t = zix_btree_new(NULL, int_cmp, NULL);
 
-  for (uintptr_t r = 0u; r < n_clear_insertions; ++r) {
-    assert(!zix_btree_insert(t, (void*)(r + 1u)));
+  for (uintptr_t r = 0U; r < n_clear_insertions; ++r) {
+    assert(!zix_btree_insert(t, (void*)(r + 1U)));
   }
 
   zix_btree_clear(t, destroy, NULL);
@@ -140,8 +140,8 @@ test_free(void)
 {
   ZixBTree* t = zix_btree_new(NULL, int_cmp, NULL);
 
-  for (uintptr_t r = 0u; r < n_clear_insertions; ++r) {
-    assert(!zix_btree_insert(t, (void*)(r + 1u)));
+  for (uintptr_t r = 0U; r < n_clear_insertions; ++r) {
+    assert(!zix_btree_insert(t, (void*)(r + 1U)));
   }
 
   assert(zix_btree_size(t) == n_clear_insertions);
@@ -152,12 +152,12 @@ test_free(void)
 static void
 test_iter_comparison(void)
 {
-  static const size_t n_elems = 4096u;
+  static const size_t n_elems = 4096U;
 
   ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
   // Store increasing numbers from 1 (jammed into the pointers themselves)
-  for (uintptr_t r = 1u; r < n_elems; ++r) {
+  for (uintptr_t r = 1U; r < n_elems; ++r) {
     assert(!zix_btree_insert(t, (void*)r));
   }
 
@@ -174,7 +174,7 @@ test_iter_comparison(void)
   assert(zix_btree_iter_equals(begin, j));
 
   // Advance it and check that they are no longer equal
-  for (size_t r = 1u; r < n_elems - 1u; ++r) {
+  for (size_t r = 1U; r < n_elems - 1U; ++r) {
     j = zix_btree_iter_next(j);
     assert(!zix_btree_iter_is_end(j));
     assert(!zix_btree_iter_equals(begin, j));
@@ -195,13 +195,13 @@ test_iter_comparison(void)
 static void
 test_insert_split_value(void)
 {
-  static const size_t    n_insertions = 767u; // Number of insertions to split
-  static const uintptr_t split_value  = 512u; // Value that will be pulled up
+  static const size_t    n_insertions = 767U; // Number of insertions to split
+  static const uintptr_t split_value  = 512U; // Value that will be pulled up
 
   ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
   // Insert right up until it would cause a split
-  for (uintptr_t r = 1u; r < n_insertions; ++r) {
+  for (uintptr_t r = 1U; r < n_insertions; ++r) {
     assert(!zix_btree_insert(t, (void*)r));
   }
 
@@ -218,16 +218,16 @@ test_remove_cases(void)
      even multiples.  This spreads the load around to hit as many cases as
      possible. */
 
-  static const uintptr_t s1           = 2u;
-  static const uintptr_t s2           = 255u;
-  const size_t           n_insertions = s1 * s2 * 1000u;
+  static const uintptr_t s1           = 2U;
+  static const uintptr_t s2           = 255U;
+  const size_t           n_insertions = s1 * s2 * 1000U;
 
   ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
   // Insert in s1-sized chunks
-  for (uintptr_t phase = 0u; phase < s1; ++phase) {
-    for (uintptr_t r = 0u; r < n_insertions / s1; ++r) {
-      const uintptr_t value = (s1 * r) + phase + 1u;
+  for (uintptr_t phase = 0U; phase < s1; ++phase) {
+    for (uintptr_t r = 0U; r < n_insertions / s1; ++r) {
+      const uintptr_t value = (s1 * r) + phase + 1U;
 
       assert(!zix_btree_insert(t, (void*)value));
     }
@@ -235,9 +235,9 @@ test_remove_cases(void)
 
   // Remove in s2-sized chunks
   ZixBTreeIter next = zix_btree_end(t);
-  for (uintptr_t phase = 0u; phase < s2; ++phase) {
-    for (uintptr_t r = 0u; r < n_insertions / s2; ++r) {
-      const uintptr_t value = (s2 * r) + phase + 1u;
+  for (uintptr_t phase = 0U; phase < s2; ++phase) {
+    for (uintptr_t r = 0U; r < n_insertions / s2; ++r) {
+      const uintptr_t value = (s2 * r) + phase + 1U;
       void*           out   = NULL;
 
       assert(!zix_btree_remove(t, (void*)value, &out, &next));
@@ -604,7 +604,7 @@ test_failed_alloc(void)
 
   // Test that each allocation failing is handled gracefully
   const size_t n_new_allocs = allocator.n_allocations;
-  for (size_t i = 0u; i < n_new_allocs; ++i) {
+  for (size_t i = 0U; i < n_new_allocs; ++i) {
     allocator.n_remaining = i;
     assert(stress(&allocator.base, 0, 4096));
   }
@@ -625,8 +625,8 @@ main(int argc, char** argv)
   test_remove_cases();
   test_failed_alloc();
 
-  const unsigned n_tests = 3u;
-  const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 131072u;
+  const unsigned n_tests = 3U;
+  const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 131072U;
 
   printf("Running %u tests with %" PRIuPTR " elements", n_tests, n_elems);
   for (unsigned i = 0; i < n_tests; ++i) {

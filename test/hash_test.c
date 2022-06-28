@@ -59,15 +59,15 @@ identity(const char* record)
 ZIX_PURE_FUNC static size_t
 decent_string_hash(const char* const str)
 {
-  return zix_digest(0u, str, strlen(str));
+  return zix_digest(0U, str, strlen(str));
 }
 
 /// Terrible hash function from K&R first edition
 ZIX_PURE_FUNC static size_t
 terrible_string_hash(const char* str)
 {
-  size_t  hash = 0u;
-  uint8_t c    = 0u;
+  size_t  hash = 0U;
+  uint8_t c    = 0U;
 
   while ((c = (uint8_t)*str++)) {
     hash += c;
@@ -82,19 +82,19 @@ string_hash_aligned(const char* const str)
   size_t length = strlen(str);
 
   length = (length + (sizeof(size_t) - 1)) / sizeof(size_t) * sizeof(size_t);
-  return zix_digest_aligned(0u, str, length);
+  return zix_digest_aligned(0U, str, length);
 }
 
 ZIX_PURE_FUNC static size_t
 string_hash32(const char* const str)
 {
-  return (size_t)zix_digest32(0u, str, strlen(str));
+  return (size_t)zix_digest32(0U, str, strlen(str));
 }
 
 ZIX_PURE_FUNC static size_t
 string_hash64(const char* const str)
 {
-  return (size_t)zix_digest64(0u, str, strlen(str));
+  return (size_t)zix_digest64(0U, str, strlen(str));
 }
 
 ZIX_PURE_FUNC static size_t
@@ -102,8 +102,8 @@ string_hash32_aligned(const char* const str)
 {
   size_t length = strlen(str);
 
-  length = (length + 3u) / 4u * 4u;
-  return (size_t)zix_digest32_aligned(0u, str, length);
+  length = (length + 3U) / 4U * 4U;
+  return (size_t)zix_digest32_aligned(0U, str, length);
 }
 
 #if UINTPTR_MAX >= UINT64_MAX
@@ -113,8 +113,8 @@ string_hash64_aligned(const char* const str)
 {
   size_t length = strlen(str);
 
-  length = (length + 7u) / 8u * 8u;
-  return (size_t)zix_digest64_aligned(0u, str, length);
+  length = (length + 7U) / 8U * 8U;
+  return (size_t)zix_digest64_aligned(0U, str, length);
 }
 
 #endif
@@ -143,13 +143,13 @@ stress_with(ZixAllocator* const allocator,
     return test_fail(hash, buffer, strings, "Failed to allocate strings\n");
   }
 
-  uint32_t seed = 1u;
-  for (size_t i = 0u; i < n_elems; ++i) {
+  uint32_t seed = 1U;
+  for (size_t i = 0U; i < n_elems; ++i) {
     strings[i] = buffer + i * (string_length + 1);
     assert((uintptr_t)strings[i] % sizeof(size_t) == 0);
     assert((uintptr_t)strings[i] % sizeof(uint32_t) == 0);
 
-    for (size_t j = 0u; j < string_length; ++j) {
+    for (size_t j = 0U; j < string_length; ++j) {
       seed          = lcg32(seed);
       strings[i][j] = (char)('!' + (seed % 92));
     }
@@ -285,7 +285,7 @@ stress_with(ZixAllocator* const allocator,
   }
 
   // Check key == value (and test zix_hash_foreach)
-  size_t n_checked = 0u;
+  size_t n_checked = 0U;
   for (ZixHashIter i = zix_hash_begin(hash); i != zix_hash_end(hash);
        i             = zix_hash_next(hash, i)) {
     const char* const string = (const char*)zix_hash_get(hash, i);
@@ -366,7 +366,7 @@ test_all_tombstones(void)
     zix_hash_new(NULL, identity, identity_index_hash, string_equal);
 
   // Insert each element then immediately remove it
-  for (unsigned i = 0u; i < N_STRINGS; ++i) {
+  for (unsigned i = 0U; i < N_STRINGS; ++i) {
     const char* removed = NULL;
 
     assert(!zix_hash_insert(hash, original_strings[i]));
@@ -377,7 +377,7 @@ test_all_tombstones(void)
   assert(zix_hash_size(hash) == 0);
 
   // Insert clashing elements which should hit the "all tombstones" case
-  for (unsigned i = 0u; i < N_STRINGS; ++i) {
+  for (unsigned i = 0U; i < N_STRINGS; ++i) {
     assert(!zix_hash_insert(hash, collision_strings[i]));
     assert(!st);
   }
@@ -397,7 +397,7 @@ test_failed_alloc(void)
 
   // Test that each allocation failing is handled gracefully
   const size_t n_new_allocs = allocator.n_allocations;
-  for (size_t i = 0u; i < n_new_allocs; ++i) {
+  for (size_t i = 0U; i < n_new_allocs; ++i) {
     allocator.n_remaining = i;
     assert(stress(&allocator.base, 16));
   }
@@ -411,7 +411,7 @@ main(void)
   test_all_tombstones();
   test_failed_alloc();
 
-  static const size_t n_elems = 1024u;
+  static const size_t n_elems = 1024U;
 
   if (stress(NULL, n_elems)) {
     return 1;

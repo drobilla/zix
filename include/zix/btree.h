@@ -33,7 +33,7 @@ extern "C" {
    height of 6 is enough to store trillions.
 */
 #ifndef ZIX_BTREE_MAX_HEIGHT
-#  define ZIX_BTREE_MAX_HEIGHT 6u
+#  define ZIX_BTREE_MAX_HEIGHT 6U
 #endif
 
 /// A B-Tree
@@ -60,8 +60,8 @@ typedef struct {
 /// A static end iterator for convenience
 static const ZixBTreeIter zix_btree_end_iter = {
   {NULL, NULL, NULL, NULL, NULL, NULL},
-  {0u, 0u, 0u, 0u, 0u, 0u},
-  0u};
+  {0U, 0U, 0U, 0U, 0U, 0U},
+  0U};
 
 /**
    Create a new (empty) B-Tree.

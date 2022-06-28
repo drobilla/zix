@@ -23,16 +23,16 @@
 static inline uint64_t
 mix64(uint64_t h)
 {
-  h ^= h >> 23u;
-  h *= 0x2127599BF4325C37ull;
-  h ^= h >> 47u;
+  h ^= h >> 23U;
+  h *= 0x2127599BF4325C37ULL;
+  h ^= h >> 47U;
   return h;
 }
 
 uint64_t
 zix_digest64(const uint64_t seed, const void* const key, const size_t len)
 {
-  static const uint64_t m = 0x880355F21E6D1965ull;
+  static const uint64_t m = 0x880355F21E6D1965ULL;
 
   // Process as many 64-bit blocks as possible
   const size_t         n_blocks   = len / sizeof(uint64_t);
@@ -40,7 +40,7 @@ zix_digest64(const uint64_t seed, const void* const key, const size_t len)
   const uint8_t* const blocks_end = data + (n_blocks * sizeof(uint64_t));
   uint64_t             h          = seed ^ (len * m);
   for (; data != blocks_end; data += sizeof(uint64_t)) {
-    uint64_t k = 0u;
+    uint64_t k = 0U;
     memcpy(&k, data, sizeof(uint64_t));
 
     h ^= mix64(k);
@@ -49,25 +49,25 @@ zix_digest64(const uint64_t seed, const void* const key, const size_t len)
 
   // Process any trailing bytes
   const uint8_t* const tail = blocks_end;
-  uint64_t             v    = 0u;
-  switch (len & 7u) {
+  uint64_t             v    = 0U;
+  switch (len & 7U) {
   case 7:
-    v |= (uint64_t)tail[6] << 48u;
+    v |= (uint64_t)tail[6] << 48U;
     FALLTHROUGH();
   case 6:
-    v |= (uint64_t)tail[5] << 40u;
+    v |= (uint64_t)tail[5] << 40U;
     FALLTHROUGH();
   case 5:
-    v |= (uint64_t)tail[4] << 32u;
+    v |= (uint64_t)tail[4] << 32U;
     FALLTHROUGH();
   case 4:
-    v |= (uint64_t)tail[3] << 24u;
+    v |= (uint64_t)tail[3] << 24U;
     FALLTHROUGH();
   case 3:
-    v |= (uint64_t)tail[2] << 16u;
+    v |= (uint64_t)tail[2] << 16U;
     FALLTHROUGH();
   case 2:
-    v |= (uint64_t)tail[1] << 8u;
+    v |= (uint64_t)tail[1] << 8U;
     FALLTHROUGH();
   case 1:
     v |= (uint64_t)tail[0];
@@ -82,16 +82,16 @@ zix_digest64(const uint64_t seed, const void* const key, const size_t len)
 uint64_t
 zix_digest64_aligned(const uint64_t seed, const void* const key, size_t len)
 {
-  static const uint64_t m = 0x880355F21E6D1965ull;
+  static const uint64_t m = 0x880355F21E6D1965ULL;
 
-  assert((uintptr_t)key % sizeof(uint64_t) == 0u);
-  assert(len % sizeof(uint64_t) == 0u);
+  assert((uintptr_t)key % sizeof(uint64_t) == 0U);
+  assert(len % sizeof(uint64_t) == 0U);
 
   const uint64_t* const blocks   = (const uint64_t*)key;
   const size_t          n_blocks = len / sizeof(uint64_t);
   uint64_t              h        = seed ^ (len * m);
 
-  for (size_t i = 0u; i < n_blocks; ++i) {
+  for (size_t i = 0U; i < n_blocks; ++i) {
     h ^= mix64(blocks[i]);
     h *= m;
   }
@@ -119,19 +119,19 @@ rotl32(const uint32_t val, const uint32_t bits)
 static inline uint32_t
 mix32(uint32_t h)
 {
-  h ^= h >> 16u;
-  h *= 0x85EBCA6Bu;
-  h ^= h >> 13u;
-  h *= 0xC2B2AE35u;
-  h ^= h >> 16u;
+  h ^= h >> 16U;
+  h *= 0x85EBCA6BU;
+  h ^= h >> 13U;
+  h *= 0xC2B2AE35U;
+  h ^= h >> 16U;
   return h;
 }
 
 uint32_t
 zix_digest32(const uint32_t seed, const void* const key, const size_t len)
 {
-  static const uint32_t c1 = 0xCC9E2D51u;
-  static const uint32_t c2 = 0x1B873593u;
+  static const uint32_t c1 = 0xCC9E2D51U;
+  static const uint32_t c2 = 0x1B873593U;
 
   // Process as many 32-bit blocks as possible
   const size_t         n_blocks   = len / sizeof(uint32_t);
@@ -139,7 +139,7 @@ zix_digest32(const uint32_t seed, const void* const key, const size_t len)
   const uint8_t* const blocks_end = data + (n_blocks * sizeof(uint32_t));
   uint32_t             h          = seed;
   for (; data != blocks_end; data += sizeof(uint32_t)) {
-    uint32_t k = 0u;
+    uint32_t k = 0U;
     memcpy(&k, data, sizeof(uint32_t));
 
     k *= c1;
@@ -148,23 +148,23 @@ zix_digest32(const uint32_t seed, const void* const key, const size_t len)
 
     h ^= k;
     h = rotl32(h, 13);
-    h = h * 5u + 0xE6546B64u;
+    h = h * 5U + 0xE6546B64U;
   }
 
   // Process any trailing bytes
-  uint32_t k = 0u;
-  switch (len & 3u) {
-  case 3u:
-    k ^= (uint32_t)data[2u] << 16u;
+  uint32_t k = 0U;
+  switch (len & 3U) {
+  case 3U:
+    k ^= (uint32_t)data[2U] << 16U;
     FALLTHROUGH();
-  case 2u:
-    k ^= (uint32_t)data[1u] << 8u;
+  case 2U:
+    k ^= (uint32_t)data[1U] << 8U;
     FALLTHROUGH();
-  case 1u:
-    k ^= (uint32_t)data[0u];
+  case 1U:
+    k ^= (uint32_t)data[0U];
 
     k *= c1;
-    k = rotl32(k, 15u);
+    k = rotl32(k, 15U);
     k *= c2;
     h ^= k;
   }
@@ -177,16 +177,16 @@ zix_digest32_aligned(const uint32_t    seed,
                      const void* const key,
                      const size_t      len)
 {
-  static const uint32_t c1 = 0xCC9E2D51u;
-  static const uint32_t c2 = 0x1B873593u;
+  static const uint32_t c1 = 0xCC9E2D51U;
+  static const uint32_t c2 = 0x1B873593U;
 
-  assert((uintptr_t)key % sizeof(uint32_t) == 0u);
-  assert(len % sizeof(uint32_t) == 0u);
+  assert((uintptr_t)key % sizeof(uint32_t) == 0U);
+  assert(len % sizeof(uint32_t) == 0U);
 
   const uint32_t* const blocks   = (const uint32_t*)key;
   const size_t          n_blocks = len / sizeof(uint32_t);
   uint32_t              h        = seed;
-  for (size_t i = 0u; i < n_blocks; ++i) {
+  for (size_t i = 0U; i < n_blocks; ++i) {
     uint32_t k = blocks[i];
 
     k *= c1;
@@ -195,7 +195,7 @@ zix_digest32_aligned(const uint32_t    seed,
 
     h ^= k;
     h = rotl32(h, 13);
-    h = h * 5u + 0xE6546B64u;
+    h = h * 5U + 0xE6546B64U;
   }
 
   return mix32(h ^ (uint32_t)len);

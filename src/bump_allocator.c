@@ -16,9 +16,9 @@ static size_t
 round_up_multiple(const size_t number, const size_t factor)
 {
   assert(factor);                        // Factor must be non-zero
-  assert((factor & (factor - 1)) == 0u); // Factor must be a power of two
+  assert((factor & (factor - 1)) == 0U); // Factor must be a power of two
 
-  return (number + factor - 1u) & ~(factor - 1u);
+  return (number + factor - 1U) & ~(factor - 1U);
 }
 
 ZIX_MALLOC_FUNC
@@ -100,7 +100,7 @@ zix_bump_aligned_alloc(ZixAllocator* const allocator,
   const size_t            old_top  = state->top;
 
   assert(alignment >= min_alignment);
-  assert(size % alignment == 0u);
+  assert(size % alignment == 0U);
 
   /* First, calculate how much we need to offset the top to achieve this
      alignment.  Note that it's not the offset that needs to be aligned (since

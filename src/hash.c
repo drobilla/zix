@@ -22,8 +22,8 @@ struct ZixHashImpl {
   ZixHashEntry*   entries;    ///< Pointer to dynamically allocated table
 };
 
-static const size_t min_n_entries = 4u;
-static const size_t tombstone     = 0xDEADu;
+static const size_t min_n_entries = 4U;
+static const size_t tombstone     = 0xDEADU;
 
 ZixHash*
 zix_hash_new(ZixAllocator* const   allocator,
@@ -44,9 +44,9 @@ zix_hash_new(ZixAllocator* const   allocator,
   hash->key_func   = key_func;
   hash->hash_func  = hash_func;
   hash->equal_func = equal_func;
-  hash->count      = 0u;
+  hash->count      = 0U;
   hash->n_entries  = min_n_entries;
-  hash->mask       = hash->n_entries - 1u;
+  hash->mask       = hash->n_entries - 1U;
 
   hash->entries =
     (ZixHashEntry*)zix_calloc(allocator, hash->n_entries, sizeof(ZixHashEntry));
@@ -72,7 +72,7 @@ ZixHashIter
 zix_hash_begin(const ZixHash* const hash)
 {
   assert(hash);
-  return hash->entries[0u].value ? 0u : zix_hash_next(hash, 0u);
+  return hash->entries[0U].value ? 0U : zix_hash_next(hash, 0U);
 }
 
 ZixHashIter
@@ -137,7 +137,7 @@ is_match(const ZixHash* const hash,
 static inline size_t
 next_index(const ZixHash* const hash, const size_t i)
 {
-  return (i == hash->mask) ? 0u : (i + 1u);
+  return (i == hash->mask) ? 0U : (i + 1U);
 }
 
 static inline ZixHashIter
@@ -174,11 +174,11 @@ rehash(ZixHash* const hash, const size_t old_n_entries)
   hash->entries = new_entries;
 
   // Reinsert every element into the new array
-  for (size_t i = 0u; i < old_n_entries; ++i) {
+  for (size_t i = 0U; i < old_n_entries; ++i) {
     ZixHashEntry* const entry = &old_entries[i];
 
     if (entry->value) {
-      assert(hash->mask == hash->n_entries - 1u);
+      assert(hash->mask == hash->n_entries - 1U);
       const size_t new_h = fold_hash(entry->hash, hash->mask);
       const size_t new_i = find_entry(hash, entry->value, new_h, entry->hash);
 
@@ -196,8 +196,8 @@ grow(ZixHash* const hash)
   const size_t old_n_entries = hash->n_entries;
   const size_t old_mask      = hash->mask;
 
-  hash->n_entries <<= 1u;
-  hash->mask = hash->n_entries - 1u;
+  hash->n_entries <<= 1U;
+  hash->mask = hash->n_entries - 1U;
 
   const ZixStatus st = rehash(hash, old_n_entries);
   if (st) {
@@ -214,8 +214,8 @@ shrink(ZixHash* const hash)
   if (hash->n_entries > min_n_entries) {
     const size_t old_n_entries = hash->n_entries;
 
-    hash->n_entries >>= 1u;
-    hash->mask = hash->n_entries - 1u;
+    hash->n_entries >>= 1U;
+    hash->mask = hash->n_entries - 1U;
 
     return rehash(hash, old_n_entries);
   }
@@ -327,7 +327,7 @@ zix_hash_insert_at(ZixHash* const          hash,
   entry->value = record;
 
   // Update size and rehash if we exceeded the maximum load
-  const size_t max_load  = hash->n_entries / 2u + hash->n_entries / 8u;
+  const size_t max_load  = hash->n_entries / 2U + hash->n_entries / 8U;
   const size_t new_count = hash->count + 1;
   if (new_count >= max_load) {
     const ZixStatus st = grow(hash);
@@ -368,7 +368,7 @@ zix_hash_erase(ZixHash* const        hash,
 
   // Decrease element count and rehash if necessary
   --hash->count;
-  if (hash->count < hash->n_entries / 4u) {
+  if (hash->count < hash->n_entries / 4U) {
     return shrink(hash);
   }
 
