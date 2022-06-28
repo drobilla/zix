@@ -95,6 +95,7 @@ sources = files(
   'src/digest.c',
   'src/hash.c',
   'src/ring.c',
+  'src/status.c',
   'src/tree.c',
 )
 
