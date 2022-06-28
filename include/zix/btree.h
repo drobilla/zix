@@ -180,7 +180,7 @@ ZixBTreeIter
 zix_btree_end(const ZixBTree* ZIX_NULLABLE t);
 
 /// Return true iff `lhs` is equal to `rhs`
-ZIX_PURE_API
+ZIX_CONST_API
 bool
 zix_btree_iter_equals(ZixBTreeIter lhs, ZixBTreeIter rhs);
 

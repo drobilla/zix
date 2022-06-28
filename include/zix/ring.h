@@ -67,17 +67,17 @@ void
 zix_ring_reset(ZixRing* ZIX_NONNULL ring);
 
 /// Return the number of bytes of space available for reading
-ZIX_CONST_API
+ZIX_PURE_API
 uint32_t
 zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
 
 /// Return the number of bytes of space available for writing
-ZIX_CONST_API
+ZIX_PURE_API
 uint32_t
 zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
 
 /// Return the capacity (i.e. total write space when empty)
-ZIX_CONST_API
+ZIX_PURE_API
 uint32_t
 zix_ring_capacity(const ZixRing* ZIX_NONNULL ring);
 
