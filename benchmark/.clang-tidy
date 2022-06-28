@@ -12,7 +12,6 @@ Checks: >
   -llvm-header-guard,
   -llvmlibc-*,
   -performance-no-int-to-ptr,
-  -readability-function-cognitive-complexity,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file
