@@ -9,7 +9,8 @@
 #  define ZIX_DISABLE_GLIB_WARNINGS                                         \
     _Pragma("clang diagnostic push")                                        \
     _Pragma("clang diagnostic ignored \"-Wdocumentation-unknown-command\"") \
-    _Pragma("clang diagnostic ignored \"-Wdocumentation\"")
+    _Pragma("clang diagnostic ignored \"-Wdocumentation\"")                 \
+    _Pragma("clang diagnostic ignored \"-Wreserved-id-macro\"")
 
 #  define ZIX_RESTORE_WARNINGS _Pragma("clang diagnostic pop")
 

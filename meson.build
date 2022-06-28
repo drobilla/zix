@@ -26,20 +26,49 @@ cc = meson.get_compiler('c')
 # Set global warning flags
 if get_option('strict') and not meson.is_subproject()
   subdir('meson/warnings')
+  add_project_arguments(all_c_warnings, language: ['c'])
 endif
 subdir('meson/suppressions')
+add_project_arguments(c_suppressions, language: ['c'])
 
-add_project_arguments(all_c_warnings + c_suppressions, language: ['c'])
+##########################
+# Platform Configuration #
+##########################
 
-################
-# Dependencies #
-################
+platform_c_args = []
 
-# Check for mlock() (used by ZixRing)
-mlock_fragment = '''#include <sys/mman.h>
-                     int main(void) { return mlock(0, 0); }'''
-if cc.compiles(mlock_fragment, name: 'mlock')
-  add_project_arguments(['-DHAVE_MLOCK'], language: 'c')
+# Determine whether to use POSIX
+no_posix = get_option('posix').disabled() or host_machine.system() == 'windows'
+if no_posix
+  platform_c_args += ['-DZIX_NO_POSIX']
+else
+  platform_c_args += ['-D_POSIX_C_SOURCE=200809L']
+endif
+
+# Check for platform features with the build system
+if get_option('checks')
+  platform_c_args += ['-DZIX_NO_DEFAULT_CONFIG']
+
+  mlock_code = '''#include <sys/mman.h>
+int main(void) { return mlock(0, 0); }'''
+
+  posix_memalign_code = '''#include <stdlib.h>
+int main(void) { void* mem; posix_memalign(&mem, 8, 8); }'''
+
+  platform_c_args += '-DHAVE_MLOCK=@0@'.format(
+    cc.compiles(mlock_code,
+                args: platform_c_args,
+                name: 'mlock').to_int())
+
+  platform_c_args += '-DHAVE_POSIX_MEMALIGN=@0@'.format(
+    cc.compiles(posix_memalign_code,
+                args: platform_c_args,
+                name: 'posix_memalign').to_int())
+endif
+
+# Build as C++ on MSVC
+if cc.get_id() == 'msvc'
+  add_project_arguments(['/TP'], language: ['c'])
 endif
 
 ###########
@@ -81,7 +110,7 @@ if get_option('default_library') == 'static'
 endif
 
 # Set any additional arguments required for building libraries or programs
-library_c_args = ['-DZIX_INTERNAL']
+library_c_args = platform_c_args + ['-DZIX_INTERNAL']
 library_link_args = []
 program_c_args = []
 program_link_args = []
@@ -215,15 +244,15 @@ if not get_option('benchmarks').disabled()
 
   if glib_dep.found()
     build_benchmarks = true
+    benchmark_c_args = platform_c_args
 
-    benchmark_c_args = []
     if cc.get_id() == 'clang'
-      benchmark_c_args += [
+      benchmark_c_suppressions = [
         '-Wno-reserved-identifier',
       ]
-    endif
 
-    benchmark_c_args = cc.get_supported_arguments(benchmark_c_args)
+      benchmark_c_args += cc.get_supported_arguments(benchmark_c_suppressions)
+    endif
 
     foreach benchmark : benchmarks
       benchmark(benchmark,

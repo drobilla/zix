@@ -21,7 +21,6 @@ if is_variable('cc')
         '-Wno-c11-extensions', # Glib
         '-Wno-implicit-fallthrough', # Really for clang < 12
         '-Wno-padded',
-        '-Wno-reserved-id-macro',
       ]
 
     elif cc.get_id() == 'gcc'
