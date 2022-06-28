@@ -3,33 +3,42 @@ Zix
 
 Zix is a lightweight C library of portability wrappers and data structures.
 
+Components
+----------
+
+  * `ZixAllocator`: A customizable allocator.
+    * `ZixBumpAllocator`: A simple realtime-safe "bump-pointer" allocator.
+  * `ZixBitset`: A packed set of bits of arbitrary length.
+  * `ZixBTree`: A page-allocated B-tree.
+  * `ZixHash`: An open-addressing hash table.
+  * `ZixRing`: A lock-free realtime-safe ring buffer.
+  * `ZixSem`: A portable semaphore wrapper.
+  * `ZixThread`: A portable thread wrapper.
+  * `ZixTree`: A binary search tree.
+  * `zix_digest`: A hash function for arbitrary data.
+
+Platforms
+---------
+
+Zix is continually tested on:
+
+  * GNU/Linux (x86, arm32, and arm64)
+  * FreeBSD (x64)
+  * MacOS (x64)
+  * Node (as wasm via emscripten)
+
 Dependencies
 ------------
 
 None, except the C standard library.
 
-Building
---------
+Documentation
+-------------
 
-Zix is a straightforward collection of C headers and implementation files which
-should be easy to build or incorporate into a project.
+Public interfaces are well-documented in the [headers](include/zix/).  There is
+no external documentation at this time.
 
-A [Meson][] build definition is included which can be used to do a proper
-system installation with a `pkg-config` file, generate IDE projects, run the
-tests, and so on.  For example, the library and tests can be built and run like
-so:
-
-    meson setup build
-    cd build
-    ninja test
-
-See the [Meson documentation][] for more details on using Meson.
-
-Usage
------
-
-The [headers](include/zix/) are reasonably well documented.  There is no
-external documentation at this time.
+  * [Installation Instructions](INSTALL.md)
 
  -- David Robillard <d@drobilla.net>
 
