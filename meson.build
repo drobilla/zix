@@ -1,184 +1,39 @@
-# Copyright 2020-2021 David Robillard <d@drobilla.net>
+# Copyright 2020-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: CC0-1.0 OR ISC
 
 project('zix', ['c'],
         version: '0.0.3',
         license: 'ISC',
-        meson_version: '>= 0.49.0',
+        meson_version: '>= 0.56.0',
         default_options: [
           'b_ndebug=if-release',
           'buildtype=release',
           'c_std=c99',
-          'default_library=shared',
-          'warning_level=3',
         ])
 
 major_version = meson.project_version().split('.')[0]
 version_suffix = '-@0@'.format(major_version)
 versioned_name = 'zix' + version_suffix
 
-#
-# General Setup
-#
+#######################
+# Compilers and Flags #
+#######################
 
-# Load build tools
+# Required tools
 pkg = import('pkgconfig')
 cc = meson.get_compiler('c')
 
-# Suppress unavoidable present even in default build
-c_warnings = []
-c_suppressions = []
-if cc.get_id() == 'clang'
-  c_warnings = [
-    '-Wno-nullability-extension',
-  ]
-elif cc.get_id() == 'msvc'
-  c_warnings += [
-    '/wd4706',  # assignment within conditional expression
-  ]
+# Set global warning flags
+if get_option('strict') and not meson.is_subproject()
+  subdir('meson/warnings')
 endif
+subdir('meson/suppressions')
 
-# Set ultra strict warnings for developers, if requested
-if get_option('strict')
-  if cc.get_id() == 'clang'
-    c_warnings += [
-      '-Weverything',
-      '-Wno-bad-function-cast',
-      '-Wno-c11-extensions', # Glib
-      '-Wno-implicit-fallthrough', # Really for clang < 12
-      '-Wno-padded',
-      '-Wno-reserved-id-macro',
-    ]
-  elif cc.get_id() == 'gcc'
-    c_warnings += [
-      # '-Waggregate-return',
-      '-Walloc-size-larger-than=16384',
-      '-Walloc-zero',
-      '-Walloca',
-      '-Wanalyzer-too-complex',
-      '-Warith-conversion',
-      '-Warray-bounds=2',
-      '-Wattribute-alias=2',
-      '-Wcast-align=strict',
-      '-Wcast-qual',
-      '-Wconversion',
-      '-Wdate-time',
-      '-Wdisabled-optimization',
-      '-Wdouble-promotion',
-      '-Wduplicated-branches',
-      '-Wduplicated-cond',
-      '-Wfloat-equal',
-      '-Wformat-overflow=2',
-      '-Wformat-signedness',
-      '-Wformat-truncation=2',
-      '-Wformat=2',
-      '-Wframe-larger-than=2048',
-      '-Wimplicit-fallthrough=2',
-      '-Winit-self',
-      # '-Winline',
-      '-Winvalid-pch',
-      # '-Wlarger-than=',
-      '-Wlogical-op',
-      '-Wmissing-declarations',
-      '-Wmissing-include-dirs',
-      '-Wmultichar',
-      '-Wnormalized=nfc',
-      '-Wnull-dereference',
-      '-Wpacked',
-      # '-Wpadded',
-      '-Wredundant-decls',
-      '-Wscalar-storage-order',
-      '-Wshadow',
-      '-Wshift-overflow=2',
-      '-Wsizeof-array-argument',
-      '-Wstack-protector',
-      '-Wstack-usage=2048',
-      '-Wstrict-aliasing=3',
-      # '-Wstrict-overflow=5',
-      '-Wstringop-overflow=3',
-      '-Wsuggest-attribute=cold',
-      '-Wsuggest-attribute=const',
-      '-Wsuggest-attribute=format',
-      '-Wsuggest-attribute=malloc',
-      '-Wsuggest-attribute=noreturn',
-      '-Wsuggest-attribute=pure',
-      # '-Wswitch-default',
-      '-Wswitch-enum',
-      '-Wsync-nand',
-      # '-Wsystem-headers',
-      # '-Wtraditional',
-      # '-Wtraditional-conversion',
-      '-Wtrampolines',
-      '-Wundef',
-      '-Wunused-const-variable=2',
-      '-Wunused-macros',
-      '-Wvarargs',
-      '-Wvector-operation-performance',
-      '-Wvla',
-      '-Wwrite-strings',
-    ]
-  elif cc.get_id() == 'msvc'
-    c_warnings += [
-      '/Wall',    # everything, except...
-      '/wd4191',  # unsafe function conversion
-      '/wd4200',  # zero-sized array in struct/union
-      '/wd4365',  # signed/unsigned mismatch
-      '/wd4514',  # unreferenced inline function has been removed
-      '/wd4710',  # function not inlined
-      '/wd4711',  # function selected for automatic inline expansion
-      '/wd4777',  # format string and argument mismatch
-      '/wd4800',  # implicit conversion to bool
-      '/wd4820',  # padding added after construct
-      '/wd5045',  # will insert Spectre mitigation for memory load
-    ]
-  endif
+add_project_arguments(all_c_warnings + c_suppressions, language: ['c'])
 
-  if cc.get_id() == 'gcc' and host_machine.system() == 'windows'
-    c_warnings += [
-      '-Wno-cast-function-type',
-      '-Wno-format',
-      '-Wno-suggest-attribute=format',
-      '-Wno-suggest-attribute=pure',
-    ]
-  endif
-
-endif
-
-add_project_arguments(cc.get_supported_arguments(c_warnings), language: ['c'])
-
-if cc.get_id() == 'msvc'
-  # Build as C++
-  add_project_arguments(['/TP'], language: ['c'])
-
-  # Suppress warnings in system headers
-  add_project_arguments(['/experimental:external',
-                         '/external:W0',
-                         '/external:anglebrackets'],
-                        language: ['c'])
-endif
-
-# Determine library type and the flags needed to build it
-if get_option('default_library') == 'both'
-  if host_machine.system() == 'windows'
-    error('default_library=both is not supported on Windows')
-  endif
-
-  library_type = 'both_libraries'
-  library_args = ['-DZIX_INTERNAL']
-  prog_args = []
-elif get_option('default_library') == 'shared'
-  library_type = 'shared_library'
-  library_args = ['-DZIX_INTERNAL']
-  prog_args = []
-else
-  library_type = 'static_library'
-  library_args = ['-DZIX_INTERNAL', '-DZIX_STATIC']
-  prog_args = ['-DZIX_STATIC']
-endif
-
-#
-# System Checks and Dependencies
-#
+################
+# Dependencies #
+################
 
 # Check for mlock() (used by ZixRing)
 mlock_fragment = '''#include <sys/mman.h>
@@ -187,50 +42,13 @@ if cc.compiles(mlock_fragment, name: 'mlock')
   add_project_arguments(['-DHAVE_MLOCK'], language: 'c')
 endif
 
-#
-# Library
-#
+###########
+# Library #
+###########
 
-sources = [
-  'src/allocator.c',
-  'src/bitset.c',
-  'src/btree.c',
-  'src/bump_allocator.c',
-  'src/digest.c',
-  'src/hash.c',
-  'src/ring.c',
-  'src/tree.c',
-]
+include_dirs = include_directories(['include'])
 
-# Build shared and/or static library/libraries
-libzix = build_target(
-  versioned_name,
-  sources,
-  version: meson.project_version(),
-  include_directories: include_directories(['include']),
-  c_args: library_args,
-  gnu_symbol_visibility: 'hidden',
-  install: true,
-  target_type: library_type)
-
-zix_dep = declare_dependency(
-  link_with: libzix,
-  include_directories: include_directories(['include']))
-
-#
-# Installation
-#
-
-# Generage pkg-config file
-pkg.generate(
-  libzix,
-  name: 'Zix',
-  filebase: versioned_name,
-  subdirs: [versioned_name],
-  version: meson.project_version(),
-  description: 'A lightweight portability and data structure C library')
-
-headers = [
+c_headers = files(
   'include/zix/allocator.h',
   'include/zix/attributes.h',
   'include/zix/bitset.h',
@@ -243,56 +61,112 @@ headers = [
   'include/zix/sem.h',
   'include/zix/thread.h',
   'include/zix/tree.h',
-]
+)
+
+sources = files(
+  'src/allocator.c',
+  'src/bitset.c',
+  'src/btree.c',
+  'src/bump_allocator.c',
+  'src/digest.c',
+  'src/hash.c',
+  'src/ring.c',
+  'src/tree.c',
+)
+
+# Set appropriate arguments for building against the library type
+subdir('meson/library')
+if get_option('default_library') == 'static'
+  add_project_arguments(['-DZIX_STATIC'], language: ['c'])
+endif
+
+# Build shared and/or static library
+libzix = library(
+  meson.project_name() + library_suffix,
+  sources,
+  c_args: ['-DZIX_INTERNAL'],
+  gnu_symbol_visibility: 'hidden',
+  include_directories: include_dirs,
+  install: true,
+  version: meson.project_version())
+
+# Declare dependency for internal meson dependants
+zix_dep = declare_dependency(
+  include_directories: include_dirs,
+  link_with: libzix)
+
+# Generage pkg-config file for external dependants
+pkg.generate(
+  libzix,
+  description: 'A lightweight portability and data structure C library',
+  filebase: versioned_name,
+  name: 'Zix',
+  subdirs: [versioned_name],
+  version: meson.project_version())
 
 # Install headers to a versioned include directory
-install_headers(headers, subdir: versioned_name / 'zix')
+install_headers(c_headers, subdir: versioned_name / 'zix')
 
-#
-# Tests
-#
+#########
+# Tests #
+#########
 
-tests = [
+sequential_tests = [
   'allocator_test',
   'bitset_test',
   'btree_test',
   'digest_test',
   'hash_test',
-  'ring_test',
-  'sem_test',
   'strerror_test',
   'tree_test',
 ]
 
-# Build and run tests
-if get_option('tests')
+threaded_tests = [
+  'ring_test',
+  'sem_test',
+]
+
+if not get_option('tests').disabled()
   # Check licensing metadata
-  reuse = find_program('reuse', required: false)
+  reuse = find_program('reuse', required: get_option('tests'))
   if reuse.found()
-    test('REUSE', reuse,
+    test('REUSE',
+         reuse,
          args: ['--root', meson.current_source_dir(), 'lint'],
          suite: 'data')
   endif
 
-  thread_dep = dependency('threads')
-  dl_dep = cc.find_library('dl', required: false)
+  common_test_sources = files('test/failing_allocator.c')
 
-  foreach test : tests
-    sources = files('test/@0@.c'.format(test), 'test/failing_allocator.c')
+  foreach test : sequential_tests
+    sources = common_test_sources + files('test/@0@.c'.format(test))
 
     test(test,
          executable(test,
                     sources,
-                    include_directories: include_directories(['include']),
-                    c_args: prog_args,
-                    dependencies: [dl_dep, zix_dep, thread_dep]),
+                    dependencies: [zix_dep],
+                    include_directories: include_dirs),
          timeout: 120)
   endforeach
+
+  thread_dep = dependency('threads', required: get_option('tests'))
+  if thread_dep.found()
+    foreach test : threaded_tests
+      sources = common_test_sources + files('test/@0@.c'.format(test))
+
+      test(test,
+           executable(test,
+                      sources,
+                      dependencies: [zix_dep, thread_dep],
+                      include_directories: include_dirs),
+           timeout: 120)
+    endforeach
+  endif
 endif
 
-#
-# Benchmarks
-#
+##############
+# Benchmarks #
+##############
 
 benchmarks = [
   'dict_bench',
@@ -302,37 +176,35 @@ benchmarks = [
 build_benchmarks = false
 if not get_option('benchmarks').disabled()
   glib_dep = dependency('glib-2.0',
-                        version: '>= 2.0.0',
-                        required: get_option('benchmarks'))
+                        required: get_option('benchmarks'),
+                        version: '>= 2.0.0')
 
-  build_benchmarks = glib_dep.found()
+  if glib_dep.found()
+    build_benchmarks = true
 
-  benchmark_c_args = []
-  if cc.get_id() == 'clang'
-    benchmark_c_args += [
-      '-Wno-reserved-identifier',
-    ]
-  endif
+    benchmark_c_args = []
+    if cc.get_id() == 'clang'
+      benchmark_c_args += [
+        '-Wno-reserved-identifier',
+      ]
+    endif
 
-  benchmark_c_args = cc.get_supported_arguments(benchmark_c_args)
+    benchmark_c_args = cc.get_supported_arguments(benchmark_c_args)
 
-  if build_benchmarks
     foreach benchmark : benchmarks
       benchmark(benchmark,
                 executable(benchmark,
                            'benchmark/@0@.c'.format(benchmark),
-                           include_directories: include_directories(['include']),
+                           include_directories: include_dirs,
                            c_args: benchmark_c_args,
                            dependencies: [zix_dep, glib_dep]))
     endforeach
-  else
-    warning('Not building benchmarks because glib was not found')
   endif
 endif
 
-if not meson.is_subproject() and meson.version().version_compare('>=0.53.0')
+if not meson.is_subproject()
   summary('Benchmarks', build_benchmarks, bool_yn: true)
-  summary('Tests', get_option('tests'), bool_yn: true)
+  summary('Tests', not get_option('tests').disabled(), bool_yn: true)
 
   summary('Install prefix', get_option('prefix'))
   summary('Headers', get_option('prefix') / get_option('includedir'))
