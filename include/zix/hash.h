@@ -267,8 +267,8 @@ zix_hash_insert(ZixHash* ZIX_NONNULL hash, ZixHashRecord* ZIX_NONNULL record);
 */
 ZIX_API
 ZixStatus
-zix_hash_erase(ZixHash* ZIX_NONNULL hash,
-               ZixHashIter          i,
+zix_hash_erase(ZixHash* ZIX_NONNULL                     hash,
+               ZixHashIter                              i,
                ZixHashRecord* ZIX_NULLABLE* ZIX_NONNULL removed);
 
 /**
@@ -281,8 +281,8 @@ zix_hash_erase(ZixHash* ZIX_NONNULL hash,
 */
 ZIX_API
 ZixStatus
-zix_hash_remove(ZixHash* ZIX_NONNULL          hash,
-                const ZixHashKey* ZIX_NONNULL key,
+zix_hash_remove(ZixHash* ZIX_NONNULL                     hash,
+                const ZixHashKey* ZIX_NONNULL            key,
                 ZixHashRecord* ZIX_NULLABLE* ZIX_NONNULL removed);
 
 /**

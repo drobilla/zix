@@ -126,8 +126,8 @@ zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_NULLABLE e);
 */
 ZIX_API
 ZixStatus
-zix_btree_remove(ZixBTree* ZIX_NONNULL    t,
-                 const void* ZIX_NULLABLE e,
+zix_btree_remove(ZixBTree* ZIX_NONNULL           t,
+                 const void* ZIX_NULLABLE        e,
                  void* ZIX_NULLABLE* ZIX_NONNULL out,
                  ZixBTreeIter* ZIX_NONNULL       next);
 

@@ -51,8 +51,8 @@ zix_tree_size(const ZixTree* ZIX_NONNULL t);
 /// Insert the element `e` into `t` and point `ti` at the new element
 ZIX_API
 ZixStatus
-zix_tree_insert(ZixTree* ZIX_NONNULL t,
-                void* ZIX_NULLABLE   e,
+zix_tree_insert(ZixTree* ZIX_NONNULL                    t,
+                void* ZIX_NULLABLE                      e,
                 ZixTreeIter* ZIX_NULLABLE* ZIX_NULLABLE ti);
 
 /// Remove the item pointed at by `ti` from `t`
@@ -67,8 +67,8 @@ zix_tree_remove(ZixTree* ZIX_NONNULL t, ZixTreeIter* ZIX_NONNULL ti);
 */
 ZIX_API
 ZixStatus
-zix_tree_find(const ZixTree* ZIX_NONNULL t,
-              const void* ZIX_NULLABLE   e,
+zix_tree_find(const ZixTree* ZIX_NONNULL             t,
+              const void* ZIX_NULLABLE               e,
               ZixTreeIter* ZIX_NULLABLE* ZIX_NONNULL ti);
 
 /// Return the data associated with the given tree item
