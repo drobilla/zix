@@ -29,7 +29,7 @@ typedef enum {
 } ZixStatus;
 
 /// Return a string describing a status code
-ZIX_API
+ZIX_CONST_API
 const char*
 zix_strerror(ZixStatus status);
 
