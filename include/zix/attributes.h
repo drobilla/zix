@@ -57,6 +57,8 @@
 #  define ZIX_UNUSED(name)
 #elif defined(__GNUC__)
 #  define ZIX_UNUSED(name) name##_unused __attribute__((__unused__))
+#elif defined(_MSC_VER)
+#  define ZIX_UNUSED(name) __pragma(warning(suppress:4100)) name
 #else
 #  define ZIX_UNUSED(name) name
 #endif

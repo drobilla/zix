@@ -44,6 +44,7 @@ if is_variable('cc')
 
     elif cc.get_id() == 'msvc'
       c_suppressions += [
+        '/wd4114', # same type qualifier used more than once
         '/wd4191', # unsafe function conversion
         '/wd4200', # zero-sized array in struct/union
         '/wd4365', # signed/unsigned mismatch

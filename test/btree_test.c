@@ -220,7 +220,7 @@ test_remove_cases(void)
 
   static const uintptr_t s1           = 2u;
   static const uintptr_t s2           = 255u;
-  static const size_t    n_insertions = s1 * s2 * 1000u;
+  const size_t           n_insertions = s1 * s2 * 1000u;
 
   ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 

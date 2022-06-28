@@ -66,11 +66,6 @@ int main(void) { void* mem; posix_memalign(&mem, 8, 8); }'''
                 name: 'posix_memalign').to_int())
 endif
 
-# Build as C++ on MSVC
-if cc.get_id() == 'msvc'
-  add_project_arguments(['/TP'], language: ['c'])
-endif
-
 ###########
 # Library #
 ###########
