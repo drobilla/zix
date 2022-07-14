@@ -102,13 +102,13 @@ sources = files(
 # Set appropriate arguments for building against the library type
 subdir('meson/library')
 if get_option('default_library') == 'static'
-  add_project_arguments(['-DZIX_STATIC'], language: ['c'])
+  extra_c_args = ['-DZIX_STATIC']
 endif
 
 # Set any additional arguments required for building libraries or programs
-library_c_args = platform_c_args + ['-DZIX_INTERNAL']
+library_c_args = platform_c_args + extra_c_args + ['-DZIX_INTERNAL']
 library_link_args = []
-program_c_args = []
+program_c_args = extra_c_args
 program_link_args = []
 if cc.get_id() == 'emscripten'
   wasm_c_args = [
@@ -148,6 +148,7 @@ libzix = library(
 
 # Declare dependency for internal meson dependants
 zix_dep = declare_dependency(
+  compile_args: extra_c_args,
   include_directories: include_dirs,
   link_with: libzix,
 )
@@ -156,6 +157,7 @@ zix_dep = declare_dependency(
 pkg.generate(
   libzix,
   description: 'A lightweight portability and data structure C library',
+  extra_cflags: extra_c_args,
   filebase: versioned_name,
   name: 'Zix',
   subdirs: [versioned_name],
