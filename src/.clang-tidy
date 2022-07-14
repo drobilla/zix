@@ -12,6 +12,7 @@ Checks: >
   -llvmlibc-*,
   -misc-no-recursion,
   -readability-function-cognitive-complexity,
+  -readability-identifier-length,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file

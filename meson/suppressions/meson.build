@@ -19,6 +19,7 @@ if is_variable('cc')
       c_suppressions += [
         '-Wno-bad-function-cast',
         '-Wno-c11-extensions', # Glib
+        '-Wno-declaration-after-statement',
         '-Wno-implicit-fallthrough', # Really for clang < 12
         '-Wno-padded',
       ]
