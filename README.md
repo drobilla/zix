@@ -41,7 +41,3 @@ no external documentation at this time.
   * [Installation Instructions](INSTALL.md)
 
  -- David Robillard <d@drobilla.net>
-
-[Meson]: https://mesonbuild.com/
-
-[Meson documentation]: https://mesonbuild.com/Quick-guide.html

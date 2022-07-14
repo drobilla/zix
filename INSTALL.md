@@ -62,28 +62,9 @@ A compiled project can be installed with the `install` command:
     meson install
 
 You may need to acquire root permissions to install to a system-wide prefix.
-The `DESTDIR` environment can be set during this command to add a path to the
-installation prefix (which is useful for packaging):
+For packaging, the installation may be staged to a directory using the
+`DESTDIR` environment variable or the `--destdir` option:
 
     DESTDIR=/tmp/mypackage/ meson install
 
-The `--destdir` option can be used for the same purpose:
-
     meson install --destdir=/tmp/mypackage/
-
-Compiler Configuration
-----------------------
-
-Several standard environment variables can be used to control how compilers are
-invoked:
-
- * `CC`:       Path to C compiler
- * `CFLAGS`:   C compiler options
- * `LDFLAGS`:  Linker options
-
-The value of these environment variables is recorded during `meson setup`,
-they have no effect at any other stage.
-
-Note that there are also meson options that do the same thing as most of these
-environment variables, they are supported for convenience and compatibility
-with the conventions of other build systems.
