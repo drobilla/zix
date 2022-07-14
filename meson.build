@@ -143,12 +143,14 @@ libzix = library(
   include_directories: include_dirs,
   install: true,
   link_args: library_link_args,
-  version: meson.project_version())
+  version: meson.project_version(),
+)
 
 # Declare dependency for internal meson dependants
 zix_dep = declare_dependency(
   include_directories: include_dirs,
-  link_with: libzix)
+  link_with: libzix,
+)
 
 # Generage pkg-config file for external dependants
 pkg.generate(
@@ -157,7 +159,8 @@ pkg.generate(
   filebase: versioned_name,
   name: 'Zix',
   subdirs: [versioned_name],
-  version: meson.project_version())
+  version: meson.project_version(),
+)
 
 # Install headers to a versioned include directory
 install_headers(c_headers, subdir: versioned_name / 'zix')
@@ -185,10 +188,12 @@ if not get_option('tests').disabled()
   # Check licensing metadata
   reuse = find_program('reuse', required: get_option('tests'))
   if reuse.found()
-    test('REUSE',
-         reuse,
-         args: ['--root', meson.current_source_dir(), 'lint'],
-         suite: 'data')
+    test(
+      'REUSE',
+      reuse,
+      args: ['--root', meson.current_source_dir(), 'lint'],
+      suite: 'data',
+    )
   endif
 
   common_test_sources = files('test/failing_allocator.c')
@@ -196,14 +201,18 @@ if not get_option('tests').disabled()
   foreach test : sequential_tests
     sources = common_test_sources + files('test/@0@.c'.format(test))
 
-    test(test,
-         executable(test,
-                    sources,
-                    c_args: program_c_args,
-                    dependencies: [zix_dep],
-                    include_directories: include_dirs,
-                    link_args: program_link_args),
-         timeout: 120)
+    test(
+      test,
+      executable(
+        test,
+        sources,
+        c_args: program_c_args,
+        dependencies: [zix_dep],
+        include_directories: include_dirs,
+        link_args: program_link_args,
+      ),
+      timeout: 120,
+    )
   endforeach
 
   thread_dep = dependency('threads', required: get_option('tests'))
@@ -211,14 +220,18 @@ if not get_option('tests').disabled()
     foreach test : threaded_tests
       sources = common_test_sources + files('test/@0@.c'.format(test))
 
-      test(test,
-           executable(test,
-                      sources,
-                      c_args: program_c_args,
-                      dependencies: [zix_dep, thread_dep],
-                      include_directories: include_dirs,
-                      link_args: program_link_args),
-           timeout: 120)
+      test(
+        test,
+        executable(
+          test,
+          sources,
+          c_args: program_c_args,
+          dependencies: [zix_dep, thread_dep],
+          include_directories: include_dirs,
+          link_args: program_link_args,
+        ),
+        timeout: 120,
+      )
     endforeach
   endif
 endif
@@ -251,12 +264,15 @@ if not get_option('benchmarks').disabled()
     endif
 
     foreach benchmark : benchmarks
-      benchmark(benchmark,
-                executable(benchmark,
-                           'benchmark/@0@.c'.format(benchmark),
-                           include_directories: include_dirs,
-                           c_args: benchmark_c_args,
-                           dependencies: [zix_dep, glib_dep]))
+      benchmark(
+        benchmark,
+        executable(
+          benchmark,
+          'benchmark/@0@.c'.format(benchmark),
+          include_directories: include_dirs,
+          c_args: benchmark_c_args,
+          dependencies: [zix_dep, glib_dep]),
+      )
     endforeach
   endif
 endif
