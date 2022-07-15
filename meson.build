@@ -29,7 +29,6 @@ if get_option('strict') and not meson.is_subproject()
   add_project_arguments(all_c_warnings, language: ['c'])
 endif
 subdir('meson/suppressions')
-add_project_arguments(c_suppressions, language: ['c'])
 
 ##########################
 # Platform Configuration #
@@ -139,7 +138,7 @@ endif
 libzix = library(
   meson.project_name() + library_suffix,
   sources,
-  c_args: library_c_args,
+  c_args: c_suppressions + library_c_args,
   gnu_symbol_visibility: 'hidden',
   include_directories: include_dirs,
   install: true,
@@ -209,7 +208,7 @@ if not get_option('tests').disabled()
       executable(
         test,
         sources,
-        c_args: program_c_args,
+        c_args: c_suppressions + program_c_args,
         dependencies: [zix_dep],
         include_directories: include_dirs,
         link_args: program_link_args,
@@ -228,7 +227,7 @@ if not get_option('tests').disabled()
         executable(
           test,
           sources,
-          c_args: program_c_args,
+          c_args: c_suppressions + program_c_args,
           dependencies: [zix_dep, thread_dep],
           include_directories: include_dirs,
           link_args: program_link_args,
@@ -273,7 +272,7 @@ if not get_option('benchmarks').disabled()
           benchmark,
           'benchmark/@0@.c'.format(benchmark),
           include_directories: include_dirs,
-          c_args: benchmark_c_args,
+          c_args: c_suppressions + benchmark_c_args,
           dependencies: [zix_dep, glib_dep]),
       )
     endforeach
