@@ -101,6 +101,7 @@ sources = files(
 
 # Set appropriate arguments for building against the library type
 subdir('meson/library')
+extra_c_args = []
 if get_option('default_library') == 'static'
   extra_c_args = ['-DZIX_STATIC']
 endif
