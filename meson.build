@@ -156,7 +156,7 @@ zix_dep = declare_dependency(
 # Generage pkg-config file for external dependants
 pkg.generate(
   libzix,
-  description: 'A lightweight portability and data structure C library',
+  description: 'Lightweight C library of portability wrappers and data structures',
   extra_cflags: extra_c_args,
   filebase: versioned_name,
   name: 'Zix',
