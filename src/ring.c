@@ -20,9 +20,17 @@
 #endif
 
 #if defined(_MSC_VER)
-#  include <windows.h>
-#  define ZIX_READ_BARRIER() MemoryBarrier()
-#  define ZIX_WRITE_BARRIER() MemoryBarrier()
+#  if defined(_M_AMD64) || defined(_M_IX86) || defined(_M_X64)
+    /* acquire and release fences are only necessary for
+     * non-x86 systems. In fact, gcc will generate no
+     * instructions for acq/rel fences on x86. */
+#    define ZIX_READ_BARRIER()
+#    define ZIX_WRITE_BARRIER()
+#  else
+#    include <windows.h>
+#    define ZIX_READ_BARRIER() MemoryBarrier()
+#    define ZIX_WRITE_BARRIER() MemoryBarrier()
+#  endif
 #elif defined(__GNUC__)
 #  define ZIX_READ_BARRIER() __atomic_thread_fence(__ATOMIC_ACQUIRE)
 #  define ZIX_WRITE_BARRIER() __atomic_thread_fence(__ATOMIC_RELEASE)
@@ -112,7 +120,9 @@ read_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 uint32_t
 zix_ring_read_space(const ZixRing* ring)
 {
-  return read_space_internal(ring, ring->read_head, ring->write_head);
+  const uint32_t r = ring->read_head;
+  const uint32_t w = ring->write_head; ZIX_READ_BARRIER();
+  return read_space_internal(ring, r, w);
 }
 
 static inline uint32_t
@@ -132,7 +142,9 @@ write_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 uint32_t
 zix_ring_write_space(const ZixRing* ring)
 {
-  return write_space_internal(ring, ring->read_head, ring->write_head);
+  const uint32_t r = ring->read_head; ZIX_READ_BARRIER();
+  const uint32_t w = ring->write_head;
+  return write_space_internal(ring, r, w);
 }
 
 uint32_t
@@ -166,17 +178,19 @@ peek_internal(const ZixRing* ring,
 uint32_t
 zix_ring_peek(ZixRing* ring, void* dst, uint32_t size)
 {
-  return peek_internal(ring, ring->read_head, ring->write_head, size, dst);
+  const uint32_t r = ring->read_head;
+  const uint32_t w = ring->write_head; ZIX_READ_BARRIER();
+  return peek_internal(ring, r, w, size, dst);
 }
 
 uint32_t
 zix_ring_read(ZixRing* ring, void* dst, uint32_t size)
 {
   const uint32_t r = ring->read_head;
-  const uint32_t w = ring->write_head;
+  const uint32_t w = ring->write_head; ZIX_READ_BARRIER();
 
   if (peek_internal(ring, r, w, size, dst)) {
-    ZIX_READ_BARRIER();
+    ZIX_WRITE_BARRIER();
     ring->read_head = (r + size) & ring->size_mask;
     return size;
   }
@@ -188,12 +202,12 @@ uint32_t
 zix_ring_skip(ZixRing* ring, uint32_t size)
 {
   const uint32_t r = ring->read_head;
-  const uint32_t w = ring->write_head;
+  const uint32_t w = ring->write_head; ZIX_READ_BARRIER();
   if (read_space_internal(ring, r, w) < size) {
     return 0;
   }
 
-  ZIX_READ_BARRIER();
+  ZIX_WRITE_BARRIER();
   ring->read_head = (r + size) & ring->size_mask;
   return size;
 }
@@ -201,7 +215,7 @@ zix_ring_skip(ZixRing* ring, uint32_t size)
 uint32_t
 zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
 {
-  const uint32_t r = ring->read_head;
+  const uint32_t r = ring->read_head; ZIX_READ_BARRIER();
   const uint32_t w = ring->write_head;
   if (write_space_internal(ring, r, w) < size) {
     return 0;
