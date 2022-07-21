@@ -23,9 +23,11 @@
 #  if defined(_M_AMD64) || defined(_M_IX86) || defined(_M_X64)
     /* acquire and release fences are only necessary for
      * non-x86 systems. In fact, gcc will generate no
-     * instructions for acq/rel fences on x86. */
-#    define ZIX_READ_BARRIER()
-#    define ZIX_WRITE_BARRIER()
+     * instructions for acq/rel fences on x86. We only need
+     * to prevent compiler reordering. */
+#    include <intrin.h>
+#    define ZIX_READ_BARRIER() _ReadBarrier()
+#    define ZIX_WRITE_BARRIER() _WriteBarrier()
 #  else
 #    include <windows.h>
 #    define ZIX_READ_BARRIER() MemoryBarrier()
