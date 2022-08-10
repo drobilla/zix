@@ -1,4 +1,4 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "zix/ring.h"
@@ -19,17 +19,13 @@
 #  define ZIX_MLOCK(ptr, size)
 #endif
 
+/*
+  Note that for simplicity, only x86 and x64 are supported with MSVC.  Hopefully
+  stdatomic.h support arrives before anyone cares about running this code on
+  Windows on ARM.
+*/
 #if defined(_MSC_VER)
-#  include <windows.h>
-#  define ZIX_READ_BARRIER() MemoryBarrier()
-#  define ZIX_WRITE_BARRIER() MemoryBarrier()
-#elif defined(__GNUC__)
-#  define ZIX_READ_BARRIER() __atomic_thread_fence(__ATOMIC_ACQUIRE)
-#  define ZIX_WRITE_BARRIER() __atomic_thread_fence(__ATOMIC_RELEASE)
-#else
-#  pragma message("warning: No memory barriers, possible SMP bugs")
-#  define ZIX_READ_BARRIER()
-#  define ZIX_WRITE_BARRIER()
+#  include <intrin.h>
 #endif
 
 struct ZixRingImpl {
@@ -40,6 +36,30 @@ struct ZixRingImpl {
   uint32_t      size_mask;  ///< Mask for fast modulo
   char*         buf;        ///< Contents
 };
+
+static inline uint32_t
+zix_atomic_load(const uint32_t* const ptr)
+{
+#if defined(_MSC_VER)
+  const uint32_t val = *ptr;
+  _ReadBarrier();
+  return val;
+#else
+  return __atomic_load_n(ptr, __ATOMIC_ACQUIRE);
+#endif
+}
+
+static inline void
+zix_atomic_store(uint32_t* const ptr, // NOLINT(readability-non-const-parameter)
+                 const uint32_t  val)
+{
+#if defined(_MSC_VER)
+  _WriteBarrier();
+  *ptr = val;
+#else
+  __atomic_store_n(ptr, val, __ATOMIC_RELEASE);
+#endif
+}
 
 static inline uint32_t
 next_power_of_two(uint32_t size)
@@ -99,6 +119,12 @@ zix_ring_reset(ZixRing* ring)
   ring->read_head  = 0;
 }
 
+/*
+  General pattern for public thread-safe functions below: start with a single
+  atomic load of the "other's" index, then do whatever work, and finally end
+  with a single atomic store to "your" index (if it is changed).
+*/
+
 static inline uint32_t
 read_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 {
@@ -108,7 +134,9 @@ read_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 uint32_t
 zix_ring_read_space(const ZixRing* ring)
 {
-  return read_space_internal(ring, ring->read_head, ring->write_head);
+  const uint32_t w = zix_atomic_load(&ring->write_head);
+
+  return read_space_internal(ring, ring->read_head, w);
 }
 
 static inline uint32_t
@@ -120,7 +148,9 @@ write_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 uint32_t
 zix_ring_write_space(const ZixRing* ring)
 {
-  return write_space_internal(ring, ring->read_head, ring->write_head);
+  const uint32_t r = zix_atomic_load(&ring->read_head);
+
+  return write_space_internal(ring, r, ring->write_head);
 }
 
 uint32_t
@@ -154,41 +184,41 @@ peek_internal(const ZixRing* ring,
 uint32_t
 zix_ring_peek(ZixRing* ring, void* dst, uint32_t size)
 {
-  return peek_internal(ring, ring->read_head, ring->write_head, size, dst);
+  const uint32_t w = zix_atomic_load(&ring->write_head);
+
+  return peek_internal(ring, ring->read_head, w, size, dst);
 }
 
 uint32_t
 zix_ring_read(ZixRing* ring, void* dst, uint32_t size)
 {
+  const uint32_t w = zix_atomic_load(&ring->write_head);
   const uint32_t r = ring->read_head;
-  const uint32_t w = ring->write_head;
   if (!peek_internal(ring, r, w, size, dst)) {
     return 0;
   }
 
-  ZIX_READ_BARRIER();
-  ring->read_head = (r + size) & ring->size_mask;
+  zix_atomic_store(&ring->read_head, (r + size) & ring->size_mask);
   return size;
 }
 
 uint32_t
 zix_ring_skip(ZixRing* ring, uint32_t size)
 {
+  const uint32_t w = zix_atomic_load(&ring->write_head);
   const uint32_t r = ring->read_head;
-  const uint32_t w = ring->write_head;
   if (read_space_internal(ring, r, w) < size) {
     return 0;
   }
 
-  ZIX_READ_BARRIER();
-  ring->read_head = (r + size) & ring->size_mask;
+  zix_atomic_store(&ring->read_head, (r + size) & ring->size_mask);
   return size;
 }
 
 uint32_t
 zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
 {
-  const uint32_t r = ring->read_head;
+  const uint32_t r = zix_atomic_load(&ring->read_head);
   const uint32_t w = ring->write_head;
   if (write_space_internal(ring, r, w) < size) {
     return 0;
@@ -197,15 +227,13 @@ zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
   const uint32_t end = w + size;
   if (end <= ring->size) {
     memcpy(&ring->buf[w], src, size);
-    ZIX_WRITE_BARRIER();
-    ring->write_head = end & ring->size_mask;
+    zix_atomic_store(&ring->write_head, end & ring->size_mask);
   } else {
     const uint32_t size1 = ring->size - w;
     const uint32_t size2 = size - size1;
     memcpy(&ring->buf[w], src, size1);
     memcpy(&ring->buf[0], (const char*)src + size1, size2);
-    ZIX_WRITE_BARRIER();
-    ring->write_head = size2;
+    zix_atomic_store(&ring->write_head, size2);
   }
 
   return size;
