@@ -54,12 +54,15 @@ x64_static:
 x64_sanitize:
   image: lv2plugin/debian-x64-clang
   script:
-    - meson setup build -Db_lundef=false -Dbuildtype=plain -Dstrict=true -Dwerror=true
+    - meson setup build -Db_lundef=false -Dbuildtype=plain -Dstrict=true -Dwerror=true -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability"
+    - ninja -C build test
+    - meson configure build -Dbuildtype=debugoptimized -Dc_args="" -Dc_link_args=""
+    - meson configure build -Db_sanitize=memory
+    - ninja -C build test
+    - meson configure build -Db_sanitize=thread
     - ninja -C build test
   variables:
     CC: "clang"
-    CFLAGS: "-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability"
-    LDFLAGS: "-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability"
 
 
 freebsd_dbg:
