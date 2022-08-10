@@ -194,16 +194,18 @@ zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
     return 0;
   }
 
-  if (w + size <= ring->size) {
+  const uint32_t end = w + size;
+  if (end <= ring->size) {
     memcpy(&ring->buf[w], src, size);
     ZIX_WRITE_BARRIER();
-    ring->write_head = (w + size) & ring->size_mask;
+    ring->write_head = end & ring->size_mask;
   } else {
-    const uint32_t this_size = ring->size - w;
-    memcpy(&ring->buf[w], src, this_size);
-    memcpy(&ring->buf[0], (const char*)src + this_size, size - this_size);
+    const uint32_t size1 = ring->size - w;
+    const uint32_t size2 = size - size1;
+    memcpy(&ring->buf[w], src, size1);
+    memcpy(&ring->buf[0], (const char*)src + size1, size2);
     ZIX_WRITE_BARRIER();
-    ring->write_head = size - this_size;
+    ring->write_head = size2;
   }
 
   return size;
