@@ -162,14 +162,13 @@ zix_ring_read(ZixRing* ring, void* dst, uint32_t size)
 {
   const uint32_t r = ring->read_head;
   const uint32_t w = ring->write_head;
-
-  if (peek_internal(ring, r, w, size, dst)) {
-    ZIX_READ_BARRIER();
-    ring->read_head = (r + size) & ring->size_mask;
-    return size;
+  if (!peek_internal(ring, r, w, size, dst)) {
+    return 0;
   }
 
-  return 0;
+  ZIX_READ_BARRIER();
+  ring->read_head = (r + size) & ring->size_mask;
+  return size;
 }
 
 uint32_t
