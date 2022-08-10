@@ -102,11 +102,7 @@ zix_ring_reset(ZixRing* ring)
 static inline uint32_t
 read_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 {
-  if (r < w) {
-    return w - r;
-  }
-
-  return (w - r + ring->size) & ring->size_mask;
+  return (w - r) & ring->size_mask;
 }
 
 uint32_t
@@ -118,15 +114,7 @@ zix_ring_read_space(const ZixRing* ring)
 static inline uint32_t
 write_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
 {
-  if (r == w) {
-    return ring->size - 1;
-  }
-
-  if (r < w) {
-    return ((r - w + ring->size) & ring->size_mask) - 1;
-  }
-
-  return (r - w) - 1;
+  return (r - w - 1U) & ring->size_mask;
 }
 
 uint32_t
