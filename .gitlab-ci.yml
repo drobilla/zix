@@ -4,33 +4,33 @@
 arm32_dbg:
   image: lv2plugin/debian-arm32
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 arm32_rel:
   image: lv2plugin/debian-arm32
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 arm64_dbg:
   image: lv2plugin/debian-arm64
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 arm64_rel:
   image: lv2plugin/debian-arm64
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 x64_dbg:
   image: lv2plugin/debian-x64
   script:
-    - meson . build -Dbuildtype=debug -Dstrict=true -Dwerror=true -Db_coverage=true
+    - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true -Db_coverage=true
     - ninja -C build test
     - ninja -C build coverage-html
   artifacts:
@@ -40,21 +40,21 @@ x64_dbg:
 x64_rel:
   image: lv2plugin/debian-x64
   script:
-    - meson . build -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 x64_static:
   image: lv2plugin/debian-x64
   script:
-    - meson . build -Ddefault_library=static -Dstrict=true -Dwerror=true
+    - meson setup build -Ddefault_library=static -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 x64_sanitize:
   image: lv2plugin/debian-x64-clang
   script:
-    - meson . build -Db_lundef=false -Dbuildtype=plain -Dstrict=true -Dwerror=true
+    - meson setup build -Db_lundef=false -Dbuildtype=plain -Dstrict=true -Dwerror=true
     - ninja -C build test
   variables:
     CC: "clang"
@@ -65,65 +65,65 @@ x64_sanitize:
 freebsd_dbg:
   tags: [freebsd,meson]
   script:
-    - meson . build -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 freebsd_rel:
   tags: [freebsd,meson]
   script:
-    - meson . build -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 mingw32_dbg:
   image: lv2plugin/debian-mingw32
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 mingw32_rel:
   image: lv2plugin/debian-mingw32
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 mingw64_dbg:
   image: lv2plugin/debian-mingw64
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 mingw64_rel:
   image: lv2plugin/debian-mingw64
   script:
-    - meson . build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 mac_dbg:
   tags: [macos]
   script:
-    - meson . build -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 mac_rel:
   tags: [macos]
   script:
-    - meson . build -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
 win_dbg:
   tags: [windows,meson]
   script:
-    - meson . build -Dbuildtype=debug -Dstrict=true -Dwerror=true
+    - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 win_rel:
   tags: [windows,meson]
   script:
-    - meson . build -Dbuildtype=release -Dstrict=true -Dwerror=true
+    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true
     - ninja -C build test
 
 
