@@ -1,4 +1,4 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_RING_H
@@ -23,8 +23,8 @@ extern "C" {
 /**
    A lock-free ring buffer.
 
-   Thread-safe with a single reader and single writer, and realtime safe
-   on both ends.
+   Thread-safe (with a few noted exceptions) for a single reader and single
+   writer, and realtime-safe on both ends.
 */
 typedef struct ZixRingImpl ZixRing;
 
@@ -48,9 +48,7 @@ zix_ring_free(ZixRing* ZIX_NULLABLE ring);
 
    This function is NOT thread safe or real-time safe, but it should be called
    after zix_ring_new() to lock all ring memory to avoid page faults while
-   using the ring (i.e. this function MUST be called first in order for the
-   ring to be truly real-time safe).
-
+   using the ring.
 */
 ZIX_API
 void
@@ -59,44 +57,73 @@ zix_ring_mlock(ZixRing* ZIX_NONNULL ring);
 /**
    Reset (empty) a ring.
 
-   This function is NOT thread-safe, it may only be called when there are no
-   readers or writers.
+   This function is NOT thread-safe, it may only be called when there is no
+   reader or writer.
 */
 ZIX_API
 void
 zix_ring_reset(ZixRing* ZIX_NONNULL ring);
 
-/// Return the number of bytes of space available for reading
+/**
+   Return the number of bytes of space available for reading.
+
+   Reader only.
+*/
 ZIX_PURE_API
 uint32_t
 zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
 
-/// Return the number of bytes of space available for writing
+/**
+   Return the number of bytes of space available for writing.
+
+   Writer only.
+*/
 ZIX_PURE_API
 uint32_t
 zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
 
-/// Return the capacity (i.e. total write space when empty)
+/**
+   Return the capacity (the total write space when empty).
+
+   This function returns a constant for any given ring, and may (but usually
+   shouldn't) be called anywhere.
+*/
 ZIX_PURE_API
 uint32_t
 zix_ring_capacity(const ZixRing* ZIX_NONNULL ring);
 
-/// Read from the ring without advancing the read head
+/**
+   Read from the ring without advancing the read head.
+
+   Reader only.
+*/
 ZIX_API
 uint32_t
 zix_ring_peek(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
-/// Read from the ring and advance the read head
+/**
+   Read from the ring and advance the read head.
+
+   Reader only.
+*/
 ZIX_API
 uint32_t
 zix_ring_read(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
-/// Skip data in the ring (advance read head without reading)
+/**
+   Skip data in the ring (advance read head without reading).
+
+   Reader only.
+*/
 ZIX_API
 uint32_t
 zix_ring_skip(ZixRing* ZIX_NONNULL ring, uint32_t size);
 
-/// Write data to the ring
+/**
+   Write data to the ring.
+
+   Writer only.
+*/
 ZIX_API
 uint32_t
 zix_ring_write(ZixRing* ZIX_NONNULL    ring,
