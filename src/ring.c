@@ -77,7 +77,7 @@ next_power_of_two(uint32_t size)
 }
 
 ZixRing*
-zix_ring_new(ZixAllocator* const allocator, uint32_t size)
+zix_ring_new(ZixAllocator* const allocator, const uint32_t size)
 {
   ZixRing* ring = (ZixRing*)zix_malloc(allocator, sizeof(ZixRing));
 
@@ -98,7 +98,7 @@ zix_ring_new(ZixAllocator* const allocator, uint32_t size)
 }
 
 void
-zix_ring_free(ZixRing* ring)
+zix_ring_free(ZixRing* const ring)
 {
   if (ring) {
     zix_free(ring->allocator, ring->buf);
@@ -107,14 +107,14 @@ zix_ring_free(ZixRing* ring)
 }
 
 void
-zix_ring_mlock(ZixRing* ring)
+zix_ring_mlock(ZixRing* const ring)
 {
   ZIX_MLOCK(ring, sizeof(ZixRing));
   ZIX_MLOCK(ring->buf, ring->size);
 }
 
 void
-zix_ring_reset(ZixRing* ring)
+zix_ring_reset(ZixRing* const ring)
 {
   ring->write_head = 0;
   ring->read_head  = 0;
@@ -127,13 +127,15 @@ zix_ring_reset(ZixRing* ring)
 */
 
 static inline uint32_t
-read_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
+read_space_internal(const ZixRing* const ring,
+                    const uint32_t       r,
+                    const uint32_t       w)
 {
   return (w - r) & ring->size_mask;
 }
 
 uint32_t
-zix_ring_read_space(const ZixRing* ring)
+zix_ring_read_space(const ZixRing* const ring)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
 
@@ -141,13 +143,15 @@ zix_ring_read_space(const ZixRing* ring)
 }
 
 static inline uint32_t
-write_space_internal(const ZixRing* ring, uint32_t r, uint32_t w)
+write_space_internal(const ZixRing* const ring,
+                     const uint32_t       r,
+                     const uint32_t       w)
 {
   return (r - w - 1U) & ring->size_mask;
 }
 
 uint32_t
-zix_ring_write_space(const ZixRing* ring)
+zix_ring_write_space(const ZixRing* const ring)
 {
   const uint32_t r = zix_atomic_load(&ring->read_head);
 
@@ -155,17 +159,17 @@ zix_ring_write_space(const ZixRing* ring)
 }
 
 uint32_t
-zix_ring_capacity(const ZixRing* ring)
+zix_ring_capacity(const ZixRing* const ring)
 {
   return ring->size - 1;
 }
 
 static inline uint32_t
-peek_internal(const ZixRing* ring,
-              uint32_t       r,
-              uint32_t       w,
-              uint32_t       size,
-              void*          dst)
+peek_internal(const ZixRing* const ring,
+              const uint32_t       r,
+              const uint32_t       w,
+              const uint32_t       size,
+              void* const          dst)
 {
   if (read_space_internal(ring, r, w) < size) {
     return 0;
@@ -183,7 +187,7 @@ peek_internal(const ZixRing* ring,
 }
 
 uint32_t
-zix_ring_peek(ZixRing* ring, void* dst, uint32_t size)
+zix_ring_peek(ZixRing* const ring, void* const dst, const uint32_t size)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
 
@@ -191,7 +195,7 @@ zix_ring_peek(ZixRing* ring, void* dst, uint32_t size)
 }
 
 uint32_t
-zix_ring_read(ZixRing* ring, void* dst, uint32_t size)
+zix_ring_read(ZixRing* const ring, void* const dst, const uint32_t size)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
   const uint32_t r = ring->read_head;
@@ -204,7 +208,7 @@ zix_ring_read(ZixRing* ring, void* dst, uint32_t size)
 }
 
 uint32_t
-zix_ring_skip(ZixRing* ring, uint32_t size)
+zix_ring_skip(ZixRing* const ring, const uint32_t size)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
   const uint32_t r = ring->read_head;
@@ -261,7 +265,7 @@ zix_ring_commit_write(ZixRing* const ring, const ZixRingTransaction* const tx)
 }
 
 uint32_t
-zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
+zix_ring_write(ZixRing* const ring, const void* src, const uint32_t size)
 {
   ZixRingTransaction tx = zix_ring_begin_write(ring);
 
