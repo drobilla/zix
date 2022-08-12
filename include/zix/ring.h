@@ -6,6 +6,7 @@
 
 #include "zix/allocator.h"
 #include "zix/attributes.h"
+#include "zix/common.h"
 
 #include <stdint.h>
 
@@ -27,6 +28,20 @@ extern "C" {
    writer, and realtime-safe on both ends.
 */
 typedef struct ZixRingImpl ZixRing;
+
+/**
+   A transaction for writing data in multiple parts.
+
+   The simple zix_ring_write() can be used to write an atomic message that will
+   immediately be visible to the reader, but transactions allow data to be
+   written in several chunks before being "committed" and becoming readable.
+   This can be useful for things like prefixing messages with a header without
+   needing an allocated buffer to construct the "packet".
+*/
+typedef struct {
+  uint32_t read_head;  ///< Read head at the start of the transaction
+  uint32_t write_head; ///< Write head if the transaction were committed
+} ZixRingTransaction;
 
 /**
    Create a new ring.
@@ -129,6 +144,64 @@ uint32_t
 zix_ring_write(ZixRing* ZIX_NONNULL    ring,
                const void* ZIX_NONNULL src,
                uint32_t                size);
+
+/**
+   Begin a write.
+
+   The returned transaction is initially empty.  Data can be written to it by
+   calling zix_ring_amend_write() one or more times, then finishing with
+   zix_ring_commit_write().
+
+   Note that the returned "transaction" is not meant to be long-lived: a call
+   to this function should be (more or less) immediately followed by calls to
+   zix_ring_amend_write() then a call to zix_ring_commit_write().
+
+   @param ring The ring to write data to.
+   @return A new empty transaction.
+*/
+ZixRingTransaction
+zix_ring_begin_write(ZixRing* ZIX_NONNULL ring);
+
+/**
+   Amend the current write with some data.
+
+   The data is written immediately after the previously amended data, as if
+   they were written contiguously with a single write call.  This data is not
+   visible to the reader until zix_ring_commit_write() is called.
+
+   If any call to this function returns an error, then the transaction is
+   invalid and must not be committed.  No cleanup is necessary for an invalid
+   transaction.  Any bytes written while attempting the transaction will remain
+   in the free portion of the buffer and be overwritten by subsequent writes.
+
+   @param ring The ring this transaction is writing to.
+   @param tx The active transaction, from zix_ring_begin_write().
+   @param src Pointer to the data to write.
+   @param size Length of data to write in bytes.
+   @return #ZIX_STATUS_NO_MEM or #ZIX_STATUS_SUCCESS.
+*/
+ZixStatus
+zix_ring_amend_write(ZixRing* ZIX_NONNULL            ring,
+                     ZixRingTransaction* ZIX_NONNULL tx,
+                     const void* ZIX_NONNULL         src,
+                     uint32_t                        size);
+
+/**
+   Commit the current write.
+
+   This atomically updates the state of the ring, so that the reader will
+   observe the data written during the transaction.
+
+   This function usually shouldn't be called for any transaction which
+   zix_ring_amend_write() returned an error for.
+
+   @param ring The ring this transaction is writing to.
+   @param tx The active transaction, from zix_ring_begin_write().
+   @return #ZIX_STATUS_SUCCESS.
+*/
+ZixStatus
+zix_ring_commit_write(ZixRing* ZIX_NONNULL                  ring,
+                      const ZixRingTransaction* ZIX_NONNULL tx);
 
 /**
    @}

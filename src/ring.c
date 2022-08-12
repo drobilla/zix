@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: ISC
 
 #include "zix/ring.h"
+#include "zix/common.h"
 
 #include "zix_config.h"
 
@@ -215,25 +216,58 @@ zix_ring_skip(ZixRing* ring, uint32_t size)
   return size;
 }
 
-uint32_t
-zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
+ZixRingTransaction
+zix_ring_begin_write(ZixRing* const ring)
 {
   const uint32_t r = zix_atomic_load(&ring->read_head);
   const uint32_t w = ring->write_head;
+
+  const ZixRingTransaction tx = {r, w};
+  return tx;
+}
+
+ZixStatus
+zix_ring_amend_write(ZixRing* const            ring,
+                     ZixRingTransaction* const tx,
+                     const void* const         src,
+                     const uint32_t            size)
+{
+  const uint32_t r = tx->read_head;
+  const uint32_t w = tx->write_head;
   if (write_space_internal(ring, r, w) < size) {
-    return 0;
+    return ZIX_STATUS_NO_MEM;
   }
 
   const uint32_t end = w + size;
   if (end <= ring->size) {
     memcpy(&ring->buf[w], src, size);
-    zix_atomic_store(&ring->write_head, end & ring->size_mask);
+    tx->write_head = end & ring->size_mask;
   } else {
     const uint32_t size1 = ring->size - w;
     const uint32_t size2 = size - size1;
     memcpy(&ring->buf[w], src, size1);
     memcpy(&ring->buf[0], (const char*)src + size1, size2);
-    zix_atomic_store(&ring->write_head, size2);
+    tx->write_head = size2;
+  }
+
+  return ZIX_STATUS_SUCCESS;
+}
+
+ZixStatus
+zix_ring_commit_write(ZixRing* const ring, const ZixRingTransaction* const tx)
+{
+  zix_atomic_store(&ring->write_head, tx->write_head);
+  return ZIX_STATUS_SUCCESS;
+}
+
+uint32_t
+zix_ring_write(ZixRing* ring, const void* src, uint32_t size)
+{
+  ZixRingTransaction tx = zix_ring_begin_write(ring);
+
+  if (zix_ring_amend_write(ring, &tx, src, size) ||
+      zix_ring_commit_write(ring, &tx)) {
+    return 0;
   }
 
   return size;
