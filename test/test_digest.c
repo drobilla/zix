@@ -3,10 +3,12 @@
 
 #undef NDEBUG
 
+#include "zix/attributes.h"
 #include "zix/digest.h"
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdint.h>
 
 // Just basic smoke tests to ensure the hash functions are reacting to data
 

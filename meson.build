@@ -172,18 +172,18 @@ install_headers(c_headers, subdir: versioned_name / 'zix')
 #########
 
 sequential_tests = [
-  'allocator_test',
-  'bitset_test',
-  'btree_test',
-  'digest_test',
-  'hash_test',
-  'strerror_test',
-  'tree_test',
+  'test_allocator',
+  'test_bitset',
+  'test_btree',
+  'test_digest',
+  'test_hash',
+  'test_strerror',
+  'test_tree',
 ]
 
 threaded_tests = [
-  'ring_test',
-  'sem_test',
+  'test_ring',
+  'test_sem',
 ]
 
 if not get_option('tests').disabled() and not meson.is_subproject()

@@ -8,13 +8,14 @@
 #include "failing_allocator.h"
 #include "test_data.h"
 
+#include "zix/allocator.h"
+#include "zix/attributes.h"
 #include "zix/common.h"
 
 #include <assert.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 

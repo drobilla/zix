@@ -6,6 +6,7 @@
 #include "zix/bitset.h"
 
 #include <assert.h>
+#include <stddef.h>
 
 #define N_BITS 256U
 #define N_ELEMS (ZIX_BITSET_ELEMS(N_BITS))
