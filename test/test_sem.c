@@ -21,7 +21,7 @@ reader(void* ZIX_UNUSED(arg))
   printf("Reader starting\n");
 
   for (unsigned i = 0; i < n_signals; ++i) {
-    zix_sem_wait(&sem);
+    assert(!zix_sem_wait(&sem));
   }
 
   printf("Reader finished\n");

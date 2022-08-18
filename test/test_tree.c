@@ -1,12 +1,17 @@
 // Copyright 2011-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
+#undef NDEBUG
+
+#include "failing_allocator.h"
 #include "test_data.h"
 
+#include "zix/allocator.h"
 #include "zix/attributes.h"
 #include "zix/common.h"
 #include "zix/tree.h"
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -45,11 +50,56 @@ test_fail(void)
 }
 
 static int
-stress(unsigned test_num, size_t n_elems)
+test_duplicate_insert(void)
+{
+  const uintptr_t r  = 0xDEADBEEF;
+  ZixTreeIter*    ti = NULL;
+  ZixTree*        t  = zix_tree_new(NULL, false, int_cmp, NULL, NULL, NULL);
+
+  assert(!zix_tree_begin(t));
+  assert(!zix_tree_end(t));
+  assert(!zix_tree_rbegin(t));
+  assert(!zix_tree_rend(t));
+
+  ZixStatus status = zix_tree_insert(t, (void*)r, &ti);
+  if (status) {
+    fprintf(stderr, "Insert failed\n");
+    return test_fail();
+  }
+
+  if ((uintptr_t)zix_tree_get(ti) != r) {
+    fprintf(stderr,
+            "Data corrupt (%" PRIuPTR " != %" PRIuPTR ")\n",
+            (uintptr_t)zix_tree_get(ti),
+            r);
+    return test_fail();
+  }
+
+  if ((status = zix_tree_insert(t, (void*)r, &ti)) != ZIX_STATUS_EXISTS) {
+    fprintf(stderr, "Duplicate insert succeeded (%s)\n", zix_strerror(status));
+    return test_fail();
+  }
+
+  zix_tree_free(t);
+  return 0;
+}
+
+static int
+stress(ZixAllocator* allocator, unsigned test_num, size_t n_elems)
 {
   uintptr_t    r  = 0U;
   ZixTreeIter* ti = NULL;
-  ZixTree*     t  = zix_tree_new(NULL, true, int_cmp, NULL, NULL, NULL);
+  ZixTree*     t  = zix_tree_new(allocator, true, int_cmp, NULL, NULL, NULL);
+
+  if (!t) {
+    fprintf(stderr, "Tree allocation failed\n");
+    return test_fail();
+  }
+
+  assert(!zix_tree_begin(t));
+  assert(!zix_tree_end(t));
+  assert(!zix_tree_rbegin(t));
+  assert(!zix_tree_rend(t));
 
   // Insert n_elems elements
   for (size_t i = 0; i < n_elems; ++i) {
@@ -187,11 +237,53 @@ stress(unsigned test_num, size_t n_elems)
   return EXIT_SUCCESS;
 }
 
+static void
+test_failed_alloc(void)
+{
+  static const size_t n_insertions = 4096;
+
+  ZixFailingAllocator allocator = zix_failing_allocator();
+
+  // Successfully test insertions to count the number of allocations
+  ZixTree* t = zix_tree_new(&allocator.base, false, int_cmp, NULL, NULL, NULL);
+  for (size_t i = 0U; i < n_insertions; ++i) {
+    assert(!zix_tree_insert(t, (void*)i, NULL));
+  }
+
+  // Test that tree allocation failure is handled gracefully
+  allocator.n_remaining = 0;
+  zix_tree_free(t);
+  assert(!zix_tree_new(&allocator.base, false, int_cmp, NULL, NULL, NULL));
+
+  // Allocate a new tree to try the same test again, but with allocation failure
+  allocator.n_remaining = 1;
+  t = zix_tree_new(&allocator.base, false, int_cmp, NULL, NULL, NULL);
+  assert(t);
+
+  // Test that each insertion allocation failing is handled gracefully
+  for (size_t i = 0U; i < n_insertions; ++i) {
+    allocator.n_remaining = 0;
+
+    assert(zix_tree_insert(t, (void*)i, NULL) == ZIX_STATUS_NO_MEM);
+  }
+
+  zix_tree_free(t);
+}
+
 int
 main(int argc, char** argv)
 {
   const unsigned n_tests = 3;
   unsigned       n_elems = 0;
+
+  assert(!zix_tree_iter_next(NULL));
+  assert(!zix_tree_iter_prev(NULL));
+
+  if (test_duplicate_insert()) {
+    return 1;
+  }
+
+  test_failed_alloc();
 
   if (argc == 1) {
     n_elems = 100000;
@@ -214,7 +306,7 @@ main(int argc, char** argv)
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");
     fflush(stdout);
-    if (stress(i, n_elems)) {
+    if (stress(NULL, i, n_elems)) {
       fprintf(stderr, "FAIL: Random seed %u\n", seed);
       return test_fail();
     }

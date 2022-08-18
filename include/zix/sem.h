@@ -198,14 +198,11 @@ zix_sem_post(ZixSem* ZIX_NONNULL sem)
 static inline ZixStatus
 zix_sem_wait(ZixSem* ZIX_NONNULL sem)
 {
-  while (sem_wait(&sem->sem)) {
-    if (errno != EINTR) {
-      return ZIX_STATUS_ERROR;
-    }
-    /* Otherwise, interrupted, so try again. */
+  while (sem_wait(&sem->sem) && errno == EINTR) {
+    // Interrupted, try again
   }
 
-  return ZIX_STATUS_SUCCESS;
+  return zix_errno_status(errno);
 }
 
 static inline bool
