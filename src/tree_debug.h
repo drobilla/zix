@@ -6,29 +6,6 @@
 
 #include <inttypes.h>
 
-#ifdef ZIX_TREE_DUMP
-static void
-zix_tree_print(ZixTreeNode* node, int level)
-{
-  if (node) {
-    if (!node->parent) {
-      printf("{{{\n");
-    }
-
-    zix_tree_print(node->right, level + 1);
-    for (int i = 0; i < level; i++) {
-      printf("  ");
-    }
-
-    printf("%ld.%d\n", (intptr_t)node->data, node->balance);
-    zix_tree_print(node->left, level + 1);
-    if (!node->parent) {
-      printf("}}}\n");
-    }
-  }
-}
-#endif
-
 #ifdef ZIX_TREE_HYPER_VERIFY
 static size_t
 height(ZixTreeNode* n)
