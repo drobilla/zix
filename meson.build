@@ -184,6 +184,7 @@ sequential_tests = [
 threaded_tests = [
   'test_ring',
   'test_sem',
+  'test_thread',
 ]
 
 if not get_option('tests').disabled() and not meson.is_subproject()

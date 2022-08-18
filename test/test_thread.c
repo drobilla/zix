@@ -1,0 +1,41 @@
+// Copyright 2012-2022 David Robillard <d@drobilla.net>
+// SPDX-License-Identifier: ISC
+
+#undef NDEBUG
+
+#include "zix/thread.h"
+
+#include <assert.h>
+#include <string.h>
+
+typedef struct {
+  int input;
+  int output;
+} SharedData;
+
+ZIX_THREAD_FUNC
+static ZixThreadResult
+thread_func(void* const arg)
+{
+  SharedData* const data = (SharedData*)arg;
+
+  data->output = data->input * 7;
+
+  return ZIX_THREAD_RESULT;
+}
+
+int
+main(int argc, char** argv)
+{
+  (void)argv;
+
+  ZixThread thread; // NOLINT
+
+  SharedData data = {argc + (int)strlen(argv[0]), 0};
+
+  assert(!zix_thread_create(&thread, 128, thread_func, &data));
+  assert(!zix_thread_join(thread));
+  assert(data.output == data.input * 7);
+
+  return 0;
+}

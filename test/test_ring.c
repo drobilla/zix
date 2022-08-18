@@ -43,7 +43,8 @@ cmp_msg(const int* const msg1, const int* const msg2)
   return 1;
 }
 
-static void*
+ZIX_THREAD_FUNC
+static ZixThreadResult
 reader(void* ZIX_UNUSED(arg))
 {
   printf("Reader starting\n");
@@ -63,10 +64,11 @@ reader(void* ZIX_UNUSED(arg))
   }
 
   printf("Reader finished\n");
-  return NULL;
+  return ZIX_THREAD_RESULT;
 }
 
-static void*
+ZIX_THREAD_FUNC
+static ZixThreadResult
 writer(void* ZIX_UNUSED(arg))
 {
   printf("Writer starting\n");
@@ -82,7 +84,7 @@ writer(void* ZIX_UNUSED(arg))
   }
 
   printf("Writer finished\n");
-  return NULL;
+  return ZIX_THREAD_RESULT;
 }
 
 static int
@@ -108,8 +110,8 @@ test_ring(const unsigned size)
   ZixThread writer_thread; // NOLINT
   assert(!zix_thread_create(&writer_thread, MSG_SIZE * 4UL, writer, NULL));
 
-  zix_thread_join(reader_thread, NULL);
-  zix_thread_join(writer_thread, NULL);
+  assert(!zix_thread_join(reader_thread));
+  assert(!zix_thread_join(writer_thread));
 
   assert(!read_error);
   assert(ring);
