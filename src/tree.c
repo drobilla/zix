@@ -53,6 +53,13 @@ struct ZixTreeNodeImpl {
 #  define DEBUG_PRINTF(fmt, ...)
 #endif
 
+static void
+zix_tree_noop_destroy(void* const ptr, const void* const user_data)
+{
+  (void)ptr;
+  (void)user_data;
+}
+
 ZixTree*
 zix_tree_new(ZixAllocator* const allocator,
              bool                allow_duplicates,
@@ -66,7 +73,7 @@ zix_tree_new(ZixAllocator* const allocator,
   if (t) {
     t->allocator         = allocator;
     t->root              = NULL;
-    t->destroy           = destroy;
+    t->destroy           = destroy ? destroy : zix_tree_noop_destroy;
     t->destroy_user_data = destroy_user_data;
     t->cmp               = cmp;
     t->cmp_data          = cmp_data;
@@ -83,9 +90,7 @@ zix_tree_free_rec(ZixTree* t, ZixTreeNode* n)
   if (n) {
     zix_tree_free_rec(t, n->left);
     zix_tree_free_rec(t, n->right);
-    if (t->destroy) {
-      t->destroy(n->data, t->destroy_user_data);
-    }
+    t->destroy(n->data, t->destroy_user_data);
 
     zix_free(t->allocator, n);
   }
@@ -447,9 +452,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 
   if ((n == t->root) && !n->left && !n->right) {
     t->root = NULL;
-    if (t->destroy) {
-      t->destroy(n->data, t->destroy_user_data);
-    }
+    t->destroy(n->data, t->destroy_user_data);
     zix_free(t->allocator, n);
     --t->size;
     assert(t->size == 0);
@@ -579,9 +582,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
 
   DUMP(t);
 
-  if (t->destroy) {
-    t->destroy(n->data, t->destroy_user_data);
-  }
+  t->destroy(n->data, t->destroy_user_data);
   zix_free(t->allocator, n);
 
   --t->size;
