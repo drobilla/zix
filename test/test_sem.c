@@ -4,6 +4,7 @@
 #undef NDEBUG
 
 #include "zix/attributes.h"
+#include "zix/common.h"
 #include "zix/sem.h"
 #include "zix/thread.h"
 
@@ -33,11 +34,22 @@ writer(void* ZIX_UNUSED(arg))
   printf("Writer starting\n");
 
   for (unsigned i = 0; i < n_signals; ++i) {
-    zix_sem_post(&sem);
+    assert(!zix_sem_post(&sem));
   }
 
   printf("Writer finished\n");
   return ZIX_THREAD_RESULT;
+}
+
+static void
+test_try_wait(void)
+{
+  assert(!zix_sem_init(&sem, 0));
+  assert(zix_sem_try_wait(&sem) == ZIX_STATUS_TIMEOUT);
+  assert(!zix_sem_post(&sem));
+  assert(!zix_sem_try_wait(&sem));
+  assert(zix_sem_try_wait(&sem) == ZIX_STATUS_TIMEOUT);
+  assert(!zix_sem_destroy(&sem));
 }
 
 int
@@ -52,6 +64,8 @@ main(int argc, char** argv)
     n_signals = (unsigned)strtol(argv[1], NULL, 10);
   }
 
+  test_try_wait();
+
   printf("Testing %u signals...\n", n_signals);
 
   assert(!zix_sem_init(&sem, 0));
@@ -64,7 +78,6 @@ main(int argc, char** argv)
 
   assert(!zix_thread_join(reader_thread));
   assert(!zix_thread_join(writer_thread));
-
-  zix_sem_destroy(&sem);
+  assert(!zix_sem_destroy(&sem));
   return 0;
 }

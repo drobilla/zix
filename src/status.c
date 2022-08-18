@@ -25,6 +25,10 @@ zix_strerror(const ZixStatus status)
     return "Bad permissions";
   case ZIX_STATUS_REACHED_END:
     return "Reached end";
+  case ZIX_STATUS_TIMEOUT:
+    return "Timeout";
+  case ZIX_STATUS_OVERFLOW:
+    return "Overflow";
   }
   return "Unknown error";
 }
