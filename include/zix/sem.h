@@ -298,8 +298,8 @@ zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
     return ZIX_STATUS_ERROR;
   }
 
-  ts.tv_sec += seconds;
-  ts.tv_nsec += nanoseconds;
+  ts.tv_sec += (time_t)seconds;
+  ts.tv_nsec += (long)nanoseconds;
 
   int r = 0;
   while ((r = sem_timedwait(&sem->sem, &ts)) && errno == EINTR) {
