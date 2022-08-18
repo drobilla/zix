@@ -6,7 +6,6 @@
 #include "zix/common.h"
 
 #include <assert.h>
-#include <string.h>
 
 typedef struct ZixTreeNodeImpl ZixTreeNode;
 
@@ -324,11 +323,10 @@ ZixStatus
 zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
 {
   int          cmp = 0;
-  ZixTreeNode* n   = t->root;
   ZixTreeNode* p   = NULL;
 
   // Find the parent p of e
-  while (n) {
+  for (ZixTreeNode* n = t->root; n;) {
     p   = n;
     cmp = t->cmp(e, n->data, t->cmp_data);
     if (cmp < 0) {
@@ -344,12 +342,13 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
   }
 
   // Allocate a new node n
-  if (!(n = (ZixTreeNode*)zix_malloc(t->allocator, sizeof(ZixTreeNode)))) {
+  ZixTreeNode* const n =
+    (ZixTreeNode*)zix_calloc(t->allocator, 1, sizeof(ZixTreeNode));
+  if (!n) {
     return ZIX_STATUS_NO_MEM;
   }
-  memset(n, '\0', sizeof(ZixTreeNode));
-  n->data    = e;
-  n->balance = 0;
+
+  n->data = e;
   if (ti) {
     *ti = n;
   }
