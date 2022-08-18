@@ -108,7 +108,7 @@ endif
 # Set any additional arguments required for building libraries or programs
 library_c_args = platform_c_args + extra_c_args + ['-DZIX_INTERNAL']
 library_link_args = []
-program_c_args = extra_c_args
+program_c_args = platform_c_args + extra_c_args
 program_link_args = []
 if cc.get_id() == 'emscripten'
   wasm_c_args = [

@@ -52,6 +52,19 @@ test_try_wait(void)
   assert(!zix_sem_destroy(&sem));
 }
 
+static void
+test_timed_wait(void)
+{
+  assert(!zix_sem_init(&sem, 0));
+  assert(zix_sem_timed_wait(&sem, 0, 0) == ZIX_STATUS_TIMEOUT);
+  assert(zix_sem_timed_wait(&sem, 0, 5000000) == ZIX_STATUS_TIMEOUT);
+  assert(!zix_sem_post(&sem));
+  assert(!zix_sem_timed_wait(&sem, 0, 5000000));
+  assert(!zix_sem_post(&sem));
+  assert(!zix_sem_timed_wait(&sem, 1000, 0));
+  assert(!zix_sem_destroy(&sem));
+}
+
 int
 main(int argc, char** argv)
 {
@@ -65,6 +78,7 @@ main(int argc, char** argv)
   }
 
   test_try_wait();
+  test_timed_wait();
 
   printf("Testing %u signals...\n", n_signals);
 

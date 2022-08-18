@@ -22,6 +22,8 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
+#include <time.h>
 
 /**
    @addtogroup zix
@@ -35,7 +37,7 @@ struct ZixSemImpl;
 /**
    A counting semaphore.
 
-   This is an integer that is always positive, and has two main operations:
+   This is an integer that is never negative, and has two main operations:
    increment (post) and decrement (wait).  If a decrement can not be performed
    (i.e. the value is 0) the caller will be blocked until another thread posts
    and the operation can succeed.
@@ -100,6 +102,20 @@ static inline ZixStatus
 zix_sem_try_wait(ZixSem* ZIX_NONNULL sem);
 
 /**
+   Wait for an amount of time until count is > 0, then decrement if possible.
+
+   Obviously not realtime safe.
+
+   @return #ZIX_STATUS_SUCCESS if `sem` was decremented, #ZIX_STATUS_TIMEOUT if
+   it was still zero when the timeout was reached, or #ZIX_STATUS_BAD_ARG if
+   `sem` is invalid.
+*/
+static inline ZixStatus
+zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
+                   uint32_t            seconds,
+                   uint32_t            nanoseconds);
+
+/**
    @cond
 */
 
@@ -153,6 +169,19 @@ zix_sem_try_wait(ZixSem* ZIX_NONNULL sem)
                                            : ZIX_STATUS_ERROR;
 }
 
+static inline ZixStatus
+zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
+                   const uint32_t      seconds,
+                   const uint32_t      nanoseconds)
+{
+  const mach_timespec_t interval = {seconds, (clock_res_t)nanoseconds};
+  const kern_return_t   r        = semaphore_timedwait(sem->sem, interval);
+
+  return (r == KERN_SUCCESS)               ? ZIX_STATUS_SUCCESS
+         : (r == KERN_OPERATION_TIMED_OUT) ? ZIX_STATUS_TIMEOUT
+                                           : ZIX_STATUS_ERROR;
+}
+
 #elif defined(_WIN32)
 
 struct ZixSemImpl {
@@ -191,6 +220,19 @@ static inline ZixStatus
 zix_sem_try_wait(ZixSem* ZIX_NONNULL sem)
 {
   const DWORD r = WaitForSingleObject(sem->sem, 0);
+
+  return (r == WAIT_OBJECT_0)  ? ZIX_STATUS_SUCCESS
+         : (r == WAIT_TIMEOUT) ? ZIX_STATUS_TIMEOUT
+                               : ZIX_STATUS_ERROR;
+}
+
+static inline ZixStatus
+zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
+                   const uint32_t      seconds,
+                   const uint32_t      nanoseconds)
+{
+  const uint32_t milliseconds = seconds * 1000U + nanoseconds / 1000000U;
+  const DWORD    r            = WaitForSingleObject(sem->sem, milliseconds);
 
   return (r == WAIT_OBJECT_0)  ? ZIX_STATUS_SUCCESS
          : (r == WAIT_TIMEOUT) ? ZIX_STATUS_TIMEOUT
@@ -242,6 +284,29 @@ zix_sem_try_wait(ZixSem* ZIX_NONNULL sem)
   }
 
   return r ? (errno == EAGAIN ? ZIX_STATUS_TIMEOUT : zix_errno_status(errno))
+           : ZIX_STATUS_SUCCESS;
+}
+
+static inline ZixStatus
+zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
+                   const uint32_t      seconds,
+                   const uint32_t      nanoseconds)
+{
+  struct timespec ts = {0, 0};
+
+  if (clock_gettime(CLOCK_REALTIME, &ts)) {
+    return ZIX_STATUS_ERROR;
+  }
+
+  ts.tv_sec += seconds;
+  ts.tv_nsec += nanoseconds;
+
+  int r = 0;
+  while ((r = sem_timedwait(&sem->sem, &ts)) && errno == EINTR) {
+    // Interrupted, try again
+  }
+
+  return r ? (errno == ETIMEDOUT ? ZIX_STATUS_TIMEOUT : zix_errno_status(errno))
            : ZIX_STATUS_SUCCESS;
 }
 
