@@ -380,17 +380,11 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
   if (p && p_height_increased) {
     int height_change = 0;
     for (ZixTreeNode* i = p; i && i->parent; i = i->parent) {
-      if (i == i->parent->left) {
-        if (--i->parent->balance == -2) {
-          zix_tree_rebalance(t, i->parent, &height_change);
-          break;
-        }
-      } else {
-        assert(i == i->parent->right);
-        if (++i->parent->balance == 2) {
-          zix_tree_rebalance(t, i->parent, &height_change);
-          break;
-        }
+      i->parent->balance += (i == i->parent->left) ? -1 : 1;
+
+      if (i->parent->balance == -2 || i->parent->balance == 2) {
+        zix_tree_rebalance(t, i->parent, &height_change);
+        break;
       }
 
       if (i->parent->balance == 0) {
@@ -525,7 +519,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
            replace->parent->right == replace);
   }
 
-  // Rebalance starting at to_balance upwards.
+  // Rebalance starting at to_balance upwards
   for (ZixTreeNode* i = to_balance; i; i = i->parent) {
     i->balance += d_balance;
     if (d_balance == 0 || i->balance == -1 || i->balance == 1) {
