@@ -177,7 +177,7 @@ sequential_tests = [
   'test_btree',
   'test_digest',
   'test_hash',
-  'test_strerror',
+  'test_status',
   'test_tree',
 ]
 

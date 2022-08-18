@@ -9,7 +9,6 @@
 #ifdef _WIN32
 #  include <windows.h>
 #else
-#  include <errno.h>
 #  include <pthread.h>
 #endif
 
@@ -85,16 +84,7 @@ zix_thread_create(ZixThread* thread,
   const int ret = pthread_create(thread, NULL, function, arg);
   pthread_attr_destroy(&attr);
 
-  switch (ret) {
-  case EAGAIN:
-    return ZIX_STATUS_NO_MEM;
-  case EINVAL:
-    return ZIX_STATUS_BAD_ARG;
-  case EPERM:
-    return ZIX_STATUS_BAD_PERMS;
-  }
-
-  return ret ? ZIX_STATUS_ERROR : ZIX_STATUS_SUCCESS;
+  return zix_errno_status(ret);
 }
 
 static inline ZixStatus

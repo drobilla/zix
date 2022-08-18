@@ -3,6 +3,8 @@
 
 #include "zix/common.h"
 
+#include <errno.h>
+
 const char*
 zix_strerror(const ZixStatus status)
 {
@@ -25,4 +27,33 @@ zix_strerror(const ZixStatus status)
     return "Reached end";
   }
   return "Unknown error";
+}
+
+ZixStatus
+zix_errno_status(const int e)
+{
+  switch (e) {
+  case 0:
+    return ZIX_STATUS_SUCCESS;
+#ifdef EAGAIN
+  case EAGAIN:
+    return ZIX_STATUS_NO_MEM;
+#endif
+#ifdef EEXIST
+  case EEXIST:
+    return ZIX_STATUS_EXISTS;
+#endif
+#ifdef EINVAL
+  case EINVAL:
+    return ZIX_STATUS_BAD_ARG;
+#endif
+#ifdef EPERM
+  case EPERM:
+    return ZIX_STATUS_BAD_PERMS;
+#endif
+  default:
+    break;
+  }
+
+  return ZIX_STATUS_ERROR;
 }

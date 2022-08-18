@@ -6,11 +6,33 @@
 #include "zix/common.h"
 
 #include <assert.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
-int
-main(void)
+static void
+test_errno_status(void)
+{
+  assert(zix_errno_status(0) == ZIX_STATUS_SUCCESS);
+  assert(zix_errno_status(INT_MAX) == ZIX_STATUS_ERROR);
+
+#ifdef EAGAIN
+  assert(zix_errno_status(EAGAIN) == ZIX_STATUS_NO_MEM);
+#endif
+#ifdef EEXIST
+  assert(zix_errno_status(EEXIST) == ZIX_STATUS_EXISTS);
+#endif
+#ifdef EINVAL
+  assert(zix_errno_status(EINVAL) == ZIX_STATUS_BAD_ARG);
+#endif
+#ifdef EPERM
+  assert(zix_errno_status(EPERM) == ZIX_STATUS_BAD_PERMS);
+#endif
+}
+
+static void
+test_strerror(void)
 {
   const char* msg = zix_strerror(ZIX_STATUS_SUCCESS);
   assert(!strcmp(msg, "Success"));
@@ -27,5 +49,12 @@ main(void)
   assert(!strcmp(msg, "Unknown error"));
 
   printf("Success\n");
+}
+
+int
+main(void)
+{
+  test_errno_status();
+  test_strerror();
   return 0;
 }

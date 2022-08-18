@@ -33,6 +33,11 @@ ZIX_CONST_API
 const char*
 zix_strerror(ZixStatus status);
 
+/// Return an errno value converted to a status code
+ZIX_CONST_API
+ZixStatus
+zix_errno_status(int e);
+
 /// Function for comparing two elements
 typedef int (*ZixComparator)(const void* a,
                              const void* b,
