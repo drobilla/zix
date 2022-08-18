@@ -13,8 +13,7 @@ typedef struct {
   int output;
 } SharedData;
 
-ZIX_THREAD_FUNC
-static ZixThreadResult
+static ZixThreadResult ZIX_THREAD_FUNC
 thread_func(void* const arg)
 {
   SharedData* const data = (SharedData*)arg;

@@ -43,8 +43,7 @@ cmp_msg(const int* const msg1, const int* const msg2)
   return 1;
 }
 
-ZIX_THREAD_FUNC
-static ZixThreadResult
+static ZixThreadResult ZIX_THREAD_FUNC
 reader(void* ZIX_UNUSED(arg))
 {
   printf("Reader starting\n");
@@ -67,8 +66,7 @@ reader(void* ZIX_UNUSED(arg))
   return ZIX_THREAD_RESULT;
 }
 
-ZIX_THREAD_FUNC
-static ZixThreadResult
+static ZixThreadResult ZIX_THREAD_FUNC
 writer(void* ZIX_UNUSED(arg))
 {
   printf("Writer starting\n");

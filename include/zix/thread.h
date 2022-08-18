@@ -27,7 +27,7 @@ extern "C" {
 
 #ifdef _WIN32
 #  define ZIX_THREAD_RESULT 0
-#  define ZIX_THREAD_FUNC __attribute__((stdcall))
+#  define ZIX_THREAD_FUNC __stdcall
 
 typedef HANDLE ZixThread;
 typedef DWORD  ZixThreadResult;
@@ -51,8 +51,7 @@ typedef void*     ZixThreadResult;
    "Returning" a result, and communicating with the parent thread in general,
    can be done through the pointer argument.
 */
-typedef ZIX_THREAD_FUNC
-ZixThreadResult (*ZixThreadFunc)(void*);
+typedef ZixThreadResult(ZIX_THREAD_FUNC* ZixThreadFunc)(void*);
 
 /**
    Initialize `thread` to a new thread.
