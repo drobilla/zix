@@ -33,6 +33,7 @@ x64_dbg:
     - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true -Db_coverage=true
     - ninja -C build test
     - ninja -C build coverage-html
+  coverage: '/ *lines\.*: \d+\.\d+.*/'
   artifacts:
     paths:
       - build/meson-logs/coveragereport
