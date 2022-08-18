@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# Copyright 2011-2021 David Robillard <d@drobilla.net>
+# Copyright 2011-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: ISC
 
 """
@@ -30,10 +30,12 @@ subprocess.call(
 
 FILENAME = "gibberish.txt"
 CHARACTERS = string.ascii_letters + string.digits + " '."
-WORDS = open("/usr/share/dict/words", "r").readlines()
 SCHEMES = ["http", "https"]
 DOMAINS = ["example.org", "drobilla.net", "lv2plug.in", "gitlab.com"]
 NAMES = ["ns", "foo", "bar", "stuff", "things"]
+
+with open("/usr/share/dict/words", "r", encoding="utf-8") as words_file:
+    WORDS = words_file.readlines()
 
 
 def random_word():
@@ -41,7 +43,7 @@ def random_word():
 
     if random.randint(0, 1):
         # Generate a URI
-        result = "%s://%s/" % (random.choice(SCHEMES), random.choice(DOMAINS))
+        result = f"{random.choice(SCHEMES)}://{random.choice(DOMAINS)}/"
         for _ in range(random.randrange(1, 6)):
             result += random.choice(NAMES) + "/"
     else:
@@ -55,9 +57,9 @@ def random_word():
 
 
 if not os.path.exists(FILENAME):
-    print("Generating random text %s" % FILENAME)
+    print(f"Generating random text {FILENAME}")
 
-    with open(FILENAME, "w") as out:
+    with open(FILENAME, "w", encoding="utf-8") as out:
         for i in range(1 << 20):
             out.write(random_word())
             out.write("\n")

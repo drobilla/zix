@@ -279,6 +279,8 @@ if not get_option('benchmarks').disabled()
   endif
 endif
 
+subdir('scripts')
+
 if not meson.is_subproject()
   summary('Benchmarks', build_benchmarks, bool_yn: true)
   summary('Tests', not get_option('tests').disabled(), bool_yn: true)

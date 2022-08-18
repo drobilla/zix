@@ -1,7 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# Copyright 2011-2020 David Robillard <d@drobilla.net>
+# Copyright 2011-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: ISC
+
+"""
+Plot a benchmark result.
+"""
 
 import math
 import os
@@ -20,7 +24,7 @@ matplotlib.rc(
         "serif": "Times",
         "sans-serif": "Helvetica",
         "monospace": "Courier",
-    }
+    },
 )
 
 pyplot.subplots_adjust(wspace=0.2, hspace=0.2)
@@ -34,11 +38,9 @@ class SensibleScalarFormatter(matplotlib.ticker.ScalarFormatter):
         self.set_powerlimits([-6, 6])
         self.set_scientific(True)
 
-    def _set_orderOfMagnitude(self, value_range):
+    def _set_order_of_magnitude(self):
         # Calculate "best" order in the usual way
-        matplotlib.ticker.ScalarFormatter._set_orderOfMagnitude(
-            self, value_range
-        )
+        super()._set_order_of_magnitude()
 
         # Round down to sensible (millions, billions, etc) order
         self.orderOfMagnitude = self.orderOfMagnitude - (
@@ -48,67 +50,68 @@ class SensibleScalarFormatter(matplotlib.ticker.ScalarFormatter):
         self.set_scientific(True)
 
 
-file_prefix = os.path.commonprefix(sys.argv[1:])
-n_plots = len(sys.argv) - 2
-for i in range(n_plots):
-    filename = sys.argv[i + 2]
-    file = open(filename, "r")
+if __name__ == "__main__":
+    file_prefix = os.path.commonprefix(sys.argv[1:])
+    N_PLOTS = len(sys.argv) - 2
+    for i in range(N_PLOTS):
+        filename = sys.argv[i + 2]
 
-    ax = pyplot.subplot(
-        math.ceil(math.sqrt(n_plots)), math.ceil(math.sqrt(n_plots)), i + 1
-    )
+        with open(filename, "r", encoding="utf-8") as in_file:
+            ax = pyplot.subplot(
+                math.ceil(math.sqrt(N_PLOTS)),
+                math.ceil(math.sqrt(N_PLOTS)),
+                i + 1,
+            )
 
-    ax.xaxis.set_major_formatter(SensibleScalarFormatter())
-    ax.yaxis.set_major_formatter(SensibleScalarFormatter())
-    for a in ["x", "y"]:
-        ax.grid(
-            which="major",
-            axis=a,
-            zorder=1,
-            linewidth=0.5,
-            linestyle=":",
-            color="0",
-            dashes=[0.5, 8.0],
+            ax.xaxis.set_major_formatter(SensibleScalarFormatter())
+            ax.yaxis.set_major_formatter(SensibleScalarFormatter())
+            for a in ["x", "y"]:
+                ax.grid(
+                    which="major",
+                    axis=a,
+                    zorder=1,
+                    linewidth=0.5,
+                    linestyle=":",
+                    color="0",
+                    dashes=[0.5, 8.0],
+                )
+
+            header = in_file.readline()
+            columns = header[1:].split()
+
+            pyplot.xlabel("Elements")
+            pyplot.ylabel("Time (s)")
+
+            times = []
+            for i in columns:
+                times.append([])
+
+            for line in in_file:
+                if line[0] == "#":
+                    continue
+
+                fields = line.split()
+                for index, field in enumerate(fields):
+                    times[index].append([float(field)])
+
+        for i in range(len(times) - 1):
+            matplotlib.pyplot.plot(
+                times[0], times[i + 1], "-o", label=columns[i + 1]
+            )
+
+        pyplot.legend(
+            loc="upper left",
+            handletextpad=0.15,
+            borderpad=0.20,
+            borderaxespad=0,
+            labelspacing=0.10,
+            columnspacing=0,
+            framealpha=0.90,
         )
 
-    header = file.readline()
-    columns = header[1:].split()
+        file_prefix_len = len(file_prefix)
+        pyplot.title(os.path.splitext(filename[file_prefix_len:])[0].title())
 
-    pyplot.xlabel("Elements")
-    pyplot.ylabel("Time (s)")
-
-    times = []
-    for i in columns:
-        times.append([])
-    for line in file:
-        if line[0] == "#":
-            continue
-
-        fields = line.split()
-        num = 0
-        for i in fields:
-            times[num].append([float(i)])
-            num += 1
-
-    file.close()
-
-    for i in range(len(times) - 1):
-        matplotlib.pyplot.plot(
-            times[0], times[i + 1], "-o", label=columns[i + 1]
-        )
-
-    pyplot.legend(
-        loc="upper left",
-        handletextpad=0.15,
-        borderpad=0.20,
-        borderaxespad=0,
-        labelspacing=0.10,
-        columnspacing=0,
-        framealpha=0.90,
-    )
-
-    pyplot.title(os.path.splitext(filename[len(file_prefix) :])[0].title())
-
-print("Writing %s" % sys.argv[1])
-matplotlib.pyplot.tight_layout()
-matplotlib.pyplot.savefig(sys.argv[1])
+        print(f"Writing {sys.argv[1]}")
+        matplotlib.pyplot.tight_layout()
+        matplotlib.pyplot.savefig(sys.argv[1])
