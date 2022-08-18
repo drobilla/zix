@@ -12,3 +12,6 @@ option('strict', type: 'boolean', value: false, yield: true,
 
 option('tests', type: 'feature', value: 'auto', yield: true,
        description: 'Build tests')
+
+option('title', type: 'string', value: 'Zix',
+       description: 'Project title')

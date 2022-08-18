@@ -186,7 +186,15 @@ threaded_tests = [
   'sem_test',
 ]
 
-if not get_option('tests').disabled()
+if not get_option('tests').disabled() and not meson.is_subproject()
+  # Check release metadata
+  autoship = find_program('autoship', required: false)
+  if autoship.found()
+    test('autoship', autoship,
+         args: ['test', meson.current_source_dir()],
+         suite: 'data')
+  endif
+
   # Check licensing metadata
   reuse = find_program('reuse', required: get_option('tests'))
   if reuse.found()
