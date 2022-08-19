@@ -15,8 +15,8 @@ static const size_t min_alignment = sizeof(uintmax_t);
 static size_t
 round_up_multiple(const size_t number, const size_t factor)
 {
-  assert(factor);                        // Factor must be non-zero
-  assert((factor & (factor - 1)) == 0U); // Factor must be a power of two
+  assert(factor);                         // Factor must be non-zero
+  assert((factor & (factor - 1U)) == 0U); // Factor must be a power of two
 
   return (number + factor - 1U) & ~(factor - 1U);
 }
@@ -27,7 +27,7 @@ zix_bump_malloc(ZixAllocator* const allocator, const size_t size)
 {
   ZixBumpAllocator* const state = (ZixBumpAllocator*)allocator;
 
-  assert((uintptr_t)((char*)state->buffer + state->top) % min_alignment == 0);
+  assert((uintptr_t)((char*)state->buffer + state->top) % min_alignment == 0U);
 
   /* For C malloc(), the result is guaranteed to be aligned for any variable.
      What that means is deliberately vague to accommodate diverse platforms,

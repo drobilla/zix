@@ -417,7 +417,7 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
     t->destroy(n->data, t->destroy_user_data);
     zix_free(t->allocator, n);
     --t->size;
-    assert(t->size == 0);
+    assert(!t->size);
     return ZIX_STATUS_SUCCESS;
   }
 

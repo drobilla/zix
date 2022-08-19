@@ -113,7 +113,7 @@ zix_digest64_aligned(const uint64_t seed, const void* const key, size_t len)
 static inline uint32_t
 rotl32(const uint32_t val, const uint32_t bits)
 {
-  return ((val << bits) | (val >> (32 - bits)));
+  return ((val << bits) | (val >> (32U - bits)));
 }
 
 static inline uint32_t

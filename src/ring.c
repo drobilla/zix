@@ -86,7 +86,7 @@ zix_ring_new(ZixAllocator* const allocator, const uint32_t size)
     ring->write_head = 0;
     ring->read_head  = 0;
     ring->size       = next_power_of_two(size);
-    ring->size_mask  = ring->size - 1;
+    ring->size_mask  = ring->size - 1U;
 
     if (!(ring->buf = (char*)zix_malloc(allocator, ring->size))) {
       zix_free(allocator, ring);
@@ -162,7 +162,7 @@ zix_ring_write_space(const ZixRing* const ring)
 uint32_t
 zix_ring_capacity(const ZixRing* const ring)
 {
-  return ring->size - 1;
+  return ring->size - 1U;
 }
 
 static inline uint32_t

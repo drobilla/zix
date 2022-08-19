@@ -75,7 +75,7 @@ zix_bitset_count_up_to(const ZixBitset* b, const ZixBitsetTally* t, size_t i)
   }
 
   if (extra) {
-    const ZixBitset mask = ~(~(ZixBitset)0 << extra);
+    const ZixBitset mask = ~(~(ZixBitset)0U << extra);
     count += zix_bitset_popcount(b[full_elems] & mask);
   }
 
