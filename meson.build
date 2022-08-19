@@ -48,11 +48,24 @@ endif
 if get_option('checks')
   platform_c_args += ['-DZIX_NO_DEFAULT_CONFIG']
 
+  clock_gettime_code = '''#include <time.h>
+int main(void) { struct timespec t; return clock_gettime(CLOCK_MONOTONIC, &t); }
+'''
+
   mlock_code = '''#include <sys/mman.h>
 int main(void) { return mlock(0, 0); }'''
 
   posix_memalign_code = '''#include <stdlib.h>
 int main(void) { void* mem; posix_memalign(&mem, 8, 8); }'''
+
+  sem_timedwait_code = '''#include <semaphore.h>
+#include <time.h>
+int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }'''
+
+  platform_c_args += '-DHAVE_CLOCK_GETTIME=@0@'.format(
+    cc.compiles(clock_gettime_code,
+                args: platform_c_args,
+                name: 'clock_gettime').to_int())
 
   platform_c_args += '-DHAVE_MLOCK=@0@'.format(
     cc.compiles(mlock_code,
@@ -63,7 +76,18 @@ int main(void) { void* mem; posix_memalign(&mem, 8, 8); }'''
     cc.compiles(posix_memalign_code,
                 args: platform_c_args,
                 name: 'posix_memalign').to_int())
+
+  platform_c_args += '-DHAVE_SEM_TIMEDWAIT=@0@'.format(
+    cc.compiles(sem_timedwait_code,
+                args: platform_c_args,
+                name: 'sem_timedwait').to_int())
 endif
+
+################
+# Dependencies #
+################
+
+thread_dep = dependency('threads', include_type: 'system')
 
 ###########
 # Library #
@@ -94,6 +118,7 @@ sources = files(
   'src/digest.c',
   'src/hash.c',
   'src/ring.c',
+  'src/sem.c',
   'src/status.c',
   'src/tree.c',
 )
@@ -139,6 +164,7 @@ libzix = library(
   meson.project_name() + library_suffix,
   sources,
   c_args: c_suppressions + library_c_args,
+  dependencies: [thread_dep],
   gnu_symbol_visibility: 'hidden',
   include_directories: include_dirs,
   install: true,
@@ -160,6 +186,7 @@ pkg.generate(
   extra_cflags: extra_c_args,
   filebase: versioned_name,
   name: 'Zix',
+  requires: [thread_dep],
   subdirs: [versioned_name],
   version: meson.project_version(),
 )

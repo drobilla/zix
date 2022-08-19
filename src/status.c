@@ -29,6 +29,8 @@ zix_strerror(const ZixStatus status)
     return "Timeout";
   case ZIX_STATUS_OVERFLOW:
     return "Overflow";
+  case ZIX_STATUS_NOT_SUPPORTED:
+    return "Not supported";
   }
   return "Unknown error";
 }

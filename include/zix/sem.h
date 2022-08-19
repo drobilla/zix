@@ -1,4 +1,4 @@
-// Copyright 2012-2020 David Robillard <d@drobilla.net>
+// Copyright 2012-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_SEM_H
@@ -10,10 +10,8 @@
 #ifdef __APPLE__
 #  include <mach/mach.h>
 #elif defined(_WIN32)
-#  include <limits.h>
 #  include <windows.h>
 #else
-#  include <errno.h>
 #  include <semaphore.h>
 #endif
 
@@ -58,7 +56,8 @@ typedef struct ZixSemImpl ZixSem;
 
    @return #ZIX_STATUS_SUCCESS, or an unlikely error.
 */
-static inline ZixStatus
+ZIX_API
+ZixStatus
 zix_sem_init(ZixSem* ZIX_NONNULL sem, unsigned initial);
 
 /**
@@ -66,7 +65,8 @@ zix_sem_init(ZixSem* ZIX_NONNULL sem, unsigned initial);
 
    @return #ZIX_STATUS_SUCCESS, or an error.
 */
-static inline ZixStatus
+ZIX_API
+ZixStatus
 zix_sem_destroy(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -78,7 +78,8 @@ zix_sem_destroy(ZixSem* ZIX_NONNULL sem);
    if the maximum possible value would have been exceeded, or
    #ZIX_STATUS_BAD_ARG if `sem` is invalid.
 */
-static inline ZixStatus
+ZIX_API
+ZixStatus
 zix_sem_post(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -89,7 +90,8 @@ zix_sem_post(ZixSem* ZIX_NONNULL sem);
    @return #ZIX_STATUS_SUCCESS if `sem` was decremented, or #ZIX_STATUS_BAD_ARG
    if `sem` is invalid.
 */
-static inline ZixStatus
+ZIX_API
+ZixStatus
 zix_sem_wait(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -98,7 +100,8 @@ zix_sem_wait(ZixSem* ZIX_NONNULL sem);
    @return #ZIX_STATUS_SUCCESS if `sem` was decremented, #ZIX_STATUS_TIMEOUT if
    it was already zero, or #ZIX_STATUS_BAD_ARG if `sem` is invalid.
 */
-static inline ZixStatus
+ZIX_API
+ZixStatus
 zix_sem_try_wait(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -107,10 +110,12 @@ zix_sem_try_wait(ZixSem* ZIX_NONNULL sem);
    Obviously not realtime safe.
 
    @return #ZIX_STATUS_SUCCESS if `sem` was decremented, #ZIX_STATUS_TIMEOUT if
-   it was still zero when the timeout was reached, or #ZIX_STATUS_BAD_ARG if
-   `sem` is invalid.
+   it was still zero when the timeout was reached, #ZIX_STATUS_NOT_SUPPORTED if
+   the system does not support timed waits, or #ZIX_STATUS_BAD_ARG if `sem` is
+   invalid.
 */
-static inline ZixStatus
+ZIX_API
+ZixStatus
 zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
                    uint32_t            seconds,
                    uint32_t            nanoseconds);
@@ -119,68 +124,11 @@ zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
    @cond
 */
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 
 struct ZixSemImpl {
   semaphore_t sem;
 };
-
-static inline ZixStatus
-zix_sem_init(ZixSem* ZIX_NONNULL sem, unsigned val)
-{
-  return semaphore_create(
-           mach_task_self(), &sem->sem, SYNC_POLICY_FIFO, (int)val)
-           ? ZIX_STATUS_ERROR
-           : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_destroy(ZixSem* ZIX_NONNULL sem)
-{
-  return semaphore_destroy(mach_task_self(), sem->sem) ? ZIX_STATUS_ERROR
-                                                       : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_post(ZixSem* ZIX_NONNULL sem)
-{
-  return semaphore_signal(sem->sem) ? ZIX_STATUS_ERROR : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_wait(ZixSem* ZIX_NONNULL sem)
-{
-  kern_return_t r = 0;
-  while ((r = semaphore_wait(sem->sem)) && r == KERN_ABORTED) {
-    // Interrupted, try again
-  }
-
-  return r ? ZIX_STATUS_ERROR : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_try_wait(ZixSem* ZIX_NONNULL sem)
-{
-  const mach_timespec_t zero = {0, 0};
-  const kern_return_t   r    = semaphore_timedwait(sem->sem, zero);
-
-  return (r == KERN_SUCCESS)               ? ZIX_STATUS_SUCCESS
-         : (r == KERN_OPERATION_TIMED_OUT) ? ZIX_STATUS_TIMEOUT
-                                           : ZIX_STATUS_ERROR;
-}
-
-static inline ZixStatus
-zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
-                   const uint32_t      seconds,
-                   const uint32_t      nanoseconds)
-{
-  const mach_timespec_t interval = {seconds, (clock_res_t)nanoseconds};
-  const kern_return_t   r        = semaphore_timedwait(sem->sem, interval);
-
-  return (r == KERN_SUCCESS)               ? ZIX_STATUS_SUCCESS
-         : (r == KERN_OPERATION_TIMED_OUT) ? ZIX_STATUS_TIMEOUT
-                                           : ZIX_STATUS_ERROR;
-}
 
 #elif defined(_WIN32)
 
@@ -188,127 +136,11 @@ struct ZixSemImpl {
   HANDLE sem;
 };
 
-static inline ZixStatus
-zix_sem_init(ZixSem* ZIX_NONNULL sem, unsigned initial)
-{
-  sem->sem = CreateSemaphore(NULL, (LONG)initial, LONG_MAX, NULL);
-  return sem->sem ? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
-}
-
-static inline ZixStatus
-zix_sem_destroy(ZixSem* ZIX_NONNULL sem)
-{
-  return CloseHandle(sem->sem) ? ZIX_STATUS_SUCCESS : ZIX_STATUS_ERROR;
-}
-
-static inline ZixStatus
-zix_sem_post(ZixSem* ZIX_NONNULL sem)
-{
-  return ReleaseSemaphore(sem->sem, 1, NULL) ? ZIX_STATUS_SUCCESS
-                                             : ZIX_STATUS_ERROR;
-}
-
-static inline ZixStatus
-zix_sem_wait(ZixSem* ZIX_NONNULL sem)
-{
-  return WaitForSingleObject(sem->sem, INFINITE) == WAIT_OBJECT_0
-           ? ZIX_STATUS_SUCCESS
-           : ZIX_STATUS_ERROR;
-}
-
-static inline ZixStatus
-zix_sem_try_wait(ZixSem* ZIX_NONNULL sem)
-{
-  const DWORD r = WaitForSingleObject(sem->sem, 0);
-
-  return (r == WAIT_OBJECT_0)  ? ZIX_STATUS_SUCCESS
-         : (r == WAIT_TIMEOUT) ? ZIX_STATUS_TIMEOUT
-                               : ZIX_STATUS_ERROR;
-}
-
-static inline ZixStatus
-zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
-                   const uint32_t      seconds,
-                   const uint32_t      nanoseconds)
-{
-  const uint32_t milliseconds = seconds * 1000U + nanoseconds / 1000000U;
-  const DWORD    r            = WaitForSingleObject(sem->sem, milliseconds);
-
-  return (r == WAIT_OBJECT_0)  ? ZIX_STATUS_SUCCESS
-         : (r == WAIT_TIMEOUT) ? ZIX_STATUS_TIMEOUT
-                               : ZIX_STATUS_ERROR;
-}
-
 #else /* !defined(__APPLE__) && !defined(_WIN32) */
 
 struct ZixSemImpl {
   sem_t sem;
 };
-
-static inline ZixStatus
-zix_sem_init(ZixSem* ZIX_NONNULL sem, unsigned initial)
-{
-  return sem_init(&sem->sem, 0, initial) ? zix_errno_status(errno)
-                                         : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_destroy(ZixSem* ZIX_NONNULL sem)
-{
-  return sem_destroy(&sem->sem) ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_post(ZixSem* ZIX_NONNULL sem)
-{
-  return sem_post(&sem->sem) ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_wait(ZixSem* ZIX_NONNULL sem)
-{
-  int r = 0;
-  while ((r = sem_wait(&sem->sem)) && errno == EINTR) {
-    // Interrupted, try again
-  }
-
-  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_try_wait(ZixSem* ZIX_NONNULL sem)
-{
-  int r = 0;
-  while ((r = sem_trywait(&sem->sem)) && errno == EINTR) {
-    // Interrupted, try again
-  }
-
-  return r ? (errno == EAGAIN ? ZIX_STATUS_TIMEOUT : zix_errno_status(errno))
-           : ZIX_STATUS_SUCCESS;
-}
-
-static inline ZixStatus
-zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
-                   const uint32_t      seconds,
-                   const uint32_t      nanoseconds)
-{
-  struct timespec ts = {0, 0};
-
-  if (clock_gettime(CLOCK_REALTIME, &ts)) {
-    return ZIX_STATUS_ERROR;
-  }
-
-  ts.tv_sec += (time_t)seconds;
-  ts.tv_nsec += (long)nanoseconds;
-
-  int r = 0;
-  while ((r = sem_timedwait(&sem->sem, &ts)) && errno == EINTR) {
-    // Interrupted, try again
-  }
-
-  return r ? (errno == ETIMEDOUT ? ZIX_STATUS_TIMEOUT : zix_errno_status(errno))
-           : ZIX_STATUS_SUCCESS;
-}
 
 #endif
 

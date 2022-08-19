@@ -39,6 +39,15 @@
 #    endif
 #  endif
 
+// POSIX.1-2001: clock_gettime()
+#  ifndef HAVE_CLOCK_GETTIME
+#    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#      define HAVE_CLOCK_GETTIME 1
+#    else
+#      define HAVE_CLOCK_GETTIME 0
+#    endif
+#  endif
+
 // POSIX.1-2001: mlock()
 #  ifndef HAVE_MLOCK
 #    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
@@ -57,6 +66,15 @@
 #    endif
 #  endif
 
+// POSIX.1-2001: sem_timedwait()
+#  ifndef HAVE_SEM_TIMEDWAIT
+#    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#      define HAVE_SEM_TIMEDWAIT 1
+#    else
+#      define HAVE_SEM_TIMEDWAIT 0
+#    endif
+#  endif
+
 #endif // !defined(ZIX_NO_DEFAULT_CONFIG)
 
 /*
@@ -66,6 +84,12 @@
   and this header is always required by any code that checks for features, even
   if the build system defines them all.
 */
+
+#if HAVE_CLOCK_GETTIME
+#  define USE_CLOCK_GETTIME 1
+#else
+#  define USE_CLOCK_GETTIME 0
+#endif
 
 #if HAVE_MLOCK
 #  define USE_MLOCK 1
@@ -77,6 +101,12 @@
 #  define USE_POSIX_MEMALIGN 1
 #else
 #  define USE_POSIX_MEMALIGN 0
+#endif
+
+#if HAVE_SEM_TIMEDWAIT
+#  define USE_SEM_TIMEDWAIT 1
+#else
+#  define USE_SEM_TIMEDWAIT 0
 #endif
 
 #endif // ZIX_CONFIG_H

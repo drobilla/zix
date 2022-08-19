@@ -28,6 +28,7 @@ typedef enum {
   ZIX_STATUS_REACHED_END,
   ZIX_STATUS_TIMEOUT,
   ZIX_STATUS_OVERFLOW,
+  ZIX_STATUS_NOT_SUPPORTED,
 } ZixStatus;
 
 /// Return a string describing a status code
