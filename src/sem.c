@@ -186,20 +186,17 @@ zix_sem_timed_wait(ZixSem*        sem,
 
   struct timespec ts = {0, 0};
 
-  if (clock_gettime(CLOCK_REALTIME, &ts)) {
-    return ZIX_STATUS_ERROR;
-  }
-
-  ts.tv_sec += (time_t)seconds;
-  ts.tv_nsec += (long)nanoseconds;
-
   int r = 0;
-  while ((r = sem_timedwait(&sem->sem, &ts)) && errno == EINTR) {
-    // Interrupted, try again
+  if (!(r = clock_gettime(CLOCK_REALTIME, &ts))) {
+    ts.tv_sec += (time_t)seconds;
+    ts.tv_nsec += (long)nanoseconds;
+
+    while ((r = sem_timedwait(&sem->sem, &ts)) && errno == EINTR) {
+      // Interrupted, try again
+    }
   }
 
-  return r ? (errno == ETIMEDOUT ? ZIX_STATUS_TIMEOUT : zix_errno_status(errno))
-           : ZIX_STATUS_SUCCESS;
+  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
 #  endif
 }
 

@@ -12,6 +12,7 @@
 #  include <pthread.h>
 #endif
 
+#include <errno.h>
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -92,10 +93,10 @@ zix_thread_join(ZixThread thread)
 #else /* !defined(_WIN32) */
 
 static inline ZixStatus
-zix_thread_create(ZixThread* thread,
-                  size_t     stack_size,
-                  void* (*function)(void*),
-                  void* arg)
+zix_thread_create(ZixThread*    thread,
+                  size_t        stack_size,
+                  ZixThreadFunc function,
+                  void*         arg)
 {
   pthread_attr_t attr;
   pthread_attr_init(&attr);
@@ -104,7 +105,7 @@ zix_thread_create(ZixThread* thread,
   const int ret = pthread_create(thread, NULL, function, arg);
   pthread_attr_destroy(&attr);
 
-  return zix_errno_status(ret);
+  return ret == EAGAIN ? ZIX_STATUS_NO_MEM : zix_errno_status(ret);
 }
 
 static inline ZixStatus

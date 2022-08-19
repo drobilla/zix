@@ -41,10 +41,6 @@ zix_errno_status(const int e)
   switch (e) {
   case 0:
     return ZIX_STATUS_SUCCESS;
-#ifdef EAGAIN
-  case EAGAIN:
-    return ZIX_STATUS_NO_MEM;
-#endif
 #ifdef EEXIST
   case EEXIST:
     return ZIX_STATUS_EXISTS;
@@ -56,6 +52,10 @@ zix_errno_status(const int e)
 #ifdef EPERM
   case EPERM:
     return ZIX_STATUS_BAD_PERMS;
+#endif
+#ifdef ETIMEDOUT
+  case ETIMEDOUT:
+    return ZIX_STATUS_TIMEOUT;
 #endif
   default:
     break;

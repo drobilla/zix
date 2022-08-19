@@ -17,9 +17,6 @@ test_errno_status(void)
   assert(zix_errno_status(0) == ZIX_STATUS_SUCCESS);
   assert(zix_errno_status(INT_MAX) == ZIX_STATUS_ERROR);
 
-#ifdef EAGAIN
-  assert(zix_errno_status(EAGAIN) == ZIX_STATUS_NO_MEM);
-#endif
 #ifdef EEXIST
   assert(zix_errno_status(EEXIST) == ZIX_STATUS_EXISTS);
 #endif
@@ -28,6 +25,9 @@ test_errno_status(void)
 #endif
 #ifdef EPERM
   assert(zix_errno_status(EPERM) == ZIX_STATUS_BAD_PERMS);
+#endif
+#ifdef ETIMEDOUT
+  assert(zix_errno_status(ETIMEDOUT) == ZIX_STATUS_TIMEOUT);
 #endif
 }
 
