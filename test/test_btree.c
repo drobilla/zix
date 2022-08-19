@@ -117,6 +117,7 @@ destroy(void* const ptr, const void* const user_data)
 static void
 no_destroy(void* const ptr, const void* const user_data)
 {
+  (void)ptr;
   (void)user_data;
   assert(!ptr);
 }
