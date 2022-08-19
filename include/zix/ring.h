@@ -66,7 +66,7 @@ zix_ring_free(ZixRing* ZIX_NULLABLE ring);
    using the ring.
 */
 ZIX_API
-void
+ZixStatus
 zix_ring_mlock(ZixRing* ZIX_NONNULL ring);
 
 /**

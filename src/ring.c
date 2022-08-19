@@ -14,7 +14,7 @@
 #  define ZIX_MLOCK(ptr, size) mlock((ptr), (size))
 #elif defined(_WIN32)
 #  include <windows.h>
-#  define ZIX_MLOCK(ptr, size) VirtualLock((ptr), (size))
+#  define ZIX_MLOCK(ptr, size) !VirtualLock((ptr), (size))
 #else
 #  pragma message("warning: No memory locking, possible RT violations")
 #  define ZIX_MLOCK(ptr, size)
@@ -106,11 +106,12 @@ zix_ring_free(ZixRing* const ring)
   }
 }
 
-void
+ZixStatus
 zix_ring_mlock(ZixRing* const ring)
 {
-  ZIX_MLOCK(ring, sizeof(ZixRing));
-  ZIX_MLOCK(ring->buf, ring->size);
+  return (ZIX_MLOCK(ring, sizeof(ZixRing)) || ZIX_MLOCK(ring->buf, ring->size))
+           ? ZIX_STATUS_ERROR
+           : ZIX_STATUS_SUCCESS;
 }
 
 void
