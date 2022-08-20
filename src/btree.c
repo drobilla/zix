@@ -501,7 +501,7 @@ zix_btree_iter_push(ZixBTreeIter* const ti,
                     ZixBTreeNode* const n,
                     const ZixShort      i)
 {
-  assert(ti->level < ZIX_BTREE_MAX_HEIGHT);
+  assert(ti->level < ZIX_BTREE_MAX_HEIGHT - 1);
   ++ti->level;
   ti->nodes[ti->level]   = n;
   ti->indexes[ti->level] = (uint16_t)i;
