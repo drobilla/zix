@@ -34,6 +34,8 @@ subdir('meson/suppressions')
 # Platform Configuration #
 ##########################
 
+thread_dep = dependency('threads', required: get_option('tests'))
+
 platform_c_args = []
 
 # Determine whether to use POSIX
@@ -46,8 +48,6 @@ endif
 
 # Check for platform features with the build system
 if get_option('checks')
-  platform_c_args += ['-DZIX_NO_DEFAULT_CONFIG']
-
   clock_gettime_code = '''#include <time.h>
 int main(void) { struct timespec t; return clock_gettime(CLOCK_MONOTONIC, &t); }
 '''
@@ -62,32 +62,28 @@ int main(void) { void* mem; posix_memalign(&mem, 8, 8); }'''
 #include <time.h>
 int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }'''
 
-  platform_c_args += '-DHAVE_CLOCK_GETTIME=@0@'.format(
-    cc.compiles(clock_gettime_code,
+  platform_c_args += [
+    '-DZIX_NO_DEFAULT_CONFIG',
+    '-DHAVE_CLOCK_GETTIME=@0@'.format(
+      cc.links(clock_gettime_code,
+               args: platform_c_args,
+               name: 'clock_gettime').to_int()),
+    '-DHAVE_MLOCK=@0@'.format(
+      cc.links(mlock_code,
+               args: platform_c_args,
+               name: 'mlock').to_int()),
+    '-DHAVE_POSIX_MEMALIGN=@0@'.format(
+      cc.links(posix_memalign_code,
+               args: platform_c_args,
+               name: 'posix_memalign').to_int()),
+    '-DHAVE_SEM_TIMEDWAIT=@0@'.format(
+      (host_machine.system() not in ['darwin', 'windows'] and
+       cc.links(sem_timedwait_code,
                 args: platform_c_args,
-                name: 'clock_gettime').to_int())
-
-  platform_c_args += '-DHAVE_MLOCK=@0@'.format(
-    cc.compiles(mlock_code,
-                args: platform_c_args,
-                name: 'mlock').to_int())
-
-  platform_c_args += '-DHAVE_POSIX_MEMALIGN=@0@'.format(
-    cc.compiles(posix_memalign_code,
-                args: platform_c_args,
-                name: 'posix_memalign').to_int())
-
-  platform_c_args += '-DHAVE_SEM_TIMEDWAIT=@0@'.format(
-    cc.compiles(sem_timedwait_code,
-                args: platform_c_args,
-                name: 'sem_timedwait').to_int())
+                dependencies: [thread_dep],
+                name: 'sem_timedwait')).to_int()),
+  ]
 endif
-
-################
-# Dependencies #
-################
-
-thread_dep = dependency('threads', include_type: 'system')
 
 ###########
 # Library #
