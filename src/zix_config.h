@@ -34,7 +34,7 @@
 #      if __has_include(<unistd.h>)
 #        include <unistd.h>
 #      endif
-#    elif defined(__unix__)
+#    elif defined(__APPLE__) || defined(__unix__)
 #      include <unistd.h>
 #    endif
 #  endif
