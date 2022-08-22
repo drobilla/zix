@@ -114,10 +114,15 @@ sources = files(
   'src/digest.c',
   'src/hash.c',
   'src/ring.c',
-  'src/sem.c',
   'src/status.c',
   'src/tree.c',
 )
+
+if thread_dep.found()
+  sources += files(
+    'src/sem.c',
+  )
+endif
 
 # Set appropriate arguments for building against the library type
 subdir('meson/library')
