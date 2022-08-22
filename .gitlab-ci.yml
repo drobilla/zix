@@ -66,6 +66,15 @@ x64_sanitize:
     CC: "clang"
 
 
+fedora:
+  image: lv2plugin/fedora-dev
+  script:
+    - meson setup build -Dbuildtype=plain -Dstrict=true -Dwerror=true
+    - ninja -C build test
+  variables:
+    CFLAGS: -O2 -D_FORTIFY_SOURCE=2
+
+
 freebsd_dbg:
   tags: [freebsd,meson]
   script:
