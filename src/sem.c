@@ -178,8 +178,11 @@ zix_sem_timed_wait(ZixSem*        sem,
                    const uint32_t seconds,
                    const uint32_t nanoseconds)
 {
+#  define NS_PER_SECOND 1000000000L
+
 #  if !USE_CLOCK_GETTIME || !USE_SEM_TIMEDWAIT
   return ZIX_STATUS_NOT_SUPPORTED;
+
 #  else
 
   struct timespec ts = {0, 0};
@@ -188,6 +191,10 @@ zix_sem_timed_wait(ZixSem*        sem,
   if (!(r = clock_gettime(CLOCK_REALTIME, &ts))) {
     ts.tv_sec += (time_t)seconds;
     ts.tv_nsec += (long)nanoseconds;
+    if (ts.tv_nsec >= NS_PER_SECOND) {
+      ts.tv_nsec -= NS_PER_SECOND;
+      ts.tv_sec++;
+    }
 
     while ((r = sem_timedwait(&sem->sem, &ts)) && errno == EINTR) {
       // Interrupted, try again
@@ -196,6 +203,8 @@ zix_sem_timed_wait(ZixSem*        sem,
 
   return zix_errno_status_if(r);
 #  endif
+
+#  undef NS_PER_SECOND
 }
 
 #endif

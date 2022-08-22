@@ -57,7 +57,7 @@ test_timed_wait(void)
 {
   assert(!zix_sem_init(&sem, 0));
   assert(zix_sem_timed_wait(&sem, 0, 0) == ZIX_STATUS_TIMEOUT);
-  assert(zix_sem_timed_wait(&sem, 0, 5000000) == ZIX_STATUS_TIMEOUT);
+  assert(zix_sem_timed_wait(&sem, 0, 999999999) == ZIX_STATUS_TIMEOUT);
   assert(!zix_sem_post(&sem));
   assert(!zix_sem_timed_wait(&sem, 5, 0));
   assert(!zix_sem_post(&sem));
