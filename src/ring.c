@@ -275,10 +275,10 @@ zix_ring_write(ZixRing* const ring, const void* src, const uint32_t size)
 {
   ZixRingTransaction tx = zix_ring_begin_write(ring);
 
-  if (zix_ring_amend_write(ring, &tx, src, size) ||
-      zix_ring_commit_write(ring, &tx)) {
+  if (zix_ring_amend_write(ring, &tx, src, size)) {
     return 0;
   }
 
+  zix_ring_commit_write(ring, &tx);
   return size;
 }

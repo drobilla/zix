@@ -83,6 +83,7 @@ test_bump_allocator(void)
 
   assert(!zix_realloc(&allocator.base, malloced, 8));     // Not the top
   assert(!zix_realloc(&allocator.base, realloced, 4089)); // No space
+  assert(!zix_calloc(&allocator.base, 4089, 1));          // No space
 
   zix_free(&allocator.base, realloced);
 
