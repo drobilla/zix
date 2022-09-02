@@ -42,6 +42,11 @@ ZIX_CONST_API
 ZixStatus
 zix_errno_status(int e);
 
+/// Return success if `r` is non-zero, or `errno` as a status code otherwise
+ZIX_PURE_API
+ZixStatus
+zix_errno_status_if(int r);
+
 /// Function for comparing two elements
 typedef int (*ZixComparator)(const void* a,
                              const void* b,

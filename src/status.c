@@ -38,6 +38,12 @@ zix_strerror(const ZixStatus status)
 }
 
 ZixStatus
+zix_errno_status_if(const int r)
+{
+  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
+}
+
+ZixStatus
 zix_errno_status(const int e)
 {
   switch (e) {

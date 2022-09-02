@@ -136,20 +136,19 @@ zix_sem_timed_wait(ZixSem*        sem,
 ZixStatus
 zix_sem_init(ZixSem* sem, unsigned initial)
 {
-  return sem_init(&sem->sem, 0, initial) ? zix_errno_status(errno)
-                                         : ZIX_STATUS_SUCCESS;
+  return zix_errno_status_if(sem_init(&sem->sem, 0, initial));
 }
 
 ZixStatus
 zix_sem_destroy(ZixSem* sem)
 {
-  return sem_destroy(&sem->sem) ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
+  return zix_errno_status_if(sem_destroy(&sem->sem));
 }
 
 ZixStatus
 zix_sem_post(ZixSem* sem)
 {
-  return sem_post(&sem->sem) ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
+  return zix_errno_status_if(sem_post(&sem->sem));
 }
 
 ZixStatus
@@ -160,7 +159,7 @@ zix_sem_wait(ZixSem* sem)
     // Interrupted, try again
   }
 
-  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
+  return zix_errno_status_if(r);
 }
 
 ZixStatus
@@ -171,7 +170,7 @@ zix_sem_try_wait(ZixSem* sem)
     // Interrupted, try again
   }
 
-  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
+  return zix_errno_status_if(r);
 }
 
 ZixStatus
@@ -195,7 +194,7 @@ zix_sem_timed_wait(ZixSem*        sem,
     }
   }
 
-  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
+  return zix_errno_status_if(r);
 #  endif
 }
 
