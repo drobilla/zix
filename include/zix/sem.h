@@ -97,8 +97,9 @@ zix_sem_wait(ZixSem* ZIX_NONNULL sem);
 /**
    Non-blocking version of wait().
 
-   @return #ZIX_STATUS_SUCCESS if `sem` was decremented, #ZIX_STATUS_TIMEOUT if
-   it was already zero, or #ZIX_STATUS_BAD_ARG if `sem` is invalid.
+   @return #ZIX_STATUS_SUCCESS if `sem` was decremented,
+   #ZIX_STATUS_UNAVAILABLE if it was already zero, or #ZIX_STATUS_BAD_ARG if
+   `sem` is invalid.
 */
 ZIX_API
 ZixStatus

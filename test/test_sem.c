@@ -45,10 +45,10 @@ static void
 test_try_wait(void)
 {
   assert(!zix_sem_init(&sem, 0));
-  assert(zix_sem_try_wait(&sem) == ZIX_STATUS_TIMEOUT);
+  assert(zix_sem_try_wait(&sem) == ZIX_STATUS_UNAVAILABLE);
   assert(!zix_sem_post(&sem));
   assert(!zix_sem_try_wait(&sem));
-  assert(zix_sem_try_wait(&sem) == ZIX_STATUS_TIMEOUT);
+  assert(zix_sem_try_wait(&sem) == ZIX_STATUS_UNAVAILABLE);
   assert(!zix_sem_destroy(&sem));
 }
 

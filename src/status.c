@@ -31,6 +31,8 @@ zix_strerror(const ZixStatus status)
     return "Overflow";
   case ZIX_STATUS_NOT_SUPPORTED:
     return "Not supported";
+  case ZIX_STATUS_UNAVAILABLE:
+    return "Resource unavailable";
   }
   return "Unknown error";
 }
@@ -41,6 +43,10 @@ zix_errno_status(const int e)
   switch (e) {
   case 0:
     return ZIX_STATUS_SUCCESS;
+#ifdef EAGAIN
+  case EAGAIN:
+    return ZIX_STATUS_UNAVAILABLE;
+#endif
 #ifdef EEXIST
   case EEXIST:
     return ZIX_STATUS_EXISTS;

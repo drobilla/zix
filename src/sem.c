@@ -61,7 +61,7 @@ zix_sem_try_wait(ZixSem* sem)
   const kern_return_t   r    = semaphore_timedwait(sem->sem, zero);
 
   return (r == KERN_SUCCESS)               ? ZIX_STATUS_SUCCESS
-         : (r == KERN_OPERATION_TIMED_OUT) ? ZIX_STATUS_TIMEOUT
+         : (r == KERN_OPERATION_TIMED_OUT) ? ZIX_STATUS_UNAVAILABLE
                                            : ZIX_STATUS_ERROR;
 }
 
@@ -114,7 +114,7 @@ zix_sem_try_wait(ZixSem* sem)
   const DWORD r = WaitForSingleObject(sem->sem, 0);
 
   return (r == WAIT_OBJECT_0)  ? ZIX_STATUS_SUCCESS
-         : (r == WAIT_TIMEOUT) ? ZIX_STATUS_TIMEOUT
+         : (r == WAIT_TIMEOUT) ? ZIX_STATUS_UNAVAILABLE
                                : ZIX_STATUS_ERROR;
 }
 
@@ -171,8 +171,7 @@ zix_sem_try_wait(ZixSem* sem)
     // Interrupted, try again
   }
 
-  return r ? (errno == EAGAIN ? ZIX_STATUS_TIMEOUT : zix_errno_status(errno))
-           : ZIX_STATUS_SUCCESS;
+  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
 }
 
 ZixStatus

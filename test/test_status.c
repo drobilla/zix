@@ -37,7 +37,7 @@ test_strerror(void)
   const char* msg = zix_strerror(ZIX_STATUS_SUCCESS);
   assert(!strcmp(msg, "Success"));
 
-  for (int i = ZIX_STATUS_ERROR; i <= ZIX_STATUS_NOT_SUPPORTED; ++i) {
+  for (int i = ZIX_STATUS_ERROR; i <= ZIX_STATUS_UNAVAILABLE; ++i) {
     msg = zix_strerror((ZixStatus)i);
     assert(strcmp(msg, "Success"));
   }

@@ -103,9 +103,9 @@ zix_thread_create(ZixThread*    thread,
   pthread_attr_setstacksize(&attr, stack_size);
 
   const int ret = pthread_create(thread, NULL, function, arg);
-  pthread_attr_destroy(&attr);
 
-  return ret == EAGAIN ? ZIX_STATUS_NO_MEM : zix_errno_status(ret);
+  pthread_attr_destroy(&attr);
+  return zix_errno_status(ret);
 }
 
 static inline ZixStatus
