@@ -6,18 +6,10 @@
 
 #include "zix_config.h"
 
-#include <stdlib.h>
-#include <string.h>
-
 #if USE_MLOCK
 #  include <sys/mman.h>
-#  define ZIX_MLOCK(ptr, size) mlock((ptr), (size))
 #elif defined(_WIN32)
 #  include <windows.h>
-#  define ZIX_MLOCK(ptr, size) !VirtualLock((ptr), (size))
-#else
-#  pragma message("warning: No memory locking, possible RT violations")
-#  define ZIX_MLOCK(ptr, size)
 #endif
 
 /*
@@ -28,6 +20,9 @@
 #if defined(_MSC_VER)
 #  include <intrin.h>
 #endif
+
+#include <stdlib.h>
+#include <string.h>
 
 struct ZixRingImpl {
   ZixAllocator* allocator;  ///< User allocator
@@ -109,9 +104,19 @@ zix_ring_free(ZixRing* const ring)
 ZixStatus
 zix_ring_mlock(ZixRing* const ring)
 {
-  return (ZIX_MLOCK(ring, sizeof(ZixRing)) || ZIX_MLOCK(ring->buf, ring->size))
-           ? ZIX_STATUS_ERROR
-           : ZIX_STATUS_SUCCESS;
+#if USE_MLOCK
+  return zix_errno_status_if(mlock(ring, sizeof(ZixRing)) +
+                             mlock(ring->buf, ring->size));
+
+#elif defined(_WIN32)
+  return (VirtualLock(ring, sizeof(ZixRing)) &&
+          VirtualLock(ring->buf, ring->size))
+           ? ZIX_STATUS_SUCCESS
+           : ZIX_STATUS_ERROR;
+
+#else
+  return ZIX_STATUS_NOT_SUPPORTED;
+#endif
 }
 
 void
