@@ -253,7 +253,6 @@ if not get_option('tests').disabled() and not meson.is_subproject()
     )
   endforeach
 
-  thread_dep = dependency('threads', required: get_option('tests'))
   if thread_dep.found()
     foreach test : threaded_tests
       sources = common_test_sources + files('test/@0@.c'.format(test))
