@@ -215,23 +215,25 @@ threaded_tests = [
 ]
 
 if not get_option('tests').disabled() and not meson.is_subproject()
-  # Check release metadata
-  autoship = find_program('autoship', required: false)
-  if autoship.found()
-    test('autoship', autoship,
-         args: ['test', meson.current_source_dir()],
-         suite: 'data')
-  endif
+  if get_option('strict')
+    # Check release metadata
+    autoship = find_program('autoship', required: get_option('tests'))
+    if autoship.found()
+      test('autoship', autoship,
+           args: ['test', meson.current_source_dir()],
+           suite: 'data')
+    endif
 
-  # Check licensing metadata
-  reuse = find_program('reuse', required: get_option('tests'))
-  if reuse.found()
-    test(
-      'REUSE',
-      reuse,
-      args: ['--root', meson.current_source_dir(), 'lint'],
-      suite: 'data',
-    )
+    # Check licensing metadata
+    reuse = find_program('reuse', required: get_option('tests'))
+    if reuse.found()
+      test(
+        'REUSE',
+        reuse,
+        args: ['--root', meson.current_source_dir(), 'lint'],
+        suite: 'data',
+      )
+    endif
   endif
 
   common_test_sources = files('test/failing_allocator.c')
