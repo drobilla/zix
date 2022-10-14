@@ -4,10 +4,9 @@
 Checks: >
   *,
   -altera-*,
-  -clang-diagnostic-unused-function,
-  -clang-diagnostic-unused-macros,
   -hicpp-multiway-paths-covered,
   -llvmlibc-*,
+  -readability-identifier-length,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 FormatStyle: file

@@ -2,20 +2,13 @@
 # SPDX-License-Identifier: CC0-1.0 OR ISC
 
 Checks: >
-  *,
   -*-magic-numbers,
-  -altera-*,
   -bugprone-easily-swappable-parameters,
   -cert-err33-c,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -google-readability-casting,
-  -hicpp-multiway-paths-covered,
   -llvm-header-guard,
-  -llvmlibc-*,
   -performance-no-int-to-ptr,
   -readability-function-cognitive-complexity,
-  -readability-identifier-length,
-WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
-FormatStyle: file
+InheritParentConfig: true
