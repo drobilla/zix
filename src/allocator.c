@@ -60,10 +60,8 @@ zix_default_aligned_alloc(ZixAllocator* const allocator,
 #if defined(_WIN32)
   return _aligned_malloc(size, alignment);
 #elif USE_POSIX_MEMALIGN
-  // POSIX.1-2008 TC2 says that ptr is not modified on failure
   void* ptr = NULL;
-  posix_memalign(&ptr, alignment, size);
-  return ptr;
+  return posix_memalign(&ptr, alignment, size) ? NULL : ptr;
 #else
   return NULL;
 #endif
