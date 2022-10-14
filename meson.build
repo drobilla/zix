@@ -218,8 +218,8 @@ threaded_tests = [
   'test_thread',
 ]
 
-if not get_option('tests').disabled() and not meson.is_subproject()
-  if get_option('strict')
+if not get_option('tests').disabled()
+  if not meson.is_subproject() and get_option('strict')
     # Check release metadata
     autoship = find_program('autoship', required: get_option('tests'))
     if autoship.found()
@@ -276,6 +276,38 @@ if not get_option('tests').disabled() and not meson.is_subproject()
         timeout: 120,
       )
     endforeach
+  endif
+
+  # Test that headers have no warnings (ignoring the usual suppressions)
+  if cc.get_id() != 'emscripten'
+    header_suppressions = []
+    if cc.get_id() in ['clang', 'emscripten']
+      header_suppressions += [
+        '-Wno-declaration-after-statement',
+        '-Wno-nullability-extension',
+        '-Wno-padded',
+      ]
+    elif cc.get_id() == 'gcc'
+      header_suppressions += [
+        '-Wno-padded',
+        '-Wno-unused-const-variable',
+      ]
+    elif cc.get_id() == 'msvc'
+      header_suppressions += [
+        '/wd4820', # padding added after construct
+      ]
+    endif
+
+    test(
+      'test_headers',
+      executable(
+        'test_headers',
+        files('test/headers/test_headers.c'),
+        c_args: header_suppressions + program_c_args,
+        dependencies: zix_dep,
+        include_directories: include_dirs,
+      ),
+    )
   endif
 endif
 

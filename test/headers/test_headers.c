@@ -1,0 +1,24 @@
+// Copyright 2022 David Robillard <d@drobilla.net>
+// SPDX-License-Identifier: ISC
+
+#include "zix/allocator.h"      // IWYU pragma: keep
+#include "zix/attributes.h"     // IWYU pragma: keep
+#include "zix/bitset.h"         // IWYU pragma: keep
+#include "zix/btree.h"          // IWYU pragma: keep
+#include "zix/bump_allocator.h" // IWYU pragma: keep
+#include "zix/common.h"         // IWYU pragma: keep
+#include "zix/digest.h"         // IWYU pragma: keep
+#include "zix/hash.h"           // IWYU pragma: keep
+#include "zix/ring.h"           // IWYU pragma: keep
+#include "zix/sem.h"            // IWYU pragma: keep
+#include "zix/thread.h"         // IWYU pragma: keep
+#include "zix/tree.h"           // IWYU pragma: keep
+
+#if defined(__GNUC__)
+__attribute__((const))
+#endif
+int
+main(void)
+{
+  return 0;
+}
