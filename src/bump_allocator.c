@@ -12,6 +12,7 @@
 
 static const size_t min_alignment = sizeof(uintmax_t);
 
+ZIX_PURE_FUNC
 static size_t
 round_up_multiple(const size_t number, const size_t factor)
 {
