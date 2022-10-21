@@ -115,6 +115,7 @@ sources = files(
   'src/hash.c',
   'src/ring.c',
   'src/status.c',
+  'src/thread.c',
   'src/tree.c',
 )
 
