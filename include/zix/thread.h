@@ -1,4 +1,4 @@
-// Copyright 2012-2020 David Robillard <d@drobilla.net>
+// Copyright 2012-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_THREAD_H
@@ -20,22 +20,21 @@ extern "C" {
 #endif
 
 /**
-   @addtogroup zix
-   @{
-   @name Thread
+   @defgroup zix_thread Thread
+   @ingroup zix
    @{
 */
 
 #ifdef _WIN32
-#  define ZIX_THREAD_RESULT 0
-#  define ZIX_THREAD_FUNC __stdcall
+#  define ZIX_THREAD_RESULT 0       ///< Result returned from a thread function
+#  define ZIX_THREAD_FUNC __stdcall ///< Thread function attribute
 
 typedef HANDLE ZixThread;
 typedef DWORD  ZixThreadResult;
 
 #else
-#  define ZIX_THREAD_RESULT NULL
-#  define ZIX_THREAD_FUNC
+#  define ZIX_THREAD_RESULT NULL ///< Result returned from a thread function
+#  define ZIX_THREAD_FUNC        ///< Thread function attribute
 
 typedef pthread_t ZixThread;
 typedef void*     ZixThreadResult;
@@ -117,7 +116,6 @@ zix_thread_join(ZixThread thread)
 #endif
 
 /**
-   @}
    @}
 */
 

@@ -15,9 +15,8 @@ extern "C" {
 #endif
 
 /**
-   @addtogroup zix
-   @{
-   @name Ring
+   @defgroup zix_ring Ring
+   @ingroup zix
    @{
 */
 
@@ -45,6 +44,8 @@ typedef struct {
 
 /**
    Create a new ring.
+
+   @param allocator Allocator for the ring.
    @param size Size in bytes (note this may be rounded up).
 
    At most `size` - 1 bytes may be stored in the ring at once.
@@ -204,7 +205,6 @@ zix_ring_commit_write(ZixRing* ZIX_NONNULL                  ring,
                       const ZixRingTransaction* ZIX_NONNULL tx);
 
 /**
-   @}
    @}
 */
 

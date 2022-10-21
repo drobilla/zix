@@ -1,4 +1,4 @@
-// Copyright 2021 David Robillard <d@drobilla.net>
+// Copyright 2021-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_ALLOCATOR_H
@@ -13,9 +13,8 @@ extern "C" {
 #endif
 
 /**
-   @addtogroup zix
-   @{
-   @name Allocator
+   @defgroup zix_allocator Allocator
+   @ingroup zix
    @{
 */
 
@@ -175,7 +174,6 @@ zix_aligned_free(ZixAllocator* const ZIX_NULLABLE allocator,
 }
 
 /**
-   @}
    @}
 */
 

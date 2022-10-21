@@ -1,4 +1,4 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_TREE_H
@@ -16,9 +16,8 @@ extern "C" {
 #endif
 
 /**
-   @addtogroup zix
-   @{
-   @name Tree
+   @defgroup zix_tree Tree
+   @ingroup zix
    @{
 */
 
@@ -117,7 +116,6 @@ ZixTreeIter* ZIX_NULLABLE
 zix_tree_iter_prev(ZixTreeIter* ZIX_NULLABLE i);
 
 /**
-   @}
    @}
 */
 

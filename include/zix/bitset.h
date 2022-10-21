@@ -1,4 +1,4 @@
-// Copyright 2014-2020 David Robillard <d@drobilla.net>
+// Copyright 2014-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_BITSET_H
@@ -12,9 +12,8 @@
 #include <stdint.h>
 
 /**
-   @addtogroup zix
-   @{
-   @name Bitset
+   @defgroup zix_bitset Bitset
+   @ingroup zix
    @{
 */
 
@@ -76,7 +75,6 @@ zix_bitset_count_up_to_if(const ZixBitset* ZIX_NONNULL      b,
                           size_t                            i);
 
 /**
-   @}
    @}
 */
 

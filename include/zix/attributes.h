@@ -1,11 +1,12 @@
-// Copyright 2021 David Robillard <d@drobilla.net>
+// Copyright 2021-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_ATTRIBUTES_H
 #define ZIX_ATTRIBUTES_H
 
 /**
-   @addtogroup zix
+   @defgroup zix_attributes Attributes
+   @ingroup zix
    @{
 */
 

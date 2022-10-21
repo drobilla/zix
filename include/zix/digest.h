@@ -1,4 +1,4 @@
-// Copyright 2012-2021 David Robillard <d@drobilla.net>
+// Copyright 2012-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_DIGEST_H
@@ -14,14 +14,15 @@ extern "C" {
 #endif
 
 /**
-   @addtogroup zix
-   @{
-   @name Digest
+   @defgroup zix_digest Digest
+   @ingroup zix
+
    Functions to generate a short "digest" of data with minimal collisions.
 
    These are good general-purpose hash functions for indexing arbitrary data,
    but are not necessarily stable across platforms and should never be used for
    cryptographic purposes.
+
    @{
 */
 
@@ -88,6 +89,10 @@ zix_digest(size_t seed, const void* ZIX_NONNULL buf, size_t len);
 ZIX_PURE_API
 size_t
 zix_digest_aligned(size_t seed, const void* ZIX_NONNULL buf, size_t len);
+
+/**
+   @}
+*/
 
 #ifdef __cplusplus
 } /* extern "C" */

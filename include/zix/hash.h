@@ -1,4 +1,4 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_HASH_H
@@ -16,9 +16,8 @@ extern "C" {
 #endif
 
 /**
-   @addtogroup zix
-   @{
-   @name Hash
+   @defgroup zix_hash Hash
+   @ingroup zix
    @{
 */
 
@@ -115,6 +114,7 @@ typedef struct {
 /**
    Create a new hash table.
 
+   @param allocator Allocator used for the internal array.
    @param key_func A function to retrieve the key from a record.
    @param hash_func The key hashing function.
    @param equal_func A function to test keys for equality.
@@ -318,7 +318,6 @@ zix_hash_find_record(const ZixHash* ZIX_NONNULL    hash,
                      const ZixHashKey* ZIX_NONNULL key);
 
 /**
-   @}
    @}
 */
 

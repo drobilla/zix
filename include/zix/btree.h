@@ -1,4 +1,4 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_BTREE_H
@@ -17,9 +17,8 @@ extern "C" {
 #endif
 
 /**
-   @addtogroup zix
-   @{
-   @name BTree
+   @defgroup zix_btree BTree
+   @ingroup zix
    @{
 */
 
@@ -81,8 +80,12 @@ zix_btree_new(ZixAllocator* ZIX_NULLABLE allocator,
 /**
    Free `t` and all the nodes it contains.
 
+   @param t The tree to free.
+
    @param destroy Function to call once for every value in the tree.  This can
    be used to free values if they are dynamically allocated.
+
+   @param destroy_user_data Opaque pointer to pass to `destroy`.
 */
 ZIX_API
 void
@@ -93,8 +96,12 @@ zix_btree_free(ZixBTree* ZIX_NULLABLE      t,
 /**
    Clear everything from `t`, leaving it empty.
 
+   @param t The tree to clear.
+
    @param destroy Function called exactly once for every value in the tree,
    just before that value is removed from the tree.
+
+   @param destroy_user_data Opaque pointer to pass to `destroy`.
 */
 ZIX_API
 void
@@ -202,7 +209,6 @@ ZixBTreeIter
 zix_btree_iter_next(ZixBTreeIter iter);
 
 /**
-   @}
    @}
 */
 

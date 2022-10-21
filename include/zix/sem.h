@@ -24,9 +24,8 @@ extern "C" {
 #include <time.h>
 
 /**
-   @addtogroup zix
-   @{
-   @name Semaphore
+   @defgroup zix_sem Semaphore
+   @ingroup zix
    @{
 */
 
@@ -147,7 +146,6 @@ struct ZixSemImpl {
 
 /**
    @endcond
-   @}
    @}
 */
 
