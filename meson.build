@@ -112,6 +112,7 @@ sources = files(
   'src/btree.c',
   'src/bump_allocator.c',
   'src/digest.c',
+  'src/errno_status.c',
   'src/hash.c',
   'src/ring.c',
   'src/status.c',

@@ -19,9 +19,7 @@
 extern "C" {
 #endif
 
-#include <stdbool.h>
 #include <stdint.h>
-#include <time.h>
 
 /**
    @defgroup zix_sem Semaphore

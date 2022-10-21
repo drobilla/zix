@@ -2,9 +2,12 @@
 // SPDX-License-Identifier: ISC
 
 #include "zix/ring.h"
-#include "zix/common.h"
 
+#include "errno_status.h"
 #include "zix_config.h"
+
+#include "zix/allocator.h"
+#include "zix/common.h"
 
 #if USE_MLOCK
 #  include <sys/mman.h>
@@ -21,6 +24,7 @@
 #  include <intrin.h>
 #endif
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 

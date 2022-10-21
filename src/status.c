@@ -3,8 +3,6 @@
 
 #include "zix/common.h"
 
-#include <errno.h>
-
 const char*
 zix_strerror(const ZixStatus status)
 {
@@ -35,43 +33,4 @@ zix_strerror(const ZixStatus status)
     return "Resource unavailable";
   }
   return "Unknown error";
-}
-
-ZixStatus
-zix_errno_status_if(const int r)
-{
-  return r ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
-}
-
-ZixStatus
-zix_errno_status(const int e)
-{
-  switch (e) {
-  case 0:
-    return ZIX_STATUS_SUCCESS;
-#ifdef EAGAIN
-  case EAGAIN:
-    return ZIX_STATUS_UNAVAILABLE;
-#endif
-#ifdef EEXIST
-  case EEXIST:
-    return ZIX_STATUS_EXISTS;
-#endif
-#ifdef EINVAL
-  case EINVAL:
-    return ZIX_STATUS_BAD_ARG;
-#endif
-#ifdef EPERM
-  case EPERM:
-    return ZIX_STATUS_BAD_PERMS;
-#endif
-#ifdef ETIMEDOUT
-  case ETIMEDOUT:
-    return ZIX_STATUS_TIMEOUT;
-#endif
-  default:
-    break;
-  }
-
-  return ZIX_STATUS_ERROR;
 }

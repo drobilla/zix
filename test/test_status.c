@@ -6,30 +6,8 @@
 #include "zix/common.h"
 
 #include <assert.h>
-#include <errno.h>
-#include <limits.h>
 #include <stdio.h>
 #include <string.h>
-
-static void
-test_errno_status(void)
-{
-  assert(zix_errno_status(0) == ZIX_STATUS_SUCCESS);
-  assert(zix_errno_status(INT_MAX) == ZIX_STATUS_ERROR);
-
-#ifdef EEXIST
-  assert(zix_errno_status(EEXIST) == ZIX_STATUS_EXISTS);
-#endif
-#ifdef EINVAL
-  assert(zix_errno_status(EINVAL) == ZIX_STATUS_BAD_ARG);
-#endif
-#ifdef EPERM
-  assert(zix_errno_status(EPERM) == ZIX_STATUS_BAD_PERMS);
-#endif
-#ifdef ETIMEDOUT
-  assert(zix_errno_status(ETIMEDOUT) == ZIX_STATUS_TIMEOUT);
-#endif
-}
 
 static void
 test_strerror(void)
@@ -54,7 +32,6 @@ test_strerror(void)
 int
 main(void)
 {
-  test_errno_status();
   test_strerror();
   return 0;
 }

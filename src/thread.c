@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: ISC
 
 #include "zix/thread.h"
+
+#include "errno_status.h"
+
 #include "zix/common.h"
 
 #ifdef _WIN32

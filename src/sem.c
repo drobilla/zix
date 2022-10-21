@@ -1,10 +1,12 @@
 // Copyright 2012-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
+#include "zix/sem.h"
+
+#include "errno_status.h"
 #include "zix_config.h"
 
 #include "zix/common.h"
-#include "zix/sem.h"
 
 #ifdef __APPLE__
 #  include <mach/mach.h>
