@@ -135,7 +135,7 @@ run(FILE* const fd)
     ZixHash* zhash = zix_hash_new(NULL,
                                   identity,
                                   (ZixHashFunc)zix_chunk_hash,
-                                  (ZixEqualFunc)zix_chunk_equal);
+                                  (ZixKeyEqualFunc)zix_chunk_equal);
 
     fprintf(insert_dat, "%zu", n);
     fprintf(search_dat, "%zu", n);
