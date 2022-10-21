@@ -11,9 +11,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_hash Hash
@@ -321,8 +319,6 @@ zix_hash_find_record(const ZixHash* ZIX_NONNULL    hash,
    @}
 */
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+ZIX_END_DECLS
 
 #endif /* ZIX_HASH_H */

@@ -15,9 +15,7 @@
 
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_thread Thread
@@ -78,8 +76,6 @@ zix_thread_join(ZixThread thread);
    @}
 */
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+ZIX_END_DECLS
 
 #endif /* ZIX_THREAD_H */

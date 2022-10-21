@@ -10,9 +10,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_ring Ring
@@ -208,8 +206,6 @@ zix_ring_commit_write(ZixRing* ZIX_NONNULL                  ring,
    @}
 */
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+ZIX_END_DECLS
 
 #endif /* ZIX_RING_H */

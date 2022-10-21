@@ -20,8 +20,10 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 SpacesInContainerLiterals: false
 StatementMacros:
   - ZIX_API
+  - ZIX_BEGIN_DECLS
   - ZIX_CONST_API
   - ZIX_CONST_API
+  - ZIX_END_DECLS
   - ZIX_MALLOC_API
   - ZIX_PURE_API
   - ZIX_THREAD_FUNC

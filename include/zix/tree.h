@@ -12,9 +12,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_tree Tree
@@ -120,8 +118,6 @@ zix_tree_iter_prev(ZixTreeIter* ZIX_NULLABLE i);
    @}
 */
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+ZIX_END_DECLS
 
 #endif /* ZIX_TREE_H */

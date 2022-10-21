@@ -8,9 +8,7 @@
 
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_allocator Allocator
@@ -177,8 +175,6 @@ zix_aligned_free(ZixAllocator* const ZIX_NULLABLE allocator,
    @}
 */
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+ZIX_END_DECLS
 
 #endif /* ZIX_ALLOCATOR_H */

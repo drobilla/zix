@@ -15,9 +15,7 @@
 #  include <semaphore.h>
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ZIX_BEGIN_DECLS
 
 #include <stdint.h>
 
@@ -147,8 +145,6 @@ struct ZixSemImpl {
    @}
 */
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+ZIX_END_DECLS
 
 #endif /* ZIX_SEM_H */

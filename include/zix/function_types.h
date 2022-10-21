@@ -8,9 +8,7 @@
 
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_function_types Function Types
@@ -30,8 +28,6 @@ typedef void (*ZixDestroyFunc)(void* ptr, const void* user_data);
    @}
 */
 
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
+ZIX_END_DECLS
 
 #endif /* ZIX_FUNCTION_TYPES_H */

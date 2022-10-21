@@ -10,6 +10,15 @@
    @{
 */
 
+// Public declaration scope
+#ifdef __cplusplus
+#  define ZIX_BEGIN_DECLS extern "C" {
+#  define ZIX_END_DECLS }
+#else
+#  define ZIX_BEGIN_DECLS
+#  define ZIX_END_DECLS
+#endif
+
 // ZIX_API must be used to decorate things in the public API
 #ifndef ZIX_API
 #  if defined(_WIN32) && !defined(ZIX_STATIC) && defined(ZIX_INTERNAL)
@@ -34,14 +43,17 @@
 #  define ZIX_MALLOC_FUNC
 #endif
 
+/// A pure function in the public API that only reads memory
 #define ZIX_PURE_API \
   ZIX_API            \
   ZIX_PURE_FUNC
 
+/// A const function in the public API that is pure and only reads parameters
 #define ZIX_CONST_API \
   ZIX_API             \
   ZIX_CONST_FUNC
 
+/// A malloc function in the public API that returns allocated memory
 #define ZIX_MALLOC_API \
   ZIX_API              \
   ZIX_MALLOC_FUNC
