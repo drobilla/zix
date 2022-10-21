@@ -5,7 +5,7 @@
 #define ZIX_THREAD_H
 
 #include "zix/attributes.h"
-#include "zix/common.h"
+#include "zix/status.h"
 
 #ifdef _WIN32
 #  include <windows.h>

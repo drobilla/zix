@@ -6,7 +6,8 @@
 
 #include "zix/allocator.h"
 #include "zix/attributes.h"
-#include "zix/common.h"
+#include "zix/function_types.h"
+#include "zix/status.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -74,7 +75,7 @@ static const ZixBTreeIter zix_btree_end_iter = {
 ZIX_API
 ZixBTree* ZIX_ALLOCATED
 zix_btree_new(ZixAllocator* ZIX_NULLABLE allocator,
-              ZixComparator ZIX_NONNULL  cmp,
+              ZixCompareFunc ZIX_NONNULL cmp,
               const void* ZIX_NULLABLE   cmp_data);
 
 /**
@@ -166,7 +167,7 @@ zix_btree_find(const ZixBTree* ZIX_NONNULL t,
 ZIX_API
 ZixStatus
 zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL t,
-                      ZixComparator ZIX_NULLABLE  compare_key,
+                      ZixCompareFunc ZIX_NULLABLE compare_key,
                       const void* ZIX_NULLABLE    compare_key_user_data,
                       const void* ZIX_NULLABLE    key,
                       ZixBTreeIter* ZIX_NONNULL   ti);

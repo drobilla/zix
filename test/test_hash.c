@@ -11,9 +11,9 @@
 
 #include "zix/allocator.h"
 #include "zix/attributes.h"
-#include "zix/common.h"
 #include "zix/digest.h"
 #include "zix/hash.h"
+#include "zix/status.h"
 
 #include <assert.h>
 #include <inttypes.h>

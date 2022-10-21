@@ -6,7 +6,7 @@
 #include "errno_status.h"
 #include "zix_config.h"
 
-#include "zix/common.h"
+#include "zix/status.h"
 
 #ifdef __APPLE__
 #  include <mach/mach.h>

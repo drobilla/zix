@@ -6,7 +6,7 @@
 
 #include "zix/allocator.h"
 #include "zix/attributes.h"
-#include "zix/common.h"
+#include "zix/status.h"
 
 #include <stdbool.h>
 #include <stddef.h>

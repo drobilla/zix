@@ -97,11 +97,12 @@ c_headers = files(
   'include/zix/bitset.h',
   'include/zix/btree.h',
   'include/zix/bump_allocator.h',
-  'include/zix/common.h',
   'include/zix/digest.h',
+  'include/zix/function_types.h',
   'include/zix/hash.h',
   'include/zix/ring.h',
   'include/zix/sem.h',
+  'include/zix/status.h',
   'include/zix/thread.h',
   'include/zix/tree.h',
 )

@@ -6,11 +6,12 @@
 #include "zix/bitset.h"         // IWYU pragma: keep
 #include "zix/btree.h"          // IWYU pragma: keep
 #include "zix/bump_allocator.h" // IWYU pragma: keep
-#include "zix/common.h"         // IWYU pragma: keep
 #include "zix/digest.h"         // IWYU pragma: keep
+#include "zix/function_types.h" // IWYU pragma: keep
 #include "zix/hash.h"           // IWYU pragma: keep
 #include "zix/ring.h"           // IWYU pragma: keep
 #include "zix/sem.h"            // IWYU pragma: keep
+#include "zix/status.h"         // IWYU pragma: keep
 #include "zix/thread.h"         // IWYU pragma: keep
 #include "zix/tree.h"           // IWYU pragma: keep
 

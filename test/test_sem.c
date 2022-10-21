@@ -4,8 +4,8 @@
 #undef NDEBUG
 
 #include "zix/attributes.h"
-#include "zix/common.h"
 #include "zix/sem.h"
+#include "zix/status.h"
 #include "zix/thread.h"
 
 #include <assert.h>

@@ -6,7 +6,8 @@
 
 #include "zix/allocator.h"
 #include "zix/attributes.h"
-#include "zix/common.h"
+#include "zix/function_types.h"
+#include "zix/status.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -32,7 +33,7 @@ ZIX_API
 ZixTree* ZIX_ALLOCATED
 zix_tree_new(ZixAllocator* ZIX_NULLABLE  allocator,
              bool                        allow_duplicates,
-             ZixComparator ZIX_NONNULL   cmp,
+             ZixCompareFunc ZIX_NONNULL  cmp,
              void* ZIX_NULLABLE          cmp_data,
              ZixDestroyFunc ZIX_NULLABLE destroy,
              const void* ZIX_NULLABLE    destroy_user_data);

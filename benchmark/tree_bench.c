@@ -8,7 +8,7 @@
 
 #include "zix/attributes.h"
 #include "zix/btree.h"
-#include "zix/common.h"
+#include "zix/status.h"
 #include "zix/tree.h"
 
 ZIX_DISABLE_GLIB_WARNINGS

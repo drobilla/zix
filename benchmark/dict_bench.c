@@ -5,9 +5,9 @@
 #include "warnings.h"
 
 #include "zix/attributes.h"
-#include "zix/common.h"
 #include "zix/digest.h"
 #include "zix/hash.h"
+#include "zix/status.h"
 
 ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>

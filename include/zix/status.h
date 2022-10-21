@@ -1,21 +1,21 @@
 // Copyright 2016-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#ifndef ZIX_COMMON_H
-#define ZIX_COMMON_H
+#ifndef ZIX_STATUS_H
+#define ZIX_STATUS_H
 
 #include "zix/attributes.h"
-
-#include <stdbool.h>
-
-/**
-   @defgroup zix Zix C API
-   @{
-*/
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+   @defgroup zix Zix C API
+   @{
+   @defgroup zix_status Status Codes
+   @{
+*/
 
 /// A status code returned by functions
 typedef enum {
@@ -38,15 +38,8 @@ ZIX_CONST_API
 const char*
 zix_strerror(ZixStatus status);
 
-/// Function for comparing two elements
-typedef int (*ZixComparator)(const void* a,
-                             const void* b,
-                             const void* user_data);
-
-/// Function to destroy an element
-typedef void (*ZixDestroyFunc)(void* ptr, const void* user_data);
-
 /**
+   @}
    @}
 */
 
@@ -54,4 +47,4 @@ typedef void (*ZixDestroyFunc)(void* ptr, const void* user_data);
 } /* extern "C" */
 #endif
 
-#endif /* ZIX_COMMON_H */
+#endif /* ZIX_STATUS_H */

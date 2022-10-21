@@ -7,7 +7,7 @@
 #include "zix_config.h"
 
 #include "zix/allocator.h"
-#include "zix/common.h"
+#include "zix/status.h"
 
 #if USE_MLOCK
 #  include <sys/mman.h>

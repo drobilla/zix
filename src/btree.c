@@ -25,11 +25,11 @@ typedef uint16_t ZixShort;
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2U)
 
 struct ZixBTreeImpl {
-  ZixAllocator* allocator;
-  ZixBTreeNode* root;
-  ZixComparator cmp;
-  const void*   cmp_data;
-  size_t        size;
+  ZixAllocator*  allocator;
+  ZixBTreeNode*  root;
+  ZixCompareFunc cmp;
+  const void*    cmp_data;
+  size_t         size;
 };
 
 struct ZixBTreeNodeImpl {
@@ -88,9 +88,9 @@ zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 }
 
 ZixBTree*
-zix_btree_new(ZixAllocator* const allocator,
-              const ZixComparator cmp,
-              const void* const   cmp_data)
+zix_btree_new(ZixAllocator* const  allocator,
+              const ZixCompareFunc cmp,
+              const void* const    cmp_data)
 {
 #if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
       (defined(__cplusplus) && __cplusplus >= 201103L))
@@ -263,11 +263,11 @@ zix_btree_split_child(ZixAllocator* const allocator,
 #ifdef ZIX_BTREE_SORTED_CHECK
 /// Check that `n` is sorted with respect to search key `e`
 static bool
-zix_btree_node_is_sorted_with_respect_to(const ZixComparator compare,
-                                         const void* const   compare_user_data,
-                                         void* const* const  values,
-                                         const unsigned      n_values,
-                                         const void* const   key)
+zix_btree_node_is_sorted_with_respect_to(const ZixCompareFunc compare,
+                                         const void* const    compare_user_data,
+                                         void* const* const   values,
+                                         const unsigned       n_values,
+                                         const void* const    key)
 {
   if (n_values <= 1U) {
     return true;
@@ -288,12 +288,12 @@ zix_btree_node_is_sorted_with_respect_to(const ZixComparator compare,
 #endif
 
 static unsigned
-zix_btree_find_value(const ZixComparator compare,
-                     const void* const   compare_user_data,
-                     void* const* const  values,
-                     const unsigned      n_values,
-                     const void* const   key,
-                     bool* const         equal)
+zix_btree_find_value(const ZixCompareFunc compare,
+                     const void* const    compare_user_data,
+                     void* const* const   values,
+                     const unsigned       n_values,
+                     const void* const    key,
+                     bool* const          equal)
 {
   unsigned first = 0U;
   unsigned count = n_values;
@@ -323,12 +323,12 @@ zix_btree_find_value(const ZixComparator compare,
 }
 
 static unsigned
-zix_btree_find_pattern(const ZixComparator compare_key,
-                       const void* const   compare_key_user_data,
-                       void* const* const  values,
-                       const unsigned      n_values,
-                       const void* const   key,
-                       bool* const         equal)
+zix_btree_find_pattern(const ZixCompareFunc compare_key,
+                       const void* const    compare_key_user_data,
+                       void* const* const   values,
+                       const unsigned       n_values,
+                       const void* const    key,
+                       bool* const          equal)
 {
 #ifdef ZIX_BTREE_SORTED_CHECK
   assert(zix_btree_node_is_sorted_with_respect_to(
@@ -854,7 +854,7 @@ zix_btree_find(const ZixBTree* const t,
 
 ZixStatus
 zix_btree_lower_bound(const ZixBTree* const t,
-                      const ZixComparator   compare_key,
+                      const ZixCompareFunc  compare_key,
                       const void* const     compare_key_user_data,
                       const void* const     key,
                       ZixBTreeIter* const   ti)
