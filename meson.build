@@ -118,14 +118,27 @@ sources = files(
   'src/hash.c',
   'src/ring.c',
   'src/status.c',
-  'src/thread.c',
   'src/tree.c',
 )
 
 if thread_dep.found()
-  sources += files(
-    'src/sem.c',
-  )
+  if host_machine.system() == 'darwin'
+    sources += files(
+      'src/darwin/sem_darwin.c',
+      'src/posix/thread_posix.c',
+    )
+
+  elif host_machine.system() == 'windows'
+    sources += files(
+      'src/win32/sem_win32.c',
+      'src/win32/thread_win32.c',
+    )
+  else
+    sources += files(
+      'src/posix/sem_posix.c',
+      'src/posix/thread_posix.c',
+    )
+  endif
 endif
 
 # Set appropriate arguments for building against the library type
