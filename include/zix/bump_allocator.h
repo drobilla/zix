@@ -10,6 +10,12 @@
 #include <stddef.h>
 
 /**
+   @defgroup bump_allocator Bump Allocator
+   @ingroup zix_allocation
+   @{
+*/
+
+/**
    A simple bump-pointer allocator that never frees.
 
    This is about the simplest possible allocator that is useful in practice.
@@ -49,5 +55,9 @@ typedef struct {
 ZIX_API
 ZixBumpAllocator
 zix_bump_allocator(size_t capacity, void* ZIX_NONNULL buffer);
+
+/**
+   @}
+*/
 
 #endif // ZIX_BUMP_ALLOCATOR_H

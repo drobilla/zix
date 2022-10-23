@@ -14,6 +14,7 @@
 #include "zix/status.h"         // IWYU pragma: keep
 #include "zix/thread.h"         // IWYU pragma: keep
 #include "zix/tree.h"           // IWYU pragma: keep
+#include "zix/zix.h"            // IWYU pragma: keep
 
 #if defined(__GNUC__)
 __attribute__((const))

@@ -12,7 +12,7 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_allocator Allocator
-   @ingroup zix
+   @ingroup zix_allocation
    @{
 */
 

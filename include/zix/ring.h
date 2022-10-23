@@ -14,7 +14,12 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_ring Ring
-   @ingroup zix
+   @ingroup zix_data_structures
+   @{
+*/
+
+/**
+   @defgroup zix_ring_definition Definition
    @{
 */
 
@@ -25,20 +30,6 @@ ZIX_BEGIN_DECLS
    writer, and realtime-safe on both ends.
 */
 typedef struct ZixRingImpl ZixRing;
-
-/**
-   A transaction for writing data in multiple parts.
-
-   The simple zix_ring_write() can be used to write an atomic message that will
-   immediately be visible to the reader, but transactions allow data to be
-   written in several chunks before being "committed" and becoming readable.
-   This can be useful for things like prefixing messages with a header without
-   needing an allocated buffer to construct the "packet".
-*/
-typedef struct {
-  uint32_t read_head;  ///< Read head at the start of the transaction
-  uint32_t write_head; ///< Write head if the transaction were committed
-} ZixRingTransaction;
 
 /**
    Create a new ring.
@@ -79,24 +70,6 @@ void
 zix_ring_reset(ZixRing* ZIX_NONNULL ring);
 
 /**
-   Return the number of bytes of space available for reading.
-
-   Reader only.
-*/
-ZIX_PURE_API
-uint32_t
-zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
-
-/**
-   Return the number of bytes of space available for writing.
-
-   Writer only.
-*/
-ZIX_PURE_API
-uint32_t
-zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
-
-/**
    Return the capacity (the total write space when empty).
 
    This function returns a constant for any given ring, and may (but usually
@@ -107,37 +80,59 @@ uint32_t
 zix_ring_capacity(const ZixRing* ZIX_NONNULL ring);
 
 /**
-   Read from the ring without advancing the read head.
-
-   Reader only.
+   @}
+   @defgroup zix_ring_read Reading
+   Functions that may only be called by the read thread.
+   @{
 */
+
+/// Return the number of bytes available for reading
+ZIX_PURE_API
+uint32_t
+zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
+
+/// Read from the ring without advancing the read head
 ZIX_API
 uint32_t
 zix_ring_peek(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
-/**
-   Read from the ring and advance the read head.
-
-   Reader only.
-*/
+/// Read from the ring and advance the read head
 ZIX_API
 uint32_t
 zix_ring_read(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
-/**
-   Skip data in the ring (advance read head without reading).
-
-   Reader only.
-*/
+/// Advance the read head, ignoring any data
 ZIX_API
 uint32_t
 zix_ring_skip(ZixRing* ZIX_NONNULL ring, uint32_t size);
 
 /**
-   Write data to the ring.
-
-   Writer only.
+   @}
+   @defgroup zix_ring_write Writing
+   Functions that may only be called by the write thread.
+   @{
 */
+
+/**
+   A transaction for writing data in multiple parts.
+
+   The simple zix_ring_write() can be used to write an atomic message that will
+   immediately be visible to the reader, but transactions allow data to be
+   written in several chunks before being "committed" and becoming readable.
+   This can be useful for things like prefixing messages with a header without
+   needing an allocated buffer to construct the "packet".
+*/
+typedef struct {
+  uint32_t read_head;  ///< Read head at the start of the transaction
+  uint32_t write_head; ///< Write head if the transaction were committed
+} ZixRingTransaction;
+
+/// Return the number of bytes available for writing
+ZIX_PURE_API
+uint32_t
+zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
+
+/// Write data to the ring
 ZIX_API
 uint32_t
 zix_ring_write(ZixRing* ZIX_NONNULL    ring,
@@ -203,6 +198,7 @@ zix_ring_commit_write(ZixRing* ZIX_NONNULL                  ring,
                       const ZixRingTransaction* ZIX_NONNULL tx);
 
 /**
+   @}
    @}
 */
 

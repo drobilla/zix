@@ -105,6 +105,7 @@ c_headers = files(
   'include/zix/status.h',
   'include/zix/thread.h',
   'include/zix/tree.h',
+  'include/zix/zix.h',
 )
 
 sources = files(

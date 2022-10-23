@@ -21,7 +21,7 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_sem Semaphore
-   @ingroup zix
+   @ingroup zix_threading
    @{
 */
 

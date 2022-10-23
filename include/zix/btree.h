@@ -17,7 +17,7 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_btree BTree
-   @ingroup zix
+   @ingroup zix_data_structures
    @{
 */
 

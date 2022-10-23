@@ -6,7 +6,7 @@
 
 /**
    @defgroup zix_attributes Attributes
-   @ingroup zix
+   @ingroup zix_utilities
    @{
 */
 

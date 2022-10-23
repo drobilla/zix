@@ -13,7 +13,7 @@
 
 /**
    @defgroup zix_bitset Bitset
-   @ingroup zix
+   @ingroup zix_data_structures
    @{
 */
 

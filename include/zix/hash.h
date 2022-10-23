@@ -15,7 +15,7 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_hash Hash
-   @ingroup zix
+   @ingroup zix_data_structures
    @{
 */
 

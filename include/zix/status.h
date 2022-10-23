@@ -9,9 +9,8 @@
 ZIX_BEGIN_DECLS
 
 /**
-   @defgroup zix Zix C API
-   @{
    @defgroup zix_status Status Codes
+   @ingroup zix_utilities
    @{
 */
 
@@ -37,7 +36,6 @@ const char*
 zix_strerror(ZixStatus status);
 
 /**
-   @}
    @}
 */
 

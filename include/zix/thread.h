@@ -19,7 +19,7 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_thread Thread
-   @ingroup zix
+   @ingroup zix_threading
    @{
 */
 
