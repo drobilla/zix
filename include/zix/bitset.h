@@ -52,7 +52,7 @@ zix_bitset_reset(ZixBitset* ZIX_NONNULL      b,
                  ZixBitsetTally* ZIX_NONNULL t,
                  size_t                      i);
 
-/// Return the `i`th bit in `t`
+/// Return the bit at index `i` in `b`
 ZIX_PURE_API
 bool
 zix_bitset_get(const ZixBitset* ZIX_NONNULL b, size_t i);
@@ -66,7 +66,7 @@ zix_bitset_count_up_to(const ZixBitset* ZIX_NONNULL      b,
 
 /**
    Return the number of set bits in `b` up to bit `i` (non-inclusive) if bit
-   `i` is set, or (size_t)-1 otherwise.
+   `i` is set, or `(size_t)-1` otherwise.
 */
 ZIX_PURE_API
 size_t
