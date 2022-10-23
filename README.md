@@ -38,9 +38,8 @@ None, except the C standard library.
 Documentation
 -------------
 
-Public interfaces are well-documented in the [headers](include/zix/).  There is
-no external documentation at this time.
-
   * [Installation Instructions](INSTALL.md)
+  * [API reference (single page)](https://drobilla.gitlab.io/zix/doc/singlehtml)
+  * [API reference (paginated)](https://drobilla.gitlab.io/zix/doc/html)
 
  -- David Robillard <d@drobilla.net>

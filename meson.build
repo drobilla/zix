@@ -12,6 +12,7 @@ project('zix', ['c'],
           'cpp_std=c++17',
         ])
 
+zix_src_root = meson.current_source_dir()
 major_version = meson.project_version().split('.')[0]
 version_suffix = '-@0@'.format(major_version)
 versioned_name = 'zix' + version_suffix
@@ -521,7 +522,15 @@ if not get_option('benchmarks').disabled()
   endif
 endif
 
+#############################
+# Scripts and Documentation #
+#############################
+
 subdir('scripts')
+
+if not get_option('docs').disabled()
+  subdir('doc')
+endif
 
 if not meson.is_subproject()
   summary('Benchmarks', build_benchmarks, bool_yn: true)

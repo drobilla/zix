@@ -4,6 +4,9 @@ option('benchmarks', type: 'feature', value: 'auto', yield: true,
 option('checks', type: 'boolean', value: true, yield: true,
        description: 'Check for features with the build system')
 
+option('docs', type: 'feature', value: 'auto', yield: true,
+       description: 'Build documentation')
+
 option('posix', type: 'feature', value: 'auto', yield: true,
        description: 'Use POSIX system facilities')
 

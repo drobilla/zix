@@ -1,0 +1,9 @@
+# Copyright 2021 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: 0BSD OR ISC
+
+c_zix_rst = custom_target(
+  'zix.rst',
+  command: [dox_to_sphinx, '-f', '@INPUT0@', '@OUTDIR@'],
+  input: [c_index_xml] + c_rst_files,
+  output: 'zix.rst',
+)
