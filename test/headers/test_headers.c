@@ -9,6 +9,7 @@
 #include "zix/digest.h"         // IWYU pragma: keep
 #include "zix/function_types.h" // IWYU pragma: keep
 #include "zix/hash.h"           // IWYU pragma: keep
+#include "zix/path.h"           // IWYU pragma: keep
 #include "zix/ring.h"           // IWYU pragma: keep
 #include "zix/sem.h"            // IWYU pragma: keep
 #include "zix/status.h"         // IWYU pragma: keep

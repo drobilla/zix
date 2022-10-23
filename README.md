@@ -15,7 +15,9 @@ Components
   * `ZixSem`: A portable semaphore wrapper.
   * `ZixThread`: A portable thread wrapper.
   * `ZixTree`: A binary search tree.
-  * `zix_digest`: A hash function for arbitrary data.
+
+  * `zix/digest.h`: Digest functions suitable for hashing arbitrary data.
+  * `zix/path.h`: Functions for working with filesystem paths lexically.
 
 Platforms
 ---------

@@ -12,7 +12,7 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_function_types Function Types
-   @ingroup zix
+   @ingroup zix_utilities
    @{
 */
 

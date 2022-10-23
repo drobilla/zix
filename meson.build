@@ -9,6 +9,7 @@ project('zix', ['c'],
           'b_ndebug=if-release',
           'buildtype=release',
           'c_std=c99',
+          'cpp_std=c++17',
         ])
 
 major_version = meson.project_version().split('.')[0]
@@ -100,6 +101,7 @@ c_headers = files(
   'include/zix/digest.h',
   'include/zix/function_types.h',
   'include/zix/hash.h',
+  'include/zix/path.h',
   'include/zix/ring.h',
   'include/zix/sem.h',
   'include/zix/status.h',
@@ -117,6 +119,7 @@ sources = files(
   'src/digest.c',
   'src/errno_status.c',
   'src/hash.c',
+  'src/path.c',
   'src/ring.c',
   'src/status.c',
   'src/string_view.c',
@@ -227,6 +230,7 @@ sequential_tests = [
   'test_btree',
   'test_digest',
   'test_hash',
+  'test_path',
   'test_status',
   'test_tree',
 ]
@@ -325,6 +329,22 @@ if not get_option('tests').disabled()
         c_args: header_suppressions + program_c_args,
         dependencies: zix_dep,
         include_directories: include_dirs,
+      ),
+    )
+  endif
+
+  if add_languages(['cpp'], native: false, required: get_option('tests_cpp'))
+    cpp = meson.get_compiler('cpp')
+
+    test(
+      'test_path_std',
+      executable(
+        'test_path_std',
+        files('test/cpp/test_path_std.cpp'),
+        cpp_args: program_c_args,
+        dependencies: [zix_dep],
+        include_directories: include_dirs,
+        link_args: program_link_args,
       ),
     )
   endif

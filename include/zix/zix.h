@@ -54,6 +54,14 @@
 
 /**
    @}
+   @defgroup zix_file_system File System
+   @{
+*/
+
+#include "zix/path.h"
+
+/**
+   @}
    @}
 */
 
