@@ -1,4 +1,4 @@
-// Copyright 2014-2020 David Robillard <d@drobilla.net>
+// Copyright 2014-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "zix/status.h"
@@ -31,6 +31,10 @@ zix_strerror(const ZixStatus status)
     return "Not supported";
   case ZIX_STATUS_UNAVAILABLE:
     return "Resource unavailable";
+  case ZIX_STATUS_NO_SPACE:
+    return "Out of storage space";
+  case ZIX_STATUS_MAX_LINKS:
+    return "Too many links";
   }
   return "Unknown error";
 }

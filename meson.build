@@ -43,8 +43,25 @@ platform_c_args = []
 no_posix = get_option('posix').disabled() or host_machine.system() == 'windows'
 if no_posix
   platform_c_args += ['-DZIX_NO_POSIX']
+elif host_machine.system() == 'darwin'
+  platform_c_args += [
+    '-D_DARWIN_C_SOURCE',
+  ]
+elif host_machine.system() in ['gnu', 'linux']
+  platform_c_args += [
+    '-D_GNU_SOURCE',
+    '-D_POSIX_C_SOURCE=200809L',
+    '-D_XOPEN_SOURCE=600',
+  ]
+elif host_machine.system() in ['dragonfly', 'freebsd', 'netbsd', 'openbsd']
+  platform_c_args += [
+    '-D_BSD_SOURCE',
+  ]
 else
-  platform_c_args += ['-D_POSIX_C_SOURCE=200809L']
+  platform_c_args += [
+    '-D_POSIX_C_SOURCE=200809L',
+    '-D_XOPEN_SOURCE=600',
+  ]
 endif
 
 # Check for platform features with the build system
@@ -53,15 +70,49 @@ if get_option('checks')
 int main(void) { struct timespec t; return clock_gettime(CLOCK_MONOTONIC, &t); }
 '''
 
+  clonefile_code = '''#include <sys/attr.h>
+#include <sys/clonefile.h>
+int main(void) { return clonefile("/src", "/dst", 0); }'''
+
+  copy_file_range_code = '''#include <unistd.h>
+int main(void) { return copy_file_range(0, NULL, 1, NULL, 0U, 0U); }'''
+
+  CreateSymbolicLink_code = '''#include <windows.h>
+int main(void) {
+  return CreateSymbolicLink(
+    "l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);
+}'''
+
+  fileno_code = '''#include <stdio.h>
+int main(void) { return fileno(stdin); }'''
+
+  flock_code = '''#include <sys/file.h>
+int main(void) { return flock(0, 0); }'''
+
+  lstat_code = '''#include <sys/stat.h>
+int main(void) { struct stat s; return lstat("/", &s); }'''
+
   mlock_code = '''#include <sys/mman.h>
 int main(void) { return mlock(0, 0); }'''
+
+  pathconf_code = '''#include <unistd.h>
+int main(void) { return pathconf("/", _PC_PATH_MAX) > 0L; }'''
+
+  posix_fadvise_code = '''#include <fcntl.h>
+int main(void) { posix_fadvise(0, 0, 4096, POSIX_FADV_SEQUENTIAL); }'''
 
   posix_memalign_code = '''#include <stdlib.h>
 int main(void) { void* mem; posix_memalign(&mem, 8, 8); }'''
 
+  realpath_code = '''#include <stdlib.h>
+int main(void) { return realpath("/", NULL) != NULL; }'''
+
   sem_timedwait_code = '''#include <semaphore.h>
 #include <time.h>
 int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }'''
+
+  sysconf_code = '''#include <unistd.h>
+int main(void) { return sysconf(_SC_PAGE_SIZE) > 0L; }'''
 
   platform_c_args += [
     '-DZIX_NO_DEFAULT_CONFIG',
@@ -69,20 +120,63 @@ int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }'''
       cc.links(clock_gettime_code,
                args: platform_c_args,
                name: 'clock_gettime').to_int()),
+    '-DHAVE_CLONEFILE=@0@'.format(
+      (host_machine.system() == 'darwin' and
+       cc.links(clonefile_code,
+                args: platform_c_args,
+                name: 'clonefile')).to_int()),
+    '-DHAVE_COPY_FILE_RANGE=@0@'.format(
+      (host_machine.system() not in ['darwin', 'windows'] and
+       cc.links(copy_file_range_code,
+                args: platform_c_args,
+                name: 'copy_file_range')).to_int()),
+    '-DHAVE_CREATESYMBOLICLINK=@0@'.format(
+      (host_machine.system() == 'windows' and
+       cc.links(CreateSymbolicLink_code,
+                args: platform_c_args,
+                name: 'CreateSymbolicLink')).to_int()),
+    '-DHAVE_FILENO=@0@'.format(
+      cc.links(fileno_code,
+               args: platform_c_args,
+               name: 'fileno').to_int()),
+    '-DHAVE_FLOCK=@0@'.format(
+      (host_machine.system() != 'windows' and
+       cc.links(flock_code,
+                args: platform_c_args,
+                name: 'flock')).to_int()),
     '-DHAVE_MLOCK=@0@'.format(
       cc.links(mlock_code,
                args: platform_c_args,
                name: 'mlock').to_int()),
+    '-DHAVE_PATHCONF=@0@'.format(
+      (host_machine.system() != 'windows' and
+       cc.links(pathconf_code,
+                args: platform_c_args,
+                name: 'pathconf')).to_int()),
+    '-DHAVE_POSIX_FADVISE=@0@'.format(
+      cc.links(posix_fadvise_code,
+               args: platform_c_args,
+               name: 'posix_fadvise').to_int()),
     '-DHAVE_POSIX_MEMALIGN=@0@'.format(
       cc.links(posix_memalign_code,
                args: platform_c_args,
                name: 'posix_memalign').to_int()),
+    '-DHAVE_REALPATH=@0@'.format(
+      (host_machine.system() != 'windows' and
+       cc.links(realpath_code,
+                args: platform_c_args,
+                name: 'realpath')).to_int()),
     '-DHAVE_SEM_TIMEDWAIT=@0@'.format(
       (host_machine.system() not in ['darwin', 'windows'] and
        cc.links(sem_timedwait_code,
                 args: platform_c_args,
                 dependencies: [thread_dep],
                 name: 'sem_timedwait')).to_int()),
+    '-DHAVE_SYSCONF=@0@'.format(
+      (host_machine.system() != 'windows' and
+       cc.links(sysconf_code,
+                args: platform_c_args,
+                name: 'sysconf')).to_int()),    
   ]
 endif
 
@@ -99,6 +193,7 @@ c_headers = files(
   'include/zix/btree.h',
   'include/zix/bump_allocator.h',
   'include/zix/digest.h',
+  'include/zix/filesystem.h',
   'include/zix/function_types.h',
   'include/zix/hash.h',
   'include/zix/path.h',
@@ -118,11 +213,13 @@ sources = files(
   'src/bump_allocator.c',
   'src/digest.c',
   'src/errno_status.c',
+  'src/filesystem.c',
   'src/hash.c',
   'src/path.c',
   'src/ring.c',
   'src/status.c',
   'src/string_view.c',
+  'src/system.c',
   'src/tree.c',
 )
 
@@ -130,17 +227,23 @@ if thread_dep.found()
   if host_machine.system() == 'darwin'
     sources += files(
       'src/darwin/sem_darwin.c',
+      'src/posix/filesystem_posix.c',
+      'src/posix/system_posix.c',
       'src/posix/thread_posix.c',
     )
 
   elif host_machine.system() == 'windows'
     sources += files(
+      'src/win32/filesystem_win32.c',
       'src/win32/sem_win32.c',
+      'src/win32/system_win32.c',
       'src/win32/thread_win32.c',
     )
   else
     sources += files(
+      'src/posix/filesystem_posix.c',
       'src/posix/sem_posix.c',
+      'src/posix/system_posix.c',
       'src/posix/thread_posix.c',
     )
   endif
@@ -281,6 +384,20 @@ if not get_option('tests').disabled()
       timeout: 120,
     )
   endforeach
+
+  test(
+    'test_filesystem',
+    executable(
+      'test_filesystem',
+      files('test/test_filesystem.c'),
+      c_args: c_suppressions + program_c_args,
+      dependencies: [zix_dep],
+      include_directories: include_dirs,
+      link_args: program_link_args,
+    ),
+    args: files('README.md'),
+    timeout: 120,
+  )
 
   if thread_dep.found()
     foreach test : threaded_tests

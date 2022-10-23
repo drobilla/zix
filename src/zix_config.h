@@ -48,12 +48,77 @@
 #    endif
 #  endif
 
+// MacOS: clonefile()
+#  ifndef HAVE_CLONEFILE
+#    if defined(__APPLE__) && __has_include(<sys/clonefile.h>)
+#      define HAVE_CLONEFILE 1
+#    else
+#      define HAVE_CLONEFILE 0
+#    endif
+#  endif
+
+// FreeBSD 13, Linux 4.5, and glibc 2.27: copy_file_range()
+#  ifndef HAVE_COPY_FILE_RANGE
+#    if (defined(__FreeBSD__) && __FreeBSD__ >= 13) || defined(__linux__) || \
+      (defined(__GLIBC__) &&                                                 \
+       (__GLIBC__ > 2 || __GLIBC__ == 2 && __GLIBC_MINOR__ >= 27))
+#      define HAVE_COPY_FILE_RANGE 1
+#    else
+#      define HAVE_COPY_FILE_RANGE 0
+#    endif
+#  endif
+
+// Windows: CreateSymbolicLink()
+#  ifndef HAVE_CREATESYMBOLICLINK
+#    if defined(_MSC_VER) && _MSC_VER >= 1910
+#      define HAVE_CREATESYMBOLICLINK 1
+#    else
+#      define HAVE_CREATESYMBOLICLINK 0
+#    endif
+#  endif
+
+// POSIX.1-2001, Windows: fileno()
+#  ifndef HAVE_FILENO
+#    if defined(_WIN32) || defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#      define HAVE_FILENO 1
+#    else
+#      define HAVE_FILENO 0
+#    endif
+#  endif
+
+// Classic UNIX: flock()
+#  ifndef HAVE_FLOCK
+#    if defined(__APPLE__) || defined(__unix__)
+#      define HAVE_FLOCK 1
+#    else
+#      define HAVE_FLOCK 0
+#    endif
+#  endif
+
 // POSIX.1-2001: mlock()
 #  ifndef HAVE_MLOCK
 #    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
 #      define HAVE_MLOCK 1
 #    else
 #      define HAVE_MLOCK 0
+#    endif
+#  endif
+
+// POSIX.1-2001: pathconf()
+#  ifndef HAVE_PATHCONF
+#    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#      define HAVE_PATHCONF 1
+#    else
+#      define HAVE_PATHCONF 0
+#    endif
+#  endif
+
+// POSIX.1-2001: posix_fadvise()
+#  ifndef HAVE_POSIX_FADVISE
+#    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#      define HAVE_POSIX_FADVISE 1
+#    else
+#      define HAVE_POSIX_FADVISE 0
 #    endif
 #  endif
 
@@ -66,12 +131,30 @@
 #    endif
 #  endif
 
+// POSIX.1-2001: realpath()
+#  ifndef HAVE_REALPATH
+#    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#      define HAVE_REALPATH 1
+#    else
+#      define HAVE_REALPATH 0
+#    endif
+#  endif
+
 // POSIX.1-2001: sem_timedwait()
 #  ifndef HAVE_SEM_TIMEDWAIT
 #    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
 #      define HAVE_SEM_TIMEDWAIT 1
 #    else
 #      define HAVE_SEM_TIMEDWAIT 0
+#    endif
+#  endif
+
+// POSIX.1-2001: sysconf()
+#  ifndef HAVE_SYSCONF
+#    if defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L
+#      define HAVE_SYSCONF 1
+#    else
+#      define HAVE_SYSCONF 0
 #    endif
 #  endif
 
@@ -91,10 +174,52 @@
 #  define USE_CLOCK_GETTIME 0
 #endif
 
+#if HAVE_CLONEFILE
+#  define USE_CLONEFILE 1
+#else
+#  define USE_CLONEFILE 0
+#endif
+
+#if HAVE_COPY_FILE_RANGE
+#  define USE_COPY_FILE_RANGE 1
+#else
+#  define USE_COPY_FILE_RANGE 0
+#endif
+
+#if HAVE_CREATESYMBOLICLINK
+#  define USE_CREATESYMBOLICLINK 1
+#else
+#  define USE_CREATESYMBOLICLINK 0
+#endif
+
+#if HAVE_FILENO
+#  define USE_FILENO 1
+#else
+#  define USE_FILENO 0
+#endif
+
+#if HAVE_FLOCK
+#  define USE_FLOCK 1
+#else
+#  define USE_FLOCK 0
+#endif
+
 #if HAVE_MLOCK
 #  define USE_MLOCK 1
 #else
 #  define USE_MLOCK 0
+#endif
+
+#if HAVE_PATHCONF
+#  define USE_PATHCONF 1
+#else
+#  define USE_PATHCONF 0
+#endif
+
+#if HAVE_POSIX_FADVISE
+#  define USE_POSIX_FADVISE 1
+#else
+#  define USE_POSIX_FADVISE 0
 #endif
 
 #if HAVE_POSIX_MEMALIGN
@@ -103,10 +228,22 @@
 #  define USE_POSIX_MEMALIGN 0
 #endif
 
+#if HAVE_REALPATH
+#  define USE_REALPATH 1
+#else
+#  define USE_REALPATH 0
+#endif
+
 #if HAVE_SEM_TIMEDWAIT
 #  define USE_SEM_TIMEDWAIT 1
 #else
 #  define USE_SEM_TIMEDWAIT 0
+#endif
+
+#if HAVE_SYSCONF
+#  define USE_SYSCONF 1
+#else
+#  define USE_SYSCONF 0
 #endif
 
 #endif // ZIX_CONFIG_H

@@ -38,6 +38,7 @@ if is_variable('cc')
       if host_machine.system() == 'windows'
         c_suppressions += [
           '-Wno-format',
+          '-Wno-suggest-attribute=const',
           '-Wno-suggest-attribute=format',
           '-Wno-suggest-attribute=pure',
         ]
@@ -56,6 +57,7 @@ if is_variable('cc')
         '/wd4777', # format string and argument mismatch
         '/wd4800', # implicit conversion to bool
         '/wd4820', # padding added after construct
+        '/wd4996', # POSIX name for this item is deprecated
         '/wd5045', # will insert Spectre mitigation for memory load
       ]
     endif

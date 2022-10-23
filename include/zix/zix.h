@@ -58,6 +58,7 @@
    @{
 */
 
+#include "zix/filesystem.h"
 #include "zix/path.h"
 
 /**

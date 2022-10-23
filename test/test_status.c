@@ -1,4 +1,4 @@
-// Copyright 2021 David Robillard <d@drobilla.net>
+// Copyright 2021-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
@@ -15,7 +15,7 @@ test_strerror(void)
   const char* msg = zix_strerror(ZIX_STATUS_SUCCESS);
   assert(!strcmp(msg, "Success"));
 
-  for (int i = ZIX_STATUS_ERROR; i <= ZIX_STATUS_UNAVAILABLE; ++i) {
+  for (int i = ZIX_STATUS_ERROR; i <= ZIX_STATUS_MAX_LINKS; ++i) {
     msg = zix_strerror((ZixStatus)i);
     assert(strcmp(msg, "Success"));
   }

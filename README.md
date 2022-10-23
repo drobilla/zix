@@ -17,6 +17,7 @@ Components
   * `ZixTree`: A binary search tree.
 
   * `zix/digest.h`: Digest functions suitable for hashing arbitrary data.
+  * `zix/filesystem.h`: Functions for working with filesystems.
   * `zix/path.h`: Functions for working with filesystem paths lexically.
 
 Platforms

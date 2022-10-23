@@ -67,7 +67,8 @@ zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
    replaced with a single "\" on Windows, and a single "/" everwhere else).
 
    Note that this function doesn't access the filesystem, so won't do anything
-   like case normalization or symbolic link dereferencing.
+   like case normalization or symbolic link dereferencing.  For that, use
+   zix_canonical_path().
 */
 ZIX_API
 char* ZIX_ALLOCATED

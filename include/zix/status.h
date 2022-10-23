@@ -28,6 +28,8 @@ typedef enum {
   ZIX_STATUS_OVERFLOW,      ///< Overflow
   ZIX_STATUS_NOT_SUPPORTED, ///< Not supported
   ZIX_STATUS_UNAVAILABLE,   ///< Resource unavailable
+  ZIX_STATUS_NO_SPACE,      ///< Out of storage space
+  ZIX_STATUS_MAX_LINKS,     ///< Too many links
 } ZixStatus;
 
 /// Return a string describing a status code
