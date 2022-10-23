@@ -12,6 +12,7 @@
 #include "zix/ring.h"           // IWYU pragma: keep
 #include "zix/sem.h"            // IWYU pragma: keep
 #include "zix/status.h"         // IWYU pragma: keep
+#include "zix/string_view.h"    // IWYU pragma: keep
 #include "zix/thread.h"         // IWYU pragma: keep
 #include "zix/tree.h"           // IWYU pragma: keep
 #include "zix/zix.h"            // IWYU pragma: keep

@@ -34,13 +34,15 @@
 
 // GCC function attributes
 #ifdef __GNUC__
+#  define ZIX_ALWAYS_INLINE_FUNC __attribute__((always_inline))
 #  define ZIX_PURE_FUNC __attribute__((pure))
 #  define ZIX_CONST_FUNC __attribute__((const))
 #  define ZIX_MALLOC_FUNC __attribute__((malloc))
 #else
-#  define ZIX_PURE_FUNC   ///< Only reads memory
-#  define ZIX_CONST_FUNC  ///< Only reads its parameters
-#  define ZIX_MALLOC_FUNC ///< Allocates memory
+#  define ZIX_ALWAYS_INLINE_FUNC ///< Should absolutely always be inlined
+#  define ZIX_PURE_FUNC          ///< Only reads memory
+#  define ZIX_CONST_FUNC         ///< Only reads its parameters
+#  define ZIX_MALLOC_FUNC        ///< Allocates memory
 #endif
 
 /// A pure function in the public API that only reads memory

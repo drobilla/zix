@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: 0BSD OR ISC
 
 project('zix', ['c'],
-        version: '0.2.0',
+        version: '0.3.0',
         license: 'ISC',
         meson_version: '>= 0.56.0',
         default_options: [
@@ -103,6 +103,7 @@ c_headers = files(
   'include/zix/ring.h',
   'include/zix/sem.h',
   'include/zix/status.h',
+  'include/zix/string_view.h',
   'include/zix/thread.h',
   'include/zix/tree.h',
   'include/zix/zix.h',
@@ -118,6 +119,7 @@ sources = files(
   'src/hash.c',
   'src/ring.c',
   'src/status.c',
+  'src/string_view.c',
   'src/tree.c',
 )
 
