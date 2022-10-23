@@ -23,21 +23,21 @@ ZIX_BEGIN_DECLS
 #if defined(ZIX_HASH_KEY_TYPE)
 typedef ZIX_HASH_KEY_TYPE ZixHashKey;
 #else
-typedef void ZixHashKey;
+typedef void ZixHashKey;        ///< The type of a key within a record
 #endif
 
 // ZIX_HASH_RECORD_TYPE can be defined to make the API more type-safe
 #if defined(ZIX_HASH_RECORD_TYPE)
 typedef ZIX_HASH_RECORD_TYPE ZixHashRecord;
 #else
-typedef void ZixHashRecord;
+typedef void ZixHashRecord;     ///< The type of a hash table record
 #endif
 
 // ZIX_HASH_SEARCH_DATA_TYPE can be defined to make the API more type-safe
 #if defined(ZIX_HASH_SEARCH_DATA_TYPE)
 typedef ZIX_HASH_SEARCH_DATA_TYPE ZixHashSearchData;
 #else
-typedef void ZixHashSearchData;
+typedef void ZixHashSearchData; ///< User data for key comparison function
 #endif
 
 /**

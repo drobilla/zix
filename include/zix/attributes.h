@@ -15,8 +15,8 @@
 #  define ZIX_BEGIN_DECLS extern "C" {
 #  define ZIX_END_DECLS }
 #else
-#  define ZIX_BEGIN_DECLS
-#  define ZIX_END_DECLS
+#  define ZIX_BEGIN_DECLS ///< Begin public API definitions
+#  define ZIX_END_DECLS   ///< End public API definitions
 #endif
 
 // ZIX_API must be used to decorate things in the public API
@@ -32,15 +32,15 @@
 #  endif
 #endif
 
-// GCC pure/const/malloc attributes
+// GCC function attributes
 #ifdef __GNUC__
 #  define ZIX_PURE_FUNC __attribute__((pure))
 #  define ZIX_CONST_FUNC __attribute__((const))
 #  define ZIX_MALLOC_FUNC __attribute__((malloc))
 #else
-#  define ZIX_PURE_FUNC
-#  define ZIX_CONST_FUNC
-#  define ZIX_MALLOC_FUNC
+#  define ZIX_PURE_FUNC   ///< Only reads memory
+#  define ZIX_CONST_FUNC  ///< Only reads its parameters
+#  define ZIX_MALLOC_FUNC ///< Allocates memory
 #endif
 
 /// A pure function in the public API that only reads memory
@@ -62,7 +62,7 @@
 #ifdef __GNUC__
 #  define ZIX_LOG_FUNC(fmt, arg1) __attribute__((format(printf, fmt, arg1)))
 #else
-#  define ZIX_LOG_FUNC(fmt, arg1)
+#  define ZIX_LOG_FUNC(fmt, arg1) ///< A function with printf-like parameters
 #endif
 
 // Unused parameter macro to suppresses warnings and make it impossible to use
@@ -73,7 +73,7 @@
 #elif defined(_MSC_VER)
 #  define ZIX_UNUSED(name) __pragma(warning(suppress : 4100)) name
 #else
-#  define ZIX_UNUSED(name) name
+#  define ZIX_UNUSED(name) name ///< An unused parameter
 #endif
 
 // Clang nullability annotations
@@ -82,9 +82,9 @@
 #  define ZIX_NULLABLE _Nullable
 #  define ZIX_ALLOCATED _Null_unspecified
 #else
-#  define ZIX_NONNULL
-#  define ZIX_NULLABLE
-#  define ZIX_ALLOCATED
+#  define ZIX_NONNULL   ///< A non-null pointer
+#  define ZIX_NULLABLE  ///< A nullable pointer
+#  define ZIX_ALLOCATED ///< An allocated (possibly null) pointer
 #endif
 
 /**
