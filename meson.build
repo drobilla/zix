@@ -454,6 +454,18 @@ if not get_option('tests').disabled()
     cpp = meson.get_compiler('cpp')
 
     test(
+      'test_headers_cpp',
+      executable(
+        'test_headers_cpp',
+        files('test/cpp/test_headers_cpp.cpp'),
+        cpp_args: program_c_args,
+        dependencies: [zix_dep],
+        include_directories: include_dirs,
+        link_args: program_link_args,
+      ),
+    )
+
+    test(
       'test_path_std',
       executable(
         'test_path_std',
