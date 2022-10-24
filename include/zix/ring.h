@@ -153,6 +153,7 @@ zix_ring_write(ZixRing* ZIX_NONNULL    ring,
    @param ring The ring to write data to.
    @return A new empty transaction.
 */
+ZIX_API
 ZixRingTransaction
 zix_ring_begin_write(ZixRing* ZIX_NONNULL ring);
 
@@ -174,6 +175,7 @@ zix_ring_begin_write(ZixRing* ZIX_NONNULL ring);
    @param size Length of data to write in bytes.
    @return #ZIX_STATUS_NO_MEM or #ZIX_STATUS_SUCCESS.
 */
+ZIX_API
 ZixStatus
 zix_ring_amend_write(ZixRing* ZIX_NONNULL            ring,
                      ZixRingTransaction* ZIX_NONNULL tx,
@@ -193,6 +195,7 @@ zix_ring_amend_write(ZixRing* ZIX_NONNULL            ring,
    @param tx The active transaction, from zix_ring_begin_write().
    @return #ZIX_STATUS_SUCCESS.
 */
+ZIX_API
 ZixStatus
 zix_ring_commit_write(ZixRing* ZIX_NONNULL                  ring,
                       const ZixRingTransaction* ZIX_NONNULL tx);
