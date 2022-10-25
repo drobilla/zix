@@ -36,7 +36,7 @@ subdir('meson/suppressions')
 # Platform Configuration #
 ##########################
 
-thread_dep = dependency('threads', required: get_option('tests'))
+thread_dep = dependency('threads', required: get_option('threads'))
 
 platform_c_args = []
 
@@ -224,27 +224,38 @@ sources = files(
   'src/tree.c',
 )
 
+if host_machine.system() == 'darwin'
+  sources += files(
+    'src/posix/filesystem_posix.c',
+    'src/posix/system_posix.c',
+  )
+elif host_machine.system() == 'windows'
+  sources += files(
+    'src/win32/filesystem_win32.c',
+    'src/win32/system_win32.c',
+  )
+else
+  sources += files(
+    'src/posix/filesystem_posix.c',
+    'src/posix/system_posix.c',
+  )
+endif
+
 if thread_dep.found()
   if host_machine.system() == 'darwin'
     sources += files(
       'src/darwin/sem_darwin.c',
-      'src/posix/filesystem_posix.c',
-      'src/posix/system_posix.c',
       'src/posix/thread_posix.c',
     )
 
   elif host_machine.system() == 'windows'
     sources += files(
-      'src/win32/filesystem_win32.c',
       'src/win32/sem_win32.c',
-      'src/win32/system_win32.c',
       'src/win32/thread_win32.c',
     )
   else
     sources += files(
-      'src/posix/filesystem_posix.c',
       'src/posix/sem_posix.c',
-      'src/posix/system_posix.c',
       'src/posix/thread_posix.c',
     )
   endif

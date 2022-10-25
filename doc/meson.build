@@ -12,15 +12,17 @@ if build_docs
 
   # Documentation Code
 
-  test(
-    'overview_code',
-    executable(
+  if not get_option('tests').disabled()
+    test(
       'overview_code',
-      files('overview_code.c'),
-      dependencies: [zix_dep],
-      c_args: c_suppressions,
+      executable(
+        'overview_code',
+        files('overview_code.c'),
+        dependencies: [zix_dep],
+        c_args: c_suppressions,
+      )
     )
-  )
+  endif
 
   # Generated API Reference
 
