@@ -471,9 +471,18 @@ if not get_option('tests').disabled()
 
     cpp_test_args = []
     if cpp.get_id() == 'clang'
-      cpp_test_args = ['-Wall']
+      cpp_test_args = [
+        '-Wall',
+        '-Wno-nullability-extension',
+        '-Wno-padded',
+        '-Wno-zero-as-null-pointer-constant',
+      ]
     elif cpp.get_id() == 'gcc'
-      cpp_test_args = ['-Wall']
+      cpp_test_args = [
+        '-Wall',
+        '-Wno-padded',
+        '-Wno-unused-const-variable',
+      ]
     elif cpp.get_id() == 'msvc'
       cpp_test_args = ['/W3']
     endif
