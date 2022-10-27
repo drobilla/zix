@@ -177,7 +177,7 @@ int main(void) { return sysconf(_SC_PAGE_SIZE) > 0L; }'''
       (host_machine.system() != 'windows' and
        cc.links(sysconf_code,
                 args: platform_c_args,
-                name: 'sysconf')).to_int()),    
+                name: 'sysconf')).to_int()),
   ]
 endif
 
@@ -462,32 +462,50 @@ if not get_option('tests').disabled()
     )
   endif
 
-  if add_languages(['cpp'], native: false, required: get_option('tests_cpp'))
+  if not get_option('tests_cpp').disabled() and add_languages(
+    ['cpp'],
+    native: false,
+    required: get_option('tests_cpp').enabled(),
+  )
     cpp = meson.get_compiler('cpp')
+
+    cpp_test_args = []
+    if cpp.get_id() == 'clang'
+      cpp_test_args = ['-Wall']
+    elif cpp.get_id() == 'gcc'
+      cpp_test_args = ['-Wall']
+    elif cpp.get_id() == 'msvc'
+      cpp_test_args = ['/W3']
+    endif
 
     test(
       'test_headers_cpp',
       executable(
         'test_headers_cpp',
         files('test/cpp/test_headers_cpp.cpp'),
-        cpp_args: program_c_args,
+        cpp_args: cpp_test_args + program_c_args,
         dependencies: [zix_dep],
         include_directories: include_dirs,
         link_args: program_link_args,
       ),
     )
 
-    test(
-      'test_path_std',
-      executable(
+    filesystem_code = '''#include <filesystem>
+int main(void) { return 0; }'''
+
+    if cpp.links(filesystem_code, name: 'filesystem')
+      test(
         'test_path_std',
-        files('test/cpp/test_path_std.cpp'),
-        cpp_args: program_c_args,
-        dependencies: [zix_dep],
-        include_directories: include_dirs,
-        link_args: program_link_args,
-      ),
-    )
+        executable(
+          'test_path_std',
+          files('test/cpp/test_path_std.cpp'),
+          cpp_args: cpp_test_args + program_c_args,
+          dependencies: [zix_dep],
+          include_directories: include_dirs,
+          link_args: program_link_args,
+        ),
+      )
+    endif
   endif
 endif
 
