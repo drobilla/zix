@@ -1,59 +1,43 @@
 # Copyright 2019-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
-arm32_dbg:
+arm32:
   image: lv2plugin/debian-arm32
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddocs=disabled
     - ninja -C build test
-
-arm32_rel:
-  image: lv2plugin/debian-arm32
-  script:
-    - meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
 
-
-arm64_dbg:
+arm64:
   image: lv2plugin/debian-arm64
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddocs=disabled
     - ninja -C build test
-
-arm64_rel:
-  image: lv2plugin/debian-arm64
-  script:
-    - meson setup build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
 
-
-x64_dbg:
+x64:
   image: lv2plugin/debian-x64
   script:
     - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true -Db_coverage=true -Ddocs=enabled
     - ninja -C build test
     - ninja -C build coverage-html
+    - meson configure -Dbuildtype=release -Db_coverage=false build
+    - ninja -C build test
   coverage: '/ *lines\.*: \d+\.\d+.*/'
   artifacts:
     paths:
       - build/doc
       - build/meson-logs/coveragereport
 
-x64_rel:
-  image: lv2plugin/debian-x64
-  script:
-    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
-    - ninja -C build test
-
-
-x64_static:
+static:
   image: lv2plugin/debian-x64
   script:
     - meson setup build -Ddefault_library=static -Dstrict=true -Dwerror=true -Ddocs=disabled
     - ninja -C build test
 
-
-x64_sanitize:
+sanitize:
   image: lv2plugin/debian-x64-clang
   script:
     - meson setup build -Db_lundef=false -Dbuildtype=plain -Dstrict=true -Dwerror=true -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dcpp_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Dcpp_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Ddocs=disabled
@@ -66,7 +50,6 @@ x64_sanitize:
   variables:
     CC: "clang"
 
-
 fedora:
   image: lv2plugin/fedora-dev
   script:
@@ -75,92 +58,57 @@ fedora:
   variables:
     CFLAGS: -O2 -D_FORTIFY_SOURCE=2
 
-
-freebsd_dbg:
+freebsd:
   tags: [freebsd,meson]
   script:
     - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddocs=disabled
     - ninja -C build test
-
-freebsd_rel:
-  tags: [freebsd,meson]
-  script:
-    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
 
-
-mingw32_dbg:
+mingw32:
   image: lv2plugin/debian-mingw32
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddocs=disabled
     - ninja -C build test
-  variables:
-    WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\10-win32"
-
-mingw32_rel:
-  image: lv2plugin/debian-mingw32
-  script:
-    - meson setup build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
   variables:
     WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\10-win32"
 
-
-mingw64_dbg:
+mingw64:
   image: lv2plugin/debian-mingw64
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddocs=disabled
     - ninja -C build test
-  variables:
-    WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\10-win32"
-
-mingw64_rel:
-  image: lv2plugin/debian-mingw64
-  script:
-    - meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
   variables:
     WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\10-win32"
 
-
-mac_dbg:
+mac:
   tags: [macos]
   script:
     - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true
     - ninja -C build test
-
-mac_rel:
-  tags: [macos]
-  script:
-    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
 
-
-win_dbg:
+win:
   tags: [windows,meson]
   script:
     - meson setup build -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddocs=disabled
     - ninja -C build test
-
-win_rel:
-  tags: [windows,meson]
-  script:
-    - meson setup build -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
 
-
-wasm_dbg:
+wasm:
   image: lv2plugin/debian-wasm
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/wasm.ini -Dbuildtype=debug -Dstrict=true -Dwerror=true -Ddefault_library=static -Ddocs=disabled
     - ninja -C build test
-
-wasm_rel:
-  image: lv2plugin/debian-wasm
-  script:
-    - meson setup build --cross-file=/usr/share/meson/cross/wasm.ini -Dbuildtype=release -Dstrict=true -Dwerror=true -Ddefault_library=static -Ddocs=disabled
+    - meson configure -Dbuildtype=release build
     - ninja -C build test
-
 
 pages:
   script:
@@ -170,7 +118,7 @@ pages:
     - mv build/doc/html .public/doc/
     - mv .public public
   needs:
-    - x64_dbg
+    - x64
   artifacts:
     paths:
      - public
