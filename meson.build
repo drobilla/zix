@@ -340,20 +340,20 @@ install_headers(c_headers, subdir: versioned_name / 'zix')
 #########
 
 sequential_tests = [
-  'test_allocator',
-  'test_bitset',
-  'test_btree',
-  'test_digest',
-  'test_hash',
-  'test_path',
-  'test_status',
-  'test_tree',
+  'allocator',
+  'bitset',
+  'btree',
+  'digest',
+  'hash',
+  'path',
+  'status',
+  'tree',
 ]
 
 threaded_tests = [
-  'test_ring',
-  'test_sem',
-  'test_thread',
+  'ring',
+  'sem',
+  'thread',
 ]
 
 if not get_option('tests').disabled()
@@ -381,24 +381,25 @@ if not get_option('tests').disabled()
   common_test_sources = files('test/failing_allocator.c')
 
   foreach test : sequential_tests
-    sources = common_test_sources + files('test/@0@.c'.format(test))
+    sources = common_test_sources + files('test/test_@0@.c'.format(test))
 
     test(
       test,
       executable(
-        test,
+        'test_@0@'.format(test),
         sources,
         c_args: c_suppressions + program_c_args,
         dependencies: [zix_dep],
         include_directories: include_dirs,
         link_args: program_link_args,
       ),
+      suite: 'unit',
       timeout: 120,
     )
   endforeach
 
   test(
-    'test_filesystem',
+    'filesystem',
     executable(
       'test_filesystem',
       files('test/test_filesystem.c'),
@@ -408,23 +409,25 @@ if not get_option('tests').disabled()
       link_args: program_link_args,
     ),
     args: files('README.md'),
+    suite: 'unit',
     timeout: 120,
   )
 
   if thread_dep.found()
     foreach test : threaded_tests
-      sources = common_test_sources + files('test/@0@.c'.format(test))
+      sources = common_test_sources + files('test/test_@0@.c'.format(test))
 
       test(
         test,
         executable(
-          test,
+          'test_@0@'.format(test),
           sources,
           c_args: c_suppressions + program_c_args,
           dependencies: [zix_dep, thread_dep],
           include_directories: include_dirs,
           link_args: program_link_args,
         ),
+        suite: 'unit',
         timeout: 120,
       )
     endforeach
@@ -451,7 +454,7 @@ if not get_option('tests').disabled()
     endif
 
     test(
-      'test_headers',
+      'headers',
       executable(
         'test_headers',
         files('test/headers/test_headers.c'),
@@ -459,6 +462,7 @@ if not get_option('tests').disabled()
         dependencies: zix_dep,
         include_directories: include_dirs,
       ),
+      suite: 'build',
     )
   endif
 
@@ -488,7 +492,7 @@ if not get_option('tests').disabled()
     endif
 
     test(
-      'test_headers_cpp',
+      'headers_cpp',
       executable(
         'test_headers_cpp',
         files('test/cpp/test_headers_cpp.cpp'),
@@ -497,6 +501,7 @@ if not get_option('tests').disabled()
         include_directories: include_dirs,
         link_args: program_link_args,
       ),
+      suite: 'build',
     )
 
     filesystem_code = '''#include <filesystem>
@@ -504,7 +509,7 @@ int main(void) { return 0; }'''
 
     if cpp.links(filesystem_code, name: 'filesystem')
       test(
-        'test_path_std',
+        'path_std',
         executable(
           'test_path_std',
           files('test/cpp/test_path_std.cpp'),
@@ -513,6 +518,7 @@ int main(void) { return 0; }'''
           include_directories: include_dirs,
           link_args: program_link_args,
         ),
+        suite: 'unit',
       )
     endif
   endif

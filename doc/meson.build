@@ -20,7 +20,8 @@ if build_docs
         files('overview_code.c'),
         dependencies: [zix_dep],
         c_args: c_suppressions,
-      )
+      ),
+      suite: 'doc',
     )
   endif
 
