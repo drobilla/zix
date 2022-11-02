@@ -1,6 +1,10 @@
 // Copyright 2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
+#ifdef _WIN32
+#  define WIN32_LEAN_AND_MEAN 1
+#endif
+
 #include "zix/allocator.h"      // IWYU pragma: keep
 #include "zix/attributes.h"     // IWYU pragma: keep
 #include "zix/bitset.h"         // IWYU pragma: keep

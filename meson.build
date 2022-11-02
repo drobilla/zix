@@ -476,7 +476,9 @@ if not get_option('tests').disabled()
     cpp_test_args = []
     if cpp.get_id() == 'clang'
       cpp_test_args = [
-        '-Wall',
+        '-Weverything',
+        '-Wno-c++98-compat',
+        '-Wno-c++98-compat-pedantic',
         '-Wno-nullability-extension',
         '-Wno-padded',
         '-Wno-zero-as-null-pointer-constant',
@@ -488,7 +490,14 @@ if not get_option('tests').disabled()
         '-Wno-unused-const-variable',
       ]
     elif cpp.get_id() == 'msvc'
-      cpp_test_args = ['/W3']
+      cpp_test_args = [
+        '/Wall',
+        '/wd4514', # unreferenced inline function has been removed
+        '/wd4710', # function not inlined
+        '/wd4711', # function selected for automatic inline expansion
+        '/wd4820', # padding added after construct
+        '/wd5039', # throwing function passed to C (winbase.h)
+      ]
     endif
 
     test(
