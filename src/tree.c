@@ -3,7 +3,6 @@
 
 #include "zix/tree.h"
 
-#include "zix/function_types.h"
 #include "zix/status.h"
 
 #include <assert.h>
@@ -11,14 +10,14 @@
 typedef struct ZixTreeNodeImpl ZixTreeNode;
 
 struct ZixTreeImpl {
-  ZixAllocator*  allocator;
-  ZixTreeNode*   root;
-  ZixDestroyFunc destroy;
-  const void*    destroy_user_data;
-  ZixCompareFunc cmp;
-  void*          cmp_data;
-  size_t         size;
-  bool           allow_duplicates;
+  ZixAllocator*      allocator;
+  ZixTreeNode*       root;
+  ZixTreeDestroyFunc destroy;
+  const void*        destroy_user_data;
+  ZixTreeCompareFunc cmp;
+  void*              cmp_data;
+  size_t             size;
+  bool               allow_duplicates;
 };
 
 struct ZixTreeNodeImpl {
@@ -53,9 +52,9 @@ zix_tree_noop_destroy(void* const ptr, const void* const user_data)
 ZixTree*
 zix_tree_new(ZixAllocator* const allocator,
              bool                allow_duplicates,
-             ZixCompareFunc      cmp,
+             ZixTreeCompareFunc  cmp,
              void*               cmp_data,
-             ZixDestroyFunc      destroy,
+             ZixTreeDestroyFunc  destroy,
              const void*         destroy_user_data)
 {
   ZixTree* t = (ZixTree*)zix_malloc(allocator, sizeof(ZixTree));

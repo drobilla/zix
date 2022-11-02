@@ -56,7 +56,6 @@ INPUT                  = @ZIX_SRCDIR@/include/zix/zix.h \
                          @ZIX_SRCDIR@/include/zix/bump_allocator.h \
                          \
                          @ZIX_SRCDIR@/include/zix/digest.h \
-                         @ZIX_SRCDIR@/include/zix/function_types.h \
                          \
                          @ZIX_SRCDIR@/include/zix/bitset.h \
                          @ZIX_SRCDIR@/include/zix/btree.h \

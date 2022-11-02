@@ -195,7 +195,6 @@ c_headers = files(
   'include/zix/bump_allocator.h',
   'include/zix/digest.h',
   'include/zix/filesystem.h',
-  'include/zix/function_types.h',
   'include/zix/hash.h',
   'include/zix/path.h',
   'include/zix/ring.h',

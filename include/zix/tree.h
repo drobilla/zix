@@ -6,7 +6,6 @@
 
 #include "zix/allocator.h"
 #include "zix/attributes.h"
-#include "zix/function_types.h"
 #include "zix/status.h"
 
 #include <stdbool.h>
@@ -26,15 +25,24 @@ typedef struct ZixTreeImpl ZixTree;
 /// An iterator over a @ref ZixTree
 typedef struct ZixTreeNodeImpl ZixTreeIter;
 
+/// Function for comparing two Tree elements
+typedef int (*ZixTreeCompareFunc)(const void* ZIX_UNSPECIFIED a,
+                                  const void* ZIX_UNSPECIFIED b,
+                                  const void* ZIX_UNSPECIFIED user_data);
+
+/// Function to destroy a Tree element
+typedef void (*ZixTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
+                                   const void* ZIX_UNSPECIFIED user_data);
+
 /// Create a new (empty) tree
 ZIX_API
 ZixTree* ZIX_ALLOCATED
-zix_tree_new(ZixAllocator* ZIX_NULLABLE  allocator,
-             bool                        allow_duplicates,
-             ZixCompareFunc ZIX_NONNULL  cmp,
-             void* ZIX_UNSPECIFIED       cmp_data,
-             ZixDestroyFunc ZIX_NULLABLE destroy,
-             const void* ZIX_NULLABLE    destroy_user_data);
+zix_tree_new(ZixAllocator* ZIX_NULLABLE      allocator,
+             bool                            allow_duplicates,
+             ZixTreeCompareFunc ZIX_NONNULL  cmp,
+             void* ZIX_UNSPECIFIED           cmp_data,
+             ZixTreeDestroyFunc ZIX_NULLABLE destroy,
+             const void* ZIX_NULLABLE        destroy_user_data);
 
 /// Free `t`
 ZIX_API

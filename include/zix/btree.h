@@ -6,7 +6,6 @@
 
 #include "zix/allocator.h"
 #include "zix/attributes.h"
-#include "zix/function_types.h"
 #include "zix/status.h"
 
 #include <stdbool.h>
@@ -40,6 +39,15 @@ typedef struct ZixBTreeImpl ZixBTree;
 /// A B-Tree node (opaque)
 typedef struct ZixBTreeNodeImpl ZixBTreeNode;
 
+/// Function for comparing two B-Tree elements
+typedef int (*ZixBTreeCompareFunc)(const void* ZIX_UNSPECIFIED a,
+                                   const void* ZIX_UNSPECIFIED b,
+                                   const void* ZIX_UNSPECIFIED user_data);
+
+/// Function to destroy a B-Tree element
+typedef void (*ZixBTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
+                                    const void* ZIX_UNSPECIFIED user_data);
+
 /**
    An iterator over a B-Tree.
 
@@ -72,9 +80,9 @@ static const ZixBTreeIter zix_btree_end_iter = {
 */
 ZIX_API
 ZixBTree* ZIX_ALLOCATED
-zix_btree_new(ZixAllocator* ZIX_NULLABLE allocator,
-              ZixCompareFunc ZIX_NONNULL cmp,
-              const void* ZIX_NULLABLE   cmp_data);
+zix_btree_new(ZixAllocator* ZIX_NULLABLE      allocator,
+              ZixBTreeCompareFunc ZIX_NONNULL cmp,
+              const void* ZIX_UNSPECIFIED     cmp_data);
 
 /**
    Free `t` and all the nodes it contains.
@@ -88,9 +96,9 @@ zix_btree_new(ZixAllocator* ZIX_NULLABLE allocator,
 */
 ZIX_API
 void
-zix_btree_free(ZixBTree* ZIX_NULLABLE      t,
-               ZixDestroyFunc ZIX_NULLABLE destroy,
-               const void* ZIX_NULLABLE    destroy_user_data);
+zix_btree_free(ZixBTree* ZIX_NULLABLE           t,
+               ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
+               const void* ZIX_NULLABLE         destroy_user_data);
 
 /**
    Clear everything from `t`, leaving it empty.
@@ -104,9 +112,9 @@ zix_btree_free(ZixBTree* ZIX_NULLABLE      t,
 */
 ZIX_API
 void
-zix_btree_clear(ZixBTree* ZIX_NONNULL       t,
-                ZixDestroyFunc ZIX_NULLABLE destroy,
-                const void* ZIX_NULLABLE    destroy_user_data);
+zix_btree_clear(ZixBTree* ZIX_NONNULL            t,
+                ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
+                const void* ZIX_NULLABLE         destroy_user_data);
 
 /// Return the number of elements in `t`
 ZIX_PURE_API
@@ -164,11 +172,11 @@ zix_btree_find(const ZixBTree* ZIX_NONNULL t,
 */
 ZIX_API
 ZixStatus
-zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL t,
-                      ZixCompareFunc ZIX_NULLABLE compare_key,
-                      const void* ZIX_NULLABLE    compare_key_user_data,
-                      const void* ZIX_UNSPECIFIED key,
-                      ZixBTreeIter* ZIX_NONNULL   ti);
+zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL      t,
+                      ZixBTreeCompareFunc ZIX_NULLABLE compare_key,
+                      const void* ZIX_NULLABLE         compare_key_user_data,
+                      const void* ZIX_UNSPECIFIED      key,
+                      ZixBTreeIter* ZIX_NONNULL        ti);
 
 /// Return the data at the given position in the tree
 ZIX_PURE_API

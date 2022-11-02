@@ -25,11 +25,11 @@ typedef uint16_t ZixShort;
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2U)
 
 struct ZixBTreeImpl {
-  ZixAllocator*  allocator;
-  ZixBTreeNode*  root;
-  ZixCompareFunc cmp;
-  const void*    cmp_data;
-  size_t         size;
+  ZixAllocator*       allocator;
+  ZixBTreeNode*       root;
+  ZixBTreeCompareFunc cmp;
+  const void*         cmp_data;
+  size_t              size;
 };
 
 struct ZixBTreeNodeImpl {
@@ -88,9 +88,9 @@ zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 }
 
 ZixBTree*
-zix_btree_new(ZixAllocator* const  allocator,
-              const ZixCompareFunc cmp,
-              const void* const    cmp_data)
+zix_btree_new(ZixAllocator* const       allocator,
+              const ZixBTreeCompareFunc cmp,
+              const void* const         cmp_data)
 {
 #if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
       (defined(__cplusplus) && __cplusplus >= 201103L))
@@ -120,10 +120,10 @@ zix_btree_new(ZixAllocator* const  allocator,
 }
 
 static void
-zix_btree_free_children(ZixBTree* const      t,
-                        ZixBTreeNode* const  n,
-                        const ZixDestroyFunc destroy,
-                        const void* const    destroy_user_data)
+zix_btree_free_children(ZixBTree* const           t,
+                        ZixBTreeNode* const       n,
+                        const ZixBTreeDestroyFunc destroy,
+                        const void* const         destroy_user_data)
 {
   if (!n->is_leaf) {
     for (ZixShort i = 0; i < n->n_vals + 1U; ++i) {
@@ -147,9 +147,9 @@ zix_btree_free_children(ZixBTree* const      t,
 }
 
 void
-zix_btree_free(ZixBTree* const      t,
-               const ZixDestroyFunc destroy,
-               const void* const    destroy_user_data)
+zix_btree_free(ZixBTree* const           t,
+               const ZixBTreeDestroyFunc destroy,
+               const void* const         destroy_user_data)
 {
   if (t) {
     zix_btree_clear(t, destroy, destroy_user_data);
@@ -159,9 +159,9 @@ zix_btree_free(ZixBTree* const      t,
 }
 
 void
-zix_btree_clear(ZixBTree* const t,
-                ZixDestroyFunc  destroy,
-                const void*     destroy_user_data)
+zix_btree_clear(ZixBTree* const     t,
+                ZixBTreeDestroyFunc destroy,
+                const void*         destroy_user_data)
 {
   zix_btree_free_children(t, t->root, destroy, destroy_user_data);
 
@@ -288,12 +288,12 @@ zix_btree_node_is_sorted_with_respect_to(const ZixCompareFunc compare,
 #endif
 
 static unsigned
-zix_btree_find_value(const ZixCompareFunc compare,
-                     const void* const    compare_user_data,
-                     void* const* const   values,
-                     const unsigned       n_values,
-                     const void* const    key,
-                     bool* const          equal)
+zix_btree_find_value(const ZixBTreeCompareFunc compare,
+                     const void* const         compare_user_data,
+                     void* const* const        values,
+                     const unsigned            n_values,
+                     const void* const         key,
+                     bool* const               equal)
 {
   unsigned first = 0U;
   unsigned count = n_values;
@@ -323,12 +323,12 @@ zix_btree_find_value(const ZixCompareFunc compare,
 }
 
 static unsigned
-zix_btree_find_pattern(const ZixCompareFunc compare_key,
-                       const void* const    compare_key_user_data,
-                       void* const* const   values,
-                       const unsigned       n_values,
-                       const void* const    key,
-                       bool* const          equal)
+zix_btree_find_pattern(const ZixBTreeCompareFunc compare_key,
+                       const void* const         compare_key_user_data,
+                       void* const* const        values,
+                       const unsigned            n_values,
+                       const void* const         key,
+                       bool* const               equal)
 {
 #ifdef ZIX_BTREE_SORTED_CHECK
   assert(zix_btree_node_is_sorted_with_respect_to(
@@ -853,11 +853,11 @@ zix_btree_find(const ZixBTree* const t,
 }
 
 ZixStatus
-zix_btree_lower_bound(const ZixBTree* const t,
-                      const ZixCompareFunc  compare_key,
-                      const void* const     compare_key_user_data,
-                      const void* const     key,
-                      ZixBTreeIter* const   ti)
+zix_btree_lower_bound(const ZixBTree* const     t,
+                      const ZixBTreeCompareFunc compare_key,
+                      const void* const         compare_key_user_data,
+                      const void* const         key,
+                      ZixBTreeIter* const       ti)
 {
   assert(t);
   assert(ti);

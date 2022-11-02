@@ -18,7 +18,6 @@
 
 #include "zix/attributes.h"
 #include "zix/digest.h"
-#include "zix/function_types.h"
 #include "zix/status.h"
 #include "zix/string_view.h"
 
