@@ -368,6 +368,7 @@ zix_file_unlock(FILE* const file, const ZixFileLockMode mode)
 #endif
 }
 
+ZIX_CONST_FUNC
 static ZixFileType
 stat_file_type(const struct stat sb)
 {

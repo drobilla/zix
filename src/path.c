@@ -92,6 +92,7 @@ typedef struct {
   ZixIndexRange dir;
 } ZixRootSlices;
 
+ZIX_PURE_FUNC
 static ZixRootSlices
 zix_path_root_slices(const char* const path)
 {
@@ -127,6 +128,7 @@ zix_string_ranges_equal(const char* const   lhs,
           !strncmp(lhs + lhs_range.begin, rhs + rhs_range.begin, lhs_len));
 }
 
+ZIX_PURE_FUNC
 static ZixIndexRange
 zix_path_root_path_range(const char* const path)
 {
@@ -138,6 +140,7 @@ zix_path_root_path_range(const char* const path)
            : zix_make_range(root.name.begin, root.name.end + dir_len);
 }
 
+ZIX_PURE_FUNC
 static ZixIndexRange
 zix_path_parent_path_range(const ZixStringView path)
 {
@@ -175,6 +178,7 @@ zix_path_parent_path_range(const ZixStringView path)
   return zix_make_range(root.begin, root.begin + l + 1U - p);
 }
 
+ZIX_PURE_FUNC
 static ZixIndexRange
 zix_path_filename_range(const ZixStringView path)
 {
@@ -193,6 +197,7 @@ zix_path_filename_range(const ZixStringView path)
   return zix_make_range(f, path.length);
 }
 
+ZIX_PURE_FUNC
 static ZixIndexRange
 zix_path_stem_range(const ZixStringView path)
 {
@@ -212,6 +217,7 @@ zix_path_stem_range(const ZixStringView path)
   return zix_is_empty_range(stem) ? name : stem;
 }
 
+ZIX_PURE_FUNC
 static ZixIndexRange
 zix_path_extension_range(const ZixStringView path)
 {
