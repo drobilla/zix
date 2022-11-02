@@ -17,7 +17,6 @@
 */
 
 #include "zix/attributes.h"
-#include "zix/digest.h"
 #include "zix/status.h"
 #include "zix/string_view.h"
 
@@ -29,6 +28,14 @@
 
 #include "zix/allocator.h"
 #include "zix/bump_allocator.h"
+
+/**
+   @}
+   @defgroup zix_algorithms Algorithms
+   @{
+*/
+
+#include "zix/digest.h"
 
 /**
    @}

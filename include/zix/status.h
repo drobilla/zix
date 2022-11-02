@@ -32,7 +32,12 @@ typedef enum {
   ZIX_STATUS_MAX_LINKS,     ///< Too many links
 } ZixStatus;
 
-/// Return a string describing a status code
+/**
+   Return a string describing a status code in plain English.
+
+   The returned string is always one sentence, with an uppercase first
+   character, and no trailing period.
+*/
 ZIX_CONST_API
 const char*
 zix_strerror(ZixStatus status);

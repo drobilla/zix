@@ -13,7 +13,7 @@ ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_digest Digest
-   @ingroup zix_utilities
+   @ingroup zix_algorithms
 
    Functions to generate a short "digest" of data with minimal collisions.
 
