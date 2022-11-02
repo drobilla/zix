@@ -32,7 +32,7 @@ ZixTree* ZIX_ALLOCATED
 zix_tree_new(ZixAllocator* ZIX_NULLABLE  allocator,
              bool                        allow_duplicates,
              ZixCompareFunc ZIX_NONNULL  cmp,
-             void* ZIX_NULLABLE          cmp_data,
+             void* ZIX_UNSPECIFIED       cmp_data,
              ZixDestroyFunc ZIX_NULLABLE destroy,
              const void* ZIX_NULLABLE    destroy_user_data);
 
@@ -50,7 +50,7 @@ zix_tree_size(const ZixTree* ZIX_NONNULL t);
 ZIX_API
 ZixStatus
 zix_tree_insert(ZixTree* ZIX_NONNULL                    t,
-                void* ZIX_NULLABLE                      e,
+                void* ZIX_UNSPECIFIED                   e,
                 ZixTreeIter* ZIX_NULLABLE* ZIX_NULLABLE ti);
 
 /// Remove the item pointed at by `ti` from `t`
@@ -66,12 +66,12 @@ zix_tree_remove(ZixTree* ZIX_NONNULL t, ZixTreeIter* ZIX_NONNULL ti);
 ZIX_API
 ZixStatus
 zix_tree_find(const ZixTree* ZIX_NONNULL             t,
-              const void* ZIX_NULLABLE               e,
+              const void* ZIX_UNSPECIFIED            e,
               ZixTreeIter* ZIX_NULLABLE* ZIX_NONNULL ti);
 
 /// Return the data associated with the given tree item
 ZIX_PURE_API
-void* ZIX_NULLABLE
+void* ZIX_UNSPECIFIED
 zix_tree_get(const ZixTreeIter* ZIX_NULLABLE ti);
 
 /// Return an iterator to the first (smallest) element in `t`
