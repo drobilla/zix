@@ -6,7 +6,7 @@ default:
   script:
     - meson setup build -Dwerror=true
     - ninja -C build test
-  
+
 dev:
   image: lv2plugin/debian-x64
   script:
