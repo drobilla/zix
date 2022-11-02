@@ -46,8 +46,6 @@ static const BinaryCase joins[] = {
 };
 
 static const BinaryCase lexical_relatives[] = {
-  {nullptr, nullptr},
-
   {"", ""},
   {"", "."},
   {".", "."},
