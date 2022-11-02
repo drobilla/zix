@@ -116,7 +116,7 @@ zix_btree_size(const ZixBTree* ZIX_NONNULL t);
 /// Insert the element `e` into `t`
 ZIX_API
 ZixStatus
-zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_NULLABLE e);
+zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_UNSPECIFIED e);
 
 /**
    Remove the value `e` from `t`.
@@ -132,10 +132,10 @@ zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_NULLABLE e);
 */
 ZIX_API
 ZixStatus
-zix_btree_remove(ZixBTree* ZIX_NONNULL           t,
-                 const void* ZIX_NULLABLE        e,
-                 void* ZIX_NULLABLE* ZIX_NONNULL out,
-                 ZixBTreeIter* ZIX_NONNULL       next);
+zix_btree_remove(ZixBTree* ZIX_NONNULL              t,
+                 const void* ZIX_UNSPECIFIED        e,
+                 void* ZIX_UNSPECIFIED* ZIX_NONNULL out,
+                 ZixBTreeIter* ZIX_NONNULL          next);
 
 /**
    Set `ti` to an element exactly equal to `e` in `t`.
@@ -145,7 +145,7 @@ zix_btree_remove(ZixBTree* ZIX_NONNULL           t,
 ZIX_API
 ZixStatus
 zix_btree_find(const ZixBTree* ZIX_NONNULL t,
-               const void* ZIX_NULLABLE    e,
+               const void* ZIX_UNSPECIFIED e,
                ZixBTreeIter* ZIX_NONNULL   ti);
 
 /**
@@ -167,12 +167,12 @@ ZixStatus
 zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL t,
                       ZixCompareFunc ZIX_NULLABLE compare_key,
                       const void* ZIX_NULLABLE    compare_key_user_data,
-                      const void* ZIX_NULLABLE    key,
+                      const void* ZIX_UNSPECIFIED key,
                       ZixBTreeIter* ZIX_NONNULL   ti);
 
 /// Return the data at the given position in the tree
 ZIX_PURE_API
-void* ZIX_NULLABLE
+void* ZIX_UNSPECIFIED
 zix_btree_get(ZixBTreeIter ti);
 
 /// Return an iterator to the first (smallest) element in `t`

@@ -83,10 +83,12 @@
 #  define ZIX_NONNULL _Nonnull
 #  define ZIX_NULLABLE _Nullable
 #  define ZIX_ALLOCATED _Null_unspecified
+#  define ZIX_UNSPECIFIED _Null_unspecified
 #else
-#  define ZIX_NONNULL   ///< A non-null pointer
-#  define ZIX_NULLABLE  ///< A nullable pointer
-#  define ZIX_ALLOCATED ///< An allocated (possibly null) pointer
+#  define ZIX_NONNULL     ///< A non-null pointer
+#  define ZIX_NULLABLE    ///< A nullable pointer
+#  define ZIX_ALLOCATED   ///< An allocated (possibly null) pointer
+#  define ZIX_UNSPECIFIED ///< A pointer with unspecified nullability
 #endif
 
 /**

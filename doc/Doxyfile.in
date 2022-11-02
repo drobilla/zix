@@ -43,6 +43,7 @@ PREDEFINED             = ZIX_ALLOCATED= \
                          ZIX_PURE_FUNC= \
                          ZIX_PURE_WIN_API= \
                          ZIX_THREAD_FUNC= \
+                         ZIX_UNSPECIFIED= \
 
 STRIP_FROM_PATH        = @ZIX_SRCDIR@
 INPUT                  = @ZIX_SRCDIR@/include/zix/zix.h \
