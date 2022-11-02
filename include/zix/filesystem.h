@@ -19,7 +19,7 @@
 ZIX_BEGIN_DECLS
 
 /**
-   @defgroup zix_filesystem Filesystem
+   @defgroup zix_fs_ops Operations
    @ingroup zix_file_system
    @{
 */

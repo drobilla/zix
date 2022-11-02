@@ -20,7 +20,7 @@
 ZIX_BEGIN_DECLS
 
 /**
-   @defgroup zix_path Path
+   @defgroup zix_path Paths
    @ingroup zix_file_system
 
    Functions for interpreting and manipulating paths.  These functions are
