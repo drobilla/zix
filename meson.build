@@ -490,12 +490,20 @@ if not get_option('tests').disabled()
         '-Wno-padded',
         '-Wno-zero-as-null-pointer-constant',
       ]
+
+      if not meson.is_cross_build()
+        cpp_test_args += [
+          '-Wno-poison-system-directories',
+        ]
+      endif
+
     elif cpp.get_id() == 'gcc'
       cpp_test_args = [
         '-Wall',
         '-Wno-padded',
         '-Wno-unused-const-variable',
       ]
+
     elif cpp.get_id() == 'msvc'
       cpp_test_args = [
         '/Wall',
