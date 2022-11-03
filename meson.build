@@ -441,11 +441,19 @@ if not get_option('tests').disabled()
         '-Wno-nullability-extension',
         '-Wno-padded',
       ]
+
+      if not meson.is_cross_build()
+        header_suppressions += [
+          '-Wno-poison-system-directories',
+        ]
+      endif
+      
     elif cc.get_id() == 'gcc'
       header_suppressions += [
         '-Wno-padded',
         '-Wno-unused-const-variable',
       ]
+
     elif cc.get_id() == 'msvc'
       header_suppressions += [
         '/wd4820', # padding added after construct
