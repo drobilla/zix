@@ -202,6 +202,11 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
     return NULL;
   }
 
+  if (final_size > 4U && !strncmp(final, "\\\\?\\", 4)) {
+    memmove(final, final + 4U, final_size - 4U);
+    final[final_size - 4U] = '\0';
+  }
+
   CloseHandle(h);
   return final;
 }
