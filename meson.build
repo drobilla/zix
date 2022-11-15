@@ -559,10 +559,12 @@ benchmarks = [
 
 build_benchmarks = false
 if not get_option('benchmarks').disabled()
-  glib_dep = dependency('glib-2.0',
-                        required: get_option('benchmarks'),
-                        version: '>= 2.0.0',
-                        include_type: 'system')
+  glib_dep = dependency(
+    'glib-2.0',
+    include_type: 'system',
+    required: get_option('benchmarks'),
+    version: '>= 2.0.0',
+  )
 
   if glib_dep.found()
     build_benchmarks = true
@@ -582,9 +584,9 @@ if not get_option('benchmarks').disabled()
         executable(
           benchmark,
           files('benchmark/@0@.c'.format(benchmark)),
-          include_directories: include_dirs,
           c_args: c_suppressions + benchmark_c_args,
           dependencies: [zix_dep, glib_dep],
+          include_directories: include_dirs,
         ),
       )
     endforeach
