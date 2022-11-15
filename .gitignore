@@ -4,3 +4,4 @@
 *.pyc
 __pycache__
 build/**
+.meson-subproject-wrap-hash.txt
