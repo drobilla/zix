@@ -428,8 +428,9 @@ zix_current_path(ZixAllocator* const allocator)
 #if defined(PATH_MAX)
   // Some POSIX systems have a static PATH_MAX so we can store it on the stack
   char buffer[PATH_MAX] = {0};
-  getcwd(buffer, PATH_MAX);
-  return copy_path(allocator, buffer, strlen(buffer));
+  if (getcwd(buffer, PATH_MAX)) {
+    return copy_path(allocator, buffer, strlen(buffer));
+  }
 
 #elif USE_PATHCONF
   // Others don't so we have to query PATH_MAX at runtime to allocate the result
