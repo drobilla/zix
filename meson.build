@@ -581,10 +581,11 @@ if not get_option('benchmarks').disabled()
         benchmark,
         executable(
           benchmark,
-          'benchmark/@0@.c'.format(benchmark),
+          files('benchmark/@0@.c'.format(benchmark)),
           include_directories: include_dirs,
           c_args: c_suppressions + benchmark_c_args,
-          dependencies: [zix_dep, glib_dep]),
+          dependencies: [zix_dep, glib_dep],
+        ),
       )
     endforeach
   endif
