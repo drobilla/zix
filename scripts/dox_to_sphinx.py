@@ -520,7 +520,12 @@ def declaration_string(record):
     if "template_params" in record:
         result = "template <%s> " % record["template_params"]
 
-    if kind == "function":
+    if kind == "define":
+        if "prototype" in record:
+            result += record["prototype"]
+        else:
+            result += local_name(record["name"])
+    elif kind == "function":
         result += record["prototype"]
     elif kind == "typedef":
         result += record["definition"]
