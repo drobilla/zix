@@ -28,6 +28,8 @@ if build_docs
   # Generated API Reference
 
   c_rst_files = files(
+    'allocation.rst',
+    'error_handling.rst',
     'index.rst',
     'string_views.rst',
     'summary.rst',

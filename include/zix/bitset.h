@@ -17,10 +17,21 @@
    @{
 */
 
-/// A bitset (always referred to by pointer, actually an array)
+/**
+   A bitset element.
+
+   A bitset is an array that is always referred to by pointer.  This type is
+   the type of an element of that array (which stores some number of bits), so
+   a pointer to this type is a pointer to a bitset.
+*/
 typedef unsigned long ZixBitset;
 
-/// Tally of the number of bits in one ZixBitset element
+/**
+   Tally of the number of bits in one ZixBitset element.
+
+   Like #ZixBitset, this is the type of one element of a tally, which is a
+   parallel array to the bitset one, also always referred to by pointer.
+*/
 typedef uint8_t ZixBitsetTally;
 
 /// The number of bits per ZixBitset array element
@@ -31,33 +42,66 @@ typedef uint8_t ZixBitsetTally;
   (((n_bits) / ZIX_BITSET_BITS_PER_ELEM) + \
    (((n_bits) % ZIX_BITSET_BITS_PER_ELEM) ? 1 : 0))
 
-/// Clear a Bitset
+/**
+   Clear a bitset.
+
+   @param b The bitset to clear.
+   @param t The tally for `b` to update.
+   @param n_bits The number of bits in `b`.
+*/
 ZIX_API
 void
 zix_bitset_clear(ZixBitset* ZIX_NONNULL      b,
                  ZixBitsetTally* ZIX_NONNULL t,
                  size_t                      n_bits);
 
-/// Set bit `i` in `t` to 1
+/**
+   Set bit `i` in `b`.
+
+   @param b The bitset to set bit `i` in.
+   @param t The tally for `b` to update.
+   @param i The index of the bit to set.
+*/
 ZIX_API
 void
 zix_bitset_set(ZixBitset* ZIX_NONNULL      b,
                ZixBitsetTally* ZIX_NONNULL t,
                size_t                      i);
 
-/// Clear bit `i` in `t` (set to 0)
+/**
+   Clear bit `i` in `b`.
+
+   @param b The bitset to set bit `i` in.
+   @param t The tally for `b` to update.
+   @param i The index of the bit to set.
+*/
 ZIX_API
 void
 zix_bitset_reset(ZixBitset* ZIX_NONNULL      b,
                  ZixBitsetTally* ZIX_NONNULL t,
                  size_t                      i);
 
-/// Return the bit at index `i` in `b`
+/**
+   Return the bit at index `i` in `b`.
+
+   @param b The bitset to access.
+   @param i The index of the bit to return.
+   @return True if the bit is set (1), false otherwise (0).
+*/
 ZIX_PURE_API
 bool
 zix_bitset_get(const ZixBitset* ZIX_NONNULL b, size_t i);
 
-/// Return the number of set bits in `b` up to bit `i` (non-inclusive)
+/**
+   Return the number of set bits in `b` up to bit `i`.
+
+   The returned count is non-inclusive, that is, doesn't include bit `i`.
+
+   @param b The bitset to count.
+   @param t The tally for `b`.
+   @param i The end index to stop counting at.
+   @return The number of set bits in `b` from bit 0 to bit `i - 1`.
+*/
 ZIX_PURE_API
 size_t
 zix_bitset_count_up_to(const ZixBitset* ZIX_NONNULL      b,
@@ -65,8 +109,12 @@ zix_bitset_count_up_to(const ZixBitset* ZIX_NONNULL      b,
                        size_t                            i);
 
 /**
-   Return the number of set bits in `b` up to bit `i` (non-inclusive) if bit
-   `i` is set, or `(size_t)-1` otherwise.
+   Return the number of set bits in `b` up to bit `i` if it is set.
+
+   The returned count is non-inclusive, that is, doesn't include bit `i`.
+
+   @return The number of set bits in `b` from bit 0 to bit `i - 1` if bit `i`
+   is set, otherwise, `(size_t)-1`.
 */
 ZIX_PURE_API
 size_t

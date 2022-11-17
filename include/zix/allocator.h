@@ -87,7 +87,7 @@ typedef void* ZIX_ALLOCATED (*ZixAlignedAllocFunc)( //
 
    This works like the standard C free(), but must be used to free memory
    allocated with the aligned_alloc() method of the allocator.  This allows
-   portability to systems (like Windows) that can not use the same free function
+   portability to systems (like Windows) that can't use the same free function
    in these cases.
 */
 typedef void (*ZixAlignedFreeFunc)( //

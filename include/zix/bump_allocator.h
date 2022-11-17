@@ -37,7 +37,7 @@
      pointer, essentially serving as a cheap pop and pop-push, respectively.
 
    - Calling free() means that realloc() will fail and free() will do nothing
-     until the next allocation.  In other words, free() can not be used twice
+     until the next allocation.  In other words, free() can't be used twice
      in a row.
 
    - There is no relocation: realloc() always returns either the input pointer,

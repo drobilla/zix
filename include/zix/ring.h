@@ -34,8 +34,9 @@ typedef struct ZixRingImpl ZixRing;
 /**
    Create a new ring.
 
-   @param allocator Allocator for the ring.
-   @param size Size in bytes (note this may be rounded up).
+   @param allocator Allocator for the ring object and its array.
+
+   @param size Size of the ring in bytes (note this may be rounded up).
 
    At most `size` - 1 bytes may be stored in the ring at once.
 */

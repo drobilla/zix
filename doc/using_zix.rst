@@ -8,5 +8,7 @@ Using Zix
 
 .. toctree::
 
+   error_handling
    string_views
+   allocation
 
