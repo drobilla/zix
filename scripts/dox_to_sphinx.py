@@ -500,6 +500,8 @@ def read_definition_doc(index, lang, root):
             elif kind == "variable":
                 record["type"] = plain_text(member.find("type"))
                 record["name"] = plain_text(member.find("name"))
+                record["args"] = plain_text(member.find("argsstring"))
+
                 record["definition"] = plain_text(member.find("definition"))
 
 
@@ -523,8 +525,12 @@ def declaration_string(record):
     elif kind == "typedef":
         result += record["definition"]
     elif kind == "variable":
-        if "type" in record and "name" in record:
-            result += "%s %s" % (record["type"], local_name(record["name"]))
+        if "type" in record and "name" in record and "args" in record:
+            result += "%s %s%s" % (
+                record["type"],
+                local_name(record["name"]),
+                record["args"],
+            )
         else:
             result += record["definition"]
     elif "type" in record:
