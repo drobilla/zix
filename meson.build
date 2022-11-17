@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: 0BSD OR ISC
 
 project('zix', ['c'],
-        version: '0.3.0',
+        version: '0.3.1',
         license: 'ISC',
         meson_version: '>= 0.56.0',
         default_options: [
@@ -190,7 +190,6 @@ include_dirs = include_directories(['include'])
 c_headers = files(
   'include/zix/allocator.h',
   'include/zix/attributes.h',
-  'include/zix/bitset.h',
   'include/zix/btree.h',
   'include/zix/bump_allocator.h',
   'include/zix/digest.h',
@@ -208,7 +207,6 @@ c_headers = files(
 
 sources = files(
   'src/allocator.c',
-  'src/bitset.c',
   'src/btree.c',
   'src/bump_allocator.c',
   'src/digest.c',
@@ -340,7 +338,6 @@ install_headers(c_headers, subdir: versioned_name / 'zix')
 
 sequential_tests = [
   'allocator',
-  'bitset',
   'btree',
   'digest',
   'hash',

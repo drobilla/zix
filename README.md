@@ -8,7 +8,6 @@ Components
 
   * `ZixAllocator`: A customizable allocator.
     * `ZixBumpAllocator`: A simple realtime-safe "bump-pointer" allocator.
-  * `ZixBitset`: A packed set of bits of arbitrary length.
   * `ZixBTree`: A page-allocated B-tree.
   * `ZixHash`: An open-addressing hash table.
   * `ZixRing`: A lock-free realtime-safe ring buffer.

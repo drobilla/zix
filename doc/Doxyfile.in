@@ -57,7 +57,6 @@ INPUT                  = @ZIX_SRCDIR@/include/zix/zix.h \
                          \
                          @ZIX_SRCDIR@/include/zix/digest.h \
                          \
-                         @ZIX_SRCDIR@/include/zix/bitset.h \
                          @ZIX_SRCDIR@/include/zix/btree.h \
                          @ZIX_SRCDIR@/include/zix/hash.h \
                          @ZIX_SRCDIR@/include/zix/ring.h \

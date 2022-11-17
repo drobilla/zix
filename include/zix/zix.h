@@ -43,7 +43,6 @@
    @{
 */
 
-#include "zix/bitset.h"
 #include "zix/btree.h"
 #include "zix/hash.h"
 #include "zix/ring.h"

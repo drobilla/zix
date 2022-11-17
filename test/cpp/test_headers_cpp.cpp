@@ -7,7 +7,6 @@
 
 #include "zix/allocator.h"      // IWYU pragma: keep
 #include "zix/attributes.h"     // IWYU pragma: keep
-#include "zix/bitset.h"         // IWYU pragma: keep
 #include "zix/btree.h"          // IWYU pragma: keep
 #include "zix/bump_allocator.h" // IWYU pragma: keep
 #include "zix/digest.h"         // IWYU pragma: keep
