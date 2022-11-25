@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static unsigned seed = 1;
+static uintptr_t seed = 1;
 
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
@@ -263,9 +263,9 @@ main(int argc, char** argv)
   } else {
     n_elems = (unsigned)strtoul(argv[1], NULL, 10);
     if (argc > 2) {
-      seed = (unsigned)strtoul(argv[2], NULL, 10);
+      seed = strtoul(argv[2], NULL, 10);
     } else {
-      seed = (unsigned)time(NULL);
+      seed = (uintptr_t)time(NULL);
     }
   }
 
@@ -274,13 +274,14 @@ main(int argc, char** argv)
     return 1;
   }
 
-  printf("Running %u tests with %u elements (seed %u)", n_tests, n_elems, seed);
+  printf(
+    "Running %u tests with %u elements (seed %zu)", n_tests, n_elems, seed);
 
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");
     fflush(stdout);
     if (stress(NULL, i, n_elems)) {
-      return test_fail("Failure with random seed %u\n", seed);
+      return test_fail("Failure with random seed %zu\n", seed);
     }
   }
 
