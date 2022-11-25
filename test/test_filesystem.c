@@ -251,7 +251,6 @@ write_to_path(const char* const path, const char* const contents)
 static void
 test_copy_file(const char* const data_file_path)
 {
-  ZixStatus   st            = ZIX_STATUS_SUCCESS;
   char* const temp_dir      = create_temp_dir("zixXXXXXX");
   char* const tmp_file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   char* const copy_path     = zix_path_join(NULL, temp_dir, "zix_test_copy");
@@ -261,7 +260,7 @@ test_copy_file(const char* const data_file_path)
 
   assert(!write_to_path(tmp_file_path, "test\n"));
 
-  assert((st = zix_copy_file(NULL, tmp_file_path, "/does/not/exist", 0U)));
+  assert(zix_copy_file(NULL, tmp_file_path, "/does/not/exist", 0U));
   assert(zix_copy_file(NULL, "/does/not/exist", copy_path, 0U));
   assert(zix_file_type(copy_path) == ZIX_FILE_TYPE_NONE);
 
@@ -271,11 +270,11 @@ test_copy_file(const char* const data_file_path)
 
   if (data_file_path) {
     // Fail to copy a file to itself
-    assert((st = zix_copy_file(NULL, data_file_path, data_file_path, 0U)) ==
+    assert(zix_copy_file(NULL, data_file_path, data_file_path, 0U) ==
            ZIX_STATUS_EXISTS);
 
     // Successful copy between filesystems
-    assert(!(st = zix_copy_file(NULL, data_file_path, copy_path, 0U)));
+    assert(!zix_copy_file(NULL, data_file_path, copy_path, 0U));
     assert(zix_file_equals(NULL, data_file_path, copy_path));
 
     // Trying the same again fails because the copy path already exists
@@ -291,37 +290,36 @@ test_copy_file(const char* const data_file_path)
 
   // Successful copy within a filesystem
   assert(zix_file_type(copy_path) == ZIX_FILE_TYPE_NONE);
-  assert(!(st = zix_copy_file(NULL, tmp_file_path, copy_path, 0U)));
+  assert(!zix_copy_file(NULL, tmp_file_path, copy_path, 0U));
   assert(zix_file_equals(NULL, tmp_file_path, copy_path));
   assert(!zix_remove(copy_path));
 
   if (zix_file_type("/dev/random") == ZIX_FILE_TYPE_CHARACTER) {
     // Fail to copy infinite file to a file
-    assert((st = zix_copy_file(NULL, "/dev/random", copy_path, 0U)) ==
+    assert(zix_copy_file(NULL, "/dev/random", copy_path, 0U) ==
            ZIX_STATUS_BAD_ARG);
 
     // Fail to copy infinite file to itself
-    assert((st = zix_copy_file(NULL, "/dev/random", "/dev/random", 0U)) ==
+    assert(zix_copy_file(NULL, "/dev/random", "/dev/random", 0U) ==
            ZIX_STATUS_BAD_ARG);
 
     // Fail to copy infinite file to another
-    assert((st = zix_copy_file(NULL, "/dev/random", "/dev/urandom", 0U)) ==
+    assert(zix_copy_file(NULL, "/dev/random", "/dev/urandom", 0U) ==
            ZIX_STATUS_BAD_ARG);
   }
 
   if (zix_file_type("/dev/full") == ZIX_FILE_TYPE_CHARACTER) {
     if (data_file_path) {
-      assert((st = zix_copy_file(NULL,
-                                 data_file_path,
-                                 "/dev/full",
-                                 ZIX_COPY_OPTION_OVERWRITE_EXISTING)) ==
+      assert(zix_copy_file(NULL,
+                           data_file_path,
+                           "/dev/full",
+                           ZIX_COPY_OPTION_OVERWRITE_EXISTING) ==
              ZIX_STATUS_NO_SPACE);
     }
 
     // Copy short file (error after flushing)
-    assert((
-      st = zix_copy_file(
-        NULL, tmp_file_path, "/dev/full", ZIX_COPY_OPTION_OVERWRITE_EXISTING)));
+    assert(zix_copy_file(
+      NULL, tmp_file_path, "/dev/full", ZIX_COPY_OPTION_OVERWRITE_EXISTING));
 
     // Copy long file (error during writing)
     FILE* const f = fopen(tmp_file_path, "w");
@@ -330,13 +328,12 @@ test_copy_file(const char* const data_file_path)
       fprintf(f, "test\n");
     }
     fclose(f);
-    assert((
-      st = zix_copy_file(
-        NULL, tmp_file_path, "/dev/full", ZIX_COPY_OPTION_OVERWRITE_EXISTING)));
+    assert(zix_copy_file(
+      NULL, tmp_file_path, "/dev/full", ZIX_COPY_OPTION_OVERWRITE_EXISTING));
   }
 
-  assert(!(st = zix_remove(tmp_file_path)));
-  assert(!(st = zix_remove(temp_dir)));
+  assert(!zix_remove(tmp_file_path));
+  assert(!zix_remove(temp_dir));
 
   free(copy_path);
   free(tmp_file_path);
