@@ -40,6 +40,8 @@
 #  define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
+struct stat;
+
 static inline ZixStatus
 zix_posix_status(const int rc)
 {
@@ -47,10 +49,10 @@ zix_posix_status(const int rc)
 }
 
 static uint32_t
-zix_get_block_size(const struct stat s1, const struct stat s2)
+zix_get_block_size(const struct stat* const s1, const struct stat* const s2)
 {
-  const blksize_t b1 = s1.st_blksize;
-  const blksize_t b2 = s2.st_blksize;
+  const blksize_t b1 = s1->st_blksize;
+  const blksize_t b2 = s2->st_blksize;
 
   return (b1 > 0 && b2 > 0) ? (uint32_t)MAX(b1, b2) : 4096U;
 }
@@ -215,7 +217,7 @@ zix_copy_file(ZixAllocator* const  allocator,
 
   // Allocate a block for copying
   const size_t   align      = zix_system_page_size();
-  const uint32_t block_size = zix_get_block_size(src_stat, dst_stat);
+  const uint32_t block_size = zix_get_block_size(&src_stat, &dst_stat);
   void* const    block      = zix_aligned_alloc(allocator, align, block_size);
 
   // Fall back to using a small stack buffer if allocation is unavailable
@@ -371,7 +373,7 @@ zix_file_unlock(FILE* const file, const ZixFileLockMode mode)
 
 ZIX_CONST_FUNC
 static ZixFileType
-stat_file_type(const struct stat sb)
+stat_file_type(const struct stat* sb)
 {
   typedef struct {
     unsigned    mask;
@@ -389,7 +391,7 @@ stat_file_type(const struct stat sb)
     {0U, ZIX_FILE_TYPE_UNKNOWN},
   };
 
-  const unsigned mask = (unsigned)sb.st_mode & (unsigned)S_IFMT;
+  const unsigned mask = (unsigned)sb->st_mode & (unsigned)S_IFMT;
   unsigned       m    = 0U;
   while (map[m].mask && map[m].mask != mask) {
     ++m;
@@ -402,14 +404,14 @@ ZixFileType
 zix_file_type(const char* const path)
 {
   struct stat sb;
-  return stat(path, &sb) ? ZIX_FILE_TYPE_NONE : stat_file_type(sb);
+  return stat(path, &sb) ? ZIX_FILE_TYPE_NONE : stat_file_type(&sb);
 }
 
 ZixFileType
 zix_symlink_type(const char* const path)
 {
   struct stat sb;
-  return lstat(path, &sb) ? ZIX_FILE_TYPE_NONE : stat_file_type(sb);
+  return lstat(path, &sb) ? ZIX_FILE_TYPE_NONE : stat_file_type(&sb);
 }
 
 char*
