@@ -259,7 +259,7 @@ test_copy_file(const char* const data_file_path)
   assert(tmp_file_path);
   assert(copy_path);
 
-  write_to_path(tmp_file_path, "test\n");
+  assert(!write_to_path(tmp_file_path, "test\n"));
 
   assert((st = zix_copy_file(NULL, tmp_file_path, "/does/not/exist", 0U)));
   assert(zix_copy_file(NULL, "/does/not/exist", copy_path, 0U));
