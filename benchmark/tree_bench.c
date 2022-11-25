@@ -22,6 +22,14 @@ ZIX_RESTORE_WARNINGS
 #include <stdlib.h>
 #include <time.h>
 
+#ifndef MIN
+#  define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef MAX
+#  define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
@@ -267,8 +275,8 @@ main(int argc, char** argv)
     return 1;
   }
 
-  const size_t min_n = strtoul(argv[1], NULL, 10);
-  const size_t max_n = strtoul(argv[2], NULL, 10);
+  const size_t min_n = MAX(2U, MIN(1U << 29U, strtoul(argv[1], NULL, 10)));
+  const size_t max_n = MAX(4U, MIN(1U << 30U, strtoul(argv[2], NULL, 10)));
 
   fprintf(stderr, "Benchmarking %zu .. %zu elements\n", min_n, max_n);
 
