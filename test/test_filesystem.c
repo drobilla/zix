@@ -354,13 +354,7 @@ test_flock(void)
   if (!st) {
     assert(zix_file_lock(f2, ZIX_FILE_LOCK_TRY) == ZIX_STATUS_UNAVAILABLE);
     assert(!zix_file_unlock(f1, ZIX_FILE_LOCK_TRY));
-
-    // assert(zix_file_unlock(f1, ZIX_FILE_LOCK_TRY));
-    // assert(zix_file_unlock(f1, ZIX_FILE_LOCK_BLOCK));
   }
-
-  //  assert(zix_file_unlock(stdout, ZIX_FILE_LOCK_TRY));
-  //  assert(zix_file_unlock(stdout, ZIX_FILE_LOCK_BLOCK));
 
   fclose(f2);
   fclose(f1);
