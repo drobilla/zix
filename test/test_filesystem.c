@@ -69,6 +69,7 @@ test_canonical_path(void)
 
   {
     FILE* const f = fopen(file_path, "w");
+    assert(f);
     fprintf(f, "test\n");
     fclose(f);
   }
@@ -141,6 +142,7 @@ test_file_type(void)
 
   // Regular file
   FILE* f = fopen(file_path, "w");
+  assert(f);
   fprintf(f, "test\n");
   fclose(f);
   assert(zix_file_type(file_path) == ZIX_FILE_TYPE_REGULAR);
@@ -167,8 +169,9 @@ test_file_type(void)
     if (fd >= 0) {
       assert(zix_file_type(file_path) == ZIX_FILE_TYPE_SOCKET);
       assert(!zix_remove(file_path));
+      close(fd);
     }
-    close(fd);
+
     close(sock);
     free(addr);
   }
@@ -191,6 +194,7 @@ test_path_exists(void)
   assert(zix_file_type(file_path) == ZIX_FILE_TYPE_NONE);
 
   FILE* f = fopen(file_path, "w");
+  assert(f);
   fprintf(f, "test\n");
   fclose(f);
 
@@ -215,6 +219,7 @@ test_is_directory(void)
   assert(zix_file_type(file_path) == ZIX_FILE_TYPE_NONE);
 
   FILE* f = fopen(file_path, "w");
+  assert(f);
   fprintf(f, "test\n");
   fclose(f);
 
@@ -320,6 +325,7 @@ test_copy_file(const char* const data_file_path)
 
     // Copy long file (error during writing)
     FILE* const f = fopen(tmp_file_path, "w");
+    assert(f);
     for (size_t i = 0; i < 4096; ++i) {
       fprintf(f, "test\n");
     }
@@ -347,6 +353,9 @@ test_flock(void)
 
   FILE* const f1 = fopen(file_path, "w");
   FILE* const f2 = fopen(file_path, "w");
+
+  assert(f1);
+  assert(f2);
 
   ZixStatus st = zix_file_lock(f1, ZIX_FILE_LOCK_TRY);
   assert(!st || st == ZIX_STATUS_NOT_SUPPORTED);
@@ -401,6 +410,8 @@ test_dir_for_each(void)
 
   FILE* const f1 = fopen(path1, "w");
   FILE* const f2 = fopen(path2, "w");
+  assert(f1);
+  assert(f2);
   fprintf(f1, "test\n");
   fprintf(f2, "test\n");
   fclose(f2);
@@ -487,6 +498,7 @@ test_create_directories(void)
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   FILE* const f         = fopen(file_path, "w");
 
+  assert(f);
   fprintf(f, "test\n");
   fclose(f);
 
@@ -577,6 +589,7 @@ test_create_symlink(void)
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   {
     FILE* const f = fopen(file_path, "w");
+    assert(f);
     fprintf(f, "%s", contents);
     fclose(f);
   }
@@ -646,6 +659,7 @@ test_create_hard_link(void)
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   {
     FILE* const f = fopen(file_path, "w");
+    assert(f);
     fprintf(f, "%s", contents);
     fclose(f);
   }
