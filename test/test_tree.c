@@ -4,6 +4,7 @@
 #undef NDEBUG
 
 #include "failing_allocator.h"
+#include "test_args.h"
 #include "test_data.h"
 
 #include "zix/allocator.h"
@@ -250,7 +251,7 @@ int
 main(int argc, char** argv)
 {
   const unsigned n_tests = 3;
-  unsigned       n_elems = 0;
+  size_t         n_elems = 0;
 
   assert(!zix_tree_iter_next(NULL));
   assert(!zix_tree_iter_prev(NULL));
@@ -259,9 +260,9 @@ main(int argc, char** argv)
   test_failed_alloc();
 
   if (argc == 1) {
-    n_elems = 100000;
+    n_elems = 100000U;
   } else {
-    n_elems = (unsigned)strtoul(argv[1], NULL, 10);
+    n_elems = zix_test_size_arg(argv[1], 4U, 1U << 20U);
     if (argc > 2) {
       seed = strtoul(argv[2], NULL, 10);
     } else {
@@ -269,13 +270,13 @@ main(int argc, char** argv)
     }
   }
 
-  if (n_elems == 0) {
+  if (!n_elems) {
     fprintf(stderr, "USAGE: %s [N_ELEMS]\n", argv[0]);
     return 1;
   }
 
   printf(
-    "Running %u tests with %u elements (seed %zu)", n_tests, n_elems, seed);
+    "Running %u tests with %zu elements (seed %zu)", n_tests, n_elems, seed);
 
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");

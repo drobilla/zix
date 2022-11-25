@@ -4,6 +4,7 @@
 #undef NDEBUG
 
 #include "failing_allocator.h"
+#include "test_args.h"
 
 #include "zix/attributes.h"
 #include "zix/ring.h"
@@ -185,9 +186,10 @@ main(int argc, char** argv)
   }
 
   const unsigned size =
-    (argc > 1) ? (unsigned)strtoul(argv[1], NULL, 10) : 1024;
+    (argc > 1) ? (unsigned)zix_test_size_arg(argv[1], 4U, 1U << 20U) : 1024U;
 
-  n_writes = (argc > 2) ? (unsigned)strtoul(argv[2], NULL, 10) : size * 1024;
+  n_writes = (argc > 2) ? (unsigned)zix_test_size_arg(argv[2], 4U, 1U << 20U)
+                        : size * 1024;
 
   test_failed_alloc();
   test_ring(size);

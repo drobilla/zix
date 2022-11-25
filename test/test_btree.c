@@ -6,6 +6,7 @@
 #include "zix/btree.h"
 
 #include "failing_allocator.h"
+#include "test_args.h"
 #include "test_data.h"
 
 #include "zix/allocator.h"
@@ -628,7 +629,8 @@ main(int argc, char** argv)
   test_failed_alloc();
 
   const unsigned n_tests = 3U;
-  const size_t   n_elems = (argc > 1) ? strtoul(argv[1], NULL, 10) : 131072U;
+  const size_t   n_elems =
+    (argc > 1) ? zix_test_size_arg(argv[1], 4U, 1U << 20U) : 131072U;
 
   printf("Running %u tests with %" PRIuPTR " elements", n_tests, n_elems);
   for (unsigned i = 0; i < n_tests; ++i) {
