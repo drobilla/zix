@@ -473,10 +473,11 @@ main()
   }
 
   for (const auto& join : joins) {
-    const Path l = join.lhs ? Path{join.lhs} : Path{};
-    const Path r = join.rhs ? Path{join.rhs} : Path{};
+    char* const joined = zix_path_join(nullptr, join.lhs, join.rhs);
+    const Path  l      = join.lhs ? Path{join.lhs} : Path{};
+    const Path  r      = join.rhs ? Path{join.rhs} : Path{};
 
-    assert(equal(l / r, zix_path_join(nullptr, join.lhs, join.rhs)));
+    assert(equal(l / r, joined));
   }
 
   for (const auto& relatives : lexical_relatives) {
