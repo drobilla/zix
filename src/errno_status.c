@@ -41,7 +41,7 @@ zix_errno_status(const int e)
     {0, ZIX_STATUS_ERROR}, // Fallback mapping
   };
 
-  static const size_t n_mappings = sizeof(map) / sizeof(Mapping);
+  static const size_t n_mappings = sizeof(map) / sizeof(Mapping) - 1U;
 
   // Find the index of the matching mapping (or leave it at the fallback entry)
   size_t m = 0;
