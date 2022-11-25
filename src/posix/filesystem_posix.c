@@ -209,8 +209,8 @@ zix_copy_file(ZixAllocator* const  allocator,
 
   // Set sequential hints so the kernel can optimize the page cache
 #if USE_POSIX_FADVISE
-  posix_fadvise(src_fd, 0, src_stat.st_size, POSIX_FADV_SEQUENTIAL);
-  posix_fadvise(dst_fd, 0, src_stat.st_size, POSIX_FADV_SEQUENTIAL);
+  (void)posix_fadvise(src_fd, 0, src_stat.st_size, POSIX_FADV_SEQUENTIAL);
+  (void)posix_fadvise(dst_fd, 0, src_stat.st_size, POSIX_FADV_SEQUENTIAL);
 #endif
 
   errno = 0;
