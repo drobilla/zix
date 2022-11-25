@@ -167,7 +167,11 @@ run(FILE* const fd)
       char* volatile match =
         (char*)g_hash_table_lookup(hash, inputs.chunks[index].buf);
 
-      assert(!strcmp(match, inputs.chunks[index].buf));
+#ifndef NDEBUG
+      const char* const m = match;
+      assert(!strcmp(m, inputs.chunks[index].buf));
+#endif
+
       (void)match;
     }
     fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -179,8 +183,12 @@ run(FILE* const fd)
       const ZixChunk* volatile match =
         (const ZixChunk*)zix_hash_find_record(zhash, &inputs.chunks[index]);
 
-      assert(match);
-      assert(!strcmp(match->buf, inputs.chunks[index].buf));
+#ifndef NDEBUG
+      const ZixChunk* const m = match;
+      assert(m);
+      assert(!strcmp(m->buf, inputs.chunks[index].buf));
+#endif
+
       (void)match;
     }
     fprintf(search_dat, "\t%lf\n", bench_end(&search_start));
