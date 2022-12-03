@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: 0BSD OR ISC
 
 *.pyc
+.meson-subproject-wrap-hash.txt
 __pycache__
 build/**
-.meson-subproject-wrap-hash.txt
+subprojects/sphinxygen/

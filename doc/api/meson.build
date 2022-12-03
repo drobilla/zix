@@ -3,7 +3,7 @@
 
 c_zix_rst = custom_target(
   'zix.rst',
-  command: [dox_to_sphinx, '-f', '@INPUT0@', '@OUTDIR@'],
+  command: [sphinxygen, '-f', '@INPUT0@', '@OUTDIR@'],
   input: [c_index_xml] + c_rst_files,
   output: 'zix.rst',
 )

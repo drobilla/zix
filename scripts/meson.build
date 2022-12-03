@@ -6,9 +6,7 @@ if get_option('strict') and not meson.is_subproject()
   pylint = find_program('pylint', required: get_option('tests'))
   black = find_program('black', required: get_option('tests'))
 
-  strict_scripts = files('benchmark.py', 'plot.py')
-  linty_scripts = files('dox_to_sphinx.py')
-  all_scripts = strict_scripts + linty_scripts
+  all_scripts = files('benchmark.py', 'plot.py')
 
   if is_variable('black') and black.found()
     black_opts = ['-l', '79', '-q', '--check']
@@ -20,6 +18,6 @@ if get_option('strict') and not meson.is_subproject()
   endif
 
   if is_variable('pylint') and pylint.found()
-    test('pylint', pylint, args: strict_scripts, suite: 'scripts')
+    test('pylint', pylint, args: all_scripts, suite: 'scripts')
   endif
 endif
