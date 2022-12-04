@@ -15,6 +15,18 @@ endif
 build_docs = doxygen.found() and sphinxygen.found() and sphinx_build.found()
 if build_docs
 
+  # Check for Sphinx LV2 theme
+
+  pymod = import('python')
+  sphinx_lv2_theme_python = pymod.find_installation(
+    modules: ['sphinx_lv2_theme'],
+    required: false
+  )
+
+  if not sphinx_lv2_theme_python.found()
+    warning('Missing sphinx_lv2_theme module, falling back to alabaster')
+  endif
+
   # Documentation Code
 
   if not get_option('tests').disabled()
