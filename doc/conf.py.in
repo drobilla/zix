@@ -6,7 +6,8 @@
 project = "Zix"
 copyright = "2011-2022, David Robillard"
 author = "David Robillard"
-release = "dev"
+release = "@ZIX_VERSION@"
+version = "@ZIX_VERSION@"
 desc = "A lightweight C library of portability wrappers and data structures"
 
 # General configuration
@@ -53,7 +54,7 @@ nitpick_ignore = list(_c_nitpick_ignore) + list(_cpp_nitpick_ignore)
 # HTML output
 
 html_copy_source = False
-html_short_title = "Zix"
+html_short_title = "@ZIX_TITLE@"
 html_theme = "sphinx_lv2_theme"
 
 if tags.has("singlehtml"):

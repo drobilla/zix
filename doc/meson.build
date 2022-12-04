@@ -42,13 +42,23 @@ if build_docs
   )
 
   c_doc_files = c_rst_files + files(
-    'conf.py',
     'overview_code.c',
   )
 
   foreach f : c_doc_files
     configure_file(copy: true, input: f, output: '@PLAINNAME@')
   endforeach
+
+  config = configuration_data()
+  config.set('ZIX_VERSION', meson.project_version())
+  config.set('ZIX_SRCDIR', zix_src_root)
+  config.set('ZIX_TITLE', get_option('title'))
+
+  conf_py = configure_file(
+    configuration: config,
+    input: files('conf.py.in'),
+    output: 'conf.py',
+  )
 
   subdir('xml')
   subdir('api')
@@ -61,7 +71,7 @@ if build_docs
     '-q',
   ]
 
-  doc_inputs = c_rst_files + [c_zix_rst, c_index_xml]
+  doc_inputs = c_rst_files + [conf_py, c_zix_rst, c_index_xml]
 
   custom_target(
     'singlehtml',
