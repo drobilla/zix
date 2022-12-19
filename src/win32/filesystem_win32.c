@@ -279,6 +279,8 @@ zix_create_symlink(const char* const target_path, const char* const link_path)
 
   return zix_windows_status(CreateSymbolicLink(link_path, target_path, flags));
 #else
+  (void)target_path;
+  (void)link_path;
   return ZIX_STATUS_NOT_SUPPORTED;
 #endif
 }
@@ -293,6 +295,8 @@ zix_create_directory_symlink(const char* const target_path,
 
   return zix_windows_status(CreateSymbolicLink(link_path, target_path, flags));
 #else
+  (void)target_path;
+  (void)link_path;
   return ZIX_STATUS_NOT_SUPPORTED;
 #endif
 }
