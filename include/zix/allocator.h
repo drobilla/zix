@@ -96,12 +96,12 @@ typedef void (*ZixAlignedFreeFunc)( //
 
 /// Definition of ZixAllocator
 struct ZixAllocatorImpl {
-  ZixMallocFunc ZIX_NONNULL       malloc;        ///< Allocate
-  ZixCallocFunc ZIX_NONNULL       calloc;        ///< Allocate and zero
-  ZixReallocFunc ZIX_NONNULL      realloc;       ///< Reallocate
-  ZixFreeFunc ZIX_NONNULL         free;          ///< Free
-  ZixAlignedAllocFunc ZIX_NONNULL aligned_alloc; ///< Allocate aligned
-  ZixAlignedFreeFunc ZIX_NONNULL  aligned_free;  ///< Free aligned
+  ZixMallocFunc ZIX_UNSPECIFIED       malloc;        ///< Allocate
+  ZixCallocFunc ZIX_UNSPECIFIED       calloc;        ///< Allocate and zero
+  ZixReallocFunc ZIX_UNSPECIFIED      realloc;       ///< Reallocate
+  ZixFreeFunc ZIX_UNSPECIFIED         free;          ///< Free
+  ZixAlignedAllocFunc ZIX_UNSPECIFIED aligned_alloc; ///< Allocate aligned
+  ZixAlignedFreeFunc ZIX_UNSPECIFIED  aligned_free;  ///< Free aligned
 };
 
 /// Return the default allocator which simply uses the system allocator
