@@ -40,6 +40,16 @@ thread_dep = dependency('threads', required: get_option('threads'))
 
 platform_c_args = []
 
+# Use versioned name everywhere to support parallel major version installations
+if host_machine.system() == 'windows'
+  if get_option('default_library') == 'both'
+    error('default_library=both is not supported on Windows')
+  endif
+  soversion = ''
+else
+  soversion = meson.project_version().split('.')[0]
+endif
+
 # Determine whether to use POSIX
 no_posix = get_option('posix').disabled() or host_machine.system() == 'windows'
 if no_posix
@@ -259,7 +269,6 @@ if thread_dep.found()
 endif
 
 # Set appropriate arguments for building against the library type
-subdir('meson/library')
 extra_c_args = []
 if get_option('default_library') == 'static'
   extra_c_args = ['-DZIX_STATIC']
@@ -296,7 +305,7 @@ endif
 
 # Build shared and/or static library
 libzix = library(
-  meson.project_name() + library_suffix,
+  versioned_name,
   sources,
   c_args: c_suppressions + library_c_args,
   dependencies: [thread_dep],
@@ -304,6 +313,7 @@ libzix = library(
   include_directories: include_dirs,
   install: true,
   link_args: library_link_args,
+  soversion: soversion,
   version: meson.project_version(),
 )
 
@@ -444,7 +454,7 @@ if not get_option('tests').disabled()
           '-Wno-poison-system-directories',
         ]
       endif
-      
+
     elif cc.get_id() == 'gcc'
       header_suppressions += [
         '-Wno-padded',
