@@ -49,16 +49,14 @@ reader(void* ZIX_UNUSED(arg))
 {
   printf("Reader starting\n");
 
-  int      ref_msg[MSG_SIZE];  // Reference generated for comparison
-  int      read_msg[MSG_SIZE]; // Read from ring
-  unsigned count = 0;
-  int      start = gen_msg(ref_msg, 0);
+  int ref_msg[MSG_SIZE];  // Reference generated for comparison
+  int read_msg[MSG_SIZE]; // Read from ring
+  int start = gen_msg(ref_msg, 0);
   for (unsigned i = 0; i < n_writes; ++i) {
     if (zix_ring_read_space(ring) >= MSG_SIZE * sizeof(int)) {
       if (zix_ring_read(ring, read_msg, MSG_SIZE * sizeof(int))) {
         assert(cmp_msg(ref_msg, read_msg));
         start = gen_msg(ref_msg, start);
-        ++count;
       }
     }
   }
