@@ -70,7 +70,7 @@
 // Unused parameter macro to suppresses warnings and make it impossible to use
 #if defined(__cplusplus)
 #  define ZIX_UNUSED(name)
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__clang__)
 #  define ZIX_UNUSED(name) name##_unused __attribute__((__unused__))
 #elif defined(_MSC_VER)
 #  define ZIX_UNUSED(name) __pragma(warning(suppress : 4100)) name

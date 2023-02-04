@@ -1,8 +1,6 @@
 // Copyright 2007-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#define _WIN32_WINNT 0x0600 // Vista
-
 #include "zix/bump_allocator.h"
 #include "zix/filesystem.h"
 

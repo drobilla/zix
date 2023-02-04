@@ -129,7 +129,7 @@ struct ZixSemImpl {
 #elif defined(_WIN32)
 
 struct ZixSemImpl {
-  HANDLE sem;
+  HANDLE ZIX_NONNULL sem;
 };
 
 #else /* !defined(__APPLE__) && !defined(_WIN32) */

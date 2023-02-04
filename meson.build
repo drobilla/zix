@@ -32,6 +32,15 @@ if get_option('strict') and not meson.is_subproject()
 endif
 subdir('meson/suppressions')
 
+if host_machine.system() == 'windows'
+  # Restrict Windows API usage to Vista and earlier
+  if cc.get_id() == 'msvc'
+    add_project_arguments('/D_WIN32_WINNT=0x0600', language: ['c', 'cpp'])
+  else
+    add_project_arguments('-D_WIN32_WINNT=0x0600', language: ['c', 'cpp'])
+  endif
+endif
+
 ##########################
 # Platform Configuration #
 ##########################
@@ -384,6 +393,16 @@ if not get_option('tests').disabled()
     endif
   endif
 
+  # Set warning suppression flags specific to tests
+  test_suppressions = []
+  if cc.get_id() in ['clang', 'emscripten']
+    if host_machine.system() == 'windows'
+      test_suppressions += [
+        '-Wno-format-nonliteral',
+      ]
+    endif
+  endif
+
   common_test_sources = files('test/failing_allocator.c')
 
   foreach test : sequential_tests
@@ -394,7 +413,7 @@ if not get_option('tests').disabled()
       executable(
         'test_@0@'.format(test),
         sources,
-        c_args: c_suppressions + program_c_args,
+        c_args: c_suppressions + program_c_args + test_suppressions,
         dependencies: [zix_dep],
         include_directories: include_dirs,
         link_args: program_link_args,
@@ -455,6 +474,12 @@ if not get_option('tests').disabled()
         ]
       endif
 
+      if host_machine.system() == 'windows'
+        header_suppressions += [
+          '-Wno-nonportable-system-include-path',
+        ]
+      endif
+
     elif cc.get_id() == 'gcc'
       header_suppressions += [
         '-Wno-padded',
@@ -501,6 +526,12 @@ if not get_option('tests').disabled()
       if not meson.is_cross_build()
         cpp_test_args += [
           '-Wno-poison-system-directories',
+        ]
+      endif
+
+      if host_machine.system() == 'windows'
+        cpp_test_args += [
+          '-Wno-nonportable-system-include-path',
         ]
       endif
 
