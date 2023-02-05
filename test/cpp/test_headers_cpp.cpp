@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: ISC
 
 #ifdef _WIN32
-#  define WIN32_LEAN_AND_MEAN 1
+#  define WIN32_LEAN_AND_MEAN
 #endif
 
 #include "zix/allocator.h"      // IWYU pragma: keep

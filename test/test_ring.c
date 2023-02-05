@@ -102,11 +102,13 @@ test_ring(const unsigned size)
   const ZixStatus st = zix_ring_mlock(ring);
   assert(!st || st == ZIX_STATUS_NOT_SUPPORTED);
 
-  ZixThread reader_thread; // NOLINT
-  assert(!zix_thread_create(&reader_thread, MSG_SIZE * 4UL, reader, NULL));
+  static const size_t stack_size = (size_t)MSG_SIZE * 4U;
 
-  ZixThread writer_thread; // NOLINT
-  assert(!zix_thread_create(&writer_thread, MSG_SIZE * 4UL, writer, NULL));
+  ZixThread reader_thread; // NOLINT(cppcoreguidelines-init-variables)
+  assert(!zix_thread_create(&reader_thread, stack_size, reader, NULL));
+
+  ZixThread writer_thread; // NOLINT(cppcoreguidelines-init-variables)
+  assert(!zix_thread_create(&writer_thread, stack_size, writer, NULL));
 
   assert(!zix_thread_join(reader_thread));
   assert(!zix_thread_join(writer_thread));

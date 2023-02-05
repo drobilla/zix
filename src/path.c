@@ -182,6 +182,10 @@ ZIX_PURE_FUNC
 static ZixIndexRange
 zix_path_filename_range(const ZixStringView path)
 {
+  if (!path.length) {
+    return zix_make_range(0, 0);
+  }
+
   // Find the first filename character (skip leading root path if any)
   const size_t begin = zix_path_root_path_range(path.data).end;
   if (begin == path.length || is_dir_sep(path.data[path.length - 1U])) {

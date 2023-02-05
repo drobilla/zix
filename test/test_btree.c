@@ -97,7 +97,7 @@ test_fail(ZixBTree* t, const char* fmt, ...)
     return EXIT_SUCCESS;
   }
 
-  va_list args;
+  va_list args; // NOLINT(cppcoreguidelines-init-variables)
   va_start(args, fmt);
   fprintf(stderr, "error: ");
   vfprintf(stderr, fmt, args);

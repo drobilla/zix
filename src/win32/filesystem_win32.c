@@ -90,7 +90,7 @@ zix_create_temporary_directory(ZixAllocator* const allocator,
 
   // Ensure that the pattern ends with "XXXXXX"
   const size_t length = strlen(path_pattern);
-  if (length < 7 || strcmp(path_pattern + length - 6, "XXXXXX")) {
+  if (length < 7 || !!strcmp(path_pattern + length - 6, "XXXXXX")) {
     errno = EINVAL;
     return NULL;
   }
@@ -206,7 +206,7 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
   }
 
   char* const final = (char*)zix_calloc(allocator, final_size + 1U, 1U);
-  if (final && !GetFinalPathNameByHandle(h, final, final_size + 1U, flags)) {
+  if (!final || !GetFinalPathNameByHandle(h, final, final_size + 1U, flags)) {
     zix_free(allocator, final);
     CloseHandle(h);
     return NULL;

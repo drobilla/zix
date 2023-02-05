@@ -35,7 +35,7 @@ test_fail(ZixHash* const hash,
           ...)
 {
   if (!expect_failure) {
-    va_list args;
+    va_list args; // NOLINT(cppcoreguidelines-init-variables)
     va_start(args, fmt);
     fprintf(stderr, "error: ");
     vfprintf(stderr, fmt, args);

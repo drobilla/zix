@@ -433,8 +433,8 @@ equal(const std::filesystem::path& path, const ZixStringView view)
           path.u8string() == std::string{view.data, view.length});
 }
 
-int
-main()
+static void
+run()
 {
   using Path = std::filesystem::path;
 
@@ -492,4 +492,16 @@ main()
       r.lexically_relative(l),
       zix_path_lexically_relative(nullptr, relatives.rhs, relatives.lhs)));
   }
+}
+
+int
+main()
+{
+  try {
+    run();
+  } catch (...) {
+    return 1;
+  }
+
+  return 0;
 }
