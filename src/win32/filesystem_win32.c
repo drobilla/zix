@@ -85,8 +85,8 @@ char*
 zix_create_temporary_directory(ZixAllocator* const allocator,
                                const char* const   path_pattern)
 {
-  static const char chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  static const int  n_chars = sizeof(chars) - 1;
+  static const char   chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  static const size_t n_chars = sizeof(chars) - 1;
 
   // Ensure that the pattern ends with "XXXXXX"
   const size_t length = strlen(path_pattern);
