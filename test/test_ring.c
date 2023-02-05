@@ -8,6 +8,7 @@
 
 #include "zix/attributes.h"
 #include "zix/ring.h"
+#include "zix/status.h"
 #include "zix/thread.h"
 
 #include <assert.h>
