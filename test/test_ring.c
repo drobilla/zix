@@ -99,7 +99,8 @@ test_ring(const unsigned size)
   assert(zix_ring_read_space(ring) == 0);
   assert(zix_ring_write_space(ring) == zix_ring_capacity(ring));
 
-  zix_ring_mlock(ring);
+  const ZixStatus st = zix_ring_mlock(ring);
+  assert(!st || st == ZIX_STATUS_NOT_SUPPORTED);
 
   ZixThread reader_thread; // NOLINT
   assert(!zix_thread_create(&reader_thread, MSG_SIZE * 4UL, reader, NULL));
