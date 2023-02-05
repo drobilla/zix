@@ -349,7 +349,7 @@ test_flock(void)
   assert(file_path);
 
   FILE* const f1 = fopen(file_path, "w");
-  FILE* const f2 = fopen(file_path, "w");
+  FILE* const f2 = fopen(file_path, "a+");
 
   assert(f1);
   assert(f2);
