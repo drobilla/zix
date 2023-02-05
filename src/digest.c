@@ -30,13 +30,13 @@ mix64(uint64_t h)
 }
 
 uint64_t
-zix_digest64(const uint64_t seed, const void* const key, const size_t len)
+zix_digest64(const uint64_t seed, const void* const buf, const size_t len)
 {
   static const uint64_t m = 0x880355F21E6D1965ULL;
 
   // Process as many 64-bit blocks as possible
   const size_t         n_blocks   = len / sizeof(uint64_t);
-  const uint8_t*       data       = (const uint8_t*)key;
+  const uint8_t*       data       = (const uint8_t*)buf;
   const uint8_t* const blocks_end = data + (n_blocks * sizeof(uint64_t));
   uint64_t             h          = seed ^ (len * m);
   for (; data != blocks_end; data += sizeof(uint64_t)) {
@@ -80,14 +80,14 @@ zix_digest64(const uint64_t seed, const void* const key, const size_t len)
 }
 
 uint64_t
-zix_digest64_aligned(const uint64_t seed, const void* const key, size_t len)
+zix_digest64_aligned(const uint64_t seed, const void* const buf, size_t len)
 {
   static const uint64_t m = 0x880355F21E6D1965ULL;
 
-  assert((uintptr_t)key % sizeof(uint64_t) == 0U);
+  assert((uintptr_t)buf % sizeof(uint64_t) == 0U);
   assert(len % sizeof(uint64_t) == 0U);
 
-  const uint64_t* const blocks   = (const uint64_t*)key;
+  const uint64_t* const blocks   = (const uint64_t*)buf;
   const size_t          n_blocks = len / sizeof(uint64_t);
   uint64_t              h        = seed ^ (len * m);
 
@@ -128,14 +128,14 @@ mix32(uint32_t h)
 }
 
 uint32_t
-zix_digest32(const uint32_t seed, const void* const key, const size_t len)
+zix_digest32(const uint32_t seed, const void* const buf, const size_t len)
 {
   static const uint32_t c1 = 0xCC9E2D51U;
   static const uint32_t c2 = 0x1B873593U;
 
   // Process as many 32-bit blocks as possible
   const size_t         n_blocks   = len / sizeof(uint32_t);
-  const uint8_t*       data       = (const uint8_t*)key;
+  const uint8_t*       data       = (const uint8_t*)buf;
   const uint8_t* const blocks_end = data + (n_blocks * sizeof(uint32_t));
   uint32_t             h          = seed;
   for (; data != blocks_end; data += sizeof(uint32_t)) {
@@ -174,16 +174,16 @@ zix_digest32(const uint32_t seed, const void* const key, const size_t len)
 
 uint32_t
 zix_digest32_aligned(const uint32_t    seed,
-                     const void* const key,
+                     const void* const buf,
                      const size_t      len)
 {
   static const uint32_t c1 = 0xCC9E2D51U;
   static const uint32_t c2 = 0x1B873593U;
 
-  assert((uintptr_t)key % sizeof(uint32_t) == 0U);
+  assert((uintptr_t)buf % sizeof(uint32_t) == 0U);
   assert(len % sizeof(uint32_t) == 0U);
 
-  const uint32_t* const blocks   = (const uint32_t*)key;
+  const uint32_t* const blocks   = (const uint32_t*)buf;
   const size_t          n_blocks = len / sizeof(uint32_t);
   uint32_t              h        = seed;
   for (size_t i = 0U; i < n_blocks; ++i) {
