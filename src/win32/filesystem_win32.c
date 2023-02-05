@@ -71,6 +71,16 @@ zix_copy_file(ZixAllocator* const  allocator,
     CopyFile(src, dst, !(options & ZIX_COPY_OPTION_OVERWRITE_EXISTING)));
 }
 
+/// Linear Congruential Generator for making random 32-bit integers
+static inline uint32_t
+lcg32(const uint32_t i)
+{
+  static const uint32_t a = 134775813U;
+  static const uint32_t c = 1U;
+
+  return (a * i) + c;
+}
+
 char*
 zix_create_temporary_directory(ZixAllocator* const allocator,
                                const char* const   path_pattern)
@@ -94,9 +104,11 @@ zix_create_temporary_directory(ZixAllocator* const allocator,
   // Repeatedly try creating a directory with random suffixes
   memcpy(result, path_pattern, length + 1U);
   char* const suffix = result + length - 6U;
+  uint32_t    seed   = GetCurrentProcessId();
   for (unsigned attempt = 0U; attempt < 128U; ++attempt) {
     for (unsigned i = 0U; i < 6U; ++i) {
-      suffix[i] = chars[rand() % n_chars];
+      seed      = lcg32(seed);
+      suffix[i] = chars[seed % n_chars];
     }
 
     if (!_mkdir(result)) {
