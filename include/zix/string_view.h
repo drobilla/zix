@@ -71,24 +71,10 @@ zix_substring(const char* const ZIX_NONNULL str, const size_t len)
 ZIX_ALWAYS_INLINE_FUNC
 ZIX_PURE_FUNC
 static inline ZixStringView
-zix_string(const char* const ZIX_NONNULL str)
+// NOLINTNEXTLINE(clang-diagnostic-unused-function)
+zix_string(const char* const ZIX_NULLABLE str)
 {
-  const ZixStringView view = {str, strlen(str)};
-  return view;
-}
-
-/**
-   Return a view of an entire string by measuring it.
-
-   This makes a view of the given string by measuring it with `strlen`.
-
-   @param str Pointer to the start of a null-terminated C string, or null.
-*/
-ZIX_PURE_FUNC
-static inline ZixStringView
-zix_optional_string(const char* const ZIX_NULLABLE str)
-{
-  return str ? zix_string(str) : zix_empty_string();
+  return str ? zix_substring(str, strlen(str)) : zix_empty_string();
 }
 
 /**

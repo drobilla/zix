@@ -237,12 +237,12 @@ zix_path_join(ZixAllocator* const allocator,
               const char* const   a,
               const char* const   b)
 {
-  const ZixStringView b_view = zix_optional_string(b);
+  const ZixStringView b_view = zix_string(b);
   if (!a || !a[0]) {
     return zix_string_view_copy(allocator, b_view);
   }
 
-  const ZixStringView a_view = zix_optional_string(a);
+  const ZixStringView a_view = zix_string(a);
   const ZixRootSlices a_root = zix_path_root_slices(a);
   const ZixRootSlices b_root = zix_path_root_slices(b);
 
@@ -644,8 +644,7 @@ zix_path_stem(const char* const path)
 ZixStringView
 zix_path_extension(const char* const path)
 {
-  return range_string_view(path,
-                           zix_path_extension_range(zix_optional_string(path)));
+  return range_string_view(path, zix_path_extension_range(zix_string(path)));
 }
 
 // Queries
@@ -677,28 +676,25 @@ zix_path_has_relative_path(const char* const path)
 bool
 zix_path_has_parent_path(const char* const path)
 {
-  return !zix_is_empty_range(
-    zix_path_parent_path_range(zix_optional_string(path)));
+  return !zix_is_empty_range(zix_path_parent_path_range(zix_string(path)));
 }
 
 bool
 zix_path_has_filename(const char* const path)
 {
-  return !zix_is_empty_range(
-    zix_path_filename_range(zix_optional_string(path)));
+  return !zix_is_empty_range(zix_path_filename_range(zix_string(path)));
 }
 
 bool
 zix_path_has_stem(const char* const path)
 {
-  return !zix_is_empty_range(zix_path_stem_range(zix_optional_string(path)));
+  return !zix_is_empty_range(zix_path_stem_range(zix_string(path)));
 }
 
 bool
 zix_path_has_extension(const char* const path)
 {
-  return !zix_is_empty_range(
-    zix_path_extension_range(zix_optional_string(path)));
+  return !zix_is_empty_range(zix_path_extension_range(zix_string(path)));
 }
 
 bool
