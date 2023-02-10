@@ -9,10 +9,10 @@
 #include "zix/allocator.h"
 #include "zix/status.h"
 
-#if USE_MLOCK
-#  include <sys/mman.h>
-#elif defined(_WIN32)
+#if defined(_WIN32)
 #  include <windows.h>
+#elif USE_MLOCK
+#  include <sys/mman.h>
 #endif
 
 /*
@@ -108,15 +108,15 @@ zix_ring_free(ZixRing* const ring)
 ZixStatus
 zix_ring_mlock(ZixRing* const ring)
 {
-#if USE_MLOCK
-  return zix_errno_status_if(mlock(ring, sizeof(ZixRing)) +
-                             mlock(ring->buf, ring->size));
-
-#elif defined(_WIN32)
+#if defined(_WIN32)
   return (VirtualLock(ring, sizeof(ZixRing)) &&
           VirtualLock(ring->buf, ring->size))
            ? ZIX_STATUS_SUCCESS
            : ZIX_STATUS_ERROR;
+
+#elif USE_MLOCK
+  return zix_errno_status_if(mlock(ring, sizeof(ZixRing)) +
+                             mlock(ring->buf, ring->size));
 
 #else
   return ZIX_STATUS_NOT_SUPPORTED;

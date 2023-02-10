@@ -45,9 +45,10 @@ endif
 # Platform Configuration #
 ##########################
 
+# Determine system dependencies of the library
+dependencies = []
 thread_dep = dependency('threads', required: get_option('threads'))
-
-platform_c_args = []
+dependencies = [thread_dep]
 
 # Use versioned name everywhere to support parallel major version installations
 if host_machine.system() == 'windows'
@@ -59,145 +60,119 @@ else
   soversion = meson.project_version().split('.')[0]
 endif
 
-# Determine whether to use POSIX
-no_posix = get_option('posix').disabled() or host_machine.system() == 'windows'
-if no_posix
-  platform_c_args += ['-DZIX_NO_POSIX']
-elif host_machine.system() == 'darwin'
-  platform_c_args += [
+# Request POSIX and system APIs from standard headers if necessary
+system_c_args = []
+if host_machine.system() == 'darwin'
+  system_c_args += [
     '-D_DARWIN_C_SOURCE',
   ]
 elif host_machine.system() in ['gnu', 'linux']
-  platform_c_args += [
+  system_c_args += [
     '-D_GNU_SOURCE',
     '-D_POSIX_C_SOURCE=200809L',
     '-D_XOPEN_SOURCE=600',
   ]
 elif host_machine.system() in ['dragonfly', 'freebsd', 'netbsd', 'openbsd']
-  platform_c_args += [
+  system_c_args += [
     '-D_BSD_SOURCE',
   ]
 else
-  platform_c_args += [
+  system_c_args += [
     '-D_POSIX_C_SOURCE=200809L',
     '-D_XOPEN_SOURCE=600',
   ]
 endif
 
-# Check for platform features with the build system
-if get_option('checks')
-  clock_gettime_code = '''#include <time.h>
-int main(void) { struct timespec t; return clock_gettime(CLOCK_MONOTONIC, &t); }
-'''
+# Build platform-specific configuration arguments
+platform_c_args = []
+if get_option('checks').disabled()
+  # Generic build without platform-specific features
+  platform_c_args += ['-DZIX_NO_DEFAULT_CONFIG']
+elif get_option('checks').auto()
+  # Statically detect configuration from the build environment
+  platform_c_args += system_c_args
+else
+  # Only use the features detected by the build system
+  platform_c_args += ['-DZIX_NO_DEFAULT_CONFIG'] + system_c_args
 
-  clonefile_code = '''#include <sys/attr.h>
-#include <sys/clonefile.h>
-int main(void) { return clonefile("/src", "/dst", 0); }'''
+  # Define HAVE_SOMETHING symbols for all detected features
+  template = '#include <@0@>\nint main(void) { @1@ }'
 
-  copy_file_range_code = '''#include <unistd.h>
-int main(void) { return copy_file_range(0, NULL, 1, NULL, 0U, 0U); }'''
+  mac_checks = {
+    'clonefile':
+      template.format(
+        'sys/clonefile.h',
+        'return clonefile("/src", "/dst", 0);'),
+  }
 
-  CreateSymbolicLink_code = '''#include <windows.h>
-int main(void) {
-  return CreateSymbolicLink(
-    "l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);
-}'''
+  posix_checks = {
+    'clock_gettime':
+      template.format(
+        'time.h',
+        'struct timespec t; return clock_gettime(CLOCK_MONOTONIC, &t);'),
 
-  fileno_code = '''#include <stdio.h>
-int main(void) { return fileno(stdin); }'''
+    'copy_file_range':
+      template.format(
+        'unistd.h',
+        'return copy_file_range(0, NULL, 1, NULL, 0U, 0U);'),
 
-  flock_code = '''#include <sys/file.h>
-int main(void) { return flock(0, 0); }'''
+    'fileno': template.format('stdio.h', 'return fileno(stdin);'),
+    'flock': template.format('sys/file.h', 'return flock(0, 0);'),
 
-  lstat_code = '''#include <sys/stat.h>
-int main(void) { struct stat s; return lstat("/", &s); }'''
+    'lstat':
+      template.format('sys/stat.h', 'struct stat s; return lstat("/", &s);'),
 
-  mlock_code = '''#include <sys/mman.h>
-int main(void) { return mlock(0, 0); }'''
+    'mlock': template.format('sys/mman.h', 'return mlock(0, 0);'),
 
-  pathconf_code = '''#include <unistd.h>
-int main(void) { return pathconf("/", _PC_PATH_MAX) > 0L; }'''
+    'pathconf':
+      template.format('unistd.h', 'return pathconf("/", _PC_PATH_MAX) > 0L;'),
 
-  posix_fadvise_code = '''#include <fcntl.h>
-int main(void) { posix_fadvise(0, 0, 4096, POSIX_FADV_SEQUENTIAL); }'''
+    'posix_fadvise': template.format(
+      'fcntl.h',
+      'posix_fadvise(0, 0, 4096, POSIX_FADV_SEQUENTIAL);'),
 
-  posix_memalign_code = '''#include <stdlib.h>
-int main(void) { void* mem; posix_memalign(&mem, 8, 8); }'''
+    'posix_memalign':
+      template.format('stdlib.h', 'void* mem; posix_memalign(&mem, 8, 8);'),
 
-  realpath_code = '''#include <stdlib.h>
-int main(void) { return realpath("/", NULL) != NULL; }'''
+    'realpath':
+      template.format('stdlib.h', 'return realpath("/", NULL) != NULL;'),
 
-  sem_timedwait_code = '''#include <semaphore.h>
+    'sysconf':
+      template.format('unistd.h', 'return sysconf(_SC_PAGE_SIZE) > 0L;'),
+  }
+
+  windows_checks = {
+    'CreateSymbolicLink':
+      template.format(
+        'windows.h',
+        'return CreateSymbolicLink(' +
+        '"l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);'),
+  }
+
+  if host_machine.system() == 'darwin'
+    checks = posix_checks + mac_checks
+  elif host_machine.system() == 'windows'
+    checks = windows_checks
+  else
+    checks = posix_checks
+
+    if thread_dep.found()
+      if cc.links('''#include <semaphore.h>
 #include <time.h>
-int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }'''
+int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }''',
+                  args: system_c_args,
+                  dependencies: thread_dep,
+                  name: 'sem_timedwait')
+        platform_c_args += ['-DHAVE_SEM_TIMEDWAIT']
+      endif
+    endif
+  endif
 
-  sysconf_code = '''#include <unistd.h>
-int main(void) { return sysconf(_SC_PAGE_SIZE) > 0L; }'''
-
-  platform_c_args += [
-    '-DZIX_NO_DEFAULT_CONFIG',
-    '-DHAVE_CLOCK_GETTIME=@0@'.format(
-      cc.links(clock_gettime_code,
-               args: platform_c_args,
-               name: 'clock_gettime').to_int()),
-    '-DHAVE_CLONEFILE=@0@'.format(
-      (host_machine.system() == 'darwin' and
-       cc.links(clonefile_code,
-                args: platform_c_args,
-                name: 'clonefile')).to_int()),
-    '-DHAVE_COPY_FILE_RANGE=@0@'.format(
-      (host_machine.system() not in ['darwin', 'windows'] and
-       cc.links(copy_file_range_code,
-                args: platform_c_args,
-                name: 'copy_file_range')).to_int()),
-    '-DHAVE_CREATESYMBOLICLINK=@0@'.format(
-      (host_machine.system() == 'windows' and
-       cc.links(CreateSymbolicLink_code,
-                args: platform_c_args,
-                name: 'CreateSymbolicLink')).to_int()),
-    '-DHAVE_FILENO=@0@'.format(
-      cc.links(fileno_code,
-               args: platform_c_args,
-               name: 'fileno').to_int()),
-    '-DHAVE_FLOCK=@0@'.format(
-      (host_machine.system() != 'windows' and
-       cc.links(flock_code,
-                args: platform_c_args,
-                name: 'flock')).to_int()),
-    '-DHAVE_MLOCK=@0@'.format(
-      cc.links(mlock_code,
-               args: platform_c_args,
-               name: 'mlock').to_int()),
-    '-DHAVE_PATHCONF=@0@'.format(
-      (host_machine.system() != 'windows' and
-       cc.links(pathconf_code,
-                args: platform_c_args,
-                name: 'pathconf')).to_int()),
-    '-DHAVE_POSIX_FADVISE=@0@'.format(
-      cc.links(posix_fadvise_code,
-               args: platform_c_args,
-               name: 'posix_fadvise').to_int()),
-    '-DHAVE_POSIX_MEMALIGN=@0@'.format(
-      cc.links(posix_memalign_code,
-               args: platform_c_args,
-               name: 'posix_memalign').to_int()),
-    '-DHAVE_REALPATH=@0@'.format(
-      (host_machine.system() != 'windows' and
-       cc.links(realpath_code,
-                args: platform_c_args,
-                name: 'realpath')).to_int()),
-    '-DHAVE_SEM_TIMEDWAIT=@0@'.format(
-      (host_machine.system() not in ['darwin', 'windows'] and
-       cc.links(sem_timedwait_code,
-                args: platform_c_args,
-                dependencies: [thread_dep],
-                name: 'sem_timedwait')).to_int()),
-    '-DHAVE_SYSCONF=@0@'.format(
-      (host_machine.system() != 'windows' and
-       cc.links(sysconf_code,
-                args: platform_c_args,
-                name: 'sysconf')).to_int()),
-  ]
+  foreach name, check_code : checks
+    if cc.links(check_code, args: system_c_args, name: name)
+      platform_c_args += ['-DHAVE_@0@'.format(name.to_upper())]
+    endif
+  endforeach
 endif
 
 ###########
@@ -317,7 +292,7 @@ libzix = library(
   versioned_name,
   sources,
   c_args: c_suppressions + library_c_args,
-  dependencies: [thread_dep],
+  dependencies: dependencies,
   gnu_symbol_visibility: 'hidden',
   include_directories: include_dirs,
   install: true,
@@ -340,7 +315,7 @@ pkg.generate(
   extra_cflags: extra_c_args,
   filebase: versioned_name,
   name: 'Zix',
-  requires: [thread_dep],
+  requires: dependencies,
   subdirs: [versioned_name],
   version: meson.project_version(),
 )
