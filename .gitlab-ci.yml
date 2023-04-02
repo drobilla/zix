@@ -43,7 +43,7 @@ sanitize:
 # Linux Distributions
 
 fedora:
-  image: lv2plugin/fedora-dev
+  image: lv2plugin/fedora-big
   script:
     - meson setup build -Dbuildtype=plain -Dstrict=true -Dwerror=true
     - ninja -C build test
