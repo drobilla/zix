@@ -82,10 +82,7 @@ if __name__ == "__main__":
             pyplot.xlabel("Elements")
             pyplot.ylabel("Time (s)")
 
-            times = []
-            for i in columns:
-                times.append([])
-
+            times = [[]] * len(columns)
             for line in in_file:
                 if line[0] == "#":
                     continue
@@ -94,9 +91,9 @@ if __name__ == "__main__":
                 for index, field in enumerate(fields):
                     times[index].append([float(field)])
 
-        for i in range(len(times) - 1):
+        for t in range(len(times) - 1):
             matplotlib.pyplot.plot(
-                times[0], times[i + 1], "-o", label=columns[i + 1]
+                times[0], times[t + 1], "-o", label=columns[t + 1]
             )
 
         pyplot.legend(
