@@ -1,3 +1,6 @@
+# Copyright 2020-2023 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: 0BSD OR ISC
+
 option('benchmarks', type: 'feature', value: 'auto', yield: true,
        description: 'Build benchmarks')
 
@@ -7,11 +10,11 @@ option('checks', type: 'feature', value: 'enabled', yield: true,
 option('docs', type: 'feature', value: 'auto', yield: true,
        description: 'Build documentation')
 
+option('lint', type: 'boolean', value: false, yield: true,
+       description: 'Run code quality checks')
+
 option('posix', type: 'feature', value: 'auto', yield: true,
        description: 'Use POSIX system facilities')
-
-option('strict', type: 'boolean', value: false, yield: true,
-       description: 'Enable ultra-strict warnings')
 
 option('threads', type: 'feature', value: 'auto', yield: true,
        description: 'Enable thread support')

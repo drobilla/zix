@@ -3,6 +3,6 @@ Upstream-Name: zix
 Upstream-Contact: David Robillard <d@drobilla.net>
 Source: https://gitlab.com/drobilla/zix
 
-Files: *.md NEWS meson_options.txt
+Files: *.md NEWS
 Copyright: 2021 David Robillard <d@drobilla.net>
 License: 0BSD OR ISC

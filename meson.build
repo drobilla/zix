@@ -1,4 +1,4 @@
-# Copyright 2020-2022 David Robillard <d@drobilla.net>
+# Copyright 2020-2023 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 project('zix', ['c'],
@@ -26,14 +26,10 @@ pkg = import('pkgconfig')
 cc = meson.get_compiler('c')
 
 # Set global warning flags
-if get_option('strict') and not meson.is_subproject()
-  subdir('meson/warnings')
-  add_project_arguments(all_c_warnings, language: ['c'])
-endif
 subdir('meson/suppressions')
 
+# Restrict Windows API usage to Vista and earlier
 if host_machine.system() == 'windows'
-  # Restrict Windows API usage to Vista and earlier
   if cc.get_id() == 'msvc'
     add_project_arguments('/D_WIN32_WINNT=0x0600', language: ['c', 'cpp'])
   else
@@ -347,7 +343,7 @@ threaded_tests = [
 ]
 
 if not get_option('tests').disabled()
-  if not meson.is_subproject() and get_option('strict')
+  if not meson.is_subproject() and get_option('lint')
     # Check release metadata
     autoship = find_program('autoship', required: get_option('tests'))
     if autoship.found()
@@ -463,6 +459,10 @@ if not get_option('tests').disabled()
 
     elif cc.get_id() == 'msvc'
       header_suppressions += [
+        '/experimental:external',
+        '/external:W0',
+        '/external:anglebrackets',
+
         '/wd4820', # padding added after construct
       ]
     endif
@@ -520,6 +520,10 @@ if not get_option('tests').disabled()
     elif cpp.get_id() == 'msvc'
       cpp_test_args = [
         '/Wall',
+        '/experimental:external',
+        '/external:W0',
+        '/external:anglebrackets',
+
         '/wd4514', # unreferenced inline function has been removed
         '/wd4710', # function not inlined
         '/wd4711', # function selected for automatic inline expansion

@@ -1,9 +1,10 @@
 # Copyright 2020-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
-if get_option('strict') and not meson.is_subproject()
+if not meson.is_subproject() and get_option('lint')
   simple_scripts = files('benchmark.py')
   plot_scripts = files('plot.py')
+  all_scripts = simple_scripts + plot_scripts
 
   # Check formatting with black
   black = find_program('black', required: get_option('tests'))
