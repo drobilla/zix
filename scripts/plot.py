@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2011-2022 David Robillard <d@drobilla.net>
+# Copyright 2011-2023 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: ISC
 
 """
@@ -82,7 +82,7 @@ if __name__ == "__main__":
             pyplot.xlabel("Elements")
             pyplot.ylabel("Time (s)")
 
-            times = [[]] * len(columns)
+            times = [[] for i in range(len(columns))]
             for line in in_file:
                 if line[0] == "#":
                     continue
@@ -109,6 +109,6 @@ if __name__ == "__main__":
         file_prefix_len = len(file_prefix)
         pyplot.title(os.path.splitext(filename[file_prefix_len:])[0].title())
 
-        print(f"Writing {sys.argv[1]}")
-        matplotlib.pyplot.tight_layout()
-        matplotlib.pyplot.savefig(sys.argv[1])
+    print("Writing %s" % sys.argv[1])
+    matplotlib.pyplot.tight_layout()
+    matplotlib.pyplot.savefig(sys.argv[1])
