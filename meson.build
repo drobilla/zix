@@ -25,9 +25,6 @@ versioned_name = 'zix' + version_suffix
 pkg = import('pkgconfig')
 cc = meson.get_compiler('c')
 
-# Set global warning flags
-subdir('meson/suppressions')
-
 # Restrict Windows API usage to Vista and earlier
 if host_machine.system() == 'windows'
   if cc.get_id() == 'msvc'
@@ -36,6 +33,105 @@ if host_machine.system() == 'windows'
     add_project_arguments('-D_WIN32_WINNT=0x0600', language: ['c', 'cpp'])
   endif
 endif
+
+# Set global warning suppressions
+warning_level = get_option('warning_level')
+c_suppressions = []
+if cc.get_id() in ['clang', 'emscripten']
+  if warning_level == 'everything'
+    c_suppressions += [
+      '-Wno-bad-function-cast',
+      '-Wno-c11-extensions', # Glib
+      '-Wno-declaration-after-statement',
+      '-Wno-implicit-fallthrough', # Really for clang < 12
+      '-Wno-padded',
+    ]
+
+    if host_machine.system() == 'windows'
+      c_suppressions += [
+        '-Wno-deprecated-declarations',
+        '-Wno-nonportable-system-include-path',
+      ]
+    endif
+  endif
+
+  if warning_level in ['everything', '3']
+    c_suppressions += [
+      '-Wno-nullability-extension',
+    ]
+  endif
+
+  if cc.get_id() == 'emscripten'
+    c_suppressions += [
+      '-Wno-format',
+    ]
+  endif
+
+elif cc.get_id() == 'gcc'
+  if warning_level == 'everything'
+    c_suppressions += [
+      '-Wno-bad-function-cast',
+      '-Wno-cast-function-type',
+      '-Wno-inline',
+      '-Wno-padded',
+      '-Wno-strict-overflow',
+      '-Wno-switch-default',
+      '-Wno-unsuffixed-float-constants',
+    ]
+
+    if host_machine.system() == 'windows'
+      c_suppressions += [
+        '-Wno-format',
+        '-Wno-suggest-attribute=const',
+        '-Wno-suggest-attribute=format',
+        '-Wno-suggest-attribute=pure',
+      ]
+    endif
+  endif
+
+elif cc.get_id() == 'msvc'
+  c_suppressions += [
+    '/experimental:external',
+    '/external:W0',
+    '/external:anglebrackets',
+  ]
+
+  if warning_level == 'everything'
+    c_suppressions += [
+      '/wd4191', # unsafe function conversion
+      '/wd4200', # zero-sized array in struct/union
+      '/wd4365', # signed/unsigned mismatch
+      '/wd4464', # relative include path contains ".."
+      '/wd4514', # unreferenced inline function has been removed
+      '/wd4710', # function not inlined
+      '/wd4711', # function selected for automatic inline expansion
+      '/wd4777', # format string and argument mismatch
+      '/wd4800', # implicit conversion to bool
+      '/wd4820', # padding added after construct
+      '/wd5045', # will insert Spectre mitigation for memory load
+    ]
+  endif
+
+  if warning_level in ['everything', '3']
+    c_suppressions += [
+      '/wd4706', # assignment within conditional expression
+    ]
+  endif
+
+  if warning_level in ['everything', '3', '2']
+    c_suppressions += [
+      '/wd4996', # POSIX name for this item is deprecated
+    ]
+  endif
+
+  if warning_level in ['everything', '3', '2', '1']
+    c_suppressions += [
+      '/wd4114', # same type qualifier used more than once
+    ]
+  endif
+endif
+
+c_suppressions = cc.get_supported_arguments(c_suppressions)
 
 ##########################
 # Platform Configuration #
