@@ -50,6 +50,12 @@ if cc.get_id() in ['clang', 'emscripten']
       '-Wno-padded',
     ]
 
+    if not meson.is_cross_build()
+      c_suppressions += [
+        '-Wno-poison-system-directories',
+      ]
+    endif
+
     if host_machine.system() == 'windows'
       c_suppressions += [
         '-Wno-deprecated-declarations',
