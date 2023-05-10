@@ -19,7 +19,7 @@ ZIX_BEGIN_DECLS
 */
 
 /**
-   @defgroup zix_ring_definition Definition
+   @defgroup zix_ring_setup Setup
    @{
 */
 

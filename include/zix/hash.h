@@ -19,6 +19,11 @@ ZIX_BEGIN_DECLS
    @{
 */
 
+/**
+   @defgroup zix_hash_datatypes Datatypes
+   @{
+*/
+
 // ZIX_HASH_KEY_TYPE can be defined to make the API more type-safe
 #if defined(ZIX_HASH_KEY_TYPE)
 typedef ZIX_HASH_KEY_TYPE ZixHashKey;
@@ -73,12 +78,14 @@ typedef struct ZixHashImpl ZixHash;
 typedef size_t ZixHashCode;
 
 /**
-   An iterator to an entry in a hash table.
-
-   This is really just an index, but should be considered opaque to the user
-   and only used via the provided API and equality comparison.
+   @}
+   @defgroup zix_hash_setup Setup
+   @{
 */
-typedef size_t ZixHashIter;
+
+/// User function for getting the key of a record
+typedef const ZixHashKey* ZIX_NONNULL (*ZixKeyFunc)(
+  const ZixHashRecord* ZIX_NONNULL record);
 
 /// User function for computing the hash of a key
 typedef ZixHashCode (*ZixHashFunc)(const ZixHashKey* ZIX_NONNULL key);
@@ -86,28 +93,6 @@ typedef ZixHashCode (*ZixHashFunc)(const ZixHashKey* ZIX_NONNULL key);
 /// User function for determining if two keys are truly equal
 typedef bool (*ZixKeyEqualFunc)(const ZixHashKey* ZIX_NONNULL a,
                                 const ZixHashKey* ZIX_NONNULL b);
-
-/// User function for determining if a key matches in a custom search
-typedef bool (*ZixKeyMatchFunc)(const ZixHashKey* ZIX_NONNULL key,
-                                const ZixHashSearchData* ZIX_NULLABLE
-                                  user_data);
-
-/// User function for getting the key of a record
-typedef const ZixHashKey* ZIX_NONNULL (*ZixKeyFunc)(
-  const ZixHashRecord* ZIX_NONNULL record);
-
-/**
-   A "plan" (position) to insert a record in a hash table.
-
-   This contains everything necessary to insert a record, except the record
-   itself.  It is exposed to split up insertion so that records only need to be
-   allocated if an existing record is not found, but the contents should be
-   considered opaque to the user.
-*/
-typedef struct {
-  ZixHashCode code;  ///< Hash code used to find this position
-  ZixHashIter index; ///< Index into hash table
-} ZixHashInsertPlan;
 
 /**
    Create a new hash table.
@@ -129,6 +114,25 @@ ZIX_API
 void
 zix_hash_free(ZixHash* ZIX_NULLABLE hash);
 
+/// Return the number of elements in the hash
+ZIX_PURE_API
+size_t
+zix_hash_size(const ZixHash* ZIX_NONNULL hash);
+
+/**
+   @}
+   @defgroup zix_hash_iteration Iteration
+   @{
+*/
+
+/**
+   An iterator to an entry in a hash table.
+
+   This is really just an index, but should be considered opaque to the user
+   and only used via the provided API and equality comparison.
+*/
+typedef size_t ZixHashIter;
+
 /// Return an iterator to the first record in a hash, or the end if it is empty
 ZIX_PURE_API
 ZixHashIter
@@ -149,10 +153,29 @@ ZIX_PURE_API
 ZixHashIter
 zix_hash_next(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
-/// Return the number of elements in a hash
-ZIX_PURE_API
-size_t
-zix_hash_size(const ZixHash* ZIX_NONNULL hash);
+/**
+   @}
+   @defgroup zix_hash_modification Modification
+   @{
+*/
+
+/// User function for determining if a key matches in a custom search
+typedef bool (*ZixKeyMatchFunc)(const ZixHashKey* ZIX_NONNULL key,
+                                const ZixHashSearchData* ZIX_NULLABLE
+                                  user_data);
+
+/**
+   A "plan" (position) to insert a record in a hash table.
+
+   This contains everything necessary to insert a record, except the record
+   itself.  It is exposed to split up insertion so that records only need to be
+   allocated if an existing record is not found, but the contents should be
+   considered opaque to the user.
+*/
+typedef struct {
+  ZixHashCode code;  ///< Hash code used to find this position
+  ZixHashIter index; ///< Index into hash table
+} ZixHashInsertPlan;
 
 /**
    Find the best position to insert a record with the given key.
@@ -284,6 +307,12 @@ zix_hash_remove(ZixHash* ZIX_NONNULL                     hash,
                 ZixHashRecord* ZIX_NULLABLE* ZIX_NONNULL removed);
 
 /**
+   @}
+   @defgroup zix_hash_searching Searching
+   @{
+*/
+
+/**
    Find the position of a record with a given key.
 
    @param hash The hash table to search.
@@ -316,6 +345,7 @@ zix_hash_find_record(const ZixHash* ZIX_NONNULL    hash,
                      const ZixHashKey* ZIX_NONNULL key);
 
 /**
+   @}
    @}
 */
 

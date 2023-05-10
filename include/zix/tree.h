@@ -19,11 +19,13 @@ ZIX_BEGIN_DECLS
    @{
 */
 
+/**
+   @defgroup zix_tree_setup Setup
+   @{
+*/
+
 /// A balanced binary search tree
 typedef struct ZixTreeImpl ZixTree;
-
-/// An iterator over a @ref ZixTree
-typedef struct ZixTreeNodeImpl ZixTreeIter;
 
 /// Function for comparing two Tree elements
 typedef int (*ZixTreeCompareFunc)(const void* ZIX_UNSPECIFIED a,
@@ -54,28 +56,14 @@ ZIX_PURE_API
 size_t
 zix_tree_size(const ZixTree* ZIX_NONNULL t);
 
-/// Insert the element `e` into `t` and point `ti` at the new element
-ZIX_API
-ZixStatus
-zix_tree_insert(ZixTree* ZIX_NONNULL                    t,
-                void* ZIX_UNSPECIFIED                   e,
-                ZixTreeIter* ZIX_NULLABLE* ZIX_NULLABLE ti);
-
-/// Remove the item pointed at by `ti` from `t`
-ZIX_API
-ZixStatus
-zix_tree_remove(ZixTree* ZIX_NONNULL t, ZixTreeIter* ZIX_NONNULL ti);
-
 /**
-   Set `ti` to an element equal to `e` in `t`.
-
-   If no such item exists, `ti` is set to NULL.
+   @}
+   @defgroup zix_tree_iteration Iteration
+   @{
 */
-ZIX_API
-ZixStatus
-zix_tree_find(const ZixTree* ZIX_NONNULL             t,
-              const void* ZIX_UNSPECIFIED            e,
-              ZixTreeIter* ZIX_NULLABLE* ZIX_NONNULL ti);
+
+/// An iterator over a @ref ZixTree
+typedef struct ZixTreeNodeImpl ZixTreeIter;
 
 /// Return the data associated with the given tree item
 ZIX_PURE_API
@@ -123,6 +111,42 @@ ZixTreeIter* ZIX_NULLABLE
 zix_tree_iter_prev(ZixTreeIter* ZIX_NULLABLE i);
 
 /**
+   @}
+   @defgroup zix_tree_modification Modification
+   @{
+*/
+
+/// Insert the element `e` into `t` and point `ti` at the new element
+ZIX_API
+ZixStatus
+zix_tree_insert(ZixTree* ZIX_NONNULL                    t,
+                void* ZIX_UNSPECIFIED                   e,
+                ZixTreeIter* ZIX_NULLABLE* ZIX_NULLABLE ti);
+
+/// Remove the item pointed at by `ti` from `t`
+ZIX_API
+ZixStatus
+zix_tree_remove(ZixTree* ZIX_NONNULL t, ZixTreeIter* ZIX_NONNULL ti);
+
+/**
+   @}
+   @defgroup zix_tree_searching Searching
+   @{
+*/
+
+/**
+   Set `ti` to an element equal to `e` in `t`.
+
+   If no such item exists, `ti` is set to NULL.
+*/
+ZIX_API
+ZixStatus
+zix_tree_find(const ZixTree* ZIX_NONNULL             t,
+              const void* ZIX_UNSPECIFIED            e,
+              ZixTreeIter* ZIX_NULLABLE* ZIX_NONNULL ti);
+
+/**
+   @}
    @}
 */
 

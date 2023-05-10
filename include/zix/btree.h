@@ -21,6 +21,11 @@ ZIX_BEGIN_DECLS
 */
 
 /**
+   @defgroup zix_btree_setup Setup
+   @{
+*/
+
+/**
    The maximum height of a ZixBTree.
 
    This is exposed because it determines the size of iterators, which are
@@ -36,9 +41,6 @@ ZIX_BEGIN_DECLS
 /// A B-Tree
 typedef struct ZixBTreeImpl ZixBTree;
 
-/// A B-Tree node (opaque)
-typedef struct ZixBTreeNodeImpl ZixBTreeNode;
-
 /// Function for comparing two B-Tree elements
 typedef int (*ZixBTreeCompareFunc)(const void* ZIX_UNSPECIFIED a,
                                    const void* ZIX_UNSPECIFIED b,
@@ -47,27 +49,6 @@ typedef int (*ZixBTreeCompareFunc)(const void* ZIX_UNSPECIFIED a,
 /// Function to destroy a B-Tree element
 typedef void (*ZixBTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
                                     const void* ZIX_UNSPECIFIED user_data);
-
-/**
-   An iterator over a B-Tree.
-
-   Note that modifying the tree invalidates all iterators.
-
-   The contents of this type are considered an implementation detail and should
-   not be used directly by clients.  They are nevertheless exposed here so that
-   iterators can be allocated on the stack.
-*/
-typedef struct {
-  ZixBTreeNode* ZIX_NULLABLE nodes[ZIX_BTREE_MAX_HEIGHT];   ///< Node stack
-  uint16_t                   indexes[ZIX_BTREE_MAX_HEIGHT]; ///< Index stack
-  uint16_t                   level;                         ///< Current level
-} ZixBTreeIter;
-
-/// A static end iterator for convenience
-static const ZixBTreeIter zix_btree_end_iter = {
-  {NULL, NULL, NULL, NULL, NULL, NULL},
-  {0U, 0U, 0U, 0U, 0U, 0U},
-  0U};
 
 /**
    Create a new (empty) B-Tree.
@@ -92,13 +73,13 @@ zix_btree_new(ZixAllocator* ZIX_NULLABLE      allocator,
    @param destroy Function to call once for every value in the tree.  This can
    be used to free values if they are dynamically allocated.
 
-   @param destroy_user_data Opaque pointer to pass to `destroy`.
+   @param destroy_data Opaque user data pointer to pass to `destroy`.
 */
 ZIX_API
 void
 zix_btree_free(ZixBTree* ZIX_NULLABLE           t,
                ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
-               const void* ZIX_NULLABLE         destroy_user_data);
+               const void* ZIX_NULLABLE         destroy_data);
 
 /**
    Clear everything from `t`, leaving it empty.
@@ -108,75 +89,49 @@ zix_btree_free(ZixBTree* ZIX_NULLABLE           t,
    @param destroy Function called exactly once for every value in the tree,
    just before that value is removed from the tree.
 
-   @param destroy_user_data Opaque pointer to pass to `destroy`.
+   @param destroy_data Opaque user data pointer to pass to `destroy`.
 */
 ZIX_API
 void
 zix_btree_clear(ZixBTree* ZIX_NONNULL            t,
                 ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
-                const void* ZIX_NULLABLE         destroy_user_data);
+                const void* ZIX_NULLABLE         destroy_data);
 
 /// Return the number of elements in `t`
 ZIX_PURE_API
 size_t
 zix_btree_size(const ZixBTree* ZIX_NONNULL t);
 
-/// Insert the element `e` into `t`
-ZIX_API
-ZixStatus
-zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_UNSPECIFIED e);
+/**
+   @}
+   @defgroup zix_btree_iteration Iteration
+   @{
+*/
+
+/// An opaque node in a B-Tree
+typedef struct ZixBTreeNodeImpl ZixBTreeNode;
 
 /**
-   Remove the value `e` from `t`.
+   An iterator over a B-Tree.
 
-   @param t Tree to remove from.
+   Note that modifying the tree invalidates all iterators.
 
-   @param e Value to remove.
-
-   @param out Set to point to the removed pointer (which may not equal `e`).
-
-   @param next On successful return, set to point at the value that immediately
-   followed `e`.
+   The contents of this type are considered an implementation detail and should
+   not be used directly by clients.  They are nevertheless exposed here so that
+   iterators can be allocated on the stack.
 */
-ZIX_API
-ZixStatus
-zix_btree_remove(ZixBTree* ZIX_NONNULL              t,
-                 const void* ZIX_UNSPECIFIED        e,
-                 void* ZIX_UNSPECIFIED* ZIX_NONNULL out,
-                 ZixBTreeIter* ZIX_NONNULL          next);
+typedef struct {
+  ZixBTreeNode* ZIX_NULLABLE nodes[ZIX_BTREE_MAX_HEIGHT];   ///< Node stack
+  uint16_t                   indexes[ZIX_BTREE_MAX_HEIGHT]; ///< Index stack
+  uint16_t                   level;                         ///< Current level
+} ZixBTreeIter;
 
-/**
-   Set `ti` to an element exactly equal to `e` in `t`.
-
-   If no such item exists, `ti` is set to the end.
-*/
-ZIX_API
-ZixStatus
-zix_btree_find(const ZixBTree* ZIX_NONNULL t,
-               const void* ZIX_UNSPECIFIED e,
-               ZixBTreeIter* ZIX_NONNULL   ti);
-
-/**
-   Set `ti` to the smallest element in `t` that is not less than `e`.
-
-   The given comparator must be compatible with the tree comparator, that is,
-   any two values must have the same ordering according to both.  Within this
-   constraint, it may implement fuzzier searching by handling special search
-   key values, for example with wildcards.
-
-   If the search key `e` compares equal to many values in the tree, then `ti`
-   will be set to the least such element.
-
-   The comparator is always called with an actual value in the tree as the
-   first argument, and `key` as the second argument.
-*/
-ZIX_API
-ZixStatus
-zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL      t,
-                      ZixBTreeCompareFunc ZIX_NULLABLE compare_key,
-                      const void* ZIX_NULLABLE         compare_key_user_data,
-                      const void* ZIX_UNSPECIFIED      key,
-                      ZixBTreeIter* ZIX_NONNULL        ti);
+/// A static end iterator for convenience
+static const ZixBTreeIter zix_btree_end_iter = {
+  {NULL, NULL, NULL, NULL, NULL, NULL},
+  {0U, 0U, 0U, 0U, 0U, 0U},
+  0U,
+};
 
 /// Return the data at the given position in the tree
 ZIX_PURE_API
@@ -216,6 +171,87 @@ ZixBTreeIter
 zix_btree_iter_next(ZixBTreeIter iter);
 
 /**
+   @}
+   @defgroup zix_btree_modification Modification
+   @{
+*/
+
+/**
+   Insert the element `e` into `t`.
+
+   @return #ZIX_STATUS_SUCCESS on success, #ZIX_STATUS_EXISTS, or
+   #ZIX_STATUS_NO_MEM.
+*/
+ZIX_API
+ZixStatus
+zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_UNSPECIFIED e);
+
+/**
+   Remove the element `e` from `t`.
+
+   @param t Tree to remove from.
+
+   @param e Value to remove.
+
+   @param out Set to point to the removed pointer (which may not equal `e`).
+
+   @param next On successful return, set to point at element immediately
+   following `e`.
+
+   @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_NOT_FOUND.
+*/
+ZIX_API
+ZixStatus
+zix_btree_remove(ZixBTree* ZIX_NONNULL              t,
+                 const void* ZIX_UNSPECIFIED        e,
+                 void* ZIX_UNSPECIFIED* ZIX_NONNULL out,
+                 ZixBTreeIter* ZIX_NONNULL          next);
+
+/**
+   @}
+   @defgroup zix_btree_searching Searching
+   @{
+*/
+
+/**
+   Set `ti` to an element exactly equal to `e` in `t`.
+
+   If no such item exists, `ti` is set to the end.
+
+   @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_NOT_FOUND.
+*/
+ZIX_API
+ZixStatus
+zix_btree_find(const ZixBTree* ZIX_NONNULL t,
+               const void* ZIX_UNSPECIFIED e,
+               ZixBTreeIter* ZIX_NONNULL   ti);
+
+/**
+   Set `ti` to the smallest element in `t` that is not less than `e`.
+
+   The given comparator must be compatible with the tree comparator, that is,
+   any two values must have the same ordering according to both.  Within this
+   constraint, it may implement fuzzier searching by handling special search
+   key values, for example with wildcards.
+
+   If the search key `e` compares equal to many values in the tree, then `ti`
+   will be set to the least such element.
+
+   The comparator is always called with an actual value in the tree as the
+   first argument, and `key` as the second argument.
+
+   @return #ZIX_STATUS_SUCCESS.
+*/
+ZIX_API
+ZixStatus
+zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL      t,
+                      ZixBTreeCompareFunc ZIX_NULLABLE compare_key,
+                      const void* ZIX_NULLABLE         compare_key_data,
+                      const void* ZIX_UNSPECIFIED      key,
+                      ZixBTreeIter* ZIX_NONNULL        ti);
+
+/**
+   @}
    @}
 */
 

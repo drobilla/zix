@@ -59,6 +59,8 @@ typedef ZixThreadResult(ZIX_THREAD_FUNC* ZixThreadFunc)(void*);
 
    The thread will immediately be launched, calling `function` with `arg`
    as the only parameter.
+
+   @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_ERROR.
 */
 ZIX_API
 ZixStatus
@@ -67,7 +69,11 @@ zix_thread_create(ZixThread*    thread,
                   ZixThreadFunc function,
                   void*         arg);
 
-/// Join `thread` (block until `thread` exits)
+/**
+   Join `thread` (block until `thread` exits).
+
+   @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_ERROR.
+*/
 ZIX_API
 ZixStatus
 zix_thread_join(ZixThread thread);
