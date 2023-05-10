@@ -1,4 +1,4 @@
-# Copyright 2021-2022 David Robillard <d@drobilla.net>
+# Copyright 2021-2023 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 docdir = get_option('datadir') / 'doc'
@@ -92,8 +92,10 @@ if build_docs
   custom_target(
     'singlehtml',
     build_by_default: true,
-    command: [sphinx_build, '-M', 'singlehtml', '@OUTDIR@', '@OUTDIR@',
-              '-t', 'singlehtml'] + sphinx_options,
+    command: [
+      sphinx_build, '-M', 'singlehtml', '@OUTDIR@', '@OUTDIR@',
+      '-W', '-E', '-q', '-t', 'singlehtml',
+    ] + sphinx_options,
     input: doc_inputs,
     install: true,
     install_dir: docdir / versioned_name,
@@ -103,8 +105,10 @@ if build_docs
   custom_target(
     'html',
     build_by_default: true,
-    command: [sphinx_build, '-M', 'html', '@OUTDIR@', '@OUTDIR@',
-              '-t', 'html'] + sphinx_options,
+    command: [
+      sphinx_build, '-M', 'html', '@OUTDIR@', '@OUTDIR@',
+      '-W', '-E', '-q', '-t', 'html',
+    ] + sphinx_options,
     input: doc_inputs,
     install: true,
     install_dir: docdir / versioned_name,
