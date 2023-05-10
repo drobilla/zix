@@ -1,4 +1,4 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_STRING_VIEW_H
@@ -28,6 +28,15 @@ typedef struct {
   const char* ZIX_NONNULL data;   ///< Pointer to the first character
   size_t                  length; ///< Length of string in bytes
 } ZixStringView;
+
+/// Initialize a string view from a string literal
+// clang-format off
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L)
+#  define ZIX_STATIC_STRING(s) (ZixStringView) {s, (sizeof(s) - 1U)}
+#else
+#  define ZIX_STATIC_STRING(s) { s, (sizeof(s) - 1U) }
+#endif
+// clang-format on
 
 /// Return a view of an empty string
 ZIX_ALWAYS_INLINE_FUNC

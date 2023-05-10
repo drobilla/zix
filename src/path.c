@@ -496,6 +496,8 @@ zix_path_lexically_relative(ZixAllocator* const allocator,
                             const char* const   path,
                             const char* const   base)
 {
+  static const ZixStringView dot = ZIX_STATIC_STRING(".");
+
   // Mismatched roots can't be expressed in relative form
   const ZixRootSlices path_root         = zix_path_root_slices(path);
   const ZixRootSlices base_root         = zix_path_root_slices(base);
@@ -520,7 +522,7 @@ zix_path_lexically_relative(ZixAllocator* const allocator,
   // Matching paths reduce to "."
   if ((a.state == ZIX_PATH_END && b.state == ZIX_PATH_END) ||
       (zix_is_empty_range(a.range) && b.state == ZIX_PATH_END)) {
-    return zix_string_view_copy(allocator, zix_string("."));
+    return zix_string_view_copy(allocator, dot);
   }
 
   // Count the trailing non-matching entries in base
@@ -546,7 +548,7 @@ zix_path_lexically_relative(ZixAllocator* const allocator,
 
   // A result with no up-references or names reduces to "."
   if (n_up == 0 && a.state == ZIX_PATH_END) {
-    return zix_string_view_copy(allocator, zix_string("."));
+    return zix_string_view_copy(allocator, dot);
   }
 
   // Allocate buffer for relative path result

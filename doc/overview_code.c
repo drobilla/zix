@@ -1,4 +1,4 @@
-// Copyright 2021-2022 David Robillard <d@drobilla.net>
+// Copyright 2021-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 /*
@@ -26,8 +26,9 @@ string_views(void)
   // end make-empty-string
 
   // begin make-static-string
-  ZixStringView hello = zix_string("hello");
+  static const ZixStringView hello = ZIX_STATIC_STRING("hello");
   // end make-static-string
+  (void)hello;
 
   // begin measure-string
   ZixStringView view = zix_string(string_pointer);

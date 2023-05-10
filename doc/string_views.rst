@@ -1,5 +1,5 @@
 ..
-   Copyright 2020-2022 David Robillard <d@drobilla.net>
+   Copyright 2020-2023 David Robillard <d@drobilla.net>
    SPDX-License-Identifier: ISC
 
 String Views
@@ -14,6 +14,17 @@ rather than a bare pointer.
 This forces code to be explicit about string measurement,
 which discourages common patterns of repeated measurement of the same string.
 For convenience, several macros and functions are provided for constructing string views:
+
+:macro:`ZIX_STATIC_STRING`
+
+   Initializes a string view from a string literal.  Note that this may only be
+   used with inlined string literals, passing a pointer to an arbitrary string
+   is undefined behaviour, for example:
+
+   .. literalinclude:: overview_code.c
+      :start-after: begin make-static-string
+      :end-before: end make-static-string
+      :dedent: 2
 
 :func:`zix_empty_string`
 
