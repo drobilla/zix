@@ -38,7 +38,7 @@ Documentation
 -------------
 
   * [Installation Instructions](INSTALL.md)
-  * [API reference (single page)](https://drobilla.gitlab.io/zix/doc/singlehtml)
-  * [API reference (paginated)](https://drobilla.gitlab.io/zix/doc/html)
+  * [API reference (single page)](https://drobilla.gitlab.io/zix/doc/singlehtml/)
+  * [API reference (paginated)](https://drobilla.gitlab.io/zix/doc/html/)
 
  -- David Robillard <d@drobilla.net>

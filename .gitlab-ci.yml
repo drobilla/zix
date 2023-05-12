@@ -10,15 +10,16 @@ default:
 dev:
   image: lv2plugin/debian-x64
   script:
-    - meson setup build -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Db_coverage=true -Ddocs=enabled -Dlint=true
+    - meson setup build -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Db_coverage=true -Dlint=true -Ddocs=enabled -Dprefix=/
     - ninja -C build test
     - ninja -C build coverage-html
+    - DESTDIR=$(pwd)/build/dest meson install -C build
     - meson configure -Dbuildtype=release -Db_coverage=false build
     - ninja -C build test
   coverage: '/ *lines\.*: \d+\.\d+.*/'
   artifacts:
     paths:
-      - build/doc
+      - build/dest/share/doc
       - build/meson-logs/coveragereport
 
 static:
@@ -128,8 +129,8 @@ pages:
   script:
     - mkdir -p .public/doc
     - mv build/meson-logs/coveragereport/ .public/coverage
-    - mv build/doc/singlehtml .public/doc/
-    - mv build/doc/html .public/doc/
+    - mv build/dest/share/doc/zix-0/singlehtml .public/doc/singlehtml
+    - mv build/dest/share/doc/zix-0/html .public/doc/html
     - mv .public public
   needs:
     - dev
