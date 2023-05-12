@@ -3,9 +3,11 @@
 
 docdir = get_option('datadir') / 'doc'
 
+# Find required programs
 doxygen = find_program('doxygen', required: get_option('docs'))
 sphinx_build = find_program('sphinx-build', required: get_option('docs'))
 
+# Find sphinxygen or fall back to subproject
 if doxygen.found() and sphinx_build.found()
   sphinxygen = find_program('sphinxygen', required: false)
   if not sphinxygen.found()
@@ -16,18 +18,18 @@ else
   sphinxygen = disabler()
 endif
 
+# Build documentation if all required tools are found
+build_docs = doxygen.found() and sphinx_build.found() and sphinxygen.found()
+if not meson.is_subproject()
+  summary('Documentation', build_docs, bool_yn: true, section: 'Configuration')
+endif
+
 build_docs = doxygen.found() and sphinxygen.found() and sphinx_build.found()
 if build_docs
-
-  # Check for Sphinx LV2 theme
-
+  # Warn if the "official" theme isn't present
   pymod = import('python')
-  sphinx_lv2_theme_python = pymod.find_installation(
-    modules: ['sphinx_lv2_theme'],
-    required: false
-  )
-
-  if not sphinx_lv2_theme_python.found()
+  doc_modules = ['sphinx_lv2_theme']
+  if not pymod.find_installation(modules: doc_modules, required: false).found()
     warning('Missing sphinx_lv2_theme module, falling back to alabaster')
   endif
 
@@ -48,71 +50,43 @@ if build_docs
 
   # Generated API Reference
 
-  c_rst_files = files(
-    'allocation.rst',
-    'error_handling.rst',
-    'index.rst',
-    'string_views.rst',
-    'summary.rst',
-    'using_zix.rst',
-  )
-
-  c_doc_files = c_rst_files + files(
-    'overview_code.c',
-  )
-
-  foreach f : c_doc_files
-    configure_file(copy: true, input: f, output: '@PLAINNAME@')
-  endforeach
-
+  # Configure conf.py for Sphinx
   config = configuration_data()
-  config.set('ZIX_VERSION', meson.project_version())
   config.set('ZIX_SRCDIR', zix_src_root)
   config.set('ZIX_TITLE', get_option('title'))
-
+  config.set('ZIX_VERSION', meson.project_version())
   conf_py = configure_file(
     configuration: config,
     input: files('conf.py.in'),
     output: 'conf.py',
   )
 
+  # Copy hand-written documentation files
+  c_rst_files = files(
+    'allocation.rst',
+    'error_handling.rst',
+    'index.rst',
+    'string_views.rst',
+    'using_zix.rst',
+  )
+  foreach f : c_rst_files + files('overview_code.c')
+    configure_file(copy: true, input: f, output: '@PLAINNAME@')
+  endforeach
+
+  # Generate reference documentation input with Doxygen and Sphinxygen
   subdir('xml')
   subdir('api')
 
-  sphinx_options = [
-    '-D', 'release=@0@'.format(meson.project_version()),
-    '-E',
-    '-W',
-    '-a',
-    '-q',
-  ]
+  # Build strict Sphinx flags, with termination on warnings if werror=true
+  sphinx_flags = ['-E', '-a', '-q']
+  if get_option('werror')
+    sphinx_flags += ['-W']
+  endif
 
-  doc_inputs = c_rst_files + [conf_py, c_zix_rst, c_index_xml]
-
-  custom_target(
-    'singlehtml',
-    build_by_default: true,
-    command: [
-      sphinx_build, '-M', 'singlehtml', '@OUTDIR@', '@OUTDIR@',
-      '-W', '-E', '-q', '-t', 'singlehtml',
-    ] + sphinx_options,
-    input: doc_inputs,
-    install: true,
-    install_dir: docdir / versioned_name,
-    output: 'singlehtml',
-  )
-
-  custom_target(
-    'html',
-    build_by_default: true,
-    command: [
-      sphinx_build, '-M', 'html', '@OUTDIR@', '@OUTDIR@',
-      '-W', '-E', '-q', '-t', 'html',
-    ] + sphinx_options,
-    input: doc_inputs,
-    install: true,
-    install_dir: docdir / versioned_name,
-    output: 'html',
-  )
-
+  # Run Sphinx to generate final documentation for each format
+  foreach format : ['html', 'singlehtml']
+    if not get_option(format).disabled()
+      subdir(format)
+    endif
+  endforeach
 endif

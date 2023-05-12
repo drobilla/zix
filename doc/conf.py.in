@@ -1,10 +1,10 @@
-# Copyright 2021-2022 David Robillard <d@drobilla.net>
+# Copyright 2021-2023 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 # Project information
 
 project = "Zix"
-copyright = "2011-2022, David Robillard"
+copyright = "2011-2023, David Robillard"
 author = "David Robillard"
 release = "@ZIX_VERSION@"
 version = "@ZIX_VERSION@"
@@ -64,72 +64,75 @@ html_copy_source = False
 html_secnumber_suffix = " "
 html_short_title = "@ZIX_TITLE@"
 
+html_theme_options = {
+    "description": desc,
+    "logo_name": True,
+}
+
+if tags.has("singlehtml"):
+    html_sidebars = {"**": ["globaltoc.html"]}
+    html_theme_options.update(
+        {
+            "globaltoc_collapse": False,
+            "globaltoc_maxdepth": 3,
+            "nosidebar": False,
+            "page_width": "80em",
+        }
+    )
+else:
+    html_theme_options.update(
+        {
+            "globaltoc_collapse": True,
+            "globaltoc_maxdepth": 1,
+            "nosidebar": True,
+            "page_width": "60em",
+        }
+    )
+
 if have_lv2_theme:
     html_theme = "sphinx_lv2_theme"
 
-    if tags.has("singlehtml"):
-        html_sidebars = {
-            "**": [
-                "globaltoc.html",
-            ]
-        }
-
-        html_theme_options = {
-            "body_max_width": "46em",
-            "body_min_width": "46em",
-            "description": desc,
-            "globaltoc_collapse": False,
-            "globaltoc_maxdepth": 3,
-            "logo_name": True,
-            "nosidebar": False,
-            "page_width": "80em",
+    html_theme_options.update(
+        {
             "show_footer_version": True,
             "show_logo_version": True,
-            "sidebar_width": "14em",
         }
+    )
+
+    if tags.has("singlehtml"):
+        html_theme_options.update(
+            {
+                "body_max_width": "62em",
+                "body_min_width": "62em",
+                "sidebar_width": "14em",
+            }
+        )
 
     else:
-        html_theme_options = {
-            "body_max_width": "60em",
-            "body_min_width": "46em",
-            "description": desc,
-            "logo_name": True,
-            "nosidebar": True,
-            "page_width": "60em",
-            "show_footer_version": True,
-            "show_logo_version": True,
-            "sidebar_width": "14em",
-        }
+        html_theme_options.update(
+            {
+                "body_max_width": "60em",
+                "body_min_width": "40em",
+            }
+        )
 else:
     html_theme = "alabaster"
     html_static_path = ["@ZIX_SRCDIR@/doc/_static"]
 
     if tags.has("singlehtml"):
-        html_sidebars = {
-            "**": [
-                "globaltoc.html",
-            ]
-        }
-
-        html_theme_options = {
-            "body_max_width": "48em",
-            "body_min_width": "48em",
-            "description": desc,
-            "globaltoc_collapse": False,
-            "globaltoc_maxdepth": 3,
-            "logo_name": True,
-            "nosidebar": False,
-            "page_width": "80em",
-            "sidebar_width": "16em",
-        }
+        html_theme_options.update(
+            {
+                "body_max_width": "58em",
+                "body_min_width": "40em",
+                "sidebar_width": "14em",
+            }
+        )
 
     else:
-        html_theme_options = {
-            "body_max_width": "60em",
-            "body_min_width": "40em",
-            "description": desc,
-            "logo_name": True,
-            "nosidebar": True,
-            "page_width": "60em",
-            "show_relbars": True,
-        }
+        html_theme_options.update(
+            {
+                "body_max_width": "60em",
+                "body_min_width": "40em",
+                "show_relbars": True,
+            }
+        )

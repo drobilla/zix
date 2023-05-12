@@ -10,11 +10,17 @@ option('checks', type: 'feature', value: 'enabled', yield: true,
 option('docs', type: 'feature', value: 'auto', yield: true,
        description: 'Build documentation')
 
+option('html', type: 'feature', value: 'auto', yield: true,
+       description: 'Build paginated HTML documentation')
+
 option('lint', type: 'boolean', value: false, yield: true,
        description: 'Run code quality checks')
 
 option('posix', type: 'feature', value: 'auto', yield: true,
        description: 'Use POSIX system facilities')
+
+option('singlehtml', type: 'feature', value: 'auto', yield: true,
+       description: 'Build single-page HTML documentation')
 
 option('threads', type: 'feature', value: 'auto', yield: true,
        description: 'Enable thread support')
