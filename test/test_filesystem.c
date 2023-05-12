@@ -690,6 +690,9 @@ int
 main(const int argc, char** const argv)
 {
 #ifdef __EMSCRIPTEN__
+  (void)argc;
+  (void)argv;
+
   const char* const data_file_path = NULL;
 #else
   const char* const data_file_path = argc > 1 ? argv[1] : "build.ninja";

@@ -17,7 +17,7 @@ if glib_dep.found()
   build_benchmarks = true
   benchmark_c_args = platform_c_args
 
-  if cc.get_id() == 'clang'
+  if cc.get_id() in ['clang', 'emscripten']
     benchmark_c_suppressions = [
       '-Wno-reserved-identifier',
     ]

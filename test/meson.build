@@ -167,7 +167,7 @@ if not get_option('tests_cpp').disabled() and add_languages(
   cpp = meson.get_compiler('cpp')
 
   cpp_test_args = []
-  if cpp.get_id() == 'clang'
+  if cpp.get_id() in ['clang', 'emscripten']
     cpp_test_args = [
       '-Weverything',
       '-Wno-c++98-compat',
