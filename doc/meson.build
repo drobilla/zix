@@ -24,7 +24,6 @@ if not meson.is_subproject()
   summary('Documentation', build_docs, bool_yn: true, section: 'Configuration')
 endif
 
-build_docs = doxygen.found() and sphinxygen.found() and sphinx_build.found()
 if build_docs
   # Warn if the "official" theme isn't present
   pymod = import('python')
