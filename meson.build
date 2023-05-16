@@ -452,7 +452,7 @@ if not meson.is_subproject()
       'Benchmarks': build_benchmarks,
     },
     bool_yn: true,
-    section: 'Configuration',
+    section: 'Components',
   )
 
   summary(
@@ -461,7 +461,6 @@ if not meson.is_subproject()
       'Headers':  get_option('prefix') / get_option('includedir'),
       'Libraries':  get_option('prefix') / get_option('libdir'),
     },
-    bool_yn: true,
     section: 'Directories',
   )
 endif
