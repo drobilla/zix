@@ -632,7 +632,7 @@ main(int argc, char** argv)
   const size_t   n_elems =
     (argc > 1) ? zix_test_size_arg(argv[1], 4U, 1U << 20U) : 131072U;
 
-  printf("Running %u tests with %" PRIuPTR " elements", n_tests, n_elems);
+  printf("Running %u tests with %zu elements", n_tests, n_elems);
   for (unsigned i = 0; i < n_tests; ++i) {
     printf(".");
     fflush(stdout);
