@@ -107,9 +107,6 @@ elif cc.get_id() == 'msvc'
 
   if warning_level == 'everything'
     c_suppressions += [
-      '/wd4191', # unsafe function conversion
-      '/wd4200', # zero-sized array in struct/union
-      '/wd4365', # signed/unsigned mismatch
       '/wd4464', # relative include path contains ".."
       '/wd4514', # unreferenced inline function has been removed
       '/wd4710', # function not inlined
