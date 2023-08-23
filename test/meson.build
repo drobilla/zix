@@ -159,11 +159,7 @@ if cc.get_id() != 'emscripten'
   )
 endif
 
-if not get_option('tests_cpp').disabled() and add_languages(
-  ['cpp'],
-  native: false,
-  required: get_option('tests_cpp').enabled(),
-)
+if add_languages(['cpp'], native: false, required: get_option('tests_cpp'))
   cpp = meson.get_compiler('cpp')
 
   cpp_test_args = []

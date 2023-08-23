@@ -29,6 +29,12 @@ configuration:
   * `CFLAGS`: C compiler options.
   * `LDFLAGS`: Linker options.
 
+Some optional tests also use the C++ compiler from the environment (unless the
+`tests_cpp` option is disabled):
+
+  * `CXX`: Path to C++ compiler.
+  * `CXXFLAGS`: C++ compiler options.
+
 However, it is better to use meson options for configuration.  All options can
 be inspected with the `configure` command from within the build directory:
 
