@@ -372,6 +372,7 @@ if cc.get_id() == 'emscripten'
     '-mbulk-memory',
     '-pthread',
     ['-s', 'ENVIRONMENT=node,worker'],
+    ['-s', 'INITIAL_MEMORY=33554432'],
   ]
 
   library_c_args += wasm_c_args

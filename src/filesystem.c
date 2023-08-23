@@ -37,31 +37,35 @@ zix_create_directories(ZixAllocator* const allocator,
   // Allocate a working copy of the path to chop along the way
   const size_t path_len = strlen(dir_path);
   char* const  path     = (char*)zix_malloc(allocator, path_len + 1U);
-  memcpy(path, dir_path, path_len + 1U);
+  ZixStatus    st       = path ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NO_MEM;
+  if (path) {
+    // Copy directory path as prefix
+    memcpy(path, dir_path, path_len + 1U);
 
-  // Start at the root directory (past any name)
-  ZixPathIter p = zix_path_begin(path);
-  while (p.state < ZIX_PATH_FILE_NAME) {
-    p = zix_path_next(path, p);
-  }
-
-  // Create each directory down the path
-  ZixStatus st = ZIX_STATUS_SUCCESS;
-  while (p.state != ZIX_PATH_END) {
-    const char old_end = path[p.range.end];
-
-    path[p.range.end] = '\0';
-    if (zix_file_type(path) != ZIX_FILE_TYPE_DIRECTORY) {
-      if ((st = zix_create_directory(path))) {
-        break;
-      }
+    // Start at the root directory (past any name)
+    ZixPathIter p = zix_path_begin(path);
+    while (p.state < ZIX_PATH_FILE_NAME) {
+      p = zix_path_next(path, p);
     }
 
-    path[p.range.end] = old_end;
-    p                 = zix_path_next(path, p);
+    // Create each directory down the path
+    while (p.state != ZIX_PATH_END) {
+      const char old_end = path[p.range.end];
+
+      path[p.range.end] = '\0';
+      if (zix_file_type(path) != ZIX_FILE_TYPE_DIRECTORY) {
+        if ((st = zix_create_directory(path))) {
+          break;
+        }
+      }
+
+      path[p.range.end] = old_end;
+      p                 = zix_path_next(path, p);
+    }
+
+    zix_free(allocator, path);
   }
 
-  zix_free(allocator, path);
   return st;
 }
 

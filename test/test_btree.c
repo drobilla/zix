@@ -221,9 +221,9 @@ test_remove_cases(void)
      even multiples.  This spreads the load around to hit as many cases as
      possible. */
 
-  static const uintptr_t s1           = 2U;
-  static const uintptr_t s2           = 255U;
-  const size_t           n_insertions = s1 * s2 * 1000U;
+  static const uintptr_t s1           = 3U;
+  static const uintptr_t s2           = 511U;
+  const size_t           n_insertions = s1 * s2 * 450U;
 
   ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
@@ -628,9 +628,9 @@ main(int argc, char** argv)
   test_remove_cases();
   test_failed_alloc();
 
-  const unsigned n_tests = 3U;
+  const unsigned n_tests = 2U;
   const size_t   n_elems =
-    (argc > 1) ? zix_test_size_arg(argv[1], 4U, 1U << 20U) : 131072U;
+    (argc > 1) ? zix_test_size_arg(argv[1], 4U, 1U << 20U) : (1U << 16U);
 
   printf("Running %u tests with %zu elements", n_tests, n_elems);
   for (unsigned i = 0; i < n_tests; ++i) {

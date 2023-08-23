@@ -435,9 +435,7 @@ zix_path_begin(const char* const path)
 {
   const ZixPathIter iter = {zix_path_root_name_range(path), ZIX_PATH_ROOT_NAME};
 
-  return (iter.range.end > iter.range.begin) ? iter
-         : path                              ? zix_path_next(path, iter)
-                                             : zix_path_next("", iter);
+  return (iter.range.end > iter.range.begin) ? iter : zix_path_next(path, iter);
 }
 
 ZixPathIter

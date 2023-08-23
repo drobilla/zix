@@ -107,6 +107,8 @@ test_bump_allocator(void)
   assert(aligned <= buffer + sizeof(buffer));
   assert((uintptr_t)aligned % 128 == 0U);
 
+  assert(!zix_aligned_alloc(&allocator.base, 8, 896));
+
   zix_aligned_free(&allocator.base, aligned);
   zix_free(&allocator.base, reclaimed); // Correct, but a noop
   zix_free(&allocator.base, malloced);  // Correct, but a noop
