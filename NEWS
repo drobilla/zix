@@ -1,5 +1,5 @@
-zix (0.3.3) unstable; urgency=medium
+zix (0.4.0) stable; urgency=medium
 
   * Initial release
 
- -- David Robillard <d@drobilla.net>  Thu, 18 Aug 2022 21:51:42 +0000
+ -- David Robillard <d@drobilla.net>  Wed, 23 Aug 2023 23:25:38 +0000
