@@ -1,13 +1,17 @@
 # Copyright 2019-2022 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
+stages: [build, deploy]
+
 default:
+  stage: build
   image: lv2plugin/debian-x64
   script:
     - meson setup build -Dwerror=true
     - ninja -C build test
 
 dev:
+  stage: build
   image: lv2plugin/debian-x64
   script:
     - meson setup build -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Db_coverage=true -Dlint=true -Ddocs=enabled -Dprefix=/
@@ -23,12 +27,14 @@ dev:
       - build/meson-logs/coveragereport
 
 static:
+  stage: build
   image: lv2plugin/debian-x64
   script:
     - meson setup build -Ddefault_library=static -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
     - ninja -C build test
 
 sanitize:
+  stage: build
   image: lv2plugin/debian-x64-clang
   script:
     - meson setup build -Db_lundef=false -Dbuildtype=plain -Dwarning_level=3 -Dwerror=true -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dcpp_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Dcpp_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Ddocs=disabled
@@ -44,6 +50,7 @@ sanitize:
 # Linux Distributions
 
 fedora:
+  stage: build
   image: lv2plugin/fedora-big
   script:
     - meson setup build -Dbuildtype=plain -Dwarning_level=3 -Dwerror=true
@@ -54,6 +61,7 @@ fedora:
 # Linux Platforms
 
 arm32:
+  stage: build
   image: lv2plugin/debian-arm32
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
@@ -62,6 +70,7 @@ arm32:
     - ninja -C build test
 
 arm64:
+  stage: build
   image: lv2plugin/debian-arm64
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
@@ -70,6 +79,7 @@ arm64:
     - ninja -C build test
 
 mingw32:
+  stage: build
   image: lv2plugin/debian-mingw32
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
@@ -80,6 +90,7 @@ mingw32:
     WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\10-win32"
 
 mingw64:
+  stage: build
   image: lv2plugin/debian-mingw64
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
@@ -90,6 +101,7 @@ mingw64:
     WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\10-win32"
 
 wasm:
+  stage: build
   image: lv2plugin/debian-wasm
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/wasm.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Ddefault_library=static -Ddocs=disabled
@@ -100,6 +112,7 @@ wasm:
 # Non-Linux/Docker rows (not hosted)
 
 freebsd:
+  stage: build
   tags: [freebsd,meson]
   script:
     - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
@@ -108,6 +121,7 @@ freebsd:
     - ninja -C build test
 
 mac:
+  stage: build
   tags: [macos]
   script:
     - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true
@@ -116,6 +130,7 @@ mac:
     - ninja -C build test
 
 win:
+  stage: build
   tags: [windows,meson]
   script:
     - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
@@ -126,6 +141,7 @@ win:
 # Documentation
 
 pages:
+  stage: deploy
   script:
     - mkdir -p .public/doc
     - mv build/meson-logs/coveragereport/ .public/coverage
