@@ -109,6 +109,6 @@ if __name__ == "__main__":
         file_prefix_len = len(file_prefix)
         pyplot.title(os.path.splitext(filename[file_prefix_len:])[0].title())
 
-    print("Writing %s" % sys.argv[1])
+    print(f"Writing {sys.argv[1]}")
     matplotlib.pyplot.tight_layout()
     matplotlib.pyplot.savefig(sys.argv[1])
