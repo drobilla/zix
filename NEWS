@@ -1,3 +1,9 @@
+zix (0.4.1) unstable; urgency=medium
+
+  * Fix documentation build in a virtualenv
+
+ -- David Robillard <d@drobilla.net>  Sat, 02 Sep 2023 23:32:38 +0000
+
 zix (0.4.0) stable; urgency=medium
 
   * Initial release
