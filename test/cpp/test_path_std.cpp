@@ -19,12 +19,14 @@
 #include <sstream>
 #include <string>
 
+namespace {
+
 struct BinaryCase {
   const char* lhs;
   const char* rhs;
 };
 
-static const BinaryCase joins[] = {
+const BinaryCase joins[] = {
   {"", ""},           {"", "/b/"},      {"", "b"},         {"/", ""},
   {"..", ".."},       {"..", "name"},   {"..", "/"},       {"/", ".."},
   {"/", nullptr},     {"//host", ""},   {"//host", "a"},   {"//host/", "a"},
@@ -45,7 +47,7 @@ static const BinaryCase joins[] = {
   {nullptr, "/b/c"},  {nullptr, "b"},   {nullptr, "b/c"},  {nullptr, nullptr},
 };
 
-static const BinaryCase lexical_relatives[] = {
+const BinaryCase lexical_relatives[] = {
   {"", ""},
   {"", "."},
   {".", "."},
@@ -127,7 +129,7 @@ static const BinaryCase lexical_relatives[] = {
 #endif
 };
 
-static const char* const paths[] = {
+const char* const paths[] = {
   // Valid paths handled consistently on all platforms
   "",
   ".",
@@ -396,7 +398,7 @@ static const char* const paths[] = {
 };
 
 /// Abort if `path` doesn't match `result` when loosely parsed
-static bool
+bool
 match(const std::filesystem::path& path, char* const result)
 {
   const bool success = (path.empty() && !result) || (result && path == result);
@@ -406,7 +408,7 @@ match(const std::filesystem::path& path, char* const result)
 }
 
 /// Abort if `path` doesn't equal `result`
-static bool
+bool
 equal(const std::filesystem::path& path, char* const result)
 {
   const bool success =
@@ -417,7 +419,7 @@ equal(const std::filesystem::path& path, char* const result)
 }
 
 /// Abort if `path` doesn't match `view` when loosely parsed
-static bool
+bool
 match(const std::filesystem::path& path, const ZixStringView view)
 {
   return (path.empty() && !view.length) ||
@@ -425,7 +427,7 @@ match(const std::filesystem::path& path, const ZixStringView view)
 }
 
 /// Abort if `path` doesn't equal `view`
-static bool
+bool
 equal(const std::filesystem::path& path, const ZixStringView view)
 {
   return (path.empty() && !view.length) ||
@@ -433,7 +435,7 @@ equal(const std::filesystem::path& path, const ZixStringView view)
           path.u8string() == std::string{view.data, view.length});
 }
 
-static void
+void
 run()
 {
   using Path = std::filesystem::path;
@@ -493,6 +495,8 @@ run()
       zix_path_lexically_relative(nullptr, relatives.rhs, relatives.lhs)));
   }
 }
+
+} // namespace
 
 int
 main()
