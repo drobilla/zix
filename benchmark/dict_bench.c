@@ -1,8 +1,16 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "bench.h"
 #include "warnings.h"
+
+typedef struct {
+  char*  buf;
+  size_t len;
+} ZixChunk;
+
+#define ZIX_HASH_KEY_TYPE ZixChunk
+#define ZIX_HASH_RECORD_TYPE ZixChunk
 
 #include "zix/attributes.h"
 #include "zix/digest.h"
@@ -22,11 +30,6 @@ ZIX_RESTORE_WARNINGS
 #include <time.h>
 
 typedef struct {
-  char*  buf;
-  size_t len;
-} ZixChunk;
-
-typedef struct {
   ZixChunk* chunks;
   size_t    n_chunks;
   char*     buf;
@@ -42,8 +45,8 @@ lcg64(const uint64_t i)
   return (a * i) + c;
 }
 
-ZIX_PURE_FUNC static const void*
-identity(const void* record)
+ZIX_PURE_FUNC static const ZixChunk*
+identity(const ZixChunk* record)
 {
   return record;
 }

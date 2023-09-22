@@ -48,6 +48,7 @@ if cc.get_id() in ['clang', 'emscripten']
       '-Wno-declaration-after-statement',
       '-Wno-implicit-fallthrough', # Really for clang < 12
       '-Wno-padded',
+      '-Wno-unsafe-buffer-usage',
     ]
 
     if not meson.is_cross_build()
