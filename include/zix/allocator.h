@@ -16,8 +16,6 @@ ZIX_BEGIN_DECLS
    @{
 */
 
-struct ZixAllocatorImpl;
-
 /**
    A memory allocator.
 

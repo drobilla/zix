@@ -3,7 +3,6 @@
 
 #include "zix/filesystem.h"
 
-#include "index_range.h"
 #include "path_iter.h"
 #include "system.h"
 

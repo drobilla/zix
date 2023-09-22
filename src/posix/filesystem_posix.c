@@ -40,8 +40,6 @@
 #  define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
-struct stat;
-
 static inline ZixStatus
 zix_posix_status(const int rc)
 {
