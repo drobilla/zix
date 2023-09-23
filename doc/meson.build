@@ -58,16 +58,23 @@ if build_docs
   )
 
   # Copy hand-written documentation files
-  c_rst_files = files(
+  rst_sources = files(
     'allocation.rst',
     'error_handling.rst',
     'index.rst',
     'string_views.rst',
     'using_zix.rst',
   )
-  foreach f : c_rst_files + files('overview_code.c')
-    configure_file(copy: true, input: f, output: '@PLAINNAME@')
+  sphinx_input = []
+  foreach f : rst_sources
+    sphinx_input += [
+      configure_file(copy: true, input: f, output: '@PLAINNAME@'),
+    ]
   endforeach
+
+  # Copy documentation code
+  doc_c_sources = files('overview_code.c')
+  configure_file(copy: true, input: doc_c_sources, output: '@PLAINNAME@')
 
   # Generate reference documentation input with Doxygen and Sphinxygen
   subdir('xml')

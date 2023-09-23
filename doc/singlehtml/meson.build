@@ -13,12 +13,13 @@ custom_target(
     '@OUTDIR@' / '..',
     '-t', 'singlehtml',
   ] + sphinx_flags,
-  input: [c_rst_files, c_zix_rst, c_index_xml, conf_py],
+  input: [api_zix_rst, conf_py, sphinx_input],
   install: true,
   install_dir: singlehtml_dir,
   output: [
-    '_static',
     'index.html',
+
+    '_static',
   ],
 )
 
