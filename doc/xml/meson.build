@@ -86,5 +86,5 @@ doxygen_xml = custom_target(
     'thread_8h.xml',
     'tree_8h.xml',
     'zix_8h.xml',
-  ]
+  ],
 )
