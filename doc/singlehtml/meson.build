@@ -10,7 +10,7 @@ custom_target(
     '-b', 'singlehtml',
     '-t', 'singlehtml',
     sphinx_in_dir,
-    '@OUTDIR@'
+    '@OUTDIR@',
   ],
   input: [api_zix_rst, conf_py, sphinx_input],
   install: true,
