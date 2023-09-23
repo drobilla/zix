@@ -95,7 +95,7 @@ foreach test, cases : sequential_tests
     link_args: program_link_args,
   )
 
-  test_executables += { test: exe }
+  test_executables += {test: exe}
   foreach suffix, args : cases
     test(test + suffix, exe, args: args, suite: 'unit', timeout: 120)
   endforeach
@@ -114,7 +114,7 @@ if thread_dep.found()
       link_args: program_link_args,
     )
 
-    test_executables += { test: exe }
+    test_executables += {test: exe}
     foreach suffix, args : cases
       test(test + suffix, exe, args: args, suite: 'unit', timeout: 120)
     endforeach

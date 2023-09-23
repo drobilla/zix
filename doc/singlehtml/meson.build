@@ -7,7 +7,10 @@ custom_target(
   'singlehtml',
   build_by_default: true,
   command: [
-    sphinx_build, '-M', 'singlehtml', '@OUTDIR@' / '..', '@OUTDIR@' / '..',
+    sphinx_build,
+    '-M', 'singlehtml',
+    '@OUTDIR@' / '..',
+    '@OUTDIR@' / '..',
     '-t', 'singlehtml',
   ] + sphinx_flags,
   input: [c_rst_files, c_zix_rst, c_index_xml, conf_py],
@@ -20,5 +23,9 @@ custom_target(
 )
 
 if not meson.is_subproject()
-  summary('Unified HTML', get_option('prefix') / singlehtml_dir, section: 'Directories')
+  summary(
+    'Unified HTML',
+    get_option('prefix') / singlehtml_dir,
+    section: 'Directories',
+  )
 endif

@@ -7,7 +7,10 @@ custom_target(
   'html',
   build_by_default: true,
   command: [
-    sphinx_build, '-M', 'html', '@OUTDIR@' / '..', '@OUTDIR@' / '..',
+    sphinx_build,
+    '-M', 'html',
+    '@OUTDIR@' / '..',
+    '@OUTDIR@' / '..',
     '-t', 'html',
   ] + sphinx_flags,
   input: [c_rst_files, c_zix_rst, c_index_xml, conf_py],
@@ -26,5 +29,9 @@ custom_target(
 )
 
 if not meson.is_subproject()
-  summary('Paginated HTML', get_option('prefix') / html_dir, section: 'Directories')
+  summary(
+    'Paginated HTML',
+    get_option('prefix') / html_dir,
+    section: 'Directories',
+  )
 endif

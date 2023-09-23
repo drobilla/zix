@@ -197,54 +197,64 @@ else
   template = '#include <@0@>\nint main(void) { @1@ }'
 
   mac_checks = {
-    'clonefile':
-      template.format(
-        'sys/clonefile.h',
-        'return clonefile("/src", "/dst", 0);'),
+    'clonefile': template.format(
+      'sys/clonefile.h',
+      'return clonefile("/src", "/dst", 0);',
+    ),
   }
 
   posix_checks = {
-    'clock_gettime':
-      template.format(
-        'time.h',
-        'struct timespec t; return clock_gettime(CLOCK_MONOTONIC, &t);'),
+    'clock_gettime': template.format(
+      'time.h',
+      'struct timespec t; return clock_gettime(CLOCK_MONOTONIC, &t);',
+    ),
 
-    'copy_file_range':
-      template.format(
-        'unistd.h',
-        'return copy_file_range(0, NULL, 1, NULL, 0U, 0U);'),
+    'copy_file_range': template.format(
+      'unistd.h',
+      'return copy_file_range(0, NULL, 1, NULL, 0U, 0U);',
+    ),
 
     'fileno': template.format('stdio.h', 'return fileno(stdin);'),
     'flock': template.format('sys/file.h', 'return flock(0, 0);'),
 
-    'lstat':
-      template.format('sys/stat.h', 'struct stat s; return lstat("/", &s);'),
+    'lstat': template.format(
+      'sys/stat.h',
+      'struct stat s; return lstat("/", &s);',
+    ),
 
     'mlock': template.format('sys/mman.h', 'return mlock(0, 0);'),
 
-    'pathconf':
-      template.format('unistd.h', 'return pathconf("/", _PC_PATH_MAX) > 0L;'),
+    'pathconf': template.format(
+      'unistd.h',
+      'return pathconf("/", _PC_PATH_MAX) > 0L;',
+    ),
 
     'posix_fadvise': template.format(
       'fcntl.h',
-      'posix_fadvise(0, 0, 4096, POSIX_FADV_SEQUENTIAL);'),
+      'posix_fadvise(0, 0, 4096, POSIX_FADV_SEQUENTIAL);',
+    ),
 
-    'posix_memalign':
-      template.format('stdlib.h', 'void* mem; posix_memalign(&mem, 8, 8);'),
+    'posix_memalign': template.format(
+      'stdlib.h',
+      'void* mem; posix_memalign(&mem, 8, 8);',
+    ),
 
-    'realpath':
-      template.format('stdlib.h', 'return realpath("/", NULL) != NULL;'),
+    'realpath': template.format(
+      'stdlib.h',
+      'return realpath("/", NULL) != NULL;',
+    ),
 
-    'sysconf':
-      template.format('unistd.h', 'return sysconf(_SC_PAGE_SIZE) > 0L;'),
+    'sysconf': template.format(
+      'unistd.h',
+      'return sysconf(_SC_PAGE_SIZE) > 0L;',
+    ),
   }
 
   windows_checks = {
-    'CreateSymbolicLink':
-      template.format(
-        'windows.h',
-        'return CreateSymbolicLink(' +
-        '"l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);'),
+    'CreateSymbolicLink': template.format(
+      'windows.h',
+      'return CreateSymbolicLink(' + '"l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);',
+    ),
   }
 
   if host_machine.system() == 'darwin'
@@ -255,12 +265,14 @@ else
     checks = posix_checks
 
     if thread_dep.found()
-      if cc.links('''#include <semaphore.h>
+      if cc.links(
+        '''#include <semaphore.h>
 #include <time.h>
 int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }''',
-                  args: system_c_args,
-                  dependencies: thread_dep,
-                  name: 'sem_timedwait')
+        args: system_c_args,
+        dependencies: thread_dep,
+        name: 'sem_timedwait',
+      )
         platform_c_args += ['-DHAVE_SEM_TIMEDWAIT']
       endif
     endif
@@ -455,9 +467,9 @@ if not meson.is_subproject()
 
   summary(
     {
-      'Install prefix':  get_option('prefix'),
-      'Headers':  get_option('prefix') / get_option('includedir'),
-      'Libraries':  get_option('prefix') / get_option('libdir'),
+      'Install prefix': get_option('prefix'),
+      'Headers': get_option('prefix') / get_option('includedir'),
+      'Libraries': get_option('prefix') / get_option('libdir'),
     },
     section: 'Directories',
   )
