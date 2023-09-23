@@ -1,12 +1,15 @@
-// Copyright 2014-2021 David Robillard <d@drobilla.net>
+// Copyright 2014-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
+
+#include "failing_allocator.h"
 
 #include "zix/allocator.h"
 #include "zix/bump_allocator.h"
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 
 static void
@@ -108,10 +111,25 @@ test_bump_allocator(void)
   assert((uintptr_t)aligned % 128 == 0U);
 
   assert(!zix_aligned_alloc(&allocator.base, 8, 896));
+  assert(zix_aligned_alloc(&allocator.base, 8, 8));
 
   zix_aligned_free(&allocator.base, aligned);
   zix_free(&allocator.base, reclaimed); // Correct, but a noop
   zix_free(&allocator.base, malloced);  // Correct, but a noop
+}
+
+static void
+test_failing_allocator(void)
+{
+  ZixFailingAllocator allocator = zix_failing_allocator();
+  allocator.n_remaining         = 0;
+
+  assert(!zix_malloc(&allocator.base, 16U));
+  assert(!zix_calloc(&allocator.base, 16U, 1U));
+  assert(!zix_realloc(&allocator.base, NULL, 32U));
+  zix_free(&allocator.base, NULL);
+  assert(!zix_aligned_alloc(&allocator.base, 8U, 16U));
+  zix_aligned_free(&allocator.base, NULL);
 }
 
 int
@@ -119,6 +137,7 @@ main(void)
 {
   test_allocator();
   test_bump_allocator();
+  test_failing_allocator();
 
   return 0;
 }

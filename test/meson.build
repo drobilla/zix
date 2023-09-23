@@ -38,75 +38,101 @@ endif
 common_test_sources = files('failing_allocator.c')
 
 # Single-threaded tests that should run everywhere
-sequential_tests = [
-  'allocator',
-  'btree',
-  'digest',
-  'hash',
-  'path',
-  'status',
-  'tree',
-]
+sequential_tests = {
+  'allocator': {'': []},
+  'btree': {
+    '': [],
+    '_small': ['4'],
+  },
+  'filesystem': {'': files('../README.md')},
+  'digest': {'': []},
+  'hash': {'': []},
+  'path': {'': []},
+  'status': {'': []},
+  'tree': {
+    '': [],
+    '_seed': ['8', '314159'],
+    '_small': ['4'],
+  },
+}
 
 # Multi-threaded tests that require thread support
-threaded_tests = [
-  'ring',
-  'sem',
-  'thread',
-]
+threaded_tests = {
+  'ring': {
+    '': [],
+    'small': ['4', '1024'],
+  },
+  'sem': {
+    '': [],
+    'one': ['1'],
+  },
+  'thread': {'': []},
+}
 
-foreach test : sequential_tests
+# Bad command-line argument (meta-)tests
+bad_tests = {
+  'btree': {
+    '_extra': ['4', '1337'],
+  },
+  'ring': {
+    '_extra': ['4', '1024', '1337'],
+  },
+  'sem': {
+    '_extra': ['4', '1337'],
+  },
+}
+
+# Test single-threaded
+test_executables = {}
+foreach test, cases : sequential_tests
   sources = common_test_sources + files('test_@0@.c'.format(test))
-
-  test(
-    test,
-    executable(
-      'test_@0@'.format(test),
-      sources,
-      c_args: c_suppressions + program_c_args + test_suppressions,
-      dependencies: [zix_dep],
-      include_directories: include_dirs,
-      link_args: program_link_args,
-    ),
-    suite: 'unit',
-    timeout: 120,
-  )
-endforeach
-
-test(
-  'filesystem',
-  executable(
-    'test_filesystem',
-    files('test_filesystem.c'),
-    c_args: c_suppressions + program_c_args,
+  exe = executable(
+    'test_@0@'.format(test),
+    sources,
+    c_args: c_suppressions + program_c_args + test_suppressions,
     dependencies: [zix_dep],
     include_directories: include_dirs,
     link_args: program_link_args,
-  ),
-  args: files('../README.md'),
-  suite: 'unit',
-  timeout: 120,
-)
+  )
 
+  test_executables += { test: exe }
+  foreach suffix, args : cases
+    test(test + suffix, exe, args: args, suite: 'unit', timeout: 120)
+  endforeach
+endforeach
+
+# Test multi-threaded 
 if thread_dep.found()
-  foreach test : threaded_tests
+  foreach test, cases : threaded_tests
     sources = common_test_sources + files('test_@0@.c'.format(test))
-
-    test(
-      test,
-      executable(
-        'test_@0@'.format(test),
-        sources,
-        c_args: c_suppressions + program_c_args + test_suppressions,
-        dependencies: [zix_dep, thread_dep],
-        include_directories: include_dirs,
-        link_args: program_link_args,
-      ),
-      suite: 'unit',
-      timeout: 120,
+    exe = executable(
+      'test_@0@'.format(test),
+      sources,
+      c_args: c_suppressions + program_c_args + test_suppressions,
+      dependencies: [zix_dep, thread_dep],
+      include_directories: include_dirs,
+      link_args: program_link_args,
     )
+
+    test_executables += { test: exe }
+    foreach suffix, args : cases
+      test(test + suffix, exe, args: args, suite: 'unit', timeout: 120)
+    endforeach
   endforeach
 endif
+
+# Test bad cases
+foreach test, cases : bad_tests
+  foreach suffix, args : cases
+    test(
+      test + suffix,
+      test_executables[test],
+      args: args,
+      should_fail: true,
+      suite: 'unit',
+    )
+  endforeach
+endforeach
 
 # Test that headers have no warnings (ignoring the usual suppressions)
 if cc.get_id() != 'emscripten'

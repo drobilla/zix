@@ -501,11 +501,6 @@ run()
 int
 main()
 {
-  try {
-    run();
-  } catch (...) {
-    return 1;
-  }
-
+  run();
   return 0;
 }

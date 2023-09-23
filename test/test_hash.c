@@ -1,4 +1,4 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
@@ -6,6 +6,7 @@
 #define ZIX_HASH_KEY_TYPE const char
 #define ZIX_HASH_RECORD_TYPE const char
 
+#include "ensure.h"
 #include "failing_allocator.h"
 #include "test_data.h"
 
@@ -24,29 +25,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-static bool expect_failure = false;
+typedef struct {
+  ZixHash* hash;
+  char*    buffer;
+  char**   strings;
+} TestState;
 
-ZIX_LOG_FUNC(4, 5)
+ZIX_LOG_FUNC(2, 3)
 static int
-test_fail(ZixHash* const hash,
-          char* const    buffer,
-          char** const   strings,
-          const char*    fmt,
-          ...)
+test_fail(TestState* const state, const char* fmt, ...)
 {
-  if (!expect_failure) {
-    va_list args; // NOLINT(cppcoreguidelines-init-variables)
-    va_start(args, fmt);
-    fprintf(stderr, "error: ");
-    vfprintf(stderr, fmt, args);
-    va_end(args);
-  }
+  va_list args; // NOLINT(cppcoreguidelines-init-variables)
+  va_start(args, fmt);
+  fprintf(stderr, "error: ");
+  vfprintf(stderr, fmt, args);
+  va_end(args);
 
-  zix_hash_free(hash);
-  free(buffer);
-  free(strings);
-
-  return expect_failure ? 0 : 1;
+  zix_hash_free(state->hash);
+  free(state->buffer);
+  free(state->strings);
+  return EXIT_FAILURE;
 }
 
 ZIX_PURE_FUNC static const char*
@@ -130,18 +128,17 @@ stress_with(ZixAllocator* const allocator,
             const ZixHashFunc   hash_func,
             const size_t        n_elems)
 {
-  ZixHash* hash = zix_hash_new(allocator, identity, hash_func, string_equal);
-  if (!hash) {
-    return test_fail(hash, NULL, NULL, "Failed to allocate hash\n");
-  }
+  ZixHash*  hash  = zix_hash_new(allocator, identity, hash_func, string_equal);
+  TestState state = {hash, NULL, NULL};
+  ENSURE(&state, hash, "Failed to allocate hash\n");
 
   static const size_t string_length = 15;
 
   char* const  buffer  = (char*)calloc(1, n_elems * (string_length + 1));
-  char** const strings = (char**)calloc(sizeof(char*), n_elems);
-  if (!buffer || !strings) {
-    return test_fail(hash, buffer, strings, "Failed to allocate strings\n");
-  }
+  char** const strings = state.strings = (char**)calloc(sizeof(char*), n_elems);
+  state.buffer                         = buffer;
+  state.strings                        = strings;
+  ENSURE(&state, buffer && state.strings, "Failed to allocate strings\n");
 
   uint32_t seed = 1U;
   for (size_t i = 0U; i < n_elems; ++i) {
@@ -158,46 +155,35 @@ stress_with(ZixAllocator* const allocator,
   // Insert each string
   for (size_t i = 0; i < n_elems; ++i) {
     ZixStatus st = zix_hash_insert(hash, strings[i]);
-    if (st) {
-      return test_fail(
-        hash, buffer, strings, "Failed to insert `%s'\n", strings[i]);
-    }
+    ENSUREV(&state, !st, "Failed to insert `%s'\n", strings[i]);
   }
 
   // Ensure hash size is correct
-  if (zix_hash_size(hash) != n_elems) {
-    return test_fail(hash,
-                     buffer,
-                     strings,
-                     "Hash size %" PRIuPTR " != %" PRIuPTR "\n",
-                     zix_hash_size(hash),
-                     n_elems);
-  }
+  ENSUREV(&state,
+          zix_hash_size(hash) == n_elems,
+          "Hash size %" PRIuPTR " != %" PRIuPTR "\n",
+          zix_hash_size(hash),
+          n_elems);
 
   // Attempt to insert each string again
   for (size_t i = 0; i < n_elems; ++i) {
     ZixStatus st = zix_hash_insert(hash, strings[i]);
-    if (st != ZIX_STATUS_EXISTS) {
-      return test_fail(hash,
-                       buffer,
-                       strings,
-                       "Double inserted `%s' (%s)\n",
-                       strings[i],
-                       zix_strerror(st));
-    }
+    ENSUREV(&state,
+            st == ZIX_STATUS_EXISTS,
+            "Double inserted `%s' (%s)\n",
+            strings[i],
+            zix_strerror(st));
   }
 
   // Search for each string
   for (size_t i = 0; i < n_elems; ++i) {
     const char* match = (const char*)zix_hash_find_record(hash, strings[i]);
-    if (!match) {
-      return test_fail(
-        hash, buffer, strings, "Failed to find `%s'\n", strings[i]);
-    }
-    if (match != strings[i]) {
-      return test_fail(
-        hash, buffer, strings, "Bad match for `%s': `%s'\n", strings[i], match);
-    }
+    ENSUREV(&state, match, "Failed to find `%s'\n", strings[i]);
+    ENSUREV(&state,
+            match == strings[i],
+            "Bad match for `%s': `%s'\n",
+            strings[i],
+            match);
   }
 
   static const char* const not_indexed_string = "__not__indexed__";
@@ -207,10 +193,7 @@ stress_with(ZixAllocator* const allocator,
   if (not_indexed) {
     memcpy(not_indexed, not_indexed_string, strlen(not_indexed_string) + 1);
     const char* match = (const char*)zix_hash_find_record(hash, not_indexed);
-    if (match) {
-      return test_fail(
-        hash, buffer, strings, "Unexpectedly found `%s'\n", not_indexed);
-    }
+    ENSUREV(&state, !match, "Unexpectedly found `%s'\n", not_indexed);
     free(not_indexed);
   }
 
@@ -221,33 +204,26 @@ stress_with(ZixAllocator* const allocator,
     // Remove string
     const char* removed = NULL;
     ZixStatus   st      = zix_hash_remove(hash, strings[i], &removed);
-    if (st) {
-      return test_fail(
-        hash, buffer, strings, "Failed to remove `%s'\n", strings[i]);
-    }
+    ENSUREV(&state, !st, "Failed to remove `%s'\n", strings[i]);
 
     // Ensure the removed value is what we expected
-    if (removed != strings[i]) {
-      return test_fail(hash,
-                       buffer,
-                       strings,
-                       "Removed `%s` instead of `%s`\n",
-                       removed,
-                       strings[i]);
-    }
+    ENSUREV(&state,
+            removed == strings[i],
+            "Removed `%s` instead of `%s`\n",
+            removed,
+            strings[i]);
 
     // Ensure size is updated
-    if (zix_hash_size(hash) != initial_size - 1) {
-      return test_fail(
-        hash, buffer, strings, "Removing node did not decrease hash size\n");
-    }
+    ENSURE(&state,
+           zix_hash_size(hash) == initial_size - 1,
+           "Removing node did not decrease hash size\n");
 
     // Ensure second removal fails
     st = zix_hash_remove(hash, strings[i], &removed);
-    if (st != ZIX_STATUS_NOT_FOUND) {
-      return test_fail(
-        hash, buffer, strings, "Unexpectedly removed `%s' twice\n", strings[i]);
-    }
+    ENSUREV(&state,
+            st == ZIX_STATUS_NOT_FOUND,
+            "Unexpectedly removed `%s' twice\n",
+            strings[i]);
 
     // Ensure value can no longer be found
     assert(zix_hash_find(hash, strings[i]) == zix_hash_end(hash));
@@ -255,20 +231,11 @@ stress_with(ZixAllocator* const allocator,
     // Check to ensure remaining strings are still present
     for (size_t j = i + 1; j < n_elems; ++j) {
       const char* match = (const char*)zix_hash_find_record(hash, strings[j]);
-      if (!match) {
-        return test_fail(hash,
-                         buffer,
-                         strings,
-                         "Failed to find `%s' after remove\n",
-                         strings[j]);
-      }
-      if (match != strings[j]) {
-        return test_fail(hash,
-                         buffer,
-                         strings,
-                         "Bad match for `%s' after remove\n",
-                         strings[j]);
-      }
+      ENSUREV(&state, match, "Failed to find `%s' after remove\n", strings[j]);
+      ENSUREV(&state,
+              match == strings[j],
+              "Bad match for `%s' after remove\n",
+              strings[j]);
     }
   }
 
@@ -278,10 +245,7 @@ stress_with(ZixAllocator* const allocator,
 
     assert(!zix_hash_record_at(hash, plan));
     ZixStatus st = zix_hash_insert_at(hash, plan, strings[i]);
-    if (st) {
-      return test_fail(
-        hash, buffer, strings, "Failed to insert `%s'\n", strings[i]);
-    }
+    ENSUREV(&state, !st, "Failed to insert `%s'\n", strings[i]);
   }
 
   // Check key == value (and test zix_hash_foreach)
@@ -290,15 +254,12 @@ stress_with(ZixAllocator* const allocator,
        i             = zix_hash_next(hash, i)) {
     const char* const string = (const char*)zix_hash_get(hash, i);
     assert(string);
-    if (strlen(string) < 3) {
-      return test_fail(hash, buffer, strings, "Corrupt value `%s'\n", string);
-    }
+    ENSUREV(&state, strlen(string) >= 3, "Corrupt value `%s'\n", string);
 
     ++n_checked;
   }
-  if (n_checked != n_elems) {
-    return test_fail(hash, buffer, strings, "Check failed\n");
-  }
+
+  ENSURE(&state, n_checked == n_elems, "Check failed\n");
 
   free(strings);
   free(buffer);
@@ -413,9 +374,5 @@ main(void)
 
   static const size_t n_elems = 1024U;
 
-  if (stress(NULL, n_elems)) {
-    return 1;
-  }
-
-  return 0;
+  return stress(NULL, n_elems);
 }

@@ -1,8 +1,9 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
 
+#include "ensure.h"
 #include "failing_allocator.h"
 #include "test_args.h"
 #include "test_data.h"
@@ -45,17 +46,18 @@ ith_elem(unsigned test_num, size_t n_elems, size_t i)
   }
 }
 
-ZIX_LOG_FUNC(1, 2)
+ZIX_LOG_FUNC(2, 3)
 static int
-test_fail(const char* const fmt, ...)
+test_fail(ZixTree* t, const char* fmt, ...)
 {
+  zix_tree_free(t);
+
   va_list args; // NOLINT(cppcoreguidelines-init-variables)
   va_start(args, fmt);
-
   fprintf(stderr, "error: ");
   vfprintf(stderr, fmt, args);
-
   va_end(args);
+
   return EXIT_FAILURE;
 }
 
@@ -79,22 +81,14 @@ test_duplicate_insert(void)
 }
 
 static int
-check_value(const uintptr_t actual, const uintptr_t expected)
-{
-  return (expected == actual)
-           ? 0
-           : test_fail("Data corrupt (%" PRIuPTR " != %" PRIuPTR ")\n",
-                       actual,
-                       expected);
-}
-
-static int
 check_tree_size(const size_t actual, const size_t expected)
 {
   return (expected == actual)
            ? 0
-           : test_fail(
-               "Tree size %" PRIuPTR " != %" PRIuPTR "\n", actual, expected);
+           : test_fail(NULL, // FIXME
+                       "Tree size %" PRIuPTR " != %" PRIuPTR "\n",
+                       actual,
+                       expected);
 }
 
 static int
@@ -105,14 +99,12 @@ insert_elements(ZixTree* const t, const unsigned test_num, const size_t n_elems)
   for (size_t i = 0; i < n_elems; ++i) {
     const uintptr_t r = ith_elem(test_num, n_elems, i);
 
-    ZixStatus status = zix_tree_insert(t, (void*)r, &ti);
-    if (status) {
-      return test_fail("Insert failed\n");
-    }
+    const ZixStatus st = zix_tree_insert(t, (void*)r, &ti);
+    ENSURE(NULL, !st, "Insert failed\n");
 
-    if (check_value((uintptr_t)zix_tree_get(ti), r)) {
-      return EXIT_FAILURE;
-    }
+    const uintptr_t value = (uintptr_t)zix_tree_get(ti);
+    ENSUREV(
+      NULL, value == r, "Insert %" PRIuPTR " != %" PRIuPTR "\n", value, r);
   }
 
   return 0;
@@ -125,32 +117,31 @@ stress(ZixAllocator* allocator, unsigned test_num, size_t n_elems)
   ZixTreeIter* ti = NULL;
   ZixTree*     t  = zix_tree_new(allocator, true, int_cmp, NULL, NULL, NULL);
 
-  assert(t);
-  assert(!zix_tree_begin(t));
-  assert(!zix_tree_end(t));
-  assert(!zix_tree_rbegin(t));
-  assert(!zix_tree_rend(t));
+  ENSURE(t, t, "Failed to allocate tree\n");
+  ENSURE(t, !zix_tree_begin(t), "Empty tree has begin iterator\n");
+  ENSURE(t, !zix_tree_end(t), "Empty tree has end iterator\n");
+  ENSURE(t, !zix_tree_rbegin(t), "Empty tree has reverse begin iterator\n");
+  ENSURE(t, !zix_tree_rend(t), "Empty tree has reverse end iterator\n");
 
   // Insert n_elems elements
-  if (insert_elements(t, test_num, n_elems)) {
-    return EXIT_FAILURE;
-  }
+  ENSURE(t,
+         !insert_elements(t, test_num, n_elems),
+         "Failed to insert initial elements\n");
 
   // Ensure tree size is correct
-  if (check_tree_size(zix_tree_size(t), n_elems)) {
-    return EXIT_FAILURE;
-  }
+  ENSUREV(t,
+          zix_tree_size(t) == n_elems,
+          "Tree size %" PRIuPTR " != %" PRIuPTR "\n",
+          zix_tree_size(t),
+          n_elems);
 
   // Search for all elements
   for (size_t i = 0; i < n_elems; ++i) {
     r = ith_elem(test_num, n_elems, i);
-    if (zix_tree_find(t, (void*)r, &ti)) {
-      return test_fail("Find failed\n");
-    }
+    ENSURE(t, !zix_tree_find(t, (void*)r, &ti), "Find failed\n");
 
-    if (check_value((uintptr_t)zix_tree_get(ti), r)) {
-      return EXIT_FAILURE;
-    }
+    const uintptr_t value = (uintptr_t)zix_tree_get(ti);
+    ENSUREV(t, value == r, "Value %" PRIuPTR " != %" PRIuPTR "\n", value, r);
   }
 
   // Iterate over all elements
@@ -159,16 +150,18 @@ stress(ZixAllocator* allocator, unsigned test_num, size_t n_elems)
   for (ZixTreeIter* iter = zix_tree_begin(t); !zix_tree_iter_is_end(iter);
        iter              = zix_tree_iter_next(iter), ++i) {
     const uintptr_t iter_data = (uintptr_t)zix_tree_get(iter);
-    if (iter_data < last) {
-      return test_fail(
-        "Iter corrupt (%" PRIuPTR " < %" PRIuPTR ")\n", iter_data, last);
-    }
+    ENSUREV(t,
+            iter_data >= last,
+            "Iter corrupt (%" PRIuPTR " < %" PRIuPTR ")\n",
+            iter_data,
+            last);
     last = iter_data;
   }
-  if (i != n_elems) {
-    return test_fail(
-      "Iteration stopped at %" PRIuPTR "/%" PRIuPTR " elements\n", i, n_elems);
-  }
+  ENSUREV(t,
+          i == n_elems,
+          "Iteration stopped at %" PRIuPTR "/%" PRIuPTR " elements\n",
+          i,
+          n_elems);
 
   // Iterate over all elements backwards
   i    = 0;
@@ -176,10 +169,11 @@ stress(ZixAllocator* allocator, unsigned test_num, size_t n_elems)
   for (ZixTreeIter* iter = zix_tree_rbegin(t); !zix_tree_iter_is_rend(iter);
        iter              = zix_tree_iter_prev(iter), ++i) {
     const uintptr_t iter_data = (uintptr_t)zix_tree_get(iter);
-    if (iter_data > last) {
-      return test_fail(
-        "Iter corrupt (%" PRIuPTR " < %" PRIuPTR ")\n", iter_data, last);
-    }
+    ENSUREV(t,
+            iter_data <= last,
+            "Iter corrupt (%" PRIuPTR " < %" PRIuPTR ")\n",
+            iter_data,
+            last);
     last = iter_data;
   }
 
@@ -188,23 +182,17 @@ stress(ZixAllocator* allocator, unsigned test_num, size_t n_elems)
     r = ith_elem(test_num, n_elems, e);
 
     ZixTreeIter* item = NULL;
-    if (zix_tree_find(t, (void*)r, &item) != ZIX_STATUS_SUCCESS) {
-      return test_fail("Failed to find item to remove\n");
-    }
-    if (zix_tree_remove(t, item)) {
-      return test_fail("Error removing item\n");
-    }
+    ENSURE(t,
+           zix_tree_find(t, (void*)r, &item) == ZIX_STATUS_SUCCESS,
+           "Failed to find item to remove\n");
+    ENSURE(t, !zix_tree_remove(t, item), "Error removing item\n");
   }
 
   // Ensure the tree is empty
-  if (check_tree_size(zix_tree_size(t), 0)) {
-    return EXIT_FAILURE;
-  }
+  ENSURE(t, zix_tree_size(t) == 0U, "Tree isn't empty\n");
 
   // Insert n_elems elements again (to test non-empty destruction)
-  if (insert_elements(t, test_num, n_elems)) {
-    return EXIT_FAILURE;
-  }
+  ENSURE(t, !insert_elements(t, test_num, n_elems), "Reinsertion failed\n");
 
   // Ensure tree size is correct
   const int ret = check_tree_size(zix_tree_size(t), n_elems);
@@ -217,34 +205,17 @@ stress(ZixAllocator* allocator, unsigned test_num, size_t n_elems)
 static void
 test_failed_alloc(void)
 {
-  static const size_t n_insertions = 4096;
-
   ZixFailingAllocator allocator = zix_failing_allocator();
 
-  // Successfully test insertions to count the number of allocations
-  ZixTree* t = zix_tree_new(&allocator.base, false, int_cmp, NULL, NULL, NULL);
-  for (size_t i = 0U; i < n_insertions; ++i) {
-    assert(!zix_tree_insert(t, (void*)i, NULL));
+  // Successfully stress test the tree to count the number of allocations
+  assert(!stress(&allocator.base, 0, 16));
+
+  // Test that each allocation failing is handled gracefully
+  const size_t n_new_allocs = allocator.n_allocations;
+  for (size_t i = 0U; i < n_new_allocs; ++i) {
+    allocator.n_remaining = i;
+    assert(stress(&allocator.base, 0, 16));
   }
-
-  // Test that tree allocation failure is handled gracefully
-  allocator.n_remaining = 0;
-  zix_tree_free(t);
-  assert(!zix_tree_new(&allocator.base, false, int_cmp, NULL, NULL, NULL));
-
-  // Allocate a new tree to try the same test again, but with allocation failure
-  allocator.n_remaining = 1;
-  t = zix_tree_new(&allocator.base, false, int_cmp, NULL, NULL, NULL);
-  assert(t);
-
-  // Test that each insertion allocation failing is handled gracefully
-  for (size_t i = 0U; i < n_insertions; ++i) {
-    allocator.n_remaining = 0;
-
-    assert(zix_tree_insert(t, (void*)i, NULL) == ZIX_STATUS_NO_MEM);
-  }
-
-  zix_tree_free(t);
 }
 
 int
@@ -270,20 +241,14 @@ main(int argc, char** argv)
     }
   }
 
-  if (!n_elems) {
-    fprintf(stderr, "USAGE: %s [N_ELEMS]\n", argv[0]);
-    return 1;
-  }
-
   printf(
     "Running %u tests with %zu elements (seed %zu)", n_tests, n_elems, seed);
 
-  for (unsigned i = 0; i < n_tests; ++i) {
+  int st = 0;
+  for (unsigned i = 0; !st && i < n_tests; ++i) {
     printf(".");
     fflush(stdout);
-    if (stress(NULL, i, n_elems)) {
-      return test_fail("Failure with random seed %zu\n", seed);
-    }
+    st = stress(NULL, i, n_elems);
   }
 
   printf("\n");

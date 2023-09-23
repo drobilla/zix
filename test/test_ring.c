@@ -1,4 +1,4 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
@@ -182,8 +182,8 @@ test_failed_alloc(void)
 int
 main(int argc, char** argv)
 {
-  if (argc > 1 && argv[1][0] == '-') {
-    printf("Usage: %s SIZE N_WRITES\n", argv[0]);
+  if (argc > 3) {
+    printf("Usage: %s SIZE [N_WRITES]\n", argv[0]);
     return 1;
   }
 

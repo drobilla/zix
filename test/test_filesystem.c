@@ -1,4 +1,4 @@
-// Copyright 2020-2022 David Robillard <d@drobilla.net>
+// Copyright 2020-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
@@ -235,17 +235,16 @@ test_is_directory(void)
 static int
 write_to_path(const char* const path, const char* const contents)
 {
-  FILE* const f = fopen(path, "w");
-  if (!f) {
-    return -1;
+  int         ret = -1;
+  FILE* const f   = fopen(path, "w");
+  if (f) {
+    const size_t len = strlen(contents);
+    fwrite(contents, 1, len, f);
+
+    ret = fflush(f) ? errno : ferror(f) ? EBADF : fclose(f) ? errno : 0;
   }
 
-  const size_t len = strlen(contents);
-  fwrite(contents, 1, len, f);
-
-  const int ret = fflush(f) ? errno : ferror(f) ? EBADF : 0;
-
-  return fclose(f) ? errno : ret;
+  return ret;
 }
 
 static void
@@ -600,13 +599,12 @@ test_create_symlink(void)
 
   // Check that the symlink seems equivalent to the original file
   assert(!st || st == ZIX_STATUS_NOT_SUPPORTED || st == ZIX_STATUS_BAD_PERMS);
+  assert(!st || zix_symlink_type(link_path) == ZIX_FILE_TYPE_NONE);
   if (!st) {
     assert(zix_symlink_type(link_path) == ZIX_FILE_TYPE_SYMLINK);
     assert(zix_file_type(link_path) == ZIX_FILE_TYPE_REGULAR);
     assert(zix_file_equals(NULL, file_path, link_path));
     assert(!zix_remove(link_path));
-  } else {
-    assert(zix_symlink_type(link_path) == ZIX_FILE_TYPE_NONE);
   }
 
   assert(!zix_remove(file_path));
@@ -670,12 +668,11 @@ test_create_hard_link(void)
 
   // Check that the link is equivalent to the original file
   assert(!st || st == ZIX_STATUS_NOT_SUPPORTED || st == ZIX_STATUS_MAX_LINKS);
+  assert(!st || zix_symlink_type(link_path) == ZIX_FILE_TYPE_NONE);
   if (!st) {
     assert(zix_file_type(link_path) == ZIX_FILE_TYPE_REGULAR);
     assert(zix_file_equals(NULL, file_path, link_path));
     assert(!zix_remove(link_path));
-  } else {
-    assert(zix_symlink_type(link_path) == ZIX_FILE_TYPE_NONE);
   }
 
   assert(!zix_remove(file_path));

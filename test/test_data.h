@@ -1,4 +1,4 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2023 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_TEST_DATA_H
@@ -46,12 +46,11 @@ unique_rand(size_t i)
 
   // Largest prime < 2^32 which satisfies (2^32 = 3 mod 4)
   static const size_t prime = 4294967291U;
-  if (i >= prime) {
-    return i; // Values >= prime are mapped to themselves
-  }
 
   const size_t residue = (size_t)(((uint64_t)i * i) % prime);
-  return (i <= prime / 2) ? residue : prime - residue;
+  return (i >= prime)       ? i // Values >= prime are mapped to themselves
+         : (i <= prime / 2) ? residue
+                            : prime - residue;
 }
 
 #endif // ZIX_TEST_DATA_H
