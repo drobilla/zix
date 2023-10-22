@@ -1,8 +1,10 @@
-zix (0.4.1) unstable; urgency=medium
+zix (0.4.2) stable; urgency=medium
 
+  * Clean up documentation build
   * Fix documentation build in a virtualenv
+  * Improve test suite code coverage
 
- -- David Robillard <d@drobilla.net>  Sat, 02 Sep 2023 23:32:38 +0000
+ -- David Robillard <d@drobilla.net>  Sun, 22 Oct 2023 18:56:14 +0000
 
 zix (0.4.0) stable; urgency=medium
 
