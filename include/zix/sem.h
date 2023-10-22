@@ -25,8 +25,6 @@ ZIX_BEGIN_DECLS
    @{
 */
 
-struct ZixSemImpl;
-
 /**
    A counting semaphore.
 
