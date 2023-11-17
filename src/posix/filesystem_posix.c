@@ -58,7 +58,13 @@ zix_get_block_size(const struct stat* const s1, const struct stat* const s2)
 static ZixStatus
 finish_copy(const int dst_fd, const int src_fd, const ZixStatus status)
 {
-  const ZixStatus st0 = zix_posix_status(dst_fd >= 0 ? fdatasync(dst_fd) : 0);
+#ifdef __APPLE__
+  const int rc = dst_fd >= 0 ? fcntl(dst_fd, F_FULLFSYNC) : 0;
+#else
+  const int rc = dst_fd >= 0 ? fdatasync(dst_fd) : 0;
+#endif
+
+  const ZixStatus st0 = zix_posix_status(rc);
   const ZixStatus st1 = zix_system_close_fds(dst_fd, src_fd);
 
   return status ? status : st0 ? st0 : st1;
