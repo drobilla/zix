@@ -248,7 +248,7 @@ write_to_path(const char* const path, const char* const contents)
 }
 
 static void
-test_copy_file(const char* const data_file_path)
+test_copy_file(const char* data_file_path)
 {
   char* const temp_dir      = create_temp_dir("zixXXXXXX");
   char* const tmp_file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
@@ -256,6 +256,10 @@ test_copy_file(const char* const data_file_path)
   assert(temp_dir);
   assert(tmp_file_path);
   assert(copy_path);
+
+  if (!data_file_path) {
+    data_file_path = tmp_file_path;
+  }
 
   assert(!write_to_path(tmp_file_path, "test\n"));
 
@@ -686,14 +690,11 @@ test_create_hard_link(void)
 int
 main(const int argc, char** const argv)
 {
-#ifdef __EMSCRIPTEN__
-  (void)argc;
-  (void)argv;
-
-  const char* const data_file_path = NULL;
-#else
-  const char* const data_file_path = argc > 1 ? argv[1] : "build.ninja";
-#endif
+  // Try to find some existing data file that's ideally not on a tmpfs
+  const char* data_file_path = (argc > 1) ? argv[1] : "build.ninja";
+  if (zix_file_type(data_file_path) != ZIX_FILE_TYPE_REGULAR) {
+    data_file_path = NULL;
+  }
 
   test_temp_directory_path();
   test_current_path();
