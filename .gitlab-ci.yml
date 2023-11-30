@@ -14,7 +14,7 @@ dev:
   stage: build
   image: lv2plugin/debian-x64
   script:
-    - meson setup build -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Db_coverage=true -Dlint=true -Ddocs=enabled -Dprefix=/
+    - meson setup build -Dbuildtype=debug -Dc_std=c11 -Dwarning_level=3 -Dwerror=true -Db_coverage=true -Dlint=true -Ddocs=enabled -Dprefix=/
     - ninja -C build test
     - ninja -C build coverage-html
     - DESTDIR=$(pwd)/build/dest meson install -C build
