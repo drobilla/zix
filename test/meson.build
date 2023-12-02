@@ -27,11 +27,13 @@ endif
 
 # Set warning suppression flags specific to tests
 test_suppressions = []
-if cc.get_id() in ['clang', 'emscripten']
-  if host_machine.system() == 'windows'
+if host_machine.system() == 'windows'
+  if cc.get_id() in ['clang', 'emscripten']
     test_suppressions += [
       '-Wno-format-nonliteral',
     ]
+  elif cc.get_id() == 'gcc'
+    test_suppressions += ['-Wno-format']
   endif
 endif
 
