@@ -1,8 +1,9 @@
 zix (0.4.3) unstable; urgency=medium
 
   * Avoid fdatasync() on Darwin
+  * Fix nullability annotations for zix_canonical_path() and friends
 
- -- David Robillard <d@drobilla.net>  Fri, 17 Nov 2023 19:36:00 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 15 Dec 2023 20:40:18 +0000
 
 zix (0.4.2) stable; urgency=medium
 

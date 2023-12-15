@@ -147,7 +147,7 @@ zix_create_directory_symlink(const char* ZIX_NONNULL target_path,
    @return The path of the created directory, or null.
 */
 ZIX_API
-char* ZIX_ALLOCATED
+char* ZIX_NULLABLE
 zix_create_temporary_directory(ZixAllocator* ZIX_NULLABLE allocator,
                                const char* ZIX_NONNULL    path_pattern);
 
@@ -228,7 +228,7 @@ zix_file_equals(ZixAllocator* ZIX_NULLABLE allocator,
    @return A new canonical version of `path`, or null if it doesn't exist.
 */
 ZIX_API
-char* ZIX_ALLOCATED
+char* ZIX_NULLABLE
 zix_canonical_path(ZixAllocator* ZIX_NULLABLE allocator,
                    const char* ZIX_NULLABLE   path);
 
