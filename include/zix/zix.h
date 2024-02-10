@@ -76,6 +76,14 @@
 
 /**
    @}
+   @defgroup zix_logging Log
+   @{
+*/
+
+#include "zix/log.h"
+
+/**
+   @}
    @}
 */
 
