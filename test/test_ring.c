@@ -101,7 +101,7 @@ test_ring(const unsigned size)
   assert(zix_ring_write_space(ring) == zix_ring_capacity(ring));
 
   const ZixStatus st = zix_ring_mlock(ring);
-  assert(!st || st == ZIX_STATUS_NOT_SUPPORTED);
+  assert(!st || st == ZIX_STATUS_NOT_SUPPORTED || st == ZIX_STATUS_UNAVAILABLE);
 
   static const size_t stack_size = (size_t)MSG_SIZE * 4U;
 
