@@ -5,8 +5,10 @@ Checks: >
   *,
   -altera-*,
   -bugprone-assignment-in-if-condition,
+  -bugprone-switch-missing-default-case,
   -hicpp-multiway-paths-covered,
   -llvmlibc-*,
+  -misc-include-cleaner,
   -readability-identifier-length,
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
