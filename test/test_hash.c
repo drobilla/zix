@@ -135,7 +135,7 @@ stress_with(ZixAllocator* const allocator,
   static const size_t string_length = 15;
 
   char* const  buffer  = (char*)calloc(1, n_elems * (string_length + 1));
-  char** const strings = state.strings = (char**)calloc(sizeof(char*), n_elems);
+  char** const strings = state.strings = (char**)calloc(n_elems, sizeof(char*));
   state.buffer                         = buffer;
   state.strings                        = strings;
   ENSURE(&state, buffer && state.strings, "Failed to allocate strings\n");
