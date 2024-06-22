@@ -52,7 +52,6 @@ if not meson.is_subproject() and get_option('lint')
           '--suppress=constParameterCallback',
           '--suppress=constParameterPointer',
           '--suppress=constVariablePointer',
-          '--suppress=invalidPrintfArgType_uint',
           '--suppress=knownConditionTrueFalse',
           '--suppress=selfAssignment',
           '--suppress=unreadVariable',

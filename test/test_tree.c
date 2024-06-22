@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-static uintptr_t seed = 1;
+static size_t seed = 1;
 
 static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
@@ -237,7 +237,7 @@ main(int argc, char** argv)
     if (argc > 2) {
       seed = strtoul(argv[2], NULL, 10);
     } else {
-      seed = (uintptr_t)time(NULL);
+      seed = (size_t)time(NULL);
     }
   }
 
