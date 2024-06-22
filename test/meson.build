@@ -50,7 +50,6 @@ if not meson.is_subproject() and get_option('lint')
           '--project=' + compdb_path,
           '--suppress=constParameterCallback',
           '--suppress=constParameterPointer',
-          '--suppress=knownConditionTrueFalse',
           '--suppress=selfAssignment',
           '--suppress=unreadVariable',
           '-q',

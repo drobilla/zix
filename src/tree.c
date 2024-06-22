@@ -507,6 +507,8 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
       t->root = replace;
     }
 
+    assert(n->left);
+
     replace->parent = n->parent;
     replace->left   = n->left;
     n->left->parent = replace;

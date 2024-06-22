@@ -356,10 +356,9 @@ zix_path_lexically_normal(ZixAllocator* const allocator, const char* const path)
   size_t last = r;
   size_t next = 0;
   for (size_t i = root_len; i < r;) {
-    if (last < r && i > 2 && i + 1 <= r && result[i - 2] == sep &&
-        result[i - 1] == '.' && result[i] == '.' &&
-        (!result[i + 1] || is_dir_sep(result[i + 1]))) {
-      if (i < r && result[i + 1] == sep) {
+    if (last < r && i > 2U && result[i - 2U] == sep && result[i - 1U] == '.' &&
+        result[i] == '.' && (!result[i + 1U] || is_dir_sep(result[i + 1U]))) {
+      if (result[i + 1] == sep) {
         ++i;
       }
 
