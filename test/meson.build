@@ -23,6 +23,17 @@ if not meson.is_subproject() and get_option('lint')
       suite: 'data',
     )
   endif
+
+  # Check code formatting
+  clang_format = find_program('clang-format', required: false)
+  if clang_format.found()
+    test(
+      'format',
+      clang_format,
+      args: ['--Werror', '--dry-run'] + c_headers + sources,
+      suite: 'code',
+    )
+  endif
 endif
 
 # Set warning suppression flags specific to tests
@@ -103,7 +114,7 @@ foreach test, cases : sequential_tests
   endforeach
 endforeach
 
-# Test multi-threaded 
+# Test multi-threaded
 if thread_dep.found()
   foreach test, cases : threaded_tests
     sources = common_test_sources + files('test_@0@.c'.format(test))

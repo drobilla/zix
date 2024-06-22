@@ -30,8 +30,8 @@ ZIX_BEGIN_DECLS
 
    This is an integer that is never negative, and has two main operations:
    increment (post) and decrement (wait).  If a decrement can't be performed
-   (because the value is 0) the caller will be blocked until another thread posts
-   and the operation can succeed.
+   (because the value is 0) the caller will be blocked until another thread
+   posts and the operation can succeed.
 
    Semaphores can be created with any starting value, but typically this will
    be 0 so the semaphore can be used as a simple signal where each post
