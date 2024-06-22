@@ -175,7 +175,7 @@ rehash(ZixHash* const hash, const size_t old_n_entries)
 
   // Reinsert every element into the new array
   for (size_t i = 0U; i < old_n_entries; ++i) {
-    ZixHashEntry* const entry = &old_entries[i];
+    const ZixHashEntry* const entry = &old_entries[i];
 
     if (entry->value) {
       assert(hash->mask == hash->n_entries - 1U);
