@@ -48,7 +48,6 @@ if not meson.is_subproject() and get_option('lint')
           '--enable=warning,style,performance,portability',
           '--error-exitcode=1',
           '--project=' + compdb_path,
-          '--suppress=assertWithSideEffect',
           '--suppress=constParameterCallback',
           '--suppress=constParameterPointer',
           '--suppress=constVariablePointer',

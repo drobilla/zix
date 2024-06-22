@@ -3,6 +3,7 @@
 
 #undef NDEBUG
 
+#include "zix/status.h"
 #include "zix/thread.h"
 
 #include <assert.h>
@@ -32,8 +33,12 @@ main(int argc, char** argv)
 
   SharedData data = {argc + (int)strlen(argv[0]), 0};
 
-  assert(!zix_thread_create(&thread, 128, thread_func, &data));
-  assert(!zix_thread_join(thread));
+  ZixStatus st = zix_thread_create(&thread, 128, thread_func, &data);
+  assert(!st);
+
+  st = zix_thread_join(thread);
+  assert(!st);
+
   assert(data.output == data.input * 7);
 
   return 0;
