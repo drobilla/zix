@@ -16,6 +16,7 @@ project(
 )
 
 zix_src_root = meson.current_source_dir()
+zix_build_root = meson.current_build_dir()
 major_version = meson.project_version().split('.')[0]
 version_suffix = '-@0@'.format(major_version)
 versioned_name = 'zix' + version_suffix

@@ -34,6 +34,34 @@ if not meson.is_subproject() and get_option('lint')
       suite: 'code',
     )
   endif
+
+  # Check code with cppcheck
+  if not meson.is_subproject()
+    cppcheck = find_program('cppcheck', required: false)
+    if cppcheck.found()
+      compdb_path = join_paths(zix_build_root, 'compile_commands.json')
+      test(
+        'cppcheck',
+        cppcheck,
+        args: [
+          '--check-level=exhaustive',
+          '--enable=warning,style,performance,portability',
+          '--error-exitcode=1',
+          '--project=' + compdb_path,
+          '--suppress=assertWithSideEffect',
+          '--suppress=constParameterCallback',
+          '--suppress=constParameterPointer',
+          '--suppress=constVariablePointer',
+          '--suppress=invalidPrintfArgType_uint',
+          '--suppress=knownConditionTrueFalse',
+          '--suppress=selfAssignment',
+          '--suppress=unreadVariable',
+          '-q',
+        ],
+        suite: 'code',
+      )
+    endif
+  endif
 endif
 
 # Set warning suppression flags specific to tests
