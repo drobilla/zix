@@ -37,6 +37,7 @@ PREDEFINED             = ZIX_ALLOCATED= \
                          ZIX_END_DECLS= \
                          ZIX_MALLOC_API= \
                          ZIX_MALLOC_FUNC= \
+                         ZIX_NODISCARD= \
                          ZIX_NONNULL= \
                          ZIX_NULLABLE= \
                          ZIX_PURE_API= \
