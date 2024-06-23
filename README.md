@@ -39,9 +39,9 @@ Zix is continually tested on:
 
   * Debian GNU/Linux 11 (x86, x64, arm32, and arm64)
   * Fedora 36 (x64)
-  * FreeBSD 13.2 (x64)
-  * MacOS 11.7 (x64)
-  * Node 12 (as wasm via emscripten)
+  * FreeBSD 13 (x64)
+  * MacOS 14 (M2)
+  * Node 12 (as wasm via emscripten 2.0.12)
   * Windows 10 (x86)
 
 Dependencies
