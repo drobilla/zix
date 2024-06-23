@@ -162,14 +162,18 @@ test_file_type(void)
     const socklen_t           addr_len = sizeof(struct sockaddr_un);
     struct sockaddr_un* const addr = (struct sockaddr_un*)calloc(1, addr_len);
 
-    addr->sun_family = AF_UNIX;
-    strncpy(addr->sun_path, file_path, sizeof(addr->sun_path) - 1);
+    if (strlen(file_path) < sizeof(addr->sun_path)) {
+      addr->sun_family = AF_UNIX;
+      strncpy(addr->sun_path, file_path, sizeof(addr->sun_path) - 1);
 
-    const int fd = bind(sock, (struct sockaddr*)addr, addr_len);
-    if (fd >= 0) {
-      assert(zix_file_type(file_path) == ZIX_FILE_TYPE_SOCKET);
-      assert(!zix_remove(file_path));
-      close(fd);
+      const int fd = bind(sock, (struct sockaddr*)addr, addr_len);
+      if (fd >= 0) {
+        assert(zix_file_type(file_path) == ZIX_FILE_TYPE_SOCKET);
+        assert(!zix_remove(file_path));
+        close(fd);
+      }
+    } else {
+      fprintf(stderr, "warning: Skipped socket test with oddly long TMPDIR\n");
     }
 
     close(sock);
