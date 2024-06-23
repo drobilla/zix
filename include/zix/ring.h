@@ -41,6 +41,7 @@ typedef struct ZixRingImpl ZixRing;
    At most `size` - 1 bytes may be stored in the ring at once.
 */
 ZIX_API
+ZIX_NODISCARD
 ZixRing* ZIX_ALLOCATED
 zix_ring_new(ZixAllocator* ZIX_NULLABLE allocator, uint32_t size);
 
@@ -155,6 +156,7 @@ zix_ring_write(ZixRing* ZIX_NONNULL    ring,
    @return A new empty transaction.
 */
 ZIX_API
+ZIX_NODISCARD
 ZixRingTransaction
 zix_ring_begin_write(ZixRing* ZIX_NONNULL ring);
 

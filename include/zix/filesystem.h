@@ -194,6 +194,7 @@ zix_dir_for_each(const char* ZIX_NONNULL path,
    @return True if the two files have byte-for-byte identical contents.
 */
 ZIX_API
+ZIX_NODISCARD
 bool
 zix_file_equals(ZixAllocator* ZIX_NULLABLE allocator,
                 const char* ZIX_NONNULL    a_path,

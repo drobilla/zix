@@ -103,6 +103,7 @@ typedef bool (*ZixKeyEqualFunc)(const ZixHashKey* ZIX_NONNULL a,
    @param equal_func A function to test keys for equality.
 */
 ZIX_API
+ZIX_NODISCARD
 ZixHash* ZIX_ALLOCATED
 zix_hash_new(ZixAllocator* ZIX_NULLABLE  allocator,
              ZixKeyFunc ZIX_NONNULL      key_func,

@@ -60,6 +60,7 @@ typedef void (*ZixBTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
    zix_btree_lower_bound() for details.
 */
 ZIX_API
+ZIX_NODISCARD
 ZixBTree* ZIX_ALLOCATED
 zix_btree_new(ZixAllocator* ZIX_NULLABLE      allocator,
               ZixBTreeCompareFunc ZIX_NONNULL cmp,
@@ -154,6 +155,7 @@ bool
 zix_btree_iter_equals(ZixBTreeIter lhs, ZixBTreeIter rhs);
 
 /// Return true iff `i` is an iterator at the end of a tree
+ZIX_NODISCARD
 static inline bool
 zix_btree_iter_is_end(const ZixBTreeIter i)
 {
@@ -167,6 +169,7 @@ zix_btree_iter_increment(ZixBTreeIter* ZIX_NONNULL i);
 
 /// Return an iterator one past `iter`
 ZIX_API
+ZIX_NODISCARD
 ZixBTreeIter
 zix_btree_iter_next(ZixBTreeIter iter);
 

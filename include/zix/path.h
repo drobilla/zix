@@ -36,6 +36,7 @@ ZIX_BEGIN_DECLS
 
 /// Join path `a` and path `b` with a single directory separator between them
 ZIX_API
+ZIX_NODISCARD
 char* ZIX_ALLOCATED
 zix_path_join(ZixAllocator* ZIX_NULLABLE allocator,
               const char* ZIX_NULLABLE   a,
@@ -55,6 +56,7 @@ zix_path_join(ZixAllocator* ZIX_NULLABLE allocator,
    else).
 */
 ZIX_API
+ZIX_NODISCARD
 char* ZIX_ALLOCATED
 zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
                    const char* ZIX_NONNULL    path);
@@ -71,6 +73,7 @@ zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
    zix_canonical_path().
 */
 ZIX_API
+ZIX_NODISCARD
 char* ZIX_ALLOCATED
 zix_path_lexically_normal(ZixAllocator* ZIX_NULLABLE allocator,
                           const char* ZIX_NONNULL    path);
@@ -83,6 +86,7 @@ zix_path_lexically_normal(ZixAllocator* ZIX_NULLABLE allocator,
    up-references).
 */
 ZIX_API
+ZIX_NODISCARD
 char* ZIX_ALLOCATED
 zix_path_lexically_relative(ZixAllocator* ZIX_NULLABLE allocator,
                             const char* ZIX_NONNULL    path,

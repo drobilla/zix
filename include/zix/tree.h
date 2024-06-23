@@ -38,6 +38,7 @@ typedef void (*ZixTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
 
 /// Create a new (empty) tree
 ZIX_API
+ZIX_NODISCARD
 ZixTree* ZIX_ALLOCATED
 zix_tree_new(ZixAllocator* ZIX_NULLABLE      allocator,
              bool                            allow_duplicates,

@@ -130,6 +130,7 @@ zix_calloc(ZixAllocator* const ZIX_NULLABLE allocator,
 }
 
 /// Convenience wrapper that defers to realloc() if allocator is null
+ZIX_NODISCARD
 static inline void* ZIX_ALLOCATED
 zix_realloc(ZixAllocator* const ZIX_NULLABLE allocator,
             void* const ZIX_NULLABLE         ptr,
