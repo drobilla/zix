@@ -89,7 +89,7 @@ zix_string(const char* const ZIX_NULLABLE str)
 /**
    Copy a string view into a newly allocated null-terminated string.
 */
-ZIX_API
+ZIX_MALLOC_API
 char* ZIX_ALLOCATED
 zix_string_view_copy(ZixAllocator* ZIX_NULLABLE allocator, ZixStringView view);
 

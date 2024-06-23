@@ -108,6 +108,7 @@ ZixAllocator* ZIX_NONNULL
 zix_default_allocator(void);
 
 /// Convenience wrapper that defers to malloc() if allocator is null
+ZIX_MALLOC_FUNC
 static inline void* ZIX_ALLOCATED
 zix_malloc(ZixAllocator* const ZIX_NULLABLE allocator, const size_t size)
 {
@@ -117,6 +118,7 @@ zix_malloc(ZixAllocator* const ZIX_NULLABLE allocator, const size_t size)
 }
 
 /// Convenience wrapper that defers to calloc() if allocator is null
+ZIX_MALLOC_FUNC
 static inline void* ZIX_ALLOCATED
 zix_calloc(ZixAllocator* const ZIX_NULLABLE allocator,
            const size_t                     nmemb,
@@ -149,6 +151,7 @@ zix_free(ZixAllocator* const ZIX_NULLABLE allocator,
 }
 
 /// Convenience wrapper that defers to the system allocator if allocator is null
+ZIX_MALLOC_FUNC
 static inline void* ZIX_ALLOCATED
 zix_aligned_alloc(ZixAllocator* const ZIX_NULLABLE allocator,
                   const size_t                     alignment,
