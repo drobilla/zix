@@ -90,7 +90,7 @@ copy_path(ZixAllocator* const allocator,
 #if !defined(PATH_MAX) && USE_PATHCONF
 
 static size_t
-max_path_size(void)
+max_path_size(const char* const path)
 {
   const long path_max = pathconf(path, _PC_PATH_MAX);
   return (path_max > 0) ? (size_t)path_max : zix_system_page_size();
@@ -99,8 +99,10 @@ max_path_size(void)
 #elif !defined(PATH_MAX)
 
 static size_t
-max_path_size(void)
+max_path_size(const char* const path)
 {
+  (void)path;
+
   return zix_system_page_size();
 }
 
@@ -440,7 +442,7 @@ zix_current_path(ZixAllocator* const allocator)
 
 #elif USE_PATHCONF
   // Others don't so we have to query PATH_MAX at runtime to allocate the result
-  const size_t size    = max_path_size();
+  const size_t size    = max_path_size(".");
   char* const  buffer  = (char*)zix_calloc(allocator, size, 1);
   char* const  current = getcwd(buffer, size);
   if (!current) {
