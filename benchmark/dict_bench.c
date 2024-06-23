@@ -45,7 +45,8 @@ lcg64(const uint64_t i)
   return (a * i) + c;
 }
 
-ZIX_PURE_FUNC static const ZixChunk*
+ZIX_PURE_FUNC
+static const ZixChunk*
 identity(const ZixChunk* record)
 {
   return record;

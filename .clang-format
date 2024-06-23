@@ -19,15 +19,17 @@ IndentPPDirectives: AfterHash
 KeepEmptyLinesAtTheStartOfBlocks: false
 SpacesInContainerLiterals: false
 StatementMacros:
+  - FALLTHROUGH
+  - ZIX_ALWAYS_INLINE_FUNC
   - ZIX_API
   - ZIX_BEGIN_DECLS
   - ZIX_CONST_API
-  - ZIX_CONST_API
+  - ZIX_CONST_FUNC
   - ZIX_END_DECLS
   - ZIX_MALLOC_API
+  - ZIX_MALLOC_FUNC
   - ZIX_PURE_API
+  - ZIX_PURE_FUNC
   - ZIX_PURE_WIN_API
-  - ZIX_THREAD_FUNC
-  - ZIX_UNUSED
   - _Pragma
 ...
