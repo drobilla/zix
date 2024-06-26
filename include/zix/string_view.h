@@ -1,4 +1,4 @@
-// Copyright 2011-2023 David Robillard <d@drobilla.net>
+// Copyright 2011-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_STRING_VIEW_H
@@ -7,6 +7,7 @@
 #include "zix/allocator.h"
 #include "zix/attributes.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -92,6 +93,17 @@ zix_string(const char* const ZIX_NULLABLE str)
 ZIX_MALLOC_API
 char* ZIX_ALLOCATED
 zix_string_view_copy(ZixAllocator* ZIX_NULLABLE allocator, ZixStringView view);
+
+/**
+   Return true if both string views refer to equal strings.
+
+   This may be significantly faster than a full string comparison, because it
+   has fast paths for when the operands have different lengths, or point to the
+   same string data.
+*/
+ZIX_PURE_API
+bool
+zix_string_view_equals(ZixStringView lhs, ZixStringView rhs);
 
 /**
    @}

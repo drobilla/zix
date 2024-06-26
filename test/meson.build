@@ -1,4 +1,4 @@
-# Copyright 2020-2023 David Robillard <d@drobilla.net>
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 if not meson.is_subproject() and get_option('lint')
@@ -85,6 +85,7 @@ sequential_tests = {
   'hash': {'': []},
   'path': {'': []},
   'status': {'': []},
+  'string_view': {'': []},
   'tree': {
     '': [],
     '_seed': ['8', '314159'],

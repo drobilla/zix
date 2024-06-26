@@ -1,9 +1,10 @@
-// Copyright 2007-2022 David Robillard <d@drobilla.net>
+// Copyright 2007-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "zix/string_view.h"
 #include "zix/allocator.h"
 
+#include <stdbool.h>
 #include <string.h>
 
 char*
@@ -15,4 +16,22 @@ zix_string_view_copy(ZixAllocator* const allocator, const ZixStringView view)
     copy[view.length] = '\0';
   }
   return copy;
+}
+
+bool
+zix_string_view_equals(const ZixStringView lhs, const ZixStringView rhs)
+{
+  if (lhs.length != rhs.length) {
+    return false;
+  }
+
+  if (lhs.data != rhs.data) {
+    for (size_t i = 0U; i < lhs.length; ++i) {
+      if (lhs.data[i] != rhs.data[i]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
