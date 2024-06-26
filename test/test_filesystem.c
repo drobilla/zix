@@ -172,9 +172,7 @@ test_file_type(void)
         assert(!zix_remove(file_path));
         close(fd);
       }
-    } else {
-      fprintf(stderr, "warning: Skipped socket test with oddly long TMPDIR\n");
-    }
+    } // otherwise, TMPDIR is oddly long, skip test
 
     close(sock);
     free(addr);
