@@ -394,6 +394,7 @@ zix_btree_leaf_find(const ZixBTree* const     t,
     t->cmp, t->cmp_data, n->data.leaf.vals, n->n_vals, e, equal);
 }
 
+ZIX_PURE_FUNC
 static inline bool
 zix_btree_can_remove_from(const ZixBTreeNode* const n)
 {
@@ -401,6 +402,7 @@ zix_btree_can_remove_from(const ZixBTreeNode* const n)
   return n->n_vals > zix_btree_min_vals(n);
 }
 
+ZIX_PURE_FUNC
 static inline bool
 zix_btree_is_full(const ZixBTreeNode* const n)
 {
