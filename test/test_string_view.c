@@ -5,6 +5,7 @@
 
 #include "failing_allocator.h"
 
+#include "zix/allocator.h"
 #include "zix/string_view.h"
 
 #include <assert.h>
