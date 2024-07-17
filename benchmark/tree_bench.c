@@ -16,7 +16,6 @@ ZIX_DISABLE_GLIB_WARNINGS
 ZIX_RESTORE_WARNINGS
 
 #include <inttypes.h>
-#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,15 +54,11 @@ g_int_cmp(const void* a, const void* b, void* user_data)
   return int_cmp(a, b, user_data);
 }
 
-ZIX_LOG_FUNC(1, 2)
 static int
-test_fail(const char* fmt, ...)
+test_fail(const char* const prefix, const uintptr_t value)
 {
-  va_list args;
-  va_start(args, fmt);
   fprintf(stderr, "error: ");
-  vfprintf(stderr, fmt, args);
-  va_end(args);
+  fprintf(stderr, "%s %" PRIuPTR "\n", prefix, value);
   return EXIT_FAILURE;
 }
 
@@ -93,7 +88,7 @@ bench_zix_tree(size_t n_elems,
 
     ZixStatus status = zix_tree_insert(t, (void*)r, &ti);
     if (status) {
-      return test_fail("Failed to insert %" PRIuPTR "\n", r);
+      return test_fail("Failed to insert", r);
     }
   }
   fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
@@ -103,10 +98,10 @@ bench_zix_tree(size_t n_elems,
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
     if (zix_tree_find(t, (void*)r, &ti)) {
-      return test_fail("Failed to find %" PRIuPTR "\n", r);
+      return test_fail("Failed to find", r);
     }
     if ((uintptr_t)zix_tree_get(ti) != r) {
-      return test_fail("Failed to get %" PRIuPTR "\n", r);
+      return test_fail("Failed to get", r);
     }
   }
   fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -127,10 +122,10 @@ bench_zix_tree(size_t n_elems,
 
     ZixTreeIter* item = NULL;
     if (zix_tree_find(t, (void*)r, &item)) {
-      return test_fail("Failed to find %" PRIuPTR " to delete\n", r);
+      return test_fail("Failed on delete to find", r);
     }
     if (zix_tree_remove(t, item)) {
-      return test_fail("Failed to remove %" PRIuPTR "\n", r);
+      return test_fail("Failed to remove", r);
     }
   }
   fprintf(del_dat, "\t%lf", bench_end(&del_start));
@@ -160,7 +155,7 @@ bench_zix_btree(size_t n_elems,
 
     ZixStatus status = zix_btree_insert(t, (void*)r);
     if (status) {
-      return test_fail("Failed to insert %" PRIuPTR "\n", r);
+      return test_fail("Failed to insert", r);
     }
   }
   fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
@@ -170,10 +165,10 @@ bench_zix_btree(size_t n_elems,
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
     if (zix_btree_find(t, (void*)r, &ti)) {
-      return test_fail("Failed to find %" PRIuPTR "\n", r);
+      return test_fail("Failed to find", r);
     }
     if ((uintptr_t)zix_btree_get(ti) != r) {
-      return test_fail("Failed to get %" PRIuPTR "\n", r);
+      return test_fail("Failed to get", r);
     }
   }
   fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -195,7 +190,7 @@ bench_zix_btree(size_t n_elems,
     void*        removed = NULL;
     ZixBTreeIter next    = zix_btree_end(t);
     if (zix_btree_remove(t, (void*)r, &removed, &next)) {
-      return test_fail("Failed to remove %" PRIuPTR "\n", r);
+      return test_fail("Failed to remove", r);
     }
   }
   fprintf(del_dat, "\t%lf", bench_end(&del_start));
@@ -225,7 +220,7 @@ bench_glib(size_t n_elems,
     GSequenceIter* iter =
       g_sequence_insert_sorted(t, (void*)r, g_int_cmp, NULL);
     if (!iter || g_sequence_iter_is_end(iter)) {
-      return test_fail("Failed to insert %" PRIuPTR "\n", r);
+      return test_fail("Failed to insert", r);
     }
   }
   fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
@@ -236,7 +231,7 @@ bench_glib(size_t n_elems,
     r                   = unique_rand(i);
     GSequenceIter* iter = g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);
     if (!iter || g_sequence_iter_is_end(iter)) {
-      return test_fail("Failed to find %" PRIuPTR "\n", r);
+      return test_fail("Failed to find", r);
     }
   }
   fprintf(search_dat, "\t%lf", bench_end(&search_start));
@@ -256,7 +251,7 @@ bench_glib(size_t n_elems,
     r                   = unique_rand(i);
     GSequenceIter* iter = g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);
     if (!iter || g_sequence_iter_is_end(iter)) {
-      return test_fail("Failed to remove %" PRIuPTR "\n", r);
+      return test_fail("Failed to remove", r);
     }
     g_sequence_remove(iter);
   }
