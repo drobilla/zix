@@ -4,6 +4,7 @@
 Checks: >
   -*-magic-numbers,
   -bugprone-easily-swappable-parameters,
+  -bugprone-multi-level-implicit-pointer-conversion,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -llvm-header-guard,
   -misc-no-recursion,

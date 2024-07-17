@@ -1,16 +1,17 @@
-# Copyright 2020-2022 David Robillard <d@drobilla.net>
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 Checks: >
+  -*-macro-to-enum,
   -*-magic-numbers,
   -android-cloexec-fopen,
   -bugprone-easily-swappable-parameters,
+  -bugprone-multi-level-implicit-pointer-conversion,
   -cert-err33-c,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -google-readability-casting,
   -llvm-header-guard,
-  -modernize-macro-to-enum,
   -performance-no-int-to-ptr,
   -readability-function-cognitive-complexity,
 InheritParentConfig: true
