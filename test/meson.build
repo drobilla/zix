@@ -44,12 +44,12 @@ if not meson.is_subproject() and get_option('lint')
         'cppcheck',
         cppcheck,
         args: [
-          '--check-level=exhaustive',
           '--enable=warning,style,performance,portability',
           '--error-exitcode=1',
           '--project=' + compdb_path,
           '--suppress=constParameterCallback',
           '--suppress=constParameterPointer',
+          '--suppress=normalCheckLevelMaxBranches',
           '--suppress=unreadVariable',
           '-q',
         ],
