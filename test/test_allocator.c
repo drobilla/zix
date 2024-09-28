@@ -122,7 +122,7 @@ static void
 test_failing_allocator(void)
 {
   ZixFailingAllocator allocator = zix_failing_allocator();
-  allocator.n_remaining         = 0;
+  zix_failing_allocator_reset(&allocator, 0);
 
   assert(!zix_malloc(&allocator.base, 16U));
   assert(!zix_calloc(&allocator.base, 16U, 1U));

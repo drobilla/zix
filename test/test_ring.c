@@ -170,9 +170,9 @@ test_failed_alloc(void)
   assert(ring);
 
   // Test that each allocation failing is handled gracefully
-  const size_t n_new_allocs = allocator.n_allocations;
+  const size_t n_new_allocs = zix_failing_allocator_reset(&allocator, 0);
   for (size_t i = 0U; i < n_new_allocs; ++i) {
-    allocator.n_remaining = i;
+    zix_failing_allocator_reset(&allocator, i);
     assert(!zix_ring_new(&allocator.base, 512));
   }
 

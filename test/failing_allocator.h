@@ -1,8 +1,8 @@
-// Copyright 2021 David Robillard <d@drobilla.net>
+// Copyright 2021-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#ifndef ZIX_FAILING_ALLOCATOR_H
-#define ZIX_FAILING_ALLOCATOR_H
+#ifndef ZIX_TEST_FAILING_ALLOCATOR_H
+#define ZIX_TEST_FAILING_ALLOCATOR_H
 
 #include "zix/allocator.h"
 
@@ -15,7 +15,12 @@ typedef struct {
   size_t       n_remaining;   ///< Number of remaining successful allocations
 } ZixFailingAllocator;
 
+/// Return an allocator configured by default to succeed
 ZixFailingAllocator
 zix_failing_allocator(void);
 
-#endif // ZIX_FAILING_ALLOCATOR_H
+/// Reset an allocator to fail after some number of "allowed" allocations
+size_t
+zix_failing_allocator_reset(ZixFailingAllocator* allocator, size_t n_allowed);
+
+#endif // ZIX_TEST_FAILING_ALLOCATOR_H

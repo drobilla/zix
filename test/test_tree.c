@@ -211,9 +211,9 @@ test_failed_alloc(void)
   assert(!stress(&allocator.base, 0, 16));
 
   // Test that each allocation failing is handled gracefully
-  const size_t n_new_allocs = allocator.n_allocations;
+  const size_t n_new_allocs = zix_failing_allocator_reset(&allocator, 0);
   for (size_t i = 0U; i < n_new_allocs; ++i) {
-    allocator.n_remaining = i;
+    zix_failing_allocator_reset(&allocator, i);
     assert(stress(&allocator.base, 0, 16));
   }
 }

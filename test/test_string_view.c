@@ -95,7 +95,7 @@ test_copy(void)
   ZixFailingAllocator allocator = zix_failing_allocator();
 
   // Copying a string takes exactly one allocation
-  allocator.n_remaining = 1U;
+  zix_failing_allocator_reset(&allocator, 1U);
 
   char* const copy = zix_string_view_copy(&allocator.base, orig);
   assert(copy);
@@ -103,7 +103,7 @@ test_copy(void)
   zix_free(&allocator.base, copy);
 
   // Check that allocation failure is handled gracefully
-  allocator.n_remaining = 0U;
+  zix_failing_allocator_reset(&allocator, 0U);
   assert(!zix_string_view_copy(&allocator.base, orig));
 }
 

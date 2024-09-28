@@ -1,10 +1,10 @@
-// Copyright 2021 David Robillard <d@drobilla.net>
+// Copyright 2021-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "failing_allocator.h"
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -106,4 +106,16 @@ zix_failing_allocator(void)
   };
 
   return failing_allocator;
+}
+
+size_t
+zix_failing_allocator_reset(ZixFailingAllocator* const allocator,
+                            const size_t               n_allowed)
+{
+  const size_t n_allocations = allocator->n_allocations;
+
+  allocator->n_allocations = 0U;
+  allocator->n_remaining   = n_allowed;
+
+  return n_allocations;
 }
