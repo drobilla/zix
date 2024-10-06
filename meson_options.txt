@@ -1,34 +1,34 @@
 # Copyright 2020-2023 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
-option('benchmarks', type: 'feature', value: 'auto', yield: true,
+option('benchmarks', type: 'feature', yield: true,
        description: 'Build benchmarks')
 
 option('checks', type: 'feature', value: 'enabled', yield: true,
        description: 'Check for platform-specific features')
 
-option('docs', type: 'feature', value: 'auto', yield: true,
+option('docs', type: 'feature', yield: true,
        description: 'Build documentation')
 
-option('html', type: 'feature', value: 'auto', yield: true,
+option('html', type: 'feature', yield: true,
        description: 'Build paginated HTML documentation')
 
 option('lint', type: 'boolean', value: false, yield: true,
        description: 'Run code quality checks')
 
-option('posix', type: 'feature', value: 'auto', yield: true,
+option('posix', type: 'feature', yield: true,
        description: 'Use POSIX system facilities')
 
-option('singlehtml', type: 'feature', value: 'auto', yield: true,
+option('singlehtml', type: 'feature', yield: true,
        description: 'Build single-page HTML documentation')
 
-option('threads', type: 'feature', value: 'auto', yield: true,
+option('threads', type: 'feature', yield: true,
        description: 'Enable thread support')
 
-option('tests', type: 'feature', value: 'auto', yield: true,
+option('tests', type: 'feature', yield: true,
        description: 'Build tests')
 
-option('tests_cpp', type: 'feature', value: 'auto', yield: true,
+option('tests_cpp', type: 'feature', yield: true,
        description: 'Build C++ standard library comparison tests')
 
 option('title', type: 'string', value: 'Zix',
