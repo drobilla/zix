@@ -193,8 +193,8 @@ stress_with(ZixAllocator* const allocator,
   if (not_indexed) {
     memcpy(not_indexed, not_indexed_string, strlen(not_indexed_string) + 1);
     const char* match = (const char*)zix_hash_find_record(hash, not_indexed);
-    ENSUREV(&state, !match, "Unexpectedly found `%s'\n", not_indexed);
     free(not_indexed);
+    ENSUREV(&state, !match, "Unexpectedly found `%s'\n", not_indexed_string);
   }
 
   // Remove strings
