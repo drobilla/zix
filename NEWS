@@ -7,8 +7,9 @@ zix (0.5.0) unstable; urgency=medium
   * Fix library current_version on MacOS
   * Fix nullability annotations for zix_canonical_path() and friends
   * Fix ring unit test when mlock() is unavailable
+  * Improve documentation
 
- -- David Robillard <d@drobilla.net>  Wed, 26 Jun 2024 22:21:42 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 15 Nov 2024 19:18:43 +0000
 
 zix (0.4.2) stable; urgency=medium
 

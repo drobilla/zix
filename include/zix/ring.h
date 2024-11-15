@@ -36,14 +36,19 @@ typedef struct ZixRingImpl ZixRing;
 
    @param allocator Allocator for the ring object and its array.
 
-   @param size Size of the ring in bytes (note this may be rounded up).
+   @param size Minimum size of the ring in bytes (rounded up to a power of 2).
 
-   At most `size` - 1 bytes may be stored in the ring at once.
+   Note that one byte of the ring is reserved, so in order to be able to write
+   `n` bytes to the ring at once, `size` must be `n + 1`.
 */
 ZIX_API ZIX_NODISCARD ZixRing* ZIX_ALLOCATED
 zix_ring_new(ZixAllocator* ZIX_NULLABLE allocator, uint32_t size);
 
-/// Destroy a ring
+/**
+   Destroy a ring.
+
+   This frees the ring structure and its buffer, discarding its contents.
+*/
 ZIX_API void
 zix_ring_free(ZixRing* ZIX_NULLABLE ring);
 
@@ -82,19 +87,46 @@ zix_ring_capacity(const ZixRing* ZIX_NONNULL ring);
    @{
 */
 
-/// Return the number of bytes available for reading
+/**
+   Return the number of bytes available for reading.
+
+   This function returns at most one less than the ring's buffer size.
+*/
 ZIX_PURE_API uint32_t
 zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
 
-/// Read from the ring without advancing the read head
+/**
+   Read from the ring without advancing the read head.
+
+   @param ring The ring to read data from.
+   @param dst The buffer to write data to.
+   @param size The number of bytes to read from `ring` and write to `dst`.
+
+   @return The number of bytes read, which is either `size` on success, or zero
+   on failure.
+*/
 ZIX_API uint32_t
 zix_ring_peek(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
-/// Read from the ring and advance the read head
+/**
+   Read from the ring and advance the read head.
+
+   @param ring The ring to read data from.
+   @param dst The buffer to write data to.
+   @param size The number of bytes to read from `ring` and write to `dst`.
+
+   @return The number of bytes read, which is either `size` on success, or zero
+   on failure.
+*/
 ZIX_API uint32_t
 zix_ring_read(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
-/// Advance the read head, ignoring any data
+/**
+   Advance the read head, ignoring any data.
+
+   @return Either `size` on success, or zero if there aren't enough bytes to
+   skip.
+*/
 ZIX_API uint32_t
 zix_ring_skip(ZixRing* ZIX_NONNULL ring, uint32_t size);
 
@@ -113,17 +145,35 @@ zix_ring_skip(ZixRing* ZIX_NONNULL ring, uint32_t size);
    written in several chunks before being "committed" and becoming readable.
    This can be useful for things like prefixing messages with a header without
    needing an allocated buffer to construct the "packet".
+
+   The contents of this structure are an implementation detail and must not be
+   manipulated by the user.
 */
 typedef struct {
   uint32_t read_head;  ///< Read head at the start of the transaction
   uint32_t write_head; ///< Write head if the transaction were committed
 } ZixRingTransaction;
 
-/// Return the number of bytes available for writing
+/**
+   Return the number of bytes available for writing.
+
+   This function returns at most one less than the ring's buffer size.
+*/
 ZIX_PURE_API uint32_t
 zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
 
-/// Write data to the ring
+/**
+   Write data to the ring.
+
+   This writes a contiguous input buffer of bytes to the ring.
+
+   @param ring The ring to write data to.
+   @param src The buffer to read data from.
+   @param size The number of bytes to read from `src` and write to `ring`.
+
+   @return The number of bytes written, which is either `size` on success, or
+   zero on failure.
+*/
 ZIX_API uint32_t
 zix_ring_write(ZixRing* ZIX_NONNULL    ring,
                const void* ZIX_NONNULL src,
