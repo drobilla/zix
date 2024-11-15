@@ -244,7 +244,8 @@ write_to_path(const char* const path, const char* const contents)
     const size_t len = strlen(contents);
     fwrite(contents, 1, len, f);
 
-    ret = fflush(f) ? errno : ferror(f) ? EBADF : fclose(f) ? errno : 0;
+    ret = fflush(f) ? errno : ferror(f) ? EBADF : 0;
+    ret = (fclose(f) && !ret) ? errno : ret;
   }
 
   return ret;
