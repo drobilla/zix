@@ -15,6 +15,7 @@ ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>
 ZIX_RESTORE_WARNINGS
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -281,6 +282,11 @@ main(int argc, char** argv)
   FILE* search_dat = fopen("tree_search.txt", "w");
   FILE* iter_dat   = fopen("tree_iterate.txt", "w");
   FILE* del_dat    = fopen("tree_delete.txt", "w");
+  assert(insert_dat);
+  assert(search_dat);
+  assert(iter_dat);
+  assert(del_dat);
+
   fprintf(insert_dat, HEADER);
   fprintf(search_dat, HEADER);
   fprintf(iter_dat, HEADER);

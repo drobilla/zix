@@ -161,6 +161,7 @@ test_file_type(void)
   if (sock >= 0) {
     const socklen_t           addr_len = sizeof(struct sockaddr_un);
     struct sockaddr_un* const addr = (struct sockaddr_un*)calloc(1, addr_len);
+    assert(addr);
 
     if (strlen(file_path) < sizeof(addr->sun_path)) {
       addr->sun_family = AF_UNIX;
@@ -393,6 +394,7 @@ visit(const char* const path, const char* const name, void* const data)
 
   if (new_names) {
     char* const name_copy = (char*)calloc(name_len + 1, 1);
+    assert(name_copy);
     memcpy(name_copy, name, name_len + 1);
 
     file_list->names                         = new_names;

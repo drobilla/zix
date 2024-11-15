@@ -92,6 +92,7 @@ read_inputs(FILE* const fd)
       inputs.chunks                      = new_chunks;
       inputs.chunks[inputs.n_chunks].buf = (char*)malloc(buf_len);
       inputs.chunks[inputs.n_chunks].len = this_str_len;
+      assert(inputs.chunks[inputs.n_chunks].buf);
       memcpy(inputs.chunks[inputs.n_chunks].buf, inputs.buf, buf_len);
       this_str_len = 0;
       if (++inputs.n_chunks == max_n_strings) {
@@ -128,6 +129,8 @@ run(FILE* const fd)
 
   FILE* insert_dat = fopen("dict_insert.txt", "w");
   FILE* search_dat = fopen("dict_search.txt", "w");
+  assert(insert_dat);
+  assert(search_dat);
   fprintf(insert_dat, "# n\tGHashTable\tZixHash\n");
   fprintf(search_dat, "# n\tGHashTable\tZixHash\n");
 
