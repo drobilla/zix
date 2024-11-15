@@ -51,8 +51,7 @@ typedef uint32_t ZixCopyOptions;
    @param options Options to control the kind of copy and error conditions.
    @return #ZIX_STATUS_SUCCESS if `dst` was successfully created, or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_copy_file(ZixAllocator* ZIX_NULLABLE allocator,
               const char* ZIX_NONNULL    src,
               const char* ZIX_NONNULL    dst,
@@ -64,8 +63,7 @@ zix_copy_file(ZixAllocator* ZIX_NULLABLE allocator,
    @return #ZIX_STATUS_SUCCESS if `dir_path` was successfully created, or an
    error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_create_directory(const char* ZIX_NONNULL dir_path);
 
 /**
@@ -77,8 +75,7 @@ zix_create_directory(const char* ZIX_NONNULL dir_path);
    @return #ZIX_STATUS_SUCCESS if `dir_path` was successfully created, or an
    error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_create_directory_like(const char* ZIX_NONNULL dir_path,
                           const char* ZIX_NONNULL existing_path);
 
@@ -92,8 +89,7 @@ zix_create_directory_like(const char* ZIX_NONNULL dir_path,
    @return #ZIX_STATUS_SUCCESS if all directories in `dir_path` were
    successfully created (or already existed), or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_create_directories(ZixAllocator* ZIX_NULLABLE allocator,
                        const char* ZIX_NONNULL    dir_path);
 
@@ -102,8 +98,7 @@ zix_create_directories(ZixAllocator* ZIX_NULLABLE allocator,
 
    @return #ZIX_STATUS_SUCCESS, or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_create_hard_link(const char* ZIX_NONNULL target_path,
                      const char* ZIX_NONNULL link_path);
 
@@ -116,8 +111,7 @@ zix_create_hard_link(const char* ZIX_NONNULL target_path,
 
    @return #ZIX_STATUS_SUCCESS, or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_create_symlink(const char* ZIX_NONNULL target_path,
                    const char* ZIX_NONNULL link_path);
 
@@ -129,8 +123,7 @@ zix_create_symlink(const char* ZIX_NONNULL target_path,
 
    @return #ZIX_STATUS_SUCCESS, or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_create_directory_symlink(const char* ZIX_NONNULL target_path,
                              const char* ZIX_NONNULL link_path);
 
@@ -146,14 +139,12 @@ zix_create_directory_symlink(const char* ZIX_NONNULL target_path,
 
    @return The path of the created directory, or null.
 */
-ZIX_MALLOC_API
-char* ZIX_NULLABLE
+ZIX_MALLOC_API char* ZIX_NULLABLE
 zix_create_temporary_directory(ZixAllocator* ZIX_NULLABLE allocator,
                                const char* ZIX_NONNULL    path_pattern);
 
 /// Remove the file or empty directory at `path`
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_remove(const char* ZIX_NONNULL path);
 
 /**
@@ -173,8 +164,7 @@ zix_remove(const char* ZIX_NONNULL path);
    parameter is always the directory path passed to this function, the `name`
    parameter is the name of the directory entry (not its full path).
 */
-ZIX_API
-void
+ZIX_API void
 zix_dir_for_each(const char* ZIX_NONNULL path,
                  void* ZIX_NULLABLE      data,
                  void (*ZIX_NONNULL f)(const char* ZIX_NONNULL path,
@@ -193,9 +183,7 @@ zix_dir_for_each(const char* ZIX_NONNULL path,
 
    @return True if the two files have byte-for-byte identical contents.
 */
-ZIX_API
-ZIX_NODISCARD
-bool
+ZIX_API ZIX_NODISCARD bool
 zix_file_equals(ZixAllocator* ZIX_NULLABLE allocator,
                 const char* ZIX_NONNULL    a_path,
                 const char* ZIX_NONNULL    b_path);
@@ -228,8 +216,7 @@ zix_file_equals(ZixAllocator* ZIX_NULLABLE allocator,
 
    @return A new canonical version of `path`, or null if it doesn't exist.
 */
-ZIX_MALLOC_API
-char* ZIX_NULLABLE
+ZIX_MALLOC_API char* ZIX_NULLABLE
 zix_canonical_path(ZixAllocator* ZIX_NULLABLE allocator,
                    const char* ZIX_NULLABLE   path);
 
@@ -256,8 +243,7 @@ typedef enum {
    @param mode Lock mode.
    @return #ZIX_STATUS_SUCCESS if the file was locked, or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_file_lock(FILE* ZIX_NONNULL file, ZixFileLockMode mode);
 
 /**
@@ -267,8 +253,7 @@ zix_file_lock(FILE* ZIX_NONNULL file, ZixFileLockMode mode);
    @param mode Lock mode.
    @return #ZIX_STATUS_SUCCESS if the file was unlocked, or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_file_unlock(FILE* ZIX_NONNULL file, ZixFileLockMode mode);
 
 /**
@@ -309,8 +294,7 @@ typedef enum {
 /**
    Return the type of a file or directory, resolving symlinks.
 */
-ZIX_API
-ZixFileType
+ZIX_API ZixFileType
 zix_file_type(const char* ZIX_NONNULL path);
 
 /**
@@ -319,8 +303,7 @@ zix_file_type(const char* ZIX_NONNULL path);
    On Windows, a directory symlink (actually a "reparse point") always appears
    as a directory.
 */
-ZIX_API
-ZixFileType
+ZIX_API ZixFileType
 zix_symlink_type(const char* ZIX_NONNULL path);
 
 /**
@@ -332,8 +315,7 @@ zix_symlink_type(const char* ZIX_NONNULL path);
 
    @return A non-negative size in bytes, or -1 on error.
 */
-ZIX_API
-ZixFileOffset
+ZIX_API ZixFileOffset
 zix_file_size(const char* ZIX_NONNULL path);
 
 /**
@@ -347,8 +329,7 @@ zix_file_size(const char* ZIX_NONNULL path);
 
    @param allocator Allocator used for the returned path.
 */
-ZIX_MALLOC_API
-char* ZIX_ALLOCATED
+ZIX_MALLOC_API char* ZIX_ALLOCATED
 zix_current_path(ZixAllocator* ZIX_NULLABLE allocator);
 
 /**
@@ -358,8 +339,7 @@ zix_current_path(ZixAllocator* ZIX_NULLABLE allocator);
 
    @return A new path to a temporary directory, or null on error.
 */
-ZIX_MALLOC_API
-char* ZIX_ALLOCATED
+ZIX_MALLOC_API char* ZIX_ALLOCATED
 zix_temp_directory_path(ZixAllocator* ZIX_NULLABLE allocator);
 
 /**

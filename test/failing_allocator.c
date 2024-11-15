@@ -23,8 +23,7 @@ attempt(ZixFailingAllocator* const allocator)
   return true;
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_failing_malloc(ZixAllocator* const allocator, const size_t size)
 {
   ZixFailingAllocator* const state = (ZixFailingAllocator*)allocator;
@@ -33,8 +32,7 @@ zix_failing_malloc(ZixAllocator* const allocator, const size_t size)
   return attempt(state) ? base->malloc(base, size) : NULL;
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_failing_calloc(ZixAllocator* const allocator,
                    const size_t        nmemb,
                    const size_t        size)
@@ -66,8 +64,7 @@ zix_failing_free(ZixAllocator* const allocator, void* const ptr)
   base->free(base, ptr);
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_failing_aligned_alloc(ZixAllocator* const allocator,
                           const size_t        alignment,
                           const size_t        size)
@@ -88,8 +85,7 @@ zix_failing_aligned_free(ZixAllocator* const allocator, void* const ptr)
   base->aligned_free(base, ptr);
 }
 
-ZIX_CONST_FUNC
-ZixFailingAllocator
+ZIX_CONST_FUNC ZixFailingAllocator
 zix_failing_allocator(void)
 {
   ZixFailingAllocator failing_allocator = {

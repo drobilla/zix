@@ -47,24 +47,21 @@ test_fail(TestState* const state, const char* fmt, ...)
   return EXIT_FAILURE;
 }
 
-ZIX_PURE_FUNC
-static const char*
+ZIX_PURE_FUNC static const char*
 identity(const char* record)
 {
   return record;
 }
 
 /// Decent hash function using zix_digest (murmur2)
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 decent_string_hash(const char* const str)
 {
   return zix_digest(0U, str, strlen(str));
 }
 
 /// Terrible hash function from K&R first edition
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 terrible_string_hash(const char* str)
 {
   size_t  hash = 0U;
@@ -77,8 +74,7 @@ terrible_string_hash(const char* str)
   return hash;
 }
 
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 string_hash_aligned(const char* const str)
 {
   size_t length = strlen(str);
@@ -87,22 +83,19 @@ string_hash_aligned(const char* const str)
   return zix_digest_aligned(0U, str, length);
 }
 
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 string_hash32(const char* const str)
 {
   return (size_t)zix_digest32(0U, str, strlen(str));
 }
 
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 string_hash64(const char* const str)
 {
   return (size_t)zix_digest64(0U, str, strlen(str));
 }
 
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 string_hash32_aligned(const char* const str)
 {
   size_t length = strlen(str);
@@ -113,8 +106,7 @@ string_hash32_aligned(const char* const str)
 
 #if UINTPTR_MAX >= UINT64_MAX
 
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 string_hash64_aligned(const char* const str)
 {
   size_t length = strlen(str);
@@ -298,8 +290,7 @@ stress(ZixAllocator* const allocator, const size_t n_elems)
 }
 
 /// Identity hash function for numeric strings for explicitly hitting cases
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 identity_index_hash(const char* const str)
 {
   return strtoul(str, NULL, 10);

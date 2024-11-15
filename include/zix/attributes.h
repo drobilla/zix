@@ -48,22 +48,13 @@
 #endif
 
 /// A pure function in the public API that only reads memory
-#define ZIX_PURE_API \
-  ZIX_API            \
-  ZIX_PURE_FUNC      \
-  ZIX_NODISCARD
+#define ZIX_PURE_API ZIX_API ZIX_PURE_FUNC ZIX_NODISCARD
 
 /// A const function in the public API that is pure and only reads parameters
-#define ZIX_CONST_API \
-  ZIX_API             \
-  ZIX_CONST_FUNC      \
-  ZIX_NODISCARD
+#define ZIX_CONST_API ZIX_API ZIX_CONST_FUNC ZIX_NODISCARD
 
 /// A malloc function in the public API that returns allocated memory
-#define ZIX_MALLOC_API \
-  ZIX_API              \
-  ZIX_MALLOC_FUNC      \
-  ZIX_NODISCARD
+#define ZIX_MALLOC_API ZIX_API ZIX_MALLOC_FUNC ZIX_NODISCARD
 
 // Printf-like format functions
 #ifdef __GNUC__

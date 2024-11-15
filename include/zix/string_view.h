@@ -40,9 +40,7 @@ typedef struct {
 // clang-format on
 
 /// Return a view of an empty string
-ZIX_ALWAYS_INLINE_FUNC
-ZIX_CONST_FUNC
-static inline ZixStringView
+ZIX_ALWAYS_INLINE_FUNC ZIX_CONST_FUNC static inline ZixStringView
 zix_empty_string(void)
 {
   const ZixStringView view = {"", 0U};
@@ -62,9 +60,7 @@ zix_empty_string(void)
    @param len Length of the substring in bytes, not including the trailing null
    terminator if present.
 */
-ZIX_ALWAYS_INLINE_FUNC
-ZIX_CONST_FUNC
-static inline ZixStringView
+ZIX_ALWAYS_INLINE_FUNC ZIX_CONST_FUNC static inline ZixStringView
 zix_substring(const char* const ZIX_NONNULL str, const size_t len)
 {
   const ZixStringView view = {str, len};
@@ -78,9 +74,7 @@ zix_substring(const char* const ZIX_NONNULL str, const size_t len)
 
    @param str Pointer to the start of a null-terminated C string, or null.
 */
-ZIX_ALWAYS_INLINE_FUNC
-ZIX_PURE_FUNC
-static inline ZixStringView
+ZIX_ALWAYS_INLINE_FUNC ZIX_PURE_FUNC static inline ZixStringView
 // NOLINTNEXTLINE(clang-diagnostic-unused-function)
 zix_string(const char* const ZIX_NULLABLE str)
 {
@@ -90,8 +84,7 @@ zix_string(const char* const ZIX_NULLABLE str)
 /**
    Copy a string view into a newly allocated null-terminated string.
 */
-ZIX_MALLOC_API
-char* ZIX_ALLOCATED
+ZIX_MALLOC_API char* ZIX_ALLOCATED
 zix_string_view_copy(ZixAllocator* ZIX_NULLABLE allocator, ZixStringView view);
 
 /**
@@ -101,8 +94,7 @@ zix_string_view_copy(ZixAllocator* ZIX_NULLABLE allocator, ZixStringView view);
    has fast paths for when the operands have different lengths, or point to the
    same string data.
 */
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_string_view_equals(ZixStringView lhs, ZixStringView rhs);
 
 /**

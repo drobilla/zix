@@ -39,8 +39,7 @@ string_views(void)
   // end make-string-view
 }
 
-ZIX_CONST_FUNC
-int
+ZIX_CONST_FUNC int
 main(void)
 {
   string_views();

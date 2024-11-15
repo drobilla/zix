@@ -49,8 +49,7 @@ typedef struct ZixSemImpl ZixSem;
 
    @return #ZIX_STATUS_SUCCESS, or an unlikely error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_sem_init(ZixSem* ZIX_NONNULL sem, unsigned initial);
 
 /**
@@ -58,8 +57,7 @@ zix_sem_init(ZixSem* ZIX_NONNULL sem, unsigned initial);
 
    @return #ZIX_STATUS_SUCCESS, or an error.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_sem_destroy(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -71,8 +69,7 @@ zix_sem_destroy(ZixSem* ZIX_NONNULL sem);
    if the maximum possible value would have been exceeded, or
    #ZIX_STATUS_BAD_ARG if `sem` is invalid.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_sem_post(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -83,8 +80,7 @@ zix_sem_post(ZixSem* ZIX_NONNULL sem);
    @return #ZIX_STATUS_SUCCESS if `sem` was decremented, or #ZIX_STATUS_BAD_ARG
    if `sem` is invalid.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_sem_wait(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -94,8 +90,7 @@ zix_sem_wait(ZixSem* ZIX_NONNULL sem);
    #ZIX_STATUS_UNAVAILABLE if it was already zero, or #ZIX_STATUS_BAD_ARG if
    `sem` is invalid.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_sem_try_wait(ZixSem* ZIX_NONNULL sem);
 
 /**
@@ -108,8 +103,7 @@ zix_sem_try_wait(ZixSem* ZIX_NONNULL sem);
    the system does not support timed waits, or #ZIX_STATUS_BAD_ARG if `sem` is
    invalid.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
                    uint32_t            seconds,
                    uint32_t            nanoseconds);

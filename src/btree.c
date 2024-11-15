@@ -78,8 +78,7 @@ zix_btree_node_new(ZixAllocator* const allocator, const bool leaf)
   return node;
 }
 
-ZIX_PURE_FUNC
-static ZixBTreeNode*
+ZIX_PURE_FUNC static ZixBTreeNode*
 zix_btree_child(const ZixBTreeNode* const node, const unsigned i)
 {
   assert(!node->is_leaf);
@@ -394,16 +393,14 @@ zix_btree_leaf_find(const ZixBTree* const     t,
     t->cmp, t->cmp_data, n->data.leaf.vals, n->n_vals, e, equal);
 }
 
-ZIX_PURE_FUNC
-static inline bool
+ZIX_PURE_FUNC static inline bool
 zix_btree_can_remove_from(const ZixBTreeNode* const n)
 {
   assert(n->n_vals >= zix_btree_min_vals(n));
   return n->n_vals > zix_btree_min_vals(n);
 }
 
-ZIX_PURE_FUNC
-static inline bool
+ZIX_PURE_FUNC static inline bool
 zix_btree_is_full(const ZixBTreeNode* const n)
 {
   assert(n->n_vals <= zix_btree_max_vals(n));

@@ -20,12 +20,10 @@ typedef struct {
   ZixPathIterState state;
 } ZixPathIter;
 
-ZIX_PURE_FUNC
-ZixPathIter
+ZIX_PURE_FUNC ZixPathIter
 zix_path_begin(const char* ZIX_NULLABLE path);
 
-ZIX_PURE_FUNC
-ZixPathIter
+ZIX_PURE_FUNC ZixPathIter
 zix_path_next(const char* ZIX_NONNULL path, ZixPathIter iter);
 
 #endif // ZIX_PATH_ITER_H

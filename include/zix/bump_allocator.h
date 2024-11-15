@@ -52,8 +52,7 @@ typedef struct {
 } ZixBumpAllocator;
 
 /// Return a bump allocator that works within a provided buffer
-ZIX_API
-ZixBumpAllocator
+ZIX_API ZixBumpAllocator
 zix_bump_allocator(size_t capacity, void* ZIX_NONNULL buffer);
 
 /**

@@ -59,9 +59,7 @@ typedef void (*ZixBTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
    Searching can be done with a custom comparator that supports wildcards, see
    zix_btree_lower_bound() for details.
 */
-ZIX_API
-ZIX_NODISCARD
-ZixBTree* ZIX_ALLOCATED
+ZIX_API ZIX_NODISCARD ZixBTree* ZIX_ALLOCATED
 zix_btree_new(ZixAllocator* ZIX_NULLABLE      allocator,
               ZixBTreeCompareFunc ZIX_NONNULL cmp,
               const void* ZIX_UNSPECIFIED     cmp_data);
@@ -76,8 +74,7 @@ zix_btree_new(ZixAllocator* ZIX_NULLABLE      allocator,
 
    @param destroy_data Opaque user data pointer to pass to `destroy`.
 */
-ZIX_API
-void
+ZIX_API void
 zix_btree_free(ZixBTree* ZIX_NULLABLE           t,
                ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
                const void* ZIX_NULLABLE         destroy_data);
@@ -92,15 +89,13 @@ zix_btree_free(ZixBTree* ZIX_NULLABLE           t,
 
    @param destroy_data Opaque user data pointer to pass to `destroy`.
 */
-ZIX_API
-void
+ZIX_API void
 zix_btree_clear(ZixBTree* ZIX_NONNULL            t,
                 ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
                 const void* ZIX_NULLABLE         destroy_data);
 
 /// Return the number of elements in `t`
-ZIX_PURE_API
-size_t
+ZIX_PURE_API size_t
 zix_btree_size(const ZixBTree* ZIX_NONNULL t);
 
 /**
@@ -135,42 +130,34 @@ static const ZixBTreeIter zix_btree_end_iter = {
 };
 
 /// Return the data at the given position in the tree
-ZIX_PURE_API
-void* ZIX_UNSPECIFIED
+ZIX_PURE_API void* ZIX_UNSPECIFIED
 zix_btree_get(ZixBTreeIter ti);
 
 /// Return an iterator to the first (smallest) element in `t`
-ZIX_PURE_API
-ZixBTreeIter
+ZIX_PURE_API ZixBTreeIter
 zix_btree_begin(const ZixBTree* ZIX_NONNULL t);
 
 /// Return an iterator to the end of `t` (one past the last element)
-ZIX_CONST_API
-ZixBTreeIter
+ZIX_CONST_API ZixBTreeIter
 zix_btree_end(const ZixBTree* ZIX_NULLABLE t);
 
 /// Return true iff `lhs` is equal to `rhs`
-ZIX_CONST_API
-bool
+ZIX_CONST_API bool
 zix_btree_iter_equals(ZixBTreeIter lhs, ZixBTreeIter rhs);
 
 /// Return true iff `i` is an iterator at the end of a tree
-ZIX_NODISCARD
-static inline bool
+ZIX_NODISCARD static inline bool
 zix_btree_iter_is_end(const ZixBTreeIter i)
 {
   return i.level == 0 && !i.nodes[0];
 }
 
 /// Increment `i` to point to the next element in the tree
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_btree_iter_increment(ZixBTreeIter* ZIX_NONNULL i);
 
 /// Return an iterator one past `iter`
-ZIX_API
-ZIX_NODISCARD
-ZixBTreeIter
+ZIX_API ZIX_NODISCARD ZixBTreeIter
 zix_btree_iter_next(ZixBTreeIter iter);
 
 /**
@@ -185,8 +172,7 @@ zix_btree_iter_next(ZixBTreeIter iter);
    @return #ZIX_STATUS_SUCCESS on success, #ZIX_STATUS_EXISTS, or
    #ZIX_STATUS_NO_MEM.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_UNSPECIFIED e);
 
 /**
@@ -203,8 +189,7 @@ zix_btree_insert(ZixBTree* ZIX_NONNULL t, void* ZIX_UNSPECIFIED e);
 
    @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_NOT_FOUND.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_btree_remove(ZixBTree* ZIX_NONNULL              t,
                  const void* ZIX_UNSPECIFIED        e,
                  void* ZIX_UNSPECIFIED* ZIX_NONNULL out,
@@ -223,8 +208,7 @@ zix_btree_remove(ZixBTree* ZIX_NONNULL              t,
 
    @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_NOT_FOUND.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_btree_find(const ZixBTree* ZIX_NONNULL t,
                const void* ZIX_UNSPECIFIED e,
                ZixBTreeIter* ZIX_NONNULL   ti);
@@ -245,8 +229,7 @@ zix_btree_find(const ZixBTree* ZIX_NONNULL t,
 
    @return #ZIX_STATUS_SUCCESS.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL      t,
                       ZixBTreeCompareFunc ZIX_NULLABLE compare_key,
                       const void* ZIX_NULLABLE         compare_key_data,

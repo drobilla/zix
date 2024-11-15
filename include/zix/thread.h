@@ -62,8 +62,7 @@ typedef ZixThreadResult(ZIX_THREAD_FUNC* ZixThreadFunc)(void*);
 
    @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_ERROR.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_thread_create(ZixThread*    thread,
                   size_t        stack_size,
                   ZixThreadFunc function,
@@ -74,8 +73,7 @@ zix_thread_create(ZixThread*    thread,
 
    @return #ZIX_STATUS_SUCCESS on success, or #ZIX_STATUS_ERROR.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_thread_join(ZixThread thread);
 
 /**

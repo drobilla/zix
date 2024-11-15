@@ -116,8 +116,7 @@ test_digest_aligned(void)
   }
 }
 
-ZIX_PURE_FUNC
-int
+ZIX_PURE_FUNC int
 main(void)
 {
   test_digest32();

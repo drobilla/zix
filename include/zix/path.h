@@ -35,9 +35,7 @@ ZIX_BEGIN_DECLS
 */
 
 /// Join path `a` and path `b` with a single directory separator between them
-ZIX_API
-ZIX_NODISCARD
-char* ZIX_ALLOCATED
+ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_join(ZixAllocator* ZIX_NULLABLE allocator,
               const char* ZIX_NULLABLE   a,
               const char* ZIX_NULLABLE   b);
@@ -55,9 +53,7 @@ zix_path_join(ZixAllocator* ZIX_NULLABLE allocator,
    converted to the preferred separator (backslash on Windows, slash everywhere
    else).
 */
-ZIX_API
-ZIX_NODISCARD
-char* ZIX_ALLOCATED
+ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
                    const char* ZIX_NONNULL    path);
 
@@ -72,9 +68,7 @@ zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
    like case normalization or symbolic link dereferencing.  For that, use
    zix_canonical_path().
 */
-ZIX_API
-ZIX_NODISCARD
-char* ZIX_ALLOCATED
+ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_lexically_normal(ZixAllocator* ZIX_NULLABLE allocator,
                           const char* ZIX_NONNULL    path);
 
@@ -85,9 +79,7 @@ zix_path_lexically_normal(ZixAllocator* ZIX_NULLABLE allocator,
    equivalent path relative to `base` is returned (which may contain
    up-references).
 */
-ZIX_API
-ZIX_NODISCARD
-char* ZIX_ALLOCATED
+ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_lexically_relative(ZixAllocator* ZIX_NULLABLE allocator,
                             const char* ZIX_NONNULL    path,
                             const char* ZIX_NONNULL    base);
@@ -99,13 +91,11 @@ zix_path_lexically_relative(ZixAllocator* ZIX_NULLABLE allocator,
 */
 
 /// Return the root name of `path` like "C:", or null
-ZIX_PURE_WIN_API
-ZixStringView
+ZIX_PURE_WIN_API ZixStringView
 zix_path_root_name(const char* ZIX_NONNULL path);
 
 /// Return the root directory of `path` like "/" or "\", or null
-ZIX_PURE_API
-ZixStringView
+ZIX_PURE_API ZixStringView
 zix_path_root_directory(const char* ZIX_NONNULL path);
 
 /**
@@ -121,8 +111,7 @@ zix_path_root_directory(const char* ZIX_NONNULL path);
    @return The newly allocated root path of `path`, or null if it has no root
    or allocation failed.
 */
-ZIX_PURE_API
-ZixStringView
+ZIX_PURE_API ZixStringView
 zix_path_root_path(const char* ZIX_NONNULL path);
 
 /**
@@ -131,8 +120,7 @@ zix_path_root_path(const char* ZIX_NONNULL path);
    If the path has no relative path (because it is empty or a root path), this
    returns null.
 */
-ZIX_PURE_API
-ZixStringView
+ZIX_PURE_API ZixStringView
 zix_path_relative_path(const char* ZIX_NONNULL path);
 
 /**
@@ -151,8 +139,7 @@ zix_path_relative_path(const char* ZIX_NONNULL path);
    @return The newly allocated path to the parent of `path`, or null if it has
    no parent or allocation failed.
 */
-ZIX_PURE_API
-ZixStringView
+ZIX_PURE_API ZixStringView
 zix_path_parent_path(const char* ZIX_NONNULL path);
 
 /**
@@ -161,8 +148,7 @@ zix_path_parent_path(const char* ZIX_NONNULL path);
    The filename is the name after the last directory separator.  If the path
    has no filename, this returns null.
 */
-ZIX_PURE_API
-ZixStringView
+ZIX_PURE_API ZixStringView
 zix_path_filename(const char* ZIX_NONNULL path);
 
 /**
@@ -171,8 +157,7 @@ zix_path_filename(const char* ZIX_NONNULL path);
    The "stem" is the filename without the extension, that is, everything up to
    the last "." if "." is not the first character.
 */
-ZIX_PURE_API
-ZixStringView
+ZIX_PURE_API ZixStringView
 zix_path_stem(const char* ZIX_NONNULL path);
 
 /**
@@ -181,8 +166,7 @@ zix_path_stem(const char* ZIX_NONNULL path);
    The "extension" is everything past the last "." in the filename, if "." is
    not the first character.
 */
-ZIX_PURE_API
-ZixStringView
+ZIX_PURE_API ZixStringView
 zix_path_extension(const char* ZIX_NONNULL path);
 
 /**
@@ -192,53 +176,43 @@ zix_path_extension(const char* ZIX_NONNULL path);
 */
 
 /// Return true if `path` has a root path like "/" or "C:\"
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_has_root_path(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a root name like "C:"
-ZIX_PURE_WIN_API
-bool
+ZIX_PURE_WIN_API bool
 zix_path_has_root_name(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a root directory like "/" or "\"
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_has_root_directory(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a relative path "dir/file.txt"
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_has_relative_path(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a parent path like "dir/"
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_has_parent_path(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a filename like "file.txt"
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_has_filename(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a stem like "file"
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_has_stem(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has an extension like ".txt"
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_has_extension(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` is an absolute path
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_is_absolute(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` is a relative path
-ZIX_PURE_API
-bool
+ZIX_PURE_API bool
 zix_path_is_relative(const char* ZIX_NULLABLE path);
 
 /**

@@ -20,8 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-ZIX_PURE_FUNC
-static int
+ZIX_PURE_FUNC static int
 int_cmp(const void* a, const void* b, const void* ZIX_UNUSED(user_data))
 {
   const uintptr_t ia = (uintptr_t)a;

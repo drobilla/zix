@@ -38,8 +38,7 @@ typedef enum {
    The returned string is always one sentence, with an uppercase first
    character, and no trailing period.
 */
-ZIX_CONST_API
-const char*
+ZIX_CONST_API const char*
 zix_strerror(ZixStatus status);
 
 /**

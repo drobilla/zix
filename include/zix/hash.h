@@ -102,22 +102,18 @@ typedef bool (*ZixKeyEqualFunc)(const ZixHashKey* ZIX_NONNULL a,
    @param hash_func The key hashing function.
    @param equal_func A function to test keys for equality.
 */
-ZIX_API
-ZIX_NODISCARD
-ZixHash* ZIX_ALLOCATED
+ZIX_API ZIX_NODISCARD ZixHash* ZIX_ALLOCATED
 zix_hash_new(ZixAllocator* ZIX_NULLABLE  allocator,
              ZixKeyFunc ZIX_NONNULL      key_func,
              ZixHashFunc ZIX_NONNULL     hash_func,
              ZixKeyEqualFunc ZIX_NONNULL equal_func);
 
 /// Free `hash`
-ZIX_API
-void
+ZIX_API void
 zix_hash_free(ZixHash* ZIX_NULLABLE hash);
 
 /// Return the number of elements in the hash
-ZIX_PURE_API
-size_t
+ZIX_PURE_API size_t
 zix_hash_size(const ZixHash* ZIX_NONNULL hash);
 
 /**
@@ -135,23 +131,19 @@ zix_hash_size(const ZixHash* ZIX_NONNULL hash);
 typedef size_t ZixHashIter;
 
 /// Return an iterator to the first record in a hash, or the end if it is empty
-ZIX_PURE_API
-ZixHashIter
+ZIX_PURE_API ZixHashIter
 zix_hash_begin(const ZixHash* ZIX_NONNULL hash);
 
 /// Return an iterator one past the last possible record in a hash
-ZIX_PURE_API
-ZixHashIter
+ZIX_PURE_API ZixHashIter
 zix_hash_end(const ZixHash* ZIX_NONNULL hash);
 
 /// Return the record pointed to by an iterator
-ZIX_PURE_API
-ZixHashRecord* ZIX_NULLABLE
+ZIX_PURE_API ZixHashRecord* ZIX_NULLABLE
 zix_hash_get(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
 /// Return an iterator that has been advanced to the next record in a hash
-ZIX_PURE_API
-ZixHashIter
+ZIX_PURE_API ZixHashIter
 zix_hash_next(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
 /**
@@ -189,8 +181,7 @@ typedef struct {
    record with this key using zix_hash_insert_at() until the hash table is
    modified (which invalidates the position).
 */
-ZIX_API
-ZixHashInsertPlan
+ZIX_API ZixHashInsertPlan
 zix_hash_plan_insert(const ZixHash* ZIX_NONNULL    hash,
                      const ZixHashKey* ZIX_NONNULL key);
 
@@ -214,8 +205,7 @@ zix_hash_plan_insert(const ZixHash* ZIX_NONNULL    hash,
    be inserted, and the predicate must return true only if the key it is called
    with (the first argument) matches the key to be inserted.
 */
-ZIX_API
-ZixHashInsertPlan
+ZIX_API ZixHashInsertPlan
 zix_hash_plan_insert_prehashed(const ZixHash* ZIX_NONNULL            hash,
                                ZixHashCode                           code,
                                ZixKeyMatchFunc ZIX_NONNULL           predicate,
@@ -228,8 +218,7 @@ zix_hash_plan_insert_prehashed(const ZixHash* ZIX_NONNULL            hash,
    can be used to insert a new record, or to access the existing matching
    record.
 */
-ZIX_PURE_API
-ZixHashRecord* ZIX_NULLABLE
+ZIX_PURE_API ZixHashRecord* ZIX_NULLABLE
 zix_hash_record_at(const ZixHash* ZIX_NONNULL hash, ZixHashInsertPlan position);
 
 /**
@@ -249,8 +238,7 @@ zix_hash_record_at(const ZixHash* ZIX_NONNULL hash, ZixHashInsertPlan position);
    @return ZIX_STATUS_SUCCESS, ZIX_STATUS_EXISTS if a record already exists at
    this position, or ZIX_STATUS_NO_MEM if growing the hash table failed.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_hash_insert_at(ZixHash* ZIX_NONNULL       hash,
                    ZixHashInsertPlan          position,
                    ZixHashRecord* ZIX_NONNULL record);
@@ -269,8 +257,7 @@ zix_hash_insert_at(ZixHash* ZIX_NONNULL       hash,
 
    @return ZIX_STATUS_SUCCESS, ZIX_STATUS_EXISTS, or ZIX_STATUS_NO_MEM.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_hash_insert(ZixHash* ZIX_NONNULL hash, ZixHashRecord* ZIX_NONNULL record);
 
 /**
@@ -287,8 +274,7 @@ zix_hash_insert(ZixHash* ZIX_NONNULL hash, ZixHashRecord* ZIX_NONNULL record);
    @return ZIX_STATUS_SUCCES or ZIX_STATUS_BAD_ARG if `i` does not point at a
    removable record.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_hash_erase(ZixHash* ZIX_NONNULL                     hash,
                ZixHashIter                              i,
                ZixHashRecord* ZIX_NULLABLE* ZIX_NONNULL removed);
@@ -301,8 +287,7 @@ zix_hash_erase(ZixHash* ZIX_NONNULL                     hash,
    @param removed Set to the removed record, or null.
    @return ZIX_STATUS_SUCCES or ZIX_STATUS_NOT_FOUND.
 */
-ZIX_API
-ZixStatus
+ZIX_API ZixStatus
 zix_hash_remove(ZixHash* ZIX_NONNULL                     hash,
                 const ZixHashKey* ZIX_NONNULL            key,
                 ZixHashRecord* ZIX_NULLABLE* ZIX_NONNULL removed);
@@ -323,8 +308,7 @@ zix_hash_remove(ZixHash* ZIX_NONNULL                     hash,
    @return An iterator to the matching record, or the end iterator if no such
    record exists.
 */
-ZIX_API
-ZixHashIter
+ZIX_API ZixHashIter
 zix_hash_find(const ZixHash* ZIX_NONNULL    hash,
               const ZixHashKey* ZIX_NONNULL key);
 
@@ -340,8 +324,7 @@ zix_hash_find(const ZixHash* ZIX_NONNULL    hash,
 
    @return A pointer to the matching record, of null if no such record exists.
 */
-ZIX_API
-ZixHashRecord* ZIX_NULLABLE
+ZIX_API ZixHashRecord* ZIX_NULLABLE
 zix_hash_find_record(const ZixHash* ZIX_NONNULL    hash,
                      const ZixHashKey* ZIX_NONNULL key);
 

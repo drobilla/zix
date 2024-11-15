@@ -13,8 +13,7 @@
 
 static const size_t min_alignment = sizeof(uintmax_t);
 
-ZIX_PURE_FUNC
-static size_t
+ZIX_PURE_FUNC static size_t
 round_up_multiple(const size_t number, const size_t factor)
 {
   assert(factor);                         // Factor must be non-zero
@@ -23,8 +22,7 @@ round_up_multiple(const size_t number, const size_t factor)
   return (number + factor - 1U) & ~(factor - 1U);
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_bump_malloc(ZixAllocator* const allocator, const size_t size)
 {
   ZixBumpAllocator* const state = (ZixBumpAllocator*)allocator;
@@ -46,8 +44,7 @@ zix_bump_malloc(ZixAllocator* const allocator, const size_t size)
   return (void*)((char*)state->buffer + state->last);
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_bump_calloc(ZixAllocator* const allocator,
                 const size_t        nmemb,
                 const size_t        size)
@@ -91,8 +88,7 @@ zix_bump_free(ZixAllocator* const allocator, void* const ptr)
   }
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_bump_aligned_alloc(ZixAllocator* const allocator,
                        const size_t        alignment,
                        const size_t        size)
@@ -138,8 +134,7 @@ zix_bump_aligned_free(ZixAllocator* const allocator, void* const ptr)
   zix_bump_free(allocator, ptr);
 }
 
-ZIX_CONST_FUNC
-ZixBumpAllocator
+ZIX_CONST_FUNC ZixBumpAllocator
 zix_bump_allocator(const size_t capacity, void* buffer)
 {
   const size_t aligned_top = (uintptr_t)buffer % min_alignment;

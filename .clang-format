@@ -1,10 +1,21 @@
-# Copyright 2020-2022 David Robillard <d@drobilla.net>
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 ---
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
-AlignEscapedNewlinesLeft: true
+AlignEscapedNewlines: Left
+AttributeMacros:
+  - ZIX_ALWAYS_INLINE_FUNC
+  - ZIX_API
+  - ZIX_CONST_API
+  - ZIX_CONST_FUNC
+  - ZIX_MALLOC_API
+  - ZIX_MALLOC_FUNC
+  - ZIX_NODISCARD
+  - ZIX_PURE_API
+  - ZIX_PURE_FUNC
+  - ZIX_PURE_WIN_API
 BasedOnStyle: Mozilla
 BraceWrapping:
   AfterEnum: false
@@ -20,17 +31,7 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 SpacesInContainerLiterals: false
 StatementMacros:
   - FALLTHROUGH
-  - ZIX_ALWAYS_INLINE_FUNC
-  - ZIX_API
   - ZIX_BEGIN_DECLS
-  - ZIX_CONST_API
-  - ZIX_CONST_FUNC
   - ZIX_END_DECLS
-  - ZIX_MALLOC_API
-  - ZIX_MALLOC_FUNC
-  - ZIX_NODISCARD
-  - ZIX_PURE_API
-  - ZIX_PURE_FUNC
-  - ZIX_PURE_WIN_API
   - _Pragma
 ...

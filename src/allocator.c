@@ -15,16 +15,14 @@
 
 #include <stdlib.h>
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_default_malloc(ZixAllocator* const allocator, const size_t size)
 {
   (void)allocator;
   return malloc(size);
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_default_calloc(ZixAllocator* const allocator,
                    const size_t        nmemb,
                    const size_t        size)
@@ -49,8 +47,7 @@ zix_default_free(ZixAllocator* const allocator, void* const ptr)
   free(ptr);
 }
 
-ZIX_MALLOC_FUNC
-static void*
+ZIX_MALLOC_FUNC static void*
 zix_default_aligned_alloc(ZixAllocator* const allocator,
                           const size_t        alignment,
                           const size_t        size)
