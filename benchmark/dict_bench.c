@@ -12,10 +12,10 @@ typedef struct {
 #define ZIX_HASH_KEY_TYPE ZixChunk
 #define ZIX_HASH_RECORD_TYPE ZixChunk
 
-#include "zix/attributes.h"
-#include "zix/digest.h"
-#include "zix/hash.h"
-#include "zix/status.h"
+#include <zix/attributes.h>
+#include <zix/digest.h>
+#include <zix/hash.h>
+#include <zix/status.h>
 
 ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>

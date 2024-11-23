@@ -4,7 +4,7 @@
 #ifndef ZIX_SYSTEM_H
 #define ZIX_SYSTEM_H
 
-#include "zix/status.h"
+#include <zix/status.h>
 
 #include <stdint.h>
 #include <sys/types.h>

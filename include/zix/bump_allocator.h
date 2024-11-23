@@ -4,8 +4,8 @@
 #ifndef ZIX_BUMP_ALLOCATOR_H
 #define ZIX_BUMP_ALLOCATOR_H
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
 
 #include <stddef.h>
 

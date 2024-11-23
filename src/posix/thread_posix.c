@@ -1,11 +1,11 @@
 // Copyright 2012-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/thread.h"
+#include <zix/thread.h>
 
 #include "../errno_status.h"
 
-#include "zix/status.h"
+#include <zix/status.h>
 
 #include <pthread.h>
 

@@ -4,7 +4,7 @@
 #ifndef ZIX_TEST_FAILING_ALLOCATOR_H
 #define ZIX_TEST_FAILING_ALLOCATOR_H
 
-#include "zix/allocator.h"
+#include <zix/allocator.h>
 
 #include <stddef.h>
 

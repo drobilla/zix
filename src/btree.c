@@ -1,7 +1,11 @@
 // Copyright 2011-2021 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/btree.h"
+#include <zix/btree.h>
+
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #include <assert.h>
 #include <stdint.h>

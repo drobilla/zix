@@ -3,8 +3,8 @@
 
 #undef NDEBUG
 
-#include "zix/attributes.h"
-#include "zix/digest.h"
+#include <zix/attributes.h>
+#include <zix/digest.h>
 
 #include <assert.h>
 #include <stddef.h>

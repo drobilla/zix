@@ -1,13 +1,13 @@
 // Copyright 2007-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/filesystem.h"
+#include <zix/filesystem.h>
 
 #include "path_iter.h"
 #include "system.h"
 
-#include "zix/allocator.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/status.h>
 
 #ifdef _WIN32
 #  include <direct.h>

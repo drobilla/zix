@@ -4,8 +4,8 @@
 #ifndef ZIX_THREAD_H
 #define ZIX_THREAD_H
 
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #ifdef _WIN32
 #  include <windows.h>

@@ -1,13 +1,13 @@
 // Copyright 2011-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/ring.h"
+#include <zix/ring.h>
 
 #include "errno_status.h"
 #include "zix_config.h"
 
-#include "zix/allocator.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/status.h>
 
 #if defined(_WIN32)
 #  include <windows.h>

@@ -3,8 +3,8 @@
 
 #undef NDEBUG
 
-#include "zix/status.h"
-#include "zix/thread.h"
+#include <zix/status.h>
+#include <zix/thread.h>
 
 #include <assert.h>
 #include <string.h>

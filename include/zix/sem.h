@@ -4,8 +4,8 @@
 #ifndef ZIX_SEM_H
 #define ZIX_SEM_H
 
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #ifdef __APPLE__
 #  include <mach/mach.h>

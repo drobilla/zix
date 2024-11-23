@@ -8,8 +8,8 @@
   written such that it at least compiles and will run without crashing.
 */
 
-#include "zix/attributes.h"
-#include "zix/string_view.h"
+#include <zix/attributes.h>
+#include <zix/string_view.h>
 
 #if defined(__GNUC__)
 #  pragma GCC diagnostic push

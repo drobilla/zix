@@ -4,7 +4,7 @@
 #ifndef ZIX_ALLOCATOR_H
 #define ZIX_ALLOCATOR_H
 
-#include "zix/attributes.h"
+#include <zix/attributes.h>
 
 #include <stddef.h>
 

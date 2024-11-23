@@ -1,15 +1,15 @@
 // Copyright 2007-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/filesystem.h"
+#include <zix/filesystem.h>
 
 #include "../errno_status.h"
 #include "../system.h"
 #include "../zix_config.h"
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #if USE_FLOCK && USE_FILENO
 #  include <sys/file.h>

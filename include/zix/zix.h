@@ -16,9 +16,9 @@
    @{
 */
 
-#include "zix/attributes.h"
-#include "zix/status.h"
-#include "zix/string_view.h"
+#include <zix/attributes.h>
+#include <zix/status.h>
+#include <zix/string_view.h>
 
 /**
    @}
@@ -26,8 +26,8 @@
    @{
 */
 
-#include "zix/allocator.h"
-#include "zix/bump_allocator.h"
+#include <zix/allocator.h>
+#include <zix/bump_allocator.h>
 
 /**
    @}
@@ -35,7 +35,7 @@
    @{
 */
 
-#include "zix/digest.h"
+#include <zix/digest.h>
 
 /**
    @}
@@ -43,10 +43,10 @@
    @{
 */
 
-#include "zix/btree.h"
-#include "zix/hash.h"
-#include "zix/ring.h"
-#include "zix/tree.h"
+#include <zix/btree.h>
+#include <zix/hash.h>
+#include <zix/ring.h>
+#include <zix/tree.h>
 
 /**
    @}
@@ -54,8 +54,8 @@
    @{
 */
 
-#include "zix/sem.h"
-#include "zix/thread.h"
+#include <zix/sem.h>
+#include <zix/thread.h>
 
 /**
    @}
@@ -63,8 +63,8 @@
    @{
 */
 
-#include "zix/filesystem.h"
-#include "zix/path.h"
+#include <zix/filesystem.h>
+#include <zix/path.h>
 
 /**
    @}

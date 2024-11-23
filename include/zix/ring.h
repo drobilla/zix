@@ -4,9 +4,9 @@
 #ifndef ZIX_RING_H
 #define ZIX_RING_H
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #include <stdint.h>
 

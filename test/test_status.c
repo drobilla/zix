@@ -3,7 +3,7 @@
 
 #undef NDEBUG
 
-#include "zix/status.h"
+#include <zix/status.h>
 
 #include <assert.h>
 #include <stdio.h>

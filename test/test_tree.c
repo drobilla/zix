@@ -8,10 +8,10 @@
 #include "test_args.h"
 #include "test_data.h"
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
-#include "zix/status.h"
-#include "zix/tree.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/status.h>
+#include <zix/tree.h>
 
 #include <assert.h>
 #include <inttypes.h>

@@ -3,8 +3,8 @@
 
 #undef NDEBUG
 
-#include "zix/path.h"
-#include "zix/string_view.h"
+#include <zix/path.h>
+#include <zix/string_view.h>
 
 #include <assert.h>
 #include <stdbool.h>

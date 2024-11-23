@@ -1,7 +1,7 @@
 // Copyright 2014-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/status.h"
+#include <zix/status.h>
 
 const char*
 zix_strerror(const ZixStatus status)

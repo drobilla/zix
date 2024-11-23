@@ -1,7 +1,10 @@
 // Copyright 2011-2021 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/hash.h"
+#include <zix/hash.h>
+
+#include <zix/allocator.h>
+#include <zix/status.h>
 
 #include <assert.h>
 #include <stdbool.h>

@@ -4,9 +4,9 @@
 #ifndef ZIX_TREE_H
 #define ZIX_TREE_H
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #include <stdbool.h>
 #include <stddef.h>

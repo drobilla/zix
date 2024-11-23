@@ -4,8 +4,8 @@
 #ifndef ZIX_STRING_VIEW_H
 #define ZIX_STRING_VIEW_H
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
 
 #include <stdbool.h>
 #include <stddef.h>

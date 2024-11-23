@@ -6,7 +6,7 @@
 
 #include "index_range.h"
 
-#include "zix/attributes.h"
+#include <zix/attributes.h>
 
 typedef enum {
   ZIX_PATH_ROOT_NAME,

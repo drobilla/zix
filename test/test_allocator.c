@@ -5,8 +5,8 @@
 
 #include "failing_allocator.h"
 
-#include "zix/allocator.h"
-#include "zix/bump_allocator.h"
+#include <zix/allocator.h>
+#include <zix/bump_allocator.h>
 
 #include <assert.h>
 #include <stddef.h>

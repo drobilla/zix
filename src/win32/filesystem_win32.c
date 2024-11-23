@@ -1,15 +1,15 @@
 // Copyright 2007-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/bump_allocator.h"
-#include "zix/filesystem.h"
+#include <zix/bump_allocator.h>
+#include <zix/filesystem.h>
 
 #include "../errno_status.h"
 #include "../zix_config.h"
 
-#include "zix/allocator.h"
-#include "zix/path.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/path.h>
+#include <zix/status.h>
 
 #include <direct.h>
 #include <fcntl.h>

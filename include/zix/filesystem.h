@@ -4,9 +4,9 @@
 #ifndef ZIX_FILESYSTEM_H
 #define ZIX_FILESYSTEM_H
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #if !(defined(_FILE_OFFSET_BITS) && _FILE_OFFSET_BITS == 64)
 #  include <stddef.h>

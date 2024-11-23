@@ -1,9 +1,9 @@
 // Copyright 2011-2021 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/allocator.h"
+#include <zix/allocator.h>
 
-#include "zix/attributes.h"
+#include <zix/attributes.h>
 
 #include "zix_config.h"
 

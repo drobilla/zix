@@ -1,8 +1,9 @@
 // Copyright 2007-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/string_view.h"
-#include "zix/allocator.h"
+#include <zix/string_view.h>
+
+#include <zix/allocator.h>
 
 #include <stdbool.h>
 #include <string.h>

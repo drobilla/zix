@@ -1,7 +1,7 @@
 // Copyright 2012-2021 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/digest.h"
+#include <zix/digest.h>
 
 #include <assert.h>
 #include <stdint.h>

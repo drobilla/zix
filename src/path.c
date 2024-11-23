@@ -1,12 +1,14 @@
 // Copyright 2007-2022 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/path.h"
+#include <zix/path.h>
 
 #include "index_range.h"
 #include "path_iter.h"
 
-#include "zix/string_view.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/string_view.h>
 
 #include <stdbool.h>
 #include <stddef.h>

@@ -4,9 +4,9 @@
 #ifndef ZIX_PATH_H
 #define ZIX_PATH_H
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
-#include "zix/string_view.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/string_view.h>
 
 #include <stdbool.h>
 

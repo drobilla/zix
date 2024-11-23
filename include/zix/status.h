@@ -4,7 +4,7 @@
 #ifndef ZIX_STATUS_H
 #define ZIX_STATUS_H
 
-#include "zix/attributes.h"
+#include <zix/attributes.h>
 
 ZIX_BEGIN_DECLS
 

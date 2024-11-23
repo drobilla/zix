@@ -5,7 +5,7 @@
 
 #include "errno_status.h"
 
-#include "zix/status.h"
+#include <zix/status.h>
 
 #ifdef _WIN32
 #  include <io.h>

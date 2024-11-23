@@ -3,7 +3,7 @@
 
 #include "errno_status.h"
 
-#include "zix/status.h"
+#include <zix/status.h>
 
 #include <errno.h>
 #include <stddef.h>

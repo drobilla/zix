@@ -4,9 +4,9 @@
 #ifndef ZIX_BTREE_H
 #define ZIX_BTREE_H
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 #include <stdbool.h>
 #include <stddef.h>

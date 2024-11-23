@@ -4,8 +4,8 @@
 #ifndef ZIX_ERRNO_STATUS_H
 #define ZIX_ERRNO_STATUS_H
 
-#include "zix/attributes.h"
-#include "zix/status.h"
+#include <zix/attributes.h>
+#include <zix/status.h>
 
 /// Return an errno value converted to a status code
 ZIX_CONST_FUNC ZixStatus

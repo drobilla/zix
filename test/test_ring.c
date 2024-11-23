@@ -6,10 +6,10 @@
 #include "failing_allocator.h"
 #include "test_args.h"
 
-#include "zix/attributes.h"
-#include "zix/ring.h"
-#include "zix/status.h"
-#include "zix/thread.h"
+#include <zix/attributes.h>
+#include <zix/ring.h>
+#include <zix/status.h>
+#include <zix/thread.h>
 
 #include <assert.h>
 #include <limits.h>

@@ -1,10 +1,10 @@
 // Copyright 2021 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include "zix/bump_allocator.h"
+#include <zix/bump_allocator.h>
 
-#include "zix/allocator.h"
-#include "zix/attributes.h"
+#include <zix/allocator.h>
+#include <zix/attributes.h>
 
 #include <assert.h>
 #include <stddef.h>

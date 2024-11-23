@@ -3,11 +3,11 @@
 
 #undef NDEBUG
 
-#include "zix/allocator.h"
-#include "zix/filesystem.h"
-#include "zix/path.h"
-#include "zix/status.h"
-#include "zix/string_view.h"
+#include <zix/allocator.h>
+#include <zix/filesystem.h>
+#include <zix/path.h>
+#include <zix/status.h>
+#include <zix/string_view.h>
 
 #ifndef _WIN32
 #  include <unistd.h>

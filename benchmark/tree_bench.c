@@ -6,10 +6,10 @@
 
 #include "../test/test_data.h"
 
-#include "zix/attributes.h"
-#include "zix/btree.h"
-#include "zix/status.h"
-#include "zix/tree.h"
+#include <zix/attributes.h>
+#include <zix/btree.h>
+#include <zix/status.h>
+#include <zix/tree.h>
 
 ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>
