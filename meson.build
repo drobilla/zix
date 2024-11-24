@@ -333,12 +333,7 @@ sources = files(
   'src/tree.c',
 )
 
-if host_machine.system() == 'darwin'
-  sources += files(
-    'src/posix/filesystem_posix.c',
-    'src/posix/system_posix.c',
-  )
-elif host_machine.system() == 'windows'
+if host_machine.system() == 'windows'
   sources += files(
     'src/win32/filesystem_win32.c',
     'src/win32/system_win32.c',
