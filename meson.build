@@ -44,8 +44,6 @@ c_suppressions = []
 if cc.get_id() in ['clang', 'emscripten']
   if warning_level == 'everything'
     c_suppressions += [
-      '-Wno-bad-function-cast',
-      '-Wno-c11-extensions', # Glib
       '-Wno-declaration-after-statement',
       '-Wno-implicit-fallthrough', # Really for clang < 12
       '-Wno-padded',
@@ -54,9 +52,7 @@ if cc.get_id() in ['clang', 'emscripten']
     ]
 
     if not meson.is_cross_build()
-      c_suppressions += [
-        '-Wno-poison-system-directories',
-      ]
+      c_suppressions += ['-Wno-poison-system-directories']
     endif
 
     if host_machine.system() == 'windows'
@@ -68,22 +64,16 @@ if cc.get_id() in ['clang', 'emscripten']
   endif
 
   if warning_level in ['everything', '3']
-    c_suppressions += [
-      '-Wno-nullability-extension',
-    ]
+    c_suppressions += ['-Wno-nullability-extension']
   endif
 
   if cc.get_id() == 'emscripten'
-    c_suppressions += [
-      '-Wno-format',
-    ]
+    c_suppressions += ['-Wno-format']
   endif
 
 elif cc.get_id() == 'gcc'
   if warning_level == 'everything'
     c_suppressions += [
-      '-Wno-bad-function-cast',
-      '-Wno-cast-function-type',
       '-Wno-inline',
       '-Wno-padded',
       '-Wno-strict-overflow',
@@ -93,7 +83,7 @@ elif cc.get_id() == 'gcc'
 
     if host_machine.system() == 'windows'
       c_suppressions += [
-        '-Wno-format',
+        '-Wno-bad-function-cast',
         '-Wno-suggest-attribute=const',
         '-Wno-suggest-attribute=format',
         '-Wno-suggest-attribute=pure',
@@ -102,9 +92,7 @@ elif cc.get_id() == 'gcc'
   endif
 
   if warning_level in ['everything', '3']
-    c_suppressions += [
-      '-Wno-pedantic', # C11
-    ]
+    c_suppressions += ['-Wno-pedantic'] # C11
   endif
 
 elif cc.get_id() == 'msvc'

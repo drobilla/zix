@@ -52,12 +52,20 @@ endif
 
 # Set warning suppression flags specific to tests
 test_suppressions = []
-if host_machine.system() == 'windows'
-  if cc.get_id() in ['clang', 'emscripten']
-    test_suppressions += [
-      '-Wno-format-nonliteral',
-    ]
-  elif cc.get_id() == 'gcc'
+if cc.get_id() in ['clang', 'emscripten']
+  if warning_level == 'everything'
+    test_suppressions += ['-Wno-bad-function-cast']
+
+    if host_machine.system() == 'windows'
+      if cc.get_id() in ['clang', 'emscripten']
+        test_suppressions += ['-Wno-format-nonliteral']
+      endif
+    endif
+  endif
+elif cc.get_id() == 'gcc'
+  test_suppressions += ['-Wno-bad-function-cast']
+
+  if host_machine.system() == 'windows'
     test_suppressions += ['-Wno-format']
   endif
 endif

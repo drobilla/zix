@@ -17,13 +17,17 @@ if glib_dep.found()
   build_benchmarks = true
   benchmark_c_args = platform_c_args
 
+  benchmark_c_suppressions = []
   if cc.get_id() in ['clang', 'emscripten']
     benchmark_c_suppressions = [
+      '-Wno-bad-function-cast',
+      '-Wno-c11-extensions', # Glib
       '-Wno-reserved-identifier',
     ]
-
-    benchmark_c_args += cc.get_supported_arguments(benchmark_c_suppressions)
+  elif cc.get_id() == 'gcc'
+    benchmark_c_suppressions = ['-Wno-bad-function-cast']
   endif
+  benchmark_c_args += cc.get_supported_arguments(benchmark_c_suppressions)
 
   foreach benchmark : benchmarks
     benchmark(
