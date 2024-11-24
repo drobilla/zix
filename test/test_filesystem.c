@@ -261,9 +261,7 @@ test_copy_file(const char* data_file_path)
   assert(tmp_file_path);
   assert(copy_path);
 
-  if (!data_file_path) {
-    data_file_path = tmp_file_path;
-  }
+  data_file_path = data_file_path ? data_file_path : tmp_file_path;
 
   assert(!write_to_path(tmp_file_path, "test\n"));
 
@@ -696,10 +694,11 @@ int
 main(const int argc, char** const argv)
 {
   // Try to find some existing data file that's ideally not on a tmpfs
-  const char* data_file_path = (argc > 1) ? argv[1] : "build.ninja";
-  if (zix_file_type(data_file_path) != ZIX_FILE_TYPE_REGULAR) {
-    data_file_path = NULL;
-  }
+  const char* const default_file_path = (argc > 1) ? argv[1] : "build.ninja";
+  const char* const data_file_path =
+    (zix_file_type(default_file_path) == ZIX_FILE_TYPE_REGULAR)
+      ? default_file_path
+      : NULL;
 
   test_temp_directory_path();
   test_current_path();
