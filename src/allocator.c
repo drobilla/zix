@@ -3,9 +3,9 @@
 
 #include <zix/allocator.h>
 
-#include <zix/attributes.h>
-
 #include "zix_config.h"
+
+#include <zix/attributes.h>
 
 #ifdef _WIN32
 #  define WIN32_LEAN_AND_MEAN

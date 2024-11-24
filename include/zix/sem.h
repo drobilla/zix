@@ -15,9 +15,9 @@
 #  include <semaphore.h>
 #endif
 
-ZIX_BEGIN_DECLS
-
 #include <stdint.h>
+
+ZIX_BEGIN_DECLS
 
 /**
    @defgroup zix_sem Semaphore

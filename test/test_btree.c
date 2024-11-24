@@ -3,8 +3,6 @@
 
 #undef NDEBUG
 
-#include <zix/btree.h>
-
 #include "ensure.h"
 #include "failing_allocator.h"
 #include "test_args.h"
@@ -12,6 +10,7 @@
 
 #include <zix/allocator.h>
 #include <zix/attributes.h>
+#include <zix/btree.h>
 #include <zix/status.h>
 
 #include <assert.h>

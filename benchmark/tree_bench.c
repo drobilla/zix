@@ -1,10 +1,9 @@
 // Copyright 2011-2020 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
+#include "../test/test_data.h"
 #include "bench.h"
 #include "warnings.h"
-
-#include "../test/test_data.h"
 
 #include <zix/attributes.h>
 #include <zix/btree.h>
