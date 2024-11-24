@@ -1,4 +1,4 @@
-// Copyright 2016-2022 David Robillard <d@drobilla.net>
+// Copyright 2016-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_ZIX_H
@@ -65,6 +65,14 @@
 
 #include <zix/filesystem.h>
 #include <zix/path.h>
+
+/**
+   @}
+   @defgroup zix_environment Environment
+   @{
+*/
+
+#include <zix/environment.h>
 
 /**
    @}

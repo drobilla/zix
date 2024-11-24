@@ -9,6 +9,7 @@ Checks: >
   -bugprone-multi-level-implicit-pointer-conversion,
   -cert-err33-c,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+  -concurrency-mt-unsafe,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -google-readability-casting,
   -llvm-header-guard,

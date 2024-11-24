@@ -68,5 +68,7 @@ INPUT                  = @ZIX_SRCDIR@/include/zix/zix.h \
                          \
                          @ZIX_SRCDIR@/include/zix/filesystem.h \
                          @ZIX_SRCDIR@/include/zix/path.h \
+                         \
+                         @ZIX_SRCDIR@/include/zix/environment.h \
 
 OUTPUT_DIRECTORY       = @DOX_OUTPUT@

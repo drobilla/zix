@@ -12,7 +12,7 @@ project(
   ],
   license: 'ISC',
   meson_version: '>= 0.56.0',
-  version: '0.5.0',
+  version: '0.5.1',
 )
 
 zix_src_root = meson.current_source_dir()
@@ -305,6 +305,7 @@ c_headers = files(
   'include/zix/btree.h',
   'include/zix/bump_allocator.h',
   'include/zix/digest.h',
+  'include/zix/environment.h',
   'include/zix/filesystem.h',
   'include/zix/hash.h',
   'include/zix/path.h',
@@ -335,11 +336,13 @@ sources = files(
 
 if host_machine.system() == 'windows'
   sources += files(
+    'src/win32/environment_win32.c',
     'src/win32/filesystem_win32.c',
     'src/win32/system_win32.c',
   )
 else
   sources += files(
+    'src/posix/environment_posix.c',
     'src/posix/filesystem_posix.c',
     'src/posix/system_posix.c',
   )

@@ -124,7 +124,7 @@ freebsd:
   stage: build
   tags: [freebsd,meson]
   script:
-    - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
+    - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled -Db_lundef=false
     - ninja -C build test
     - meson configure -Dbuildtype=release build
     - ninja -C build test

@@ -73,6 +73,7 @@ sequential_tests = {
   },
   'filesystem': {'': files('../README.md')},
   'digest': {'': []},
+  'environment': {'': []},
   'hash': {'': []},
   'path': {'': []},
   'status': {'': []},
