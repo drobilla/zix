@@ -19,7 +19,6 @@ ZIX_RESTORE_WARNINGS
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 #ifndef MIN
 #  define MIN(a, b) (((a) < (b)) ? (a) : (b))
@@ -82,7 +81,7 @@ bench_zix_tree(size_t n_elems,
   ZixTree*     t  = zix_tree_new(NULL, false, int_cmp, NULL, NULL, NULL);
 
   // Insert n_elems elements
-  struct timespec insert_start = bench_start();
+  BenchmarkTime insert_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
 
@@ -94,7 +93,7 @@ bench_zix_tree(size_t n_elems,
   fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
 
   // Search for all elements
-  struct timespec search_start = bench_start();
+  BenchmarkTime search_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
     if (zix_tree_find(t, (void*)r, &ti)) {
@@ -107,7 +106,7 @@ bench_zix_tree(size_t n_elems,
   fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
   // Iterate over all elements
-  struct timespec iter_start = bench_start();
+  BenchmarkTime iter_start = bench_start();
   for (ZixTreeIter* iter = zix_tree_begin(t); !zix_tree_iter_is_end(iter);
        iter              = zix_tree_iter_next(iter)) {
     volatile void* const value = zix_tree_get(iter);
@@ -116,7 +115,7 @@ bench_zix_tree(size_t n_elems,
   fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
 
   // Delete all elements
-  struct timespec del_start = bench_start();
+  BenchmarkTime del_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
 
@@ -149,7 +148,7 @@ bench_zix_btree(size_t n_elems,
   ZixBTree*    t  = zix_btree_new(NULL, int_cmp, NULL);
 
   // Insert n_elems elements
-  struct timespec insert_start = bench_start();
+  BenchmarkTime insert_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
 
@@ -161,7 +160,7 @@ bench_zix_btree(size_t n_elems,
   fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
 
   // Search for all elements
-  struct timespec search_start = bench_start();
+  BenchmarkTime search_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
     if (zix_btree_find(t, (void*)r, &ti)) {
@@ -174,8 +173,8 @@ bench_zix_btree(size_t n_elems,
   fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
   // Iterate over all elements
-  struct timespec iter_start = bench_start();
-  ZixBTreeIter    iter       = zix_btree_begin(t);
+  BenchmarkTime iter_start = bench_start();
+  ZixBTreeIter  iter       = zix_btree_begin(t);
   for (; !zix_btree_iter_is_end(iter); zix_btree_iter_increment(&iter)) {
     volatile void* const value = zix_btree_get(iter);
     (void)value;
@@ -183,7 +182,7 @@ bench_zix_btree(size_t n_elems,
   fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
 
   // Delete all elements
-  struct timespec del_start = bench_start();
+  BenchmarkTime del_start = bench_start();
   for (size_t i = 0; i < n_elems; i++) {
     r = unique_rand(i);
 
@@ -213,7 +212,7 @@ bench_glib(size_t n_elems,
   GSequence* t = g_sequence_new(NULL);
 
   // Insert n_elems elements
-  struct timespec insert_start = bench_start();
+  BenchmarkTime insert_start = bench_start();
   for (size_t i = 0; i < n_elems; ++i) {
     r = unique_rand(i);
 
@@ -226,7 +225,7 @@ bench_glib(size_t n_elems,
   fprintf(insert_dat, "\t%lf", bench_end(&insert_start));
 
   // Search for all elements
-  struct timespec search_start = bench_start();
+  BenchmarkTime search_start = bench_start();
   for (size_t i = 0; i < n_elems; ++i) {
     r                   = unique_rand(i);
     GSequenceIter* iter = g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);
@@ -237,7 +236,7 @@ bench_glib(size_t n_elems,
   fprintf(search_dat, "\t%lf", bench_end(&search_start));
 
   // Iterate over all elements
-  struct timespec iter_start = bench_start();
+  BenchmarkTime iter_start = bench_start();
   for (GSequenceIter* iter = g_sequence_get_begin_iter(t);
        !g_sequence_iter_is_end(iter);
        iter = g_sequence_iter_next(iter)) {
@@ -246,7 +245,7 @@ bench_glib(size_t n_elems,
   fprintf(iter_dat, "\t%lf", bench_end(&iter_start));
 
   // Delete all elements
-  struct timespec del_start = bench_start();
+  BenchmarkTime del_start = bench_start();
   for (size_t i = 0; i < n_elems; ++i) {
     r                   = unique_rand(i);
     GSequenceIter* iter = g_sequence_lookup(t, (void*)r, g_int_cmp, NULL);

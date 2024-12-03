@@ -27,7 +27,6 @@ ZIX_RESTORE_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 typedef struct {
   ZixChunk* chunks;
@@ -149,7 +148,7 @@ run(FILE* const fd)
     // Benchmark insertion
 
     // GHashTable
-    struct timespec insert_start = bench_start();
+    BenchmarkTime insert_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       g_hash_table_insert(hash, inputs.chunks[i].buf, inputs.chunks[i].buf);
     }
@@ -167,7 +166,7 @@ run(FILE* const fd)
     // Benchmark search
 
     // GHashTable
-    struct timespec search_start = bench_start();
+    BenchmarkTime search_start = bench_start();
     for (size_t i = 0; i < n; ++i) {
       const size_t index = (size_t)(lcg64(seed + i) % n);
       char* volatile match =
