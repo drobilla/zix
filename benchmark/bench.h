@@ -1,33 +1,29 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef BENCH_H
 #define BENCH_H
 
-#include <time.h>
+#include <glib.h>
 
-typedef struct timespec BenchmarkTime;
+typedef gint64 BenchmarkTime;
 
 static inline double
 bench_elapsed_s(const BenchmarkTime* start, const BenchmarkTime* end)
 {
-  return ((double)(end->tv_sec - start->tv_sec) +
-          ((double)(end->tv_nsec - start->tv_nsec) * 0.000000001));
+  return (double)(*end - *start) * 0.000001;
 }
 
 static inline BenchmarkTime
 bench_start(void)
 {
-  BenchmarkTime start_t;
-  clock_gettime(CLOCK_REALTIME, &start_t);
-  return start_t;
+  return g_get_monotonic_time();
 }
 
 static inline double
 bench_end(const BenchmarkTime* start_t)
 {
-  BenchmarkTime end_t;
-  clock_gettime(CLOCK_REALTIME, &end_t);
+  const BenchmarkTime end_t = g_get_monotonic_time();
   return bench_elapsed_s(start_t, &end_t);
 }
 
