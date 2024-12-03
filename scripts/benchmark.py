@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2011-2022 David Robillard <d@drobilla.net>
+# Copyright 2011-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: ISC
 
 """
@@ -14,7 +14,7 @@ import subprocess
 
 # Benchmark trees
 
-subprocess.call(["./tree_bench", "40000", "640000"])
+subprocess.call(["benchmark/tree_bench", "40000", "640000"])
 subprocess.call(
     [
         "../scripts/plot.py",
@@ -64,7 +64,7 @@ if not os.path.exists(FILENAME):
             out.write(random_word())
             out.write("\n")
 
-subprocess.call(["./dict_bench", "gibberish.txt"])
+subprocess.call(["benchmark/dict_bench", "gibberish.txt"])
 subprocess.call(
     [
         "../scripts/plot.py",
