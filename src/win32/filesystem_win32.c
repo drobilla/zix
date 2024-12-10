@@ -111,7 +111,7 @@ zix_create_temporary_directory(ZixAllocator* const allocator,
       suffix[i] = chars[seed % n_chars];
     }
 
-    if (!_mkdir(result)) {
+    if (!zix_create_directory(result)) {
       return result;
     }
   }
@@ -267,9 +267,8 @@ zix_symlink_type(const char* const path)
 ZixStatus
 zix_create_directory(const char* const dir_path)
 {
-  return (!dir_path[0])     ? ZIX_STATUS_BAD_ARG
-         : _mkdir(dir_path) ? zix_errno_status(errno)
-                            : ZIX_STATUS_SUCCESS;
+  return !dir_path[0] ? ZIX_STATUS_BAD_ARG
+                      : zix_windows_status(CreateDirectory(dir_path, NULL));
 }
 
 ZixStatus
