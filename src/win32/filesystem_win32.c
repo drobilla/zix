@@ -123,10 +123,9 @@ zix_create_temporary_directory(ZixAllocator* const allocator,
 ZixStatus
 zix_remove(const char* const path)
 {
-  return ((zix_file_type(path) == ZIX_FILE_TYPE_DIRECTORY)
-            ? zix_windows_status(RemoveDirectory(path))
-          : remove(path) ? zix_errno_status(errno)
-                         : ZIX_STATUS_SUCCESS);
+  return zix_windows_status((zix_file_type(path) == ZIX_FILE_TYPE_DIRECTORY)
+                              ? RemoveDirectory(path)
+                              : DeleteFile(path));
 }
 
 void
