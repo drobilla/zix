@@ -1,4 +1,4 @@
-// Copyright 2020-2023 David Robillard <d@drobilla.net>
+// Copyright 2020-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
@@ -64,6 +64,10 @@ test_canonical_path(void)
   char* const temp_dir = create_temp_dir("zixXXXXXX");
   assert(temp_dir);
 
+  char* const sub_dir = zix_path_join(NULL, temp_dir, "sub");
+  assert(!zix_create_directory(sub_dir));
+  assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
+
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   assert(file_path);
 
@@ -96,10 +100,10 @@ test_canonical_path(void)
 
   // Test dot segment resolution
 
-  char* const parent_dir_1 = zix_path_join(NULL, temp_dir, "..");
+  char* const parent_dir_1 = zix_path_join(NULL, sub_dir, "..");
   assert(parent_dir_1);
 
-  const ZixStringView parent_view  = zix_path_parent_path(temp_dir);
+  const ZixStringView parent_view  = zix_path_parent_path(sub_dir);
   char* const         parent_dir_2 = zix_string_view_copy(NULL, parent_view);
   assert(parent_dir_2);
   assert(parent_dir_2[0]);
@@ -120,6 +124,7 @@ test_canonical_path(void)
   // Clean everything up
 
   assert(!zix_remove(file_path));
+  assert(!zix_remove(sub_dir));
   assert(!zix_remove(temp_dir));
 
   free(real_parent_dir_2);
@@ -127,6 +132,7 @@ test_canonical_path(void)
   free(parent_dir_2);
   free(parent_dir_1);
   free(file_path);
+  free(sub_dir);
   free(temp_dir);
 }
 
