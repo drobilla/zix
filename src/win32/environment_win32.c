@@ -14,7 +14,7 @@ zix_expand_environment_strings(ZixAllocator* const allocator,
     return NULL;
   }
 
-  char* const out = (char*)zix_calloc(allocator, 1U, size + 1U);
+  char* const out = (char*)zix_calloc(allocator, (size_t)size + 1U, 1U);
   if (out) {
     ExpandEnvironmentStrings(string, out, size + 1U);
   }

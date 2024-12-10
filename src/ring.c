@@ -1,4 +1,4 @@
-// Copyright 2011-2022 David Robillard <d@drobilla.net>
+// Copyright 2011-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/ring.h>
@@ -190,7 +190,7 @@ peek_internal(const ZixRing* const ring,
   } else {
     const uint32_t first_size = ring->size - r;
     memcpy(dst, &ring->buf[r], first_size);
-    memcpy((char*)dst + first_size, &ring->buf[0], size - first_size);
+    memcpy((char*)dst + first_size, &ring->buf[0], (size_t)size - first_size);
   }
 
   return size;

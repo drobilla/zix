@@ -1,4 +1,4 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/btree.h>
@@ -199,7 +199,7 @@ zix_btree_ainsert(void** const   array,
                   const unsigned i,
                   void* const    e)
 {
-  memmove(array + i + 1U, array + i, (n - i) * sizeof(e));
+  memmove(array + i + 1U, array + i, ((size_t)n - i) * sizeof(e));
   array[i] = e;
 }
 
@@ -208,7 +208,7 @@ static void*
 zix_btree_aerase(void** const array, const unsigned n, const unsigned i)
 {
   void* const ret = array[i];
-  memmove(array + i, array + i + 1U, (n - i) * sizeof(ret));
+  memmove(array + i, array + i + 1U, ((size_t)n - i) * sizeof(ret));
   return ret;
 }
 
@@ -250,7 +250,7 @@ zix_btree_split_child(ZixAllocator* const allocator,
            rhs->n_vals * sizeof(void*));
     memcpy(rhs->data.inode.children,
            lhs->data.inode.children + lhs->n_vals + 1U,
-           (rhs->n_vals + 1U) * sizeof(ZixBTreeNode*));
+           ((size_t)rhs->n_vals + 1U) * sizeof(ZixBTreeNode*));
 
     // Move middle value up to parent
     zix_btree_ainsert(
@@ -620,7 +620,7 @@ zix_btree_merge(ZixBTree* const t, ZixBTreeNode* const n, const unsigned i)
            rhs->n_vals * sizeof(void*));
     memcpy(lhs->data.inode.children + lhs->n_vals,
            rhs->data.inode.children,
-           (rhs->n_vals + 1U) * sizeof(void*));
+           ((size_t)rhs->n_vals + 1U) * sizeof(void*));
   }
 
   lhs->n_vals += rhs->n_vals;
@@ -962,7 +962,7 @@ zix_btree_end(const ZixBTree* const t)
 bool
 zix_btree_iter_equals(const ZixBTreeIter lhs, const ZixBTreeIter rhs)
 {
-  const size_t indexes_size = (lhs.level + 1U) * sizeof(uint16_t);
+  const size_t indexes_size = ((size_t)lhs.level + 1U) * sizeof(uint16_t);
 
   return (lhs.level == rhs.level) && (lhs.nodes[0U] == rhs.nodes[0U]) &&
          (!lhs.nodes[0U] || !memcmp(lhs.indexes, rhs.indexes, indexes_size));

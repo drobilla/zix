@@ -1,4 +1,4 @@
-// Copyright 2007-2022 David Robillard <d@drobilla.net>
+// Copyright 2007-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/filesystem.h>
@@ -205,7 +205,7 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
     return NULL;
   }
 
-  char* const final = (char*)zix_calloc(allocator, final_size + 1U, 1U);
+  char* const final = (char*)zix_calloc(allocator, (size_t)final_size + 1U, 1U);
   if (!final || !GetFinalPathNameByHandle(h, final, final_size + 1U, flags)) {
     zix_free(allocator, final);
     CloseHandle(h);
