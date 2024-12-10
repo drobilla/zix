@@ -6,12 +6,15 @@ html_dir = docdir / versioned_name / 'html'
 custom_target(
   'html',
   build_by_default: true,
-  command: sphinx_build_command + [
-    '-b', 'html',
-    '-t', 'html',
-    sphinx_in_dir,
-    '@OUTDIR@',
-  ],
+  command: (
+    sphinx_build_command
+    + [
+      '-b', 'html',
+      '-t', 'html',
+      sphinx_in_dir,
+      '@OUTDIR@',
+    ]
+  ),
   input: [api_zix_rst, conf_py, sphinx_input],
   install: true,
   install_dir: html_dir,

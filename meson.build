@@ -253,7 +253,7 @@ else
   windows_checks = {
     'CreateSymbolicLink': template.format(
       'windows.h',
-      'return CreateSymbolicLink(' + '"l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);',
+      'return CreateSymbolicLink("l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);',
     ),
   }
 
@@ -378,10 +378,7 @@ if cc.get_id() == 'emscripten'
     '-pthread',
   ]
 
-  wasm_link_args = [
-    '-matomics',
-    '-mbulk-memory',
-    '-pthread',
+  wasm_link_args = wasm_c_args + [
     ['-s', 'ENVIRONMENT=node,worker'],
     ['-s', 'INITIAL_MEMORY=33554432'],
   ]
