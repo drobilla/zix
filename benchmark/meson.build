@@ -15,7 +15,7 @@ glib_dep = dependency(
 
 if glib_dep.found()
   build_benchmarks = true
-  benchmark_c_args = platform_c_args
+  benchmark_c_args = extra_c_args
 
   benchmark_c_suppressions = []
   if cc.get_id() in ['clang', 'emscripten']

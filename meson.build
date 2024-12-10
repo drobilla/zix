@@ -170,6 +170,10 @@ elif host_machine.system() in ['dragonfly', 'freebsd', 'netbsd', 'openbsd']
   system_c_args += [
     '-D_BSD_SOURCE',
   ]
+elif host_machine.system() == 'windows'
+  system_c_args += [
+    '-DWIN32_LEAN_AND_MEAN',
+  ]
 else
   system_c_args += [
     '-D_POSIX_C_SOURCE=200809L',
@@ -365,7 +369,7 @@ endif
 # Set any additional arguments required for building libraries or programs
 library_c_args = platform_c_args + extra_c_args + ['-DZIX_INTERNAL']
 library_link_args = []
-program_c_args = platform_c_args + extra_c_args
+program_c_args = extra_c_args
 program_link_args = []
 if cc.get_id() == 'emscripten'
   wasm_c_args = [
