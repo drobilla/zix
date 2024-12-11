@@ -680,6 +680,7 @@ zix_btree_fatten_child(ZixBTree* const t, ZixBTreeIter* const iter)
 
   assert(n);
   assert(!n->is_leaf);
+  assert(n->n_vals);
   ZixBTreeNode* const* const children = n->data.inode.children;
 
   if (i > 0U && zix_btree_can_remove_from(children[i - 1U])) {
