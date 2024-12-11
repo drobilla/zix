@@ -14,11 +14,11 @@ typedef const char ArgPathChar;
 
 /// Copy and convert a path argument if necessary
 ArgPathChar*
-arg_path_new(ZixAllocator* const allocator, const char* const path);
+arg_path_new(ZixAllocator* allocator, const char* path);
 
 /// Free a path from arg_path_new() if necessary
 void
-arg_path_free(ZixAllocator* const allocator, ArgPathChar* const path);
+arg_path_free(ZixAllocator* allocator, ArgPathChar* path);
 
 /// Convert from (user) UTF-8 to (Windows) UTF-16
 wchar_t*

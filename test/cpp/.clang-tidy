@@ -1,10 +1,11 @@
-# Copyright 2020-2022 David Robillard <d@drobilla.net>
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 Checks: >
   -*-avoid-c-arrays,
   -*-no-malloc,
   -android-cloexec-fopen,
+  -bugprone-exception-escape,
   -cppcoreguidelines-owning-memory,
   -fuchsia-default-arguments-calls,
   -modernize-raw-string-literal,

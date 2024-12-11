@@ -61,6 +61,9 @@ zix_sem_timed_wait(ZixSem*        sem,
 {
 #if !USE_CLOCK_GETTIME || !USE_SEM_TIMEDWAIT
 
+  (void)sem;
+  (void)seconds;
+  (void)nanoseconds;
   return ZIX_STATUS_NOT_SUPPORTED;
 
 #else

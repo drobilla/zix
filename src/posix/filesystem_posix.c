@@ -341,6 +341,9 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
   }
 
   zix_free(allocator, buffer);
+
+#else
+  (void)allocator;
 #endif
 
   return NULL;
@@ -449,6 +452,7 @@ zix_current_path(ZixAllocator* const allocator)
   return current;
 
 #else
+  (void)allocator;
   return NULL;
 
 #endif

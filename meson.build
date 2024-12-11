@@ -48,6 +48,7 @@ if cc.get_id() in ['clang', 'emscripten']
 
     if host_machine.system() == 'windows'
       c_suppressions += [
+        '-Wno-bad-function-cast',
         '-Wno-deprecated-declarations',
         '-Wno-nonportable-system-include-path',
       ]
