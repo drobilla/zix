@@ -483,8 +483,11 @@ run()
   }
 
   for (const auto& relatives : lexical_relatives) {
-    const Path l = relatives.lhs ? Path{relatives.lhs} : Path{};
-    const Path r = relatives.rhs ? Path{relatives.rhs} : Path{};
+    assert(relatives.lhs);
+    assert(relatives.rhs);
+
+    const Path l = Path{relatives.lhs};
+    const Path r = Path{relatives.rhs};
 
     assert(match(
       l.lexically_relative(r),
