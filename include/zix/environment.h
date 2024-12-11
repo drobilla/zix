@@ -26,7 +26,7 @@ ZIX_BEGIN_DECLS
    @param string Input string to expand.
    @return A newly allocated copy of `string` with variables expanded, or null.
 */
-ZIX_API char* ZIX_ALLOCATED
+ZIX_MALLOC_API char* ZIX_ALLOCATED
 zix_expand_environment_strings(ZixAllocator* ZIX_NULLABLE allocator,
                                const char* ZIX_NONNULL    string);
 

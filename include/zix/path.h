@@ -35,7 +35,7 @@ ZIX_BEGIN_DECLS
 */
 
 /// Join path `a` and path `b` with a single directory separator between them
-ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
+ZIX_MALLOC_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_join(ZixAllocator* ZIX_NULLABLE allocator,
               const char* ZIX_NULLABLE   a,
               const char* ZIX_NULLABLE   b);
@@ -53,7 +53,7 @@ zix_path_join(ZixAllocator* ZIX_NULLABLE allocator,
    converted to the preferred separator (backslash on Windows, slash everywhere
    else).
 */
-ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
+ZIX_MALLOC_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
                    const char* ZIX_NONNULL    path);
 
@@ -68,7 +68,7 @@ zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
    like case normalization or symbolic link dereferencing.  For that, use
    zix_canonical_path().
 */
-ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
+ZIX_MALLOC_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_lexically_normal(ZixAllocator* ZIX_NULLABLE allocator,
                           const char* ZIX_NONNULL    path);
 
@@ -79,7 +79,7 @@ zix_path_lexically_normal(ZixAllocator* ZIX_NULLABLE allocator,
    equivalent path relative to `base` is returned (which may contain
    up-references).
 */
-ZIX_API ZIX_NODISCARD char* ZIX_ALLOCATED
+ZIX_MALLOC_API ZIX_NODISCARD char* ZIX_ALLOCATED
 zix_path_lexically_relative(ZixAllocator* ZIX_NULLABLE allocator,
                             const char* ZIX_NONNULL    path,
                             const char* ZIX_NONNULL    base);
