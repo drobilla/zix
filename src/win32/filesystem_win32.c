@@ -8,7 +8,6 @@
 #include "win32_util.h"
 
 #include <zix/allocator.h>
-#include <zix/bump_allocator.h>
 #include <zix/path.h>
 #include <zix/status.h>
 
@@ -365,10 +364,10 @@ zix_file_type(const char* const path)
   }
 
   // Resolve symlink to find the canonical type
-  char             buf[MAX_PATH];
-  ZixBumpAllocator allocator = zix_bump_allocator(sizeof(buf), buf);
-  char* const      canonical = zix_canonical_path(&allocator.base, path);
-  return zix_symlink_type(canonical);
+  char* const       canonical = zix_canonical_path(NULL, path);
+  const ZixFileType real_type = zix_symlink_type(canonical);
+  zix_free(NULL, canonical);
+  return real_type;
 }
 
 ZixFileType
