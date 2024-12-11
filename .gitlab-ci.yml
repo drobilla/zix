@@ -1,4 +1,4 @@
-# Copyright 2019-2022 David Robillard <d@drobilla.net>
+# Copyright 2019-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 stages: [build, deploy]
@@ -95,6 +95,10 @@ mingw32:
     - ninja -C build test
     - meson configure -Dbuildtype=release build
     - ninja -C build test
+    - meson configure -Dwin_ver=winxp build
+    - ninja -C build test
+    - meson configure -Dwin_ver=nt4 build
+    - ninja -C build test
   variables:
     WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\10-win32"
 
@@ -105,6 +109,8 @@ mingw64:
     - meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
     - ninja -C build test
     - meson configure -Dbuildtype=release build
+    - ninja -C build test
+    - meson configure -Dwin_ver=winxp build
     - ninja -C build test
   variables:
     WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\10-win32"
@@ -145,6 +151,10 @@ win:
     - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
     - ninja -C build test
     - meson configure -Dbuildtype=release build
+    - ninja -C build test
+    - meson configure -Dwin_ver=winxp build
+    - ninja -C build test
+    - meson configure -Dwin_ver=nt4 build
     - ninja -C build test
 
 # Documentation

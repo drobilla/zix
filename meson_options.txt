@@ -1,4 +1,4 @@
-# Copyright 2020-2023 David Robillard <d@drobilla.net>
+# Copyright 2020-2024 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 option('benchmarks', type: 'feature', yield: true,
@@ -33,3 +33,7 @@ option('tests_cpp', type: 'feature', yield: true,
 
 option('title', type: 'string', value: 'Zix',
        description: 'Project title')
+
+option('win_ver', type: 'combo', value: 'vista',
+       choices: ['nt4', 'winxp', 'vista'],
+       description: 'Latest Windows API version to use')

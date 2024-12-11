@@ -183,13 +183,14 @@ zix_file_unlock(FILE* const file, const ZixFileLockMode mode)
 char*
 zix_canonical_path(ZixAllocator* const allocator, const char* const path)
 {
-  char full[MAX_PATH] = {0};
-  if (!path || !GetFullPathName(path, MAX_PATH, full, NULL)) {
+  if (!path) {
     return NULL;
   }
 
+#if USE_GETFINALPATHNAMEBYHANDLE // Vista+
+
   const HANDLE h =
-    CreateFile(full,
+    CreateFile(path,
                FILE_READ_ATTRIBUTES,
                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                NULL,
@@ -197,27 +198,39 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
                FILE_FLAG_BACKUP_SEMANTICS,
                NULL);
 
-  const DWORD flags      = FILE_NAME_NORMALIZED | VOLUME_NAME_DOS;
-  const DWORD final_size = GetFinalPathNameByHandle(h, NULL, 0U, flags);
-  if (!final_size) {
-    CloseHandle(h);
+  if (h == INVALID_HANDLE_VALUE) {
     return NULL;
   }
 
-  char* const final = (char*)zix_calloc(allocator, (size_t)final_size + 1U, 1U);
-  if (!final || !GetFinalPathNameByHandle(h, final, final_size + 1U, flags)) {
-    zix_free(allocator, final);
-    CloseHandle(h);
-    return NULL;
-  }
-
-  if (final_size > 4U && !strncmp(final, "\\\\?\\", 4)) {
-    memmove(final, final + 4U, final_size - 4U);
-    final[final_size - 4U] = '\0';
+  const DWORD flags  = FILE_NAME_NORMALIZED | VOLUME_NAME_DOS;
+  const DWORD length = GetFinalPathNameByHandle(h, NULL, 0U, flags);
+  TCHAR*      final  = NULL;
+  if (length) {
+    final = (TCHAR*)zix_calloc(allocator, (size_t)length + 1U, sizeof(TCHAR));
+    if (final) {
+      GetFinalPathNameByHandle(h, final, length + 1U, flags);
+    }
   }
 
   CloseHandle(h);
   return final;
+
+#else // Fall back to "full path iff it exists" for older Windows
+
+  TCHAR* full = NULL;
+  if (GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES) {
+    const DWORD length = GetFullPathName(path, 0U, NULL, NULL);
+    if (length) {
+      full = (TCHAR*)zix_calloc(allocator, (size_t)length + 1U, sizeof(TCHAR));
+      if (full) {
+        GetFullPathName(path, length + 1U, full, NULL);
+      }
+    }
+  }
+
+  return full;
+
+#endif
 }
 
 static ZixFileType
@@ -312,7 +325,13 @@ zix_create_directory_symlink(const char* const target_path,
 ZixStatus
 zix_create_hard_link(const char* const target_path, const char* const link_path)
 {
+#if USE_CREATEHARDLINK
   return zix_windows_status(CreateHardLink(link_path, target_path, NULL));
+#else
+  (void)target_path;
+  (void)link_path;
+  return ZIX_STATUS_NOT_SUPPORTED;
+#endif
 }
 
 char*

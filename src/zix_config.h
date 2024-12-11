@@ -1,4 +1,4 @@
-// Copyright 2021-2023 David Robillard <d@drobilla.net>
+// Copyright 2021-2024 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 /*
@@ -78,9 +78,16 @@
 #    endif
 #  endif
 
-// Windows: CreateSymbolicLink()
+// Windows XP: CreateHardLink()
+#  ifndef HAVE_CREATEHARDLINK
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0501
+#      define HAVE_CREATEHARDLINK 1
+#    endif
+#  endif
+
+// Windows Vista: CreateSymbolicLink()
 #  ifndef HAVE_CREATESYMBOLICLINK
-#    if defined(_MSC_VER) && _MSC_VER >= 1910
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600 && !defined(__MINGW32__)
 #      define HAVE_CREATESYMBOLICLINK 1
 #    endif
 #  endif
@@ -96,6 +103,13 @@
 #  ifndef HAVE_FLOCK
 #    if defined(__APPLE__) || defined(__unix__)
 #      define HAVE_FLOCK 1
+#    endif
+#  endif
+
+// Windows Vista: GetFinalPathNameByHandle()
+#  ifndef HAVE_GETFINALPATHNAMEBYHANDLE
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
+#      define HAVE_GETFINALPATHNAMEBYHANDLE 1
 #    endif
 #  endif
 
@@ -148,6 +162,13 @@
 #    endif
 #  endif
 
+// Windows XP: VirtualLock
+#  ifndef HAVE_VIRTUALLOCK
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0501
+#      define HAVE_VIRTUALLOCK 1
+#    endif
+#  endif
+
 #endif // !defined(ZIX_NO_DEFAULT_CONFIG)
 
 /*
@@ -176,6 +197,12 @@
 #  define USE_COPY_FILE_RANGE 0
 #endif
 
+#if defined(HAVE_CREATEHARDLINK) && HAVE_CREATEHARDLINK
+#  define USE_CREATEHARDLINK 1
+#else
+#  define USE_CREATEHARDLINK 0
+#endif
+
 #if defined(HAVE_CREATESYMBOLICLINK) && HAVE_CREATESYMBOLICLINK
 #  define USE_CREATESYMBOLICLINK 1
 #else
@@ -192,6 +219,12 @@
 #  define USE_FLOCK 1
 #else
 #  define USE_FLOCK 0
+#endif
+
+#if defined(HAVE_GETFINALPATHNAMEBYHANDLE) && HAVE_GETFINALPATHNAMEBYHANDLE
+#  define USE_GETFINALPATHNAMEBYHANDLE 1
+#else
+#  define USE_GETFINALPATHNAMEBYHANDLE 0
 #endif
 
 #if defined(HAVE_MLOCK) && HAVE_MLOCK
@@ -234,6 +267,12 @@
 #  define USE_SYSCONF 1
 #else
 #  define USE_SYSCONF 0
+#endif
+
+#if defined(HAVE_VIRTUALLOCK) && HAVE_VIRTUALLOCK
+#  define USE_VIRTUALLOCK 1
+#else
+#  define USE_VIRTUALLOCK 0
 #endif
 
 #endif // ZIX_CONFIG_H

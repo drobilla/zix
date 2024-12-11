@@ -29,15 +29,6 @@ versioned_name = 'zix' + version_suffix
 pkg = import('pkgconfig')
 cc = meson.get_compiler('c')
 
-# Restrict Windows API usage to Vista and earlier
-if host_machine.system() == 'windows'
-  if cc.get_id() == 'msvc'
-    add_project_arguments('/D_WIN32_WINNT=0x0600', language: ['c', 'cpp'])
-  else
-    add_project_arguments('-D_WIN32_WINNT=0x0600', language: ['c', 'cpp'])
-  endif
-endif
-
 # Set global warning suppressions
 warning_level = get_option('warning_level')
 c_suppressions = []
@@ -171,8 +162,14 @@ elif host_machine.system() in ['dragonfly', 'freebsd', 'netbsd', 'openbsd']
     '-D_BSD_SOURCE',
   ]
 elif host_machine.system() == 'windows'
+  winvers = {
+    'nt4': '0x0400',
+    'winxp': '0x0501',
+    'vista': '0x0600',
+  }
   system_c_args += [
     '-DWIN32_LEAN_AND_MEAN',
+    '-D_WIN32_WINNT=' + winvers[get_option('win_ver')],
   ]
 else
   system_c_args += [
@@ -251,16 +248,32 @@ else
   }
 
   windows_checks = {
+    'CreateHardLink': template.format(
+      'windows.h',
+      'return CreateHardLink("l", "t", NULL);',
+    ),
     'CreateSymbolicLink': template.format(
       'windows.h',
       'return CreateSymbolicLink("l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);',
     ),
+    'GetFinalPathNameByHandle': template.format(
+      'windows.h',
+      'return GetFinalPathNameByHandle(NULL, NULL, 0U, 0U);',
+    ),
+    'VirtualLock': template.format(
+      'windows.h',
+      'return VirtualLock(NULL, sizeof(void*));',
+    ),
   }
 
+  check_c_args = system_c_args
   if host_machine.system() == 'darwin'
     checks = posix_checks + mac_checks
   elif host_machine.system() == 'windows'
     checks = windows_checks
+    if cc.get_id() == 'msvc'
+      check_c_args += ['/Wall', '/WX']
+    endif
   else
     checks = posix_checks
 
@@ -269,7 +282,7 @@ else
         '''#include <semaphore.h>
 #include <time.h>
 int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }''',
-        args: system_c_args,
+        args: check_c_args,
         dependencies: thread_dep,
         name: 'sem_timedwait',
       )
@@ -279,7 +292,13 @@ int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }''',
   endif
 
   foreach name, check_code : checks
-    if cc.links(check_code, args: system_c_args, name: name)
+    is_mingw = host_machine.system() == 'windows' and cc.get_id() == 'gcc'
+    if is_mingw and name in ['CreateSymbolicLink']
+      message('Ignoring MinGW stub @0@'.format(name))
+      continue
+    endif
+
+    if cc.links(check_code, args: check_c_args, name: name)
       platform_c_args += ['-DHAVE_@0@'.format(name.to_upper())]
     endif
   endforeach

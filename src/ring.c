@@ -9,7 +9,7 @@
 #include <zix/allocator.h>
 #include <zix/status.h>
 
-#if defined(_WIN32)
+#if USE_VIRTUALLOCK
 #  include <windows.h>
 #elif USE_MLOCK
 #  include <sys/mman.h>
@@ -108,7 +108,7 @@ zix_ring_free(ZixRing* const ring)
 ZixStatus
 zix_ring_mlock(ZixRing* const ring)
 {
-#if defined(_WIN32)
+#if USE_VIRTUALLOCK
   return (VirtualLock(ring, sizeof(ZixRing)) &&
           VirtualLock(ring->buf, ring->size))
            ? ZIX_STATUS_SUCCESS
@@ -119,6 +119,7 @@ zix_ring_mlock(ZixRing* const ring)
                              mlock(ring->buf, ring->size));
 
 #else
+  (void)ring;
   return ZIX_STATUS_NOT_SUPPORTED;
 #endif
 }
