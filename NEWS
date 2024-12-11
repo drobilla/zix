@@ -10,9 +10,10 @@ zix (0.5.1) unstable; urgency=medium
   * Fix nullability annotations for zix_canonical_path() and friends
   * Fix ring unit test when mlock() is unavailable
   * Improve documentation
+  * Support building for UWP
   * Support building for Windows with or without UNICODE
 
- -- David Robillard <d@drobilla.net>  Wed, 11 Dec 2024 05:21:56 +0000
+ -- David Robillard <d@drobilla.net>  Wed, 11 Dec 2024 05:22:31 +0000
 
 zix (0.4.2) stable; urgency=medium
 

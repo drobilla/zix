@@ -170,6 +170,7 @@ elif host_machine.system() == 'windows'
     'nt4': '0x0400',
     'winxp': '0x0501',
     'vista': '0x0600',
+    'win8': '0x0602',
   }
   system_c_args += [
     '-DWIN32_LEAN_AND_MEAN',
@@ -252,6 +253,11 @@ else
   }
 
   windows_checks = {
+    'CreateFile2': template.format(
+      'windows.h',
+      'CREATEFILE2_EXTENDED_PARAMETERS p = {0};\n'
+      + 'return CreateFile2(NULL, FILE_READ_ATTRIBUTES, 0U, OPEN_EXISTING, &p);',
+    ),
     'CreateHardLink': template.format(
       'windows.h',
       'return CreateHardLink(TEXT("l"), TEXT("t"), NULL);',
@@ -297,7 +303,7 @@ int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }''',
 
   foreach name, check_code : checks
     is_mingw = host_machine.system() == 'windows' and cc.get_id() == 'gcc'
-    if is_mingw and name in ['CreateSymbolicLink']
+    if is_mingw and name in ['CreateFile2', 'CreateSymbolicLink']
       message('Ignoring MinGW stub @0@'.format(name))
       continue
     endif

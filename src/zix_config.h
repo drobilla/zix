@@ -55,6 +55,13 @@
 #    define ZIX_POSIX_VERSION 0
 #  endif
 
+// Define ZIX_WINAPI_UWP to 1 (if this is a sandboxed UWP app) or 0
+#  if defined(WINAPI_FAMILY) && WINAPI_FAMILY < 10
+#    define ZIX_WINAPI_UWP 1
+#  else
+#    define ZIX_WINAPI_UWP 0
+#  endif
+
 // POSIX.1-2001: clock_gettime()
 #  ifndef HAVE_CLOCK_GETTIME
 #    if ZIX_POSIX_VERSION >= 200112L
@@ -78,16 +85,24 @@
 #    endif
 #  endif
 
-// Windows XP: CreateHardLink()
+// Windows 8 (Desktop, UWP): CreateFile2()
+#  ifndef HAVE_CREATEFILE2
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0602 && !defined(__MINGW32__)
+#      define HAVE_CREATEFILE2 1
+#    endif
+#  endif
+
+// Windows XP (Desktop): CreateHardLink()
 #  ifndef HAVE_CREATEHARDLINK
-#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0501
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0501 && !ZIX_WINAPI_UWP
 #      define HAVE_CREATEHARDLINK 1
 #    endif
 #  endif
 
-// Windows Vista: CreateSymbolicLink()
+// Windows Vista (Desktop): CreateSymbolicLink()
 #  ifndef HAVE_CREATESYMBOLICLINK
-#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600 && !defined(__MINGW32__)
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600 && \
+      !defined(__MINGW32__) && !ZIX_WINAPI_UWP
 #      define HAVE_CREATESYMBOLICLINK 1
 #    endif
 #  endif
@@ -106,7 +121,7 @@
 #    endif
 #  endif
 
-// Windows Vista: GetFinalPathNameByHandle()
+// Windows Vista (Desktop, UWP): GetFinalPathNameByHandle()
 #  ifndef HAVE_GETFINALPATHNAMEBYHANDLE
 #    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
 #      define HAVE_GETFINALPATHNAMEBYHANDLE 1
@@ -162,9 +177,9 @@
 #    endif
 #  endif
 
-// Windows XP: VirtualLock
+// Windows XP (Desktop): VirtualLock
 #  ifndef HAVE_VIRTUALLOCK
-#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0501
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0501 && !ZIX_WINAPI_UWP
 #      define HAVE_VIRTUALLOCK 1
 #    endif
 #  endif
@@ -195,6 +210,12 @@
 #  define USE_COPY_FILE_RANGE 1
 #else
 #  define USE_COPY_FILE_RANGE 0
+#endif
+
+#if defined(HAVE_CREATEFILE2) && HAVE_CREATEFILE2
+#  define USE_CREATEFILE2 1
+#else
+#  define USE_CREATEFILE2 0
 #endif
 
 #if defined(HAVE_CREATEHARDLINK) && HAVE_CREATEHARDLINK

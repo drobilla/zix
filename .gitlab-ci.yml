@@ -95,6 +95,8 @@ mingw32:
     - ninja -C build test
     - meson configure -Dbuildtype=release build
     - ninja -C build test
+    - meson configure -Dwin_ver=vista build
+    - ninja -C build test
     - meson configure -Dwin_ver=winxp build
     - ninja -C build test
     - meson configure -Dwin_ver=nt4 build
@@ -111,6 +113,8 @@ mingw64:
     - meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
     - ninja -C build test
     - meson configure -Dbuildtype=release build
+    - ninja -C build test
+    - meson configure -Dwin_ver=vista build
     - ninja -C build test
     - meson configure -Dwin_ver=winxp build
     - ninja -C build test
@@ -156,11 +160,15 @@ win:
     - ninja -C build test
     - meson configure -Dbuildtype=release build
     - ninja -C build test
+    - meson configure -Dwin_ver=vista build
+    - ninja -C build test
     - meson configure -Dwin_ver=winxp build
     - ninja -C build test
     - meson configure -Dwin_ver=nt4 build
     - ninja -C build test
     - meson configure -Dwin_wchar=disabled build
+    - ninja -C build test
+    - meson configure -Dwin_wchar=enabled -Dwin_ver=win8 -Dc_args="/DWINAPI_FAMILY=WINAPI_FAMILY_PC_APP" -Dc_link_args="/APPCONTAINER" build
     - ninja -C build test
 
 # Documentation

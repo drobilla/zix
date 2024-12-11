@@ -248,6 +248,49 @@ zix_file_unlock(FILE* const file, const ZixFileLockMode mode)
     UnlockFileEx(handle, 0, UINT32_MAX, UINT32_MAX, &overlapped));
 }
 
+#if USE_GETFINALPATHNAMEBYHANDLE && USE_CREATEFILE2
+
+static HANDLE
+open_attribute_handle(const char* const path)
+{
+  wchar_t* const wpath = zix_utf8_to_wchar(NULL, path);
+
+  CREATEFILE2_EXTENDED_PARAMETERS params = {
+    sizeof(CREATEFILE2_EXTENDED_PARAMETERS),
+    0U,
+    FILE_FLAG_BACKUP_SEMANTICS,
+    0U,
+    NULL,
+    NULL};
+
+  const HANDLE handle =
+    CreateFile2(wpath, FILE_READ_ATTRIBUTES, 0U, OPEN_EXISTING, &params);
+
+  zix_free(NULL, wpath);
+  return handle;
+}
+
+#elif USE_GETFINALPATHNAMEBYHANDLE
+
+static HANDLE
+open_attribute_handle(const char* const path)
+{
+  ArgPathChar* const wpath = arg_path_new(NULL, path);
+
+  const HANDLE handle = CreateFile(wpath,
+                                   FILE_READ_ATTRIBUTES,
+                                   0U,
+                                   NULL,
+                                   OPEN_EXISTING,
+                                   FILE_FLAG_BACKUP_SEMANTICS,
+                                   NULL);
+
+  arg_path_free(NULL, wpath);
+  return handle;
+}
+
+#endif
+
 char*
 zix_canonical_path(ZixAllocator* const allocator, const char* const path)
 {
@@ -255,20 +298,10 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
     return NULL;
   }
 
-  ArgPathChar* const wpath = arg_path_new(allocator, path);
-
 #if USE_GETFINALPATHNAMEBYHANDLE // Vista+
 
-  const HANDLE h =
-    CreateFile(wpath,
-               FILE_READ_ATTRIBUTES,
-               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-               NULL,
-               OPEN_EXISTING,
-               FILE_FLAG_BACKUP_SEMANTICS,
-               NULL);
-
-  TCHAR* final = NULL;
+  const HANDLE h     = open_attribute_handle(path);
+  TCHAR*       final = NULL;
   if (h != INVALID_HANDLE_VALUE) {
     const DWORD flags  = FILE_NAME_NORMALIZED | VOLUME_NAME_DOS;
     const DWORD length = GetFinalPathNameByHandle(h, NULL, 0U, flags);
@@ -281,12 +314,12 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
   }
 
   CloseHandle(h);
-  arg_path_free(allocator, wpath);
   return path_result(allocator, final);
 
 #else // Fall back to "full path iff it exists" for older Windows
 
-  TCHAR* full = NULL;
+  ArgPathChar* const wpath = arg_path_new(allocator, path);
+  TCHAR*             full  = NULL;
   if (GetFileAttributes(wpath) != INVALID_FILE_ATTRIBUTES) {
     const DWORD length = GetFullPathName(wpath, 0U, NULL, NULL);
     if (length) {
