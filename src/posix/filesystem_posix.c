@@ -349,7 +349,7 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
 ZixStatus
 zix_file_lock(FILE* const file, const ZixFileLockMode mode)
 {
-#if !defined(__EMSCRIPTEN__) && USE_FLOCK && USE_FILENO
+#if USE_FLOCK && USE_FILENO
   return zix_posix_status(
     flock(fileno(file),
           (mode == ZIX_FILE_LOCK_BLOCK) ? LOCK_EX : (LOCK_EX | LOCK_NB)));
@@ -364,7 +364,7 @@ zix_file_lock(FILE* const file, const ZixFileLockMode mode)
 ZixStatus
 zix_file_unlock(FILE* const file, const ZixFileLockMode mode)
 {
-#if !defined(__EMSCRIPTEN__) && USE_FLOCK && USE_FILENO
+#if USE_FLOCK && USE_FILENO
   return zix_posix_status(
     flock(fileno(file),
           (mode == ZIX_FILE_LOCK_BLOCK) ? LOCK_UN : (LOCK_UN | LOCK_NB)));

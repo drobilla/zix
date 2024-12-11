@@ -116,7 +116,7 @@
 
 // Classic UNIX: flock()
 #  ifndef HAVE_FLOCK
-#    if defined(__APPLE__) || defined(__unix__)
+#    if (defined(__APPLE__) || defined(__unix__)) && !defined(__EMSCRIPTEN__)
 #      define HAVE_FLOCK 1
 #    endif
 #  endif

@@ -308,6 +308,11 @@ int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }''',
       continue
     endif
 
+    if cc.get_id() == 'emscripten' and name in ['flock', 'fileno']
+      message('Ignoring emscripten stub @0@'.format(name))
+      continue
+    endif
+
     if cc.links(check_code, args: check_c_args, name: name)
       platform_c_args += ['-DHAVE_@0@'.format(name.to_upper())]
     endif
