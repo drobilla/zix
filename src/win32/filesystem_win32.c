@@ -222,6 +222,12 @@ zix_dir_for_each(const char* const          path,
 ZixStatus
 zix_file_lock(FILE* const file, const ZixFileLockMode mode)
 {
+#ifdef __clang__
+  (void)file;
+  (void)mode;
+  return ZIX_STATUS_NOT_SUPPORTED;
+#else
+
   HANDLE     handle     = (HANDLE)_get_osfhandle(fileno(file));
   OVERLAPPED overlapped = {0};
 
@@ -231,18 +237,24 @@ zix_file_lock(FILE* const file, const ZixFileLockMode mode)
 
   return zix_windows_status(
     LockFileEx(handle, flags, 0, UINT32_MAX, UINT32_MAX, &overlapped));
+#endif
 }
 
 ZixStatus
 zix_file_unlock(FILE* const file, const ZixFileLockMode mode)
 {
   (void)mode;
+#ifdef __clang__
+  (void)file;
+  return ZIX_STATUS_NOT_SUPPORTED;
+#else
 
   HANDLE     handle     = (HANDLE)_get_osfhandle(fileno(file));
   OVERLAPPED overlapped = {0};
 
   return zix_windows_status(
     UnlockFileEx(handle, 0, UINT32_MAX, UINT32_MAX, &overlapped));
+#endif
 }
 
 #if USE_GETFINALPATHNAMEBYHANDLE && USE_CREATEFILE2
