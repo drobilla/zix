@@ -365,7 +365,9 @@ zix_file_type(const char* const path)
 
   // Resolve symlink to find the canonical type
   char* const       canonical = zix_canonical_path(NULL, path);
-  const ZixFileType real_type = zix_symlink_type(canonical);
+  const ZixFileType real_type =
+    canonical ? zix_symlink_type(canonical) : ZIX_FILE_TYPE_NONE;
+
   zix_free(NULL, canonical);
   return real_type;
 }

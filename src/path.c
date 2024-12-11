@@ -697,7 +697,7 @@ zix_path_is_absolute(const char* const path)
 {
 #ifdef _WIN32
   const ZixRootSlices root = zix_path_root_slices(path);
-  return (!zix_is_empty_range(root.name) &&
+  return (path && !zix_is_empty_range(root.name) &&
           (!zix_is_empty_range(root.dir) ||
            (is_dir_sep(path[0]) && is_dir_sep(path[1]))));
 
