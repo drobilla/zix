@@ -172,11 +172,9 @@ zix_remove(const char* const path)
 }
 
 void
-zix_dir_for_each(const char* const path,
-                 void* const       data,
-                 void (*const f)(const char* path,
-                                 const char* name,
-                                 void*       data))
+zix_dir_for_each(const char* const          path,
+                 void* const                data,
+                 const ZixDirEntryVisitFunc f)
 {
   static const TCHAR* const dot    = TEXT(".");
   static const TCHAR* const dotdot = TEXT("..");

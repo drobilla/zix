@@ -154,6 +154,17 @@ zix_remove(const char* ZIX_NONNULL path);
 */
 
 /**
+   Function for reading input bytes from a stream.
+
+   @param path Path to the directory being visited.
+   @param name Name of the directory entry.
+   @param data Opaque user data.
+*/
+typedef void (*ZixDirEntryVisitFunc)(const char* ZIX_NONNULL path,
+                                     const char* ZIX_NONNULL name,
+                                     void* ZIX_NONNULL       data);
+
+/**
    Visit every file in the directory at `path`.
 
    @param path A path to a directory.
@@ -165,11 +176,9 @@ zix_remove(const char* ZIX_NONNULL path);
    parameter is the name of the directory entry (not its full path).
 */
 ZIX_API void
-zix_dir_for_each(const char* ZIX_NONNULL path,
-                 void* ZIX_NULLABLE      data,
-                 void (*ZIX_NONNULL f)(const char* ZIX_NONNULL path,
-                                       const char* ZIX_NONNULL name,
-                                       void* ZIX_NONNULL       data));
+zix_dir_for_each(const char* ZIX_NONNULL          path,
+                 void* ZIX_NULLABLE               data,
+                 ZixDirEntryVisitFunc ZIX_NONNULL f);
 
 /**
    Return whether the given paths point to files with identical contents.

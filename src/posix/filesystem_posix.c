@@ -300,11 +300,9 @@ zix_remove(const char* const path)
 }
 
 void
-zix_dir_for_each(const char* const path,
-                 void* const       data,
-                 void (*const f)(const char* path,
-                                 const char* name,
-                                 void*       data))
+zix_dir_for_each(const char* const          path,
+                 void* const                data,
+                 const ZixDirEntryVisitFunc f)
 {
   DIR* dir = opendir(path);
   if (dir) {
