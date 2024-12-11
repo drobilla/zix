@@ -33,13 +33,12 @@ struct ZixTreeNodeImpl {
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-// Uncomment these for debugging features
-// #define ZIX_TREE_VERIFY       1
-// #define ZIX_TREE_HYPER_VERIFY 1
-
-#if defined(ZIX_TREE_VERIFY) || defined(ZIX_TREE_HYPER_VERIFY)
-#  include "tree_debug.h"
-#  define ASSERT_BALANCE(n) assert(verify_balance(n))
+#ifndef NDEBUG
+#  define ASSERT_BALANCE(n)                             \
+    assert(!(((n)->balance < -2 || (n)->balance > 2) || \
+             ((n)->balance < 0 && !(n)->left) ||        \
+             ((n)->balance > 0 && !(n)->right) ||       \
+             ((n)->balance != 0 && !(n)->left && !(n)->right)))
 #else
 #  define ASSERT_BALANCE(n)
 #endif
@@ -284,10 +283,6 @@ rotate_right_left(ZixTreeNode* p, int* height_change)
 static ZixTreeNode*
 zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
 {
-#ifdef ZIX_TREE_HYPER_VERIFY
-  const size_t old_height = height(node);
-#endif
-
   *height_change = 0;
 
   const bool is_root = !node->parent;
@@ -313,10 +308,6 @@ zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
     assert(!replacement->parent);
     t->root = replacement;
   }
-
-#ifdef ZIX_TREE_HYPER_VERIFY
-  assert(old_height + *height_change == height(replacement));
-#endif
 
   return replacement;
 }
@@ -396,12 +387,6 @@ zix_tree_insert(ZixTree* t, void* e, ZixTreeIter** ti)
   }
 
   ++t->size;
-
-#ifdef ZIX_TREE_VERIFY
-  if (!verify(t, t->root)) {
-    return ZIX_STATUS_ERROR;
-  }
-#endif
 
   return ZIX_STATUS_SUCCESS;
 }
@@ -550,13 +535,6 @@ zix_tree_remove(ZixTree* t, ZixTreeIter* ti)
   zix_free(t->allocator, n);
 
   --t->size;
-
-#ifdef ZIX_TREE_VERIFY
-  if (!verify(t, t->root)) {
-    return ZIX_STATUS_ERROR;
-  }
-#endif
-
   return ZIX_STATUS_SUCCESS;
 }
 
