@@ -99,6 +99,8 @@ mingw32:
     - ninja -C build test
     - meson configure -Dwin_ver=nt4 build
     - ninja -C build test
+    - meson configure -Dwin_wchar=disabled build
+    - ninja -C build test
   variables:
     WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\10-win32"
 
@@ -111,6 +113,8 @@ mingw64:
     - meson configure -Dbuildtype=release build
     - ninja -C build test
     - meson configure -Dwin_ver=winxp build
+    - ninja -C build test
+    - meson configure -Dwin_wchar=disabled build
     - ninja -C build test
   variables:
     WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\10-win32"
@@ -155,6 +159,8 @@ win:
     - meson configure -Dwin_ver=winxp build
     - ninja -C build test
     - meson configure -Dwin_ver=nt4 build
+    - ninja -C build test
+    - meson configure -Dwin_wchar=disabled build
     - ninja -C build test
 
 # Documentation

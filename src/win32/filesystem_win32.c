@@ -5,6 +5,7 @@
 
 #include "../errno_status.h"
 #include "../zix_config.h"
+#include "win32_util.h"
 
 #include <zix/allocator.h>
 #include <zix/bump_allocator.h>
@@ -16,6 +17,7 @@
 #include <io.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <tchar.h>
 #include <windows.h>
 
 #include <errno.h>
@@ -24,6 +26,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef UNICODE
+
+static char*
+path_result(ZixAllocator* const allocator, wchar_t* const path)
+{
+  if (!path) {
+    return NULL;
+  }
+
+  static const wchar_t* const long_prefix = L"\\\\?\\";
+
+  const size_t p      = !wcsncmp(path, long_prefix, 4U) ? 4U : 0U;
+  char* const  result = zix_wchar_to_utf8(allocator, path + p);
+  zix_free(allocator, path);
+  return result;
+}
+
+#else // !defined(UNICODE)
+
+static char*
+path_result(ZixAllocator* const allocator, char* const path)
+{
+  (void)allocator;
+  return path;
+}
+
+#endif
 
 static inline ZixStatus
 zix_winerror_status(const DWORD e)
@@ -67,8 +97,15 @@ zix_copy_file(ZixAllocator* const  allocator,
 {
   (void)allocator;
 
-  return zix_windows_status(
-    CopyFile(src, dst, !(options & ZIX_COPY_OPTION_OVERWRITE_EXISTING)));
+  ArgPathChar* const wsrc = arg_path_new(allocator, src);
+  ArgPathChar* const wdst = arg_path_new(allocator, dst);
+
+  const BOOL ret =
+    CopyFile(wsrc, wdst, !(options & ZIX_COPY_OPTION_OVERWRITE_EXISTING));
+
+  arg_path_free(allocator, wdst);
+  arg_path_free(allocator, wsrc);
+  return zix_windows_status(ret);
 }
 
 /// Linear Congruential Generator for making random 32-bit integers
@@ -123,9 +160,15 @@ zix_create_temporary_directory(ZixAllocator* const allocator,
 ZixStatus
 zix_remove(const char* const path)
 {
-  return zix_windows_status((zix_file_type(path) == ZIX_FILE_TYPE_DIRECTORY)
-                              ? RemoveDirectory(path)
-                              : DeleteFile(path));
+  ArgPathChar* const wpath = arg_path_new(NULL, path);
+  const DWORD        attrs = GetFileAttributes(wpath);
+
+  const BOOL success =
+    ((attrs & FILE_ATTRIBUTE_DIRECTORY) ? RemoveDirectory(wpath)
+                                        : DeleteFile(wpath));
+
+  arg_path_free(NULL, wpath);
+  return zix_windows_status(success);
 }
 
 void
@@ -135,9 +178,28 @@ zix_dir_for_each(const char* const path,
                                  const char* name,
                                  void*       data))
 {
+  static const TCHAR* const dot    = TEXT(".");
+  static const TCHAR* const dotdot = TEXT("..");
+
+#ifdef UNICODE
+  const int path_size = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
+  if (path_size < 1) {
+    return;
+  }
+
+  const size_t path_len = (size_t)path_size - 1U;
+  TCHAR* const pat = (TCHAR*)zix_calloc(NULL, path_len + 4U, sizeof(TCHAR));
+  if (!pat) {
+    return;
+  }
+
+  MultiByteToWideChar(CP_UTF8, 0, path, -1, pat, path_size);
+#else
   const size_t path_len = strlen(path);
-  char         pat[MAX_PATH + 2U];
+  TCHAR* const pat = (TCHAR*)zix_calloc(NULL, path_len + 2U, sizeof(TCHAR));
   memcpy(pat, path, path_len + 1U);
+#endif
+
   pat[path_len]      = '\\';
   pat[path_len + 1U] = '*';
   pat[path_len + 2U] = '\0';
@@ -146,8 +208,14 @@ zix_dir_for_each(const char* const path,
   HANDLE          fh = FindFirstFile(pat, &fd);
   if (fh != INVALID_HANDLE_VALUE) {
     do {
-      if (!!strcmp(fd.cFileName, ".") && !!strcmp(fd.cFileName, "..")) {
+      if (!!_tcscmp(fd.cFileName, dot) && !!_tcscmp(fd.cFileName, dotdot)) {
+#ifdef UNICODE
+        char* const name = zix_wchar_to_utf8(NULL, fd.cFileName);
+        f(path, name, data);
+        zix_free(NULL, name);
+#else
         f(path, fd.cFileName, data);
+#endif
       }
     } while (FindNextFile(fh, &fd));
   }
@@ -187,10 +255,12 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
     return NULL;
   }
 
+  ArgPathChar* const wpath = arg_path_new(allocator, path);
+
 #if USE_GETFINALPATHNAMEBYHANDLE // Vista+
 
   const HANDLE h =
-    CreateFile(path,
+    CreateFile(wpath,
                FILE_READ_ATTRIBUTES,
                FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                NULL,
@@ -198,37 +268,37 @@ zix_canonical_path(ZixAllocator* const allocator, const char* const path)
                FILE_FLAG_BACKUP_SEMANTICS,
                NULL);
 
-  if (h == INVALID_HANDLE_VALUE) {
-    return NULL;
-  }
-
-  const DWORD flags  = FILE_NAME_NORMALIZED | VOLUME_NAME_DOS;
-  const DWORD length = GetFinalPathNameByHandle(h, NULL, 0U, flags);
-  TCHAR*      final  = NULL;
-  if (length) {
-    final = (TCHAR*)zix_calloc(allocator, (size_t)length + 1U, sizeof(TCHAR));
-    if (final) {
-      GetFinalPathNameByHandle(h, final, length + 1U, flags);
-    }
-  }
-
-  CloseHandle(h);
-  return final;
-
-#else // Fall back to "full path iff it exists" for older Windows
-
-  TCHAR* full = NULL;
-  if (GetFileAttributes(path) != INVALID_FILE_ATTRIBUTES) {
-    const DWORD length = GetFullPathName(path, 0U, NULL, NULL);
+  TCHAR* final = NULL;
+  if (h != INVALID_HANDLE_VALUE) {
+    const DWORD flags  = FILE_NAME_NORMALIZED | VOLUME_NAME_DOS;
+    const DWORD length = GetFinalPathNameByHandle(h, NULL, 0U, flags);
     if (length) {
-      full = (TCHAR*)zix_calloc(allocator, (size_t)length + 1U, sizeof(TCHAR));
-      if (full) {
-        GetFullPathName(path, length + 1U, full, NULL);
+      final = (TCHAR*)zix_calloc(allocator, (size_t)length + 1U, sizeof(TCHAR));
+      if (final) {
+        GetFinalPathNameByHandle(h, final, length + 1U, flags);
       }
     }
   }
 
-  return full;
+  CloseHandle(h);
+  arg_path_free(allocator, wpath);
+  return path_result(allocator, final);
+
+#else // Fall back to "full path iff it exists" for older Windows
+
+  TCHAR* full = NULL;
+  if (GetFileAttributes(wpath) != INVALID_FILE_ATTRIBUTES) {
+    const DWORD length = GetFullPathName(wpath, 0U, NULL, NULL);
+    if (length) {
+      full = (TCHAR*)zix_calloc(allocator, (size_t)length + 1U, sizeof(TCHAR));
+      if (full) {
+        GetFullPathName(wpath, length + 1U, full, NULL);
+      }
+    }
+  }
+
+  arg_path_free(allocator, wpath);
+  return path_result(allocator, full);
 
 #endif
 }
@@ -258,7 +328,7 @@ attrs_file_type(const DWORD attrs)
 ZixFileType
 zix_file_type(const char* const path)
 {
-  const ZixFileType type = attrs_file_type(GetFileAttributes(path));
+  const ZixFileType type = zix_symlink_type(path);
   if (type != ZIX_FILE_TYPE_SYMLINK) {
     return type;
   }
@@ -267,20 +337,33 @@ zix_file_type(const char* const path)
   char             buf[MAX_PATH];
   ZixBumpAllocator allocator = zix_bump_allocator(sizeof(buf), buf);
   char* const      canonical = zix_canonical_path(&allocator.base, path);
-  return zix_file_type(canonical);
+  return zix_symlink_type(canonical);
 }
 
 ZixFileType
 zix_symlink_type(const char* const path)
 {
-  return attrs_file_type(GetFileAttributes(path));
+  ArgPathChar* const wpath = arg_path_new(NULL, path);
+  if (!wpath) {
+    return ZIX_FILE_TYPE_NONE;
+  }
+
+  const ZixFileType type = attrs_file_type(GetFileAttributes(wpath));
+  arg_path_free(NULL, wpath);
+  return type;
 }
 
 ZixStatus
 zix_create_directory(const char* const dir_path)
 {
-  return !dir_path[0] ? ZIX_STATUS_BAD_ARG
-                      : zix_windows_status(CreateDirectory(dir_path, NULL));
+  if (!dir_path[0]) {
+    return ZIX_STATUS_BAD_ARG;
+  }
+
+  ArgPathChar* const wpath = arg_path_new(NULL, dir_path);
+  const ZixStatus    st    = zix_windows_status(CreateDirectory(wpath, NULL));
+  arg_path_free(NULL, wpath);
+  return st;
 }
 
 ZixStatus
@@ -298,7 +381,15 @@ zix_create_symlink(const char* const target_path, const char* const link_path)
 #if USE_CREATESYMBOLICLINK
   static const DWORD flags = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
 
-  return zix_windows_status(CreateSymbolicLink(link_path, target_path, flags));
+  ArgPathChar* const wtarget = arg_path_new(NULL, target_path);
+  ArgPathChar* const wlink   = arg_path_new(NULL, link_path);
+
+  const BOOL success = CreateSymbolicLink(wlink, wtarget, flags);
+
+  arg_path_free(NULL, wlink);
+  arg_path_free(NULL, wtarget);
+  return zix_windows_status(success);
+
 #else
   (void)target_path;
   (void)link_path;
@@ -314,7 +405,15 @@ zix_create_directory_symlink(const char* const target_path,
   static const DWORD flags =
     SYMBOLIC_LINK_FLAG_DIRECTORY | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
 
-  return zix_windows_status(CreateSymbolicLink(link_path, target_path, flags));
+  ArgPathChar* const wtarget = arg_path_new(NULL, target_path);
+  ArgPathChar* const wlink   = arg_path_new(NULL, link_path);
+
+  const BOOL success = CreateSymbolicLink(wlink, wtarget, flags);
+
+  arg_path_free(NULL, wlink);
+  arg_path_free(NULL, wtarget);
+  return zix_windows_status(success);
+
 #else
   (void)target_path;
   (void)link_path;
@@ -326,7 +425,15 @@ ZixStatus
 zix_create_hard_link(const char* const target_path, const char* const link_path)
 {
 #if USE_CREATEHARDLINK
-  return zix_windows_status(CreateHardLink(link_path, target_path, NULL));
+  ArgPathChar* const wtarget = arg_path_new(NULL, target_path);
+  ArgPathChar* const wlink   = arg_path_new(NULL, link_path);
+
+  const BOOL success = CreateHardLink(wlink, wtarget, NULL);
+
+  arg_path_free(NULL, wlink);
+  arg_path_free(NULL, wtarget);
+  return zix_windows_status(success);
+
 #else
   (void)target_path;
   (void)link_path;
@@ -337,25 +444,25 @@ zix_create_hard_link(const char* const target_path, const char* const link_path)
 char*
 zix_temp_directory_path(ZixAllocator* const allocator)
 {
-  const DWORD size = GetTempPath(0U, NULL);
-  char* const buf  = (char*)zix_calloc(allocator, size, 1);
+  const DWORD  size = GetTempPath(0U, NULL);
+  TCHAR* const buf  = (TCHAR*)zix_calloc(allocator, size, sizeof(TCHAR));
   if (buf && (GetTempPath(size, buf) != size - 1U)) {
     zix_free(allocator, buf);
     return NULL;
   }
 
-  return buf;
+  return path_result(allocator, buf);
 }
 
 char*
 zix_current_path(ZixAllocator* const allocator)
 {
-  const DWORD size = GetCurrentDirectory(0U, NULL);
-  char* const buf  = (char*)zix_calloc(allocator, size, 1);
+  const DWORD  size = GetCurrentDirectory(0U, NULL);
+  TCHAR* const buf  = (TCHAR*)zix_calloc(allocator, size, sizeof(TCHAR));
   if (buf && (GetCurrentDirectory(size, buf) != size - 1U)) {
     zix_free(allocator, buf);
     return NULL;
   }
 
-  return buf;
+  return path_result(allocator, buf);
 }

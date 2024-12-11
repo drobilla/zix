@@ -162,6 +162,10 @@ elif host_machine.system() in ['dragonfly', 'freebsd', 'netbsd', 'openbsd']
     '-D_BSD_SOURCE',
   ]
 elif host_machine.system() == 'windows'
+  if not get_option('win_wchar').disabled()
+    system_c_args += ['-DUNICODE', '-D_UNICODE']
+  endif
+
   winvers = {
     'nt4': '0x0400',
     'winxp': '0x0501',
@@ -250,11 +254,11 @@ else
   windows_checks = {
     'CreateHardLink': template.format(
       'windows.h',
-      'return CreateHardLink("l", "t", NULL);',
+      'return CreateHardLink(TEXT("l"), TEXT("t"), NULL);',
     ),
     'CreateSymbolicLink': template.format(
       'windows.h',
-      'return CreateSymbolicLink("l", "t", SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);',
+      'return CreateSymbolicLink(TEXT("l"), TEXT("t"), SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE);',
     ),
     'GetFinalPathNameByHandle': template.format(
       'windows.h',
@@ -350,6 +354,7 @@ if host_machine.system() == 'windows'
     'src/win32/environment_win32.c',
     'src/win32/filesystem_win32.c',
     'src/win32/system_win32.c',
+    'src/win32/win32_util.c',
   )
 else
   sources += files(
