@@ -32,17 +32,21 @@ Components
   * `zix/filesystem.h`: Functions for working with filesystems.
   * `zix/path.h`: Functions for working with filesystem paths lexically.
 
+* Environment
+
+  * `zix/environment.h`: Function to expand shell-style variables in a string.
+
 Platforms
 ---------
 
 Zix is continually tested on:
 
-  * Debian GNU/Linux 11 (x86, x64, arm32, and arm64)
+  * Debian 11 (x86, x64, arm32, and arm64)
   * Fedora 36 (x64)
-  * FreeBSD 13 (x64)
+  * FreeBSD 14 (x64)
   * MacOS 14 (M2)
   * Node 12 (as wasm via emscripten 2.0.12)
-  * Windows 10 (x86)
+  * Windows 10 (x64)
 
 Dependencies
 ------------
