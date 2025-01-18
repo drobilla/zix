@@ -1,4 +1,4 @@
-zix (0.5.1) unstable; urgency=medium
+zix (0.6.0) stable; urgency=medium
 
   * Add ZIX_NODISCARD attribute
   * Add option to build for older Windows versions
@@ -13,7 +13,7 @@ zix (0.5.1) unstable; urgency=medium
   * Support building for UWP
   * Support building for Windows with or without UNICODE
 
- -- David Robillard <d@drobilla.net>  Wed, 11 Dec 2024 05:22:31 +0000
+ -- David Robillard <d@drobilla.net>  Sat, 18 Jan 2025 21:49:37 +0000
 
 zix (0.4.2) stable; urgency=medium
 
