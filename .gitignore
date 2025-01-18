@@ -6,5 +6,5 @@
 __pycache__
 build/**
 subprojects/packagecache/
-subprojects/sphinxygen-1.0.4/
+subprojects/sphinxygen-1.0.10/
 subprojects/sphinxygen/
