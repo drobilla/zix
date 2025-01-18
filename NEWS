@@ -1,8 +1,8 @@
-zix (0.6.1) unstable; urgency=medium
+zix (0.6.2) stable; urgency=medium
 
-  * Update sphinxygen wrap
+  * Fix documentation build with sphinxygen fallback wrap
 
- -- David Robillard <d@drobilla.net>  Sat, 18 Jan 2025 22:39:02 +0000
+ -- David Robillard <d@drobilla.net>  Sat, 18 Jan 2025 23:53:31 +0000
 
 zix (0.6.0) stable; urgency=medium
 
