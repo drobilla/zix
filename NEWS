@@ -1,3 +1,9 @@
+zix (0.6.3) unstable; urgency=medium
+
+  * Use getenv() instead of environ to avoid issues on FreeBSD
+
+ -- David Robillard <d@drobilla.net>  Mon, 10 Feb 2025 21:36:46 +0000
+
 zix (0.6.2) stable; urgency=medium
 
   * Fix documentation build with sphinxygen fallback wrap

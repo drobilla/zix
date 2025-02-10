@@ -4,13 +4,10 @@
 #include <zix/environment.h>
 
 #include <zix/allocator.h>
-#include <zix/string_view.h>
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
-
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-extern char** environ;
 
 static bool
 is_path_delim(const char c)
@@ -22,27 +19,6 @@ static bool
 is_var_name_char(const char c)
 {
   return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c == '_');
-}
-
-static const char*
-find_env(const ZixStringView name)
-{
-  if (environ) {
-    for (size_t i = 0U; environ[i]; ++i) {
-      // Find the first character in this entry that doesn't match the name
-      const char* const entry = environ[i];
-      size_t            j     = 0U;
-      while (j < name.length && entry[j] == name.data[j]) {
-        ++j;
-      }
-
-      if (j == name.length && entry[j] == '=') {
-        return entry + j + 1U;
-      }
-    }
-  }
-
-  return NULL;
 }
 
 // Append suffix to dst, update dst_len, and return the realloc'd result
@@ -65,7 +41,7 @@ append_str(ZixAllocator* const allocator,
   return out;
 }
 
-// Append the value of the environment variable var to dst if one is set
+// Append the value of an environment variable to dst if it's set
 static char*
 append_var(ZixAllocator* const allocator,
            size_t* const       dst_len,
@@ -74,8 +50,7 @@ append_var(ZixAllocator* const allocator,
            const char* const   ref)
 {
   // Get value from environment
-  const ZixStringView var = zix_substring(ref + 1U, ref_len - 1U);
-  const char*         val = find_env(var);
+  const char* const val = getenv(ref + 1U); // NOLINT(concurrency-mt-unsafe)
   if (val) {
     return append_str(allocator, dst_len, dst, strlen(val), val);
   }
@@ -84,12 +59,32 @@ append_var(ZixAllocator* const allocator,
   return append_str(allocator, dst_len, dst, ref_len, ref);
 }
 
+// Copy a variable reference string like $NAME to a null-termianted string
+static char*
+set_ref(ZixAllocator* const allocator,
+        char** const        buffer,
+        const size_t        ref_len,
+        const char* const   ref)
+{
+  char* const out = (char*)zix_realloc(allocator, *buffer, ref_len + 1U);
+
+  if (out) {
+    memcpy(out, ref, ref_len);
+    out[ref_len] = '\0';
+  } else {
+    zix_free(allocator, *buffer);
+  }
+
+  return out;
+}
+
 char*
 zix_expand_environment_strings(ZixAllocator* const allocator,
                                const char* const   string)
 {
-  char*  out = NULL;
-  size_t len = 0U;
+  char*  ref = NULL; // Reference string like $NAME
+  char*  out = NULL; // Expanded result
+  size_t len = 0U;   // Length of expanded result
 
   size_t start = 0U; // Start of current chunk to copy
   for (size_t s = 0U; string[s];) {
@@ -102,7 +97,9 @@ zix_expand_environment_strings(ZixAllocator* const allocator,
           const size_t      prefix_len = s - start;
           if ((prefix_len &&
                !(out = append_str(allocator, &len, out, prefix_len, prefix))) ||
-              !(out = append_var(allocator, &len, out, t, string + s))) {
+              !(ref = set_ref(allocator, &ref, t, string + s)) ||
+              !(out = append_var(allocator, &len, out, t, ref))) {
+            zix_free(allocator, ref);
             return NULL;
           }
           start = s = t;
@@ -116,6 +113,7 @@ zix_expand_environment_strings(ZixAllocator* const allocator,
       if ((prefix_len &&
            !(out = append_str(allocator, &len, out, prefix_len, prefix))) ||
           !(out = append_var(allocator, &len, out, 5U, "$HOME"))) {
+        zix_free(allocator, ref);
         return NULL;
       }
       start = ++s;
@@ -130,5 +128,6 @@ zix_expand_environment_strings(ZixAllocator* const allocator,
     out = append_str(allocator, &len, out, tail_len, tail);
   }
 
+  zix_free(allocator, ref);
   return out;
 }
