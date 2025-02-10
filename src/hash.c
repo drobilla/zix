@@ -330,7 +330,7 @@ zix_hash_insert_at(ZixHash* const          hash,
   entry->value = record;
 
   // Update size and rehash if we exceeded the maximum load
-  const size_t max_load  = hash->n_entries / 2U + hash->n_entries / 8U;
+  const size_t max_load  = (hash->n_entries / 2U) + (hash->n_entries / 8U);
   const size_t new_count = hash->count + 1U;
   if (new_count >= max_load) {
     const ZixStatus st = grow(hash);
