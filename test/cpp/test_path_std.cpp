@@ -16,8 +16,9 @@
 #include <cassert>
 #include <cstdlib>
 #include <filesystem>
-#include <sstream>
 #include <string>
+
+// IWYU pragma: no_include <version>
 
 namespace {
 
