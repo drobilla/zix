@@ -451,7 +451,7 @@ zix_dep = declare_dependency(
   link_with: libzix,
 )
 
-# Generage pkg-config file for external dependants
+# Generate pkg-config file for external dependants
 pkg.generate(
   libzix,
   description: 'Lightweight C library of portability wrappers and data structures',

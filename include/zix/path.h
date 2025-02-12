@@ -62,7 +62,7 @@ zix_path_preferred(ZixAllocator* ZIX_NULLABLE allocator,
 
    Paths in normal form have all dot segments removed and use only a single
    preferred separator for all separators (that is, any number of separators is
-   replaced with a single "\" on Windows, and a single "/" everwhere else).
+   replaced with a single "\" on Windows, and a single "/" everywhere else).
 
    Note that this function doesn't access the filesystem, so won't do anything
    like case normalization or symbolic link dereferencing.  For that, use

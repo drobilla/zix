@@ -417,7 +417,7 @@ stress(ZixAllocator* const allocator,
     uintptr_t removed = 0;
     ENSUREV(t,
             zix_btree_remove(t, (void*)r, (void**)&removed, &next),
-            "Removal of non-existant %" PRIuPTR " succeeded\n",
+            "Removal of non-existent %" PRIuPTR " succeeded\n",
             r);
   }
 

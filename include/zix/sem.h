@@ -37,7 +37,7 @@ ZIX_BEGIN_DECLS
    be 0 so the semaphore can be used as a simple signal where each post
    corresponds to one wait.
 
-   Semaphores are very efficient (much moreso than a mutex/cond pair).  In
+   Semaphores are very efficient (compared to a mutex/cond pair).  In
    particular, at least on Linux, post is async-signal-safe, which means it
    does not block and will not be interrupted.  If you need to signal from
    a realtime thread, this is the most appropriate primitive to use.
