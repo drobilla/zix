@@ -437,6 +437,7 @@ libzix = library(
   darwin_versions: ['0.6.0', meson.project_version()],
   dependencies: dependencies,
   gnu_symbol_visibility: 'hidden',
+  implicit_include_directories: false,
   include_directories: include_dirs,
   install: true,
   link_args: library_link_args,

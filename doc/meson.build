@@ -37,8 +37,9 @@ if build_docs
       executable(
         'overview_code',
         files('overview_code.c'),
-        dependencies: [zix_dep],
         c_args: c_suppressions,
+        dependencies: [zix_dep],
+        implicit_include_directories: false,
       ),
       suite: 'doc',
     )

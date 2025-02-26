@@ -37,6 +37,7 @@ if glib_dep.found()
         files('@0@.c'.format(benchmark)),
         c_args: c_suppressions + benchmark_c_args,
         dependencies: [zix_dep, glib_dep],
+        implicit_include_directories: false,
         include_directories: include_dirs,
       ),
     )
