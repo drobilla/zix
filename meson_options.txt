@@ -13,7 +13,7 @@ option('docs', type: 'feature', yield: true,
 option('html', type: 'feature', yield: true,
        description: 'Build paginated HTML documentation')
 
-option('lint', type: 'boolean', value: false, yield: true,
+option('lint', type: 'boolean', value: false,
        description: 'Run code quality checks')
 
 option('posix', type: 'feature', yield: true,
