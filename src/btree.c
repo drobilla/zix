@@ -154,9 +154,9 @@ zix_btree_free(ZixBTree* const           t,
 }
 
 void
-zix_btree_clear(ZixBTree* const     t,
-                ZixBTreeDestroyFunc destroy,
-                const void*         destroy_user_data)
+zix_btree_clear(ZixBTree* const           t,
+                const ZixBTreeDestroyFunc destroy,
+                const void* const         destroy_user_data)
 {
   if (t->root) {
     zix_btree_free_children(t, t->root, destroy, destroy_user_data);
