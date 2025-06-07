@@ -101,6 +101,23 @@ destroy(void* const ptr, const void* const user_data)
 }
 
 static void
+test_empty(void)
+{
+  ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
+  assert(t);
+
+  // Check that reading functions work properly with an empty (rootless) tree
+  const int    e  = 42;
+  ZixBTreeIter ti = zix_btree_end(t);
+  zix_btree_clear(t, NULL, NULL);
+  assert(!zix_btree_size(t));
+  assert(zix_btree_find(t, &e, &ti) == ZIX_STATUS_NOT_FOUND);
+  assert(!zix_btree_lower_bound(t, int_cmp, NULL, &e, &ti));
+
+  zix_btree_free(t, destroy, NULL);
+}
+
+static void
 test_clear(void)
 {
   ZixBTree* t = zix_btree_new(NULL, int_cmp, NULL);
@@ -576,6 +593,7 @@ main(int argc, char** argv)
     return EXIT_FAILURE;
   }
 
+  test_empty();
   test_clear();
   test_free();
   test_iter_comparison();

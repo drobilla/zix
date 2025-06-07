@@ -102,22 +102,14 @@ zix_btree_new(ZixAllocator* const       allocator,
 
   assert(cmp);
 
-  ZixBTree* const t = (ZixBTree*)zix_aligned_alloc(
-    allocator, ZIX_BTREE_PAGE_SIZE, ZIX_BTREE_PAGE_SIZE);
-
-  if (!t) {
-    return NULL;
+  ZixBTree* const t = (ZixBTree*)zix_malloc(allocator, sizeof(ZixBTree));
+  if (t) {
+    t->allocator = allocator;
+    t->root      = NULL;
+    t->cmp       = cmp;
+    t->cmp_data  = cmp_data;
+    t->size      = 0U;
   }
-
-  if (!(t->root = zix_btree_node_new(allocator, true))) {
-    zix_aligned_free(allocator, t);
-    return NULL;
-  }
-
-  t->allocator = allocator;
-  t->cmp       = cmp;
-  t->cmp_data  = cmp_data;
-  t->size      = 0U;
 
   return t;
 }
@@ -157,7 +149,7 @@ zix_btree_free(ZixBTree* const           t,
   if (t) {
     zix_btree_clear(t, destroy, destroy_user_data);
     zix_aligned_free(t->allocator, t->root);
-    zix_aligned_free(t->allocator, t);
+    zix_free(t->allocator, t);
   }
 }
 
@@ -166,11 +158,13 @@ zix_btree_clear(ZixBTree* const     t,
                 ZixBTreeDestroyFunc destroy,
                 const void*         destroy_user_data)
 {
-  zix_btree_free_children(t, t->root, destroy, destroy_user_data);
+  if (t->root) {
+    zix_btree_free_children(t, t->root, destroy, destroy_user_data);
+    zix_aligned_free(t->allocator, t->root);
+    t->root = NULL;
+  }
 
-  memset(t->root, 0U, sizeof(ZixBTreeNode));
-  t->root->is_leaf = true;
-  t->size          = 0U;
+  t->size = 0U;
 }
 
 size_t
@@ -436,8 +430,13 @@ zix_btree_insert(ZixBTree* const t, void* const e)
 
   ZixStatus st = ZIX_STATUS_SUCCESS;
 
-  // Grow up if necessary to ensure the root is not full
-  if (zix_btree_is_full(t->root)) {
+  if (!t->root) {
+    // Empty tree, create a new leaf root
+    if (!(t->root = zix_btree_node_new(t->allocator, true))) {
+      return ZIX_STATUS_NO_MEM;
+    }
+  } else if (zix_btree_is_full(t->root)) {
+    // Grow up if necessary to ensure the root is not full
     if ((st = zix_btree_grow_up(t))) {
       return st;
     }
@@ -829,6 +828,9 @@ zix_btree_find(const ZixBTree* const t,
   ZixBTreeNode* n = t->root;
 
   *ti = zix_btree_end_iter;
+  if (!n) {
+    return ZIX_STATUS_NOT_FOUND;
+  }
 
   while (!n->is_leaf) {
     bool           equal = false;
@@ -870,6 +872,9 @@ zix_btree_lower_bound(const ZixBTree* const     t,
   ZixBTreeNode* n           = t->root; // Current node
   uint16_t      found_level = 0U;      // Lowest level a match was found at
   bool          found       = false;   // True if a match was ever found
+  if (!n) {
+    return ZIX_STATUS_SUCCESS;
+  }
 
   // Search down until we reach a leaf
   while (!n->is_leaf) {
