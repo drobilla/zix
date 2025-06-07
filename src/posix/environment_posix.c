@@ -59,7 +59,7 @@ append_var(ZixAllocator* const allocator,
   return append_str(allocator, dst_len, dst, ref_len, ref);
 }
 
-// Copy a variable reference string like $NAME to a null-termianted string
+// Copy a variable reference string like $NAME to a null-terminated string
 static char*
 set_ref(ZixAllocator* const allocator,
         char** const        buffer,
