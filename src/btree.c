@@ -14,9 +14,9 @@
 // #define ZIX_BTREE_SORTED_CHECK 1
 
 // Define ZixShort as an integer type half the size of a pointer
-#if UINTPTR_MAX >= UINT32_MAX
+#if UINTPTR_MAX > UINT32_MAX // 64-bit
 typedef uint32_t ZixShort;
-#else
+#else // 32-bit
 typedef uint16_t ZixShort;
 #endif
 
@@ -218,7 +218,7 @@ zix_btree_split_child(ZixAllocator* const allocator,
   assert(i < n->n_vals + 1U);
   assert(zix_btree_child(n, i) == lhs);
 
-  const ZixShort max_n_vals = zix_btree_max_vals(lhs);
+  const unsigned max_n_vals = zix_btree_max_vals(lhs);
   ZixBTreeNode*  rhs        = zix_btree_node_new(allocator, lhs->is_leaf);
   if (!rhs) {
     return NULL;
@@ -492,8 +492,9 @@ zix_btree_insert(ZixBTree* const t, void* const e)
 static void
 zix_btree_iter_set_frame(ZixBTreeIter* const ti,
                          ZixBTreeNode* const n,
-                         const ZixShort      i)
+                         const unsigned      i)
 {
+  assert(i <= UINT16_MAX);
   ti->nodes[ti->level]   = n;
   ti->indexes[ti->level] = (uint16_t)i;
 }
