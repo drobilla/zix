@@ -111,6 +111,9 @@ test_failed_alloc(void)
 
   zix_failing_allocator_reset(&allocator, 2U);
   assert(!zix_expand_environment_strings(&allocator.base, "/one:$HOME/two"));
+
+  zix_failing_allocator_reset(&allocator, 1U);
+  assert(!zix_expand_environment_strings(&allocator.base, "/one:$UNSET/two"));
 #endif
 }
 

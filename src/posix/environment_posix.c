@@ -100,6 +100,7 @@ zix_expand_environment_strings(ZixAllocator* const allocator,
               !(ref = set_ref(allocator, &ref, t, string + s)) ||
               !(out = append_var(allocator, &len, out, t, ref))) {
             zix_free(allocator, ref);
+            zix_free(allocator, out);
             return NULL;
           }
           start = s = t;
