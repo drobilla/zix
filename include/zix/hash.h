@@ -20,7 +20,7 @@ ZIX_BEGIN_DECLS
 */
 
 /**
-   @defgroup zix_hash_datatypes Datatypes
+   @defgroup zix_hash_types Types
    @{
 */
 
@@ -77,12 +77,6 @@ typedef struct ZixHashImpl ZixHash;
 /// A full hash code for a key which is not folded down to the table size
 typedef size_t ZixHashCode;
 
-/**
-   @}
-   @defgroup zix_hash_setup Setup
-   @{
-*/
-
 /// User function for getting the key of a record
 typedef const ZixHashKey* ZIX_NONNULL (*ZixKeyFunc)(
   const ZixHashRecord* ZIX_NONNULL record);
@@ -93,6 +87,12 @@ typedef ZixHashCode (*ZixHashFunc)(const ZixHashKey* ZIX_NONNULL key);
 /// User function for determining if two keys are truly equal
 typedef bool (*ZixKeyEqualFunc)(const ZixHashKey* ZIX_NONNULL a,
                                 const ZixHashKey* ZIX_NONNULL b);
+
+/**
+   @}
+   @defgroup zix_hash_setup Setup
+   @{
+*/
 
 /**
    Create a new hash table.

@@ -21,7 +21,7 @@ ZIX_BEGIN_DECLS
 */
 
 /**
-   @defgroup zix_btree_setup Setup
+   @defgroup zix_btree_types Types
    @{
 */
 
@@ -49,6 +49,12 @@ typedef int (*ZixBTreeCompareFunc)(const void* ZIX_UNSPECIFIED a,
 /// Function to destroy a B-Tree element
 typedef void (*ZixBTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
                                     const void* ZIX_UNSPECIFIED user_data);
+
+/**
+   @}
+   @defgroup zix_btree_setup Setup
+   @{
+*/
 
 /**
    Create a new (empty) B-Tree.

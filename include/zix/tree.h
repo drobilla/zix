@@ -20,7 +20,7 @@ ZIX_BEGIN_DECLS
 */
 
 /**
-   @defgroup zix_tree_setup Setup
+   @defgroup zix_tree_types Types
    @{
 */
 
@@ -35,6 +35,12 @@ typedef int (*ZixTreeCompareFunc)(const void* ZIX_UNSPECIFIED a,
 /// Function to destroy a Tree element
 typedef void (*ZixTreeDestroyFunc)(void* ZIX_UNSPECIFIED       ptr,
                                    const void* ZIX_UNSPECIFIED user_data);
+
+/**
+   @}
+   @defgroup zix_tree_setup Setup
+   @{
+*/
 
 /// Create a new (empty) tree
 ZIX_API ZIX_NODISCARD ZixTree* ZIX_ALLOCATED

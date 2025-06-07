@@ -19,7 +19,7 @@ ZIX_BEGIN_DECLS
 */
 
 /**
-   @defgroup zix_ring_setup Setup
+   @defgroup zix_ring_types Types
    @{
 */
 
@@ -30,6 +30,12 @@ ZIX_BEGIN_DECLS
    writer, and realtime-safe on both ends.
 */
 typedef struct ZixRingImpl ZixRing;
+
+/**
+   @}
+   @defgroup zix_ring_setup Setup
+   @{
+*/
 
 /**
    Create a new ring.
