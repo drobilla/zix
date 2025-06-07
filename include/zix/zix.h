@@ -1,4 +1,4 @@
-// Copyright 2016-2024 David Robillard <d@drobilla.net>
+// Copyright 2016-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_ZIX_H
@@ -45,6 +45,7 @@
 
 #include <zix/btree.h>
 #include <zix/hash.h>
+#include <zix/rank_tree.h>
 #include <zix/ring.h>
 #include <zix/tree.h>
 

@@ -35,6 +35,7 @@ _opaque = [
     "ZixBTreeNodeImpl",
     "ZixHash",
     "ZixHashImpl",
+    "ZixRankTreeImpl",
     "ZixRing",
     "ZixRingImpl",
     "ZixSem",
@@ -52,6 +53,7 @@ _opaque = [
     "uint32_t",
     "uint64_t",
     "uint8_t",
+    "uintptr_t",
 ]
 
 _c_nitpick_ignore = map(lambda x: ("c:identifier", x), _opaque)

@@ -1,9 +1,10 @@
-zix (0.6.3) unstable; urgency=medium
+zix (0.7.0) unstable; urgency=medium
 
+  * Add ZixRankTree
   * Reduce empty BTree memory requirements
   * Use getenv() instead of environ to avoid issues on FreeBSD
 
- -- David Robillard <d@drobilla.net>  Thu, 29 May 2025 15:22:01 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 30 May 2025 17:51:39 +0000
 
 zix (0.6.2) stable; urgency=medium
 

@@ -12,7 +12,7 @@ project(
   ],
   license: 'ISC',
   meson_version: '>= 0.56.0',
-  version: '0.6.3',
+  version: '0.7.0',
 )
 
 zix_src_root = meson.current_source_dir()
@@ -38,6 +38,7 @@ if cc.get_id() in ['clang', 'emscripten']
       '-Wno-declaration-after-statement',
       '-Wno-implicit-fallthrough', # Really for clang < 12
       '-Wno-padded',
+      '-Wno-pre-c11-compat',
       '-Wno-switch-default',
       '-Wno-unsafe-buffer-usage',
       '-Wno-unsafe-buffer-usage-in-libc-call',
@@ -337,6 +338,7 @@ c_headers = files(
   'include/zix/filesystem.h',
   'include/zix/hash.h',
   'include/zix/path.h',
+  'include/zix/rank_tree.h',
   'include/zix/ring.h',
   'include/zix/sem.h',
   'include/zix/status.h',
@@ -355,6 +357,7 @@ sources = files(
   'src/filesystem.c',
   'src/hash.c',
   'src/path.c',
+  'src/rank_tree.c',
   'src/ring.c',
   'src/status.c',
   'src/string_view.c',
@@ -435,7 +438,7 @@ libzix = library(
   versioned_name,
   sources,
   c_args: c_suppressions + library_c_args,
-  darwin_versions: ['0.6.0', meson.project_version()],
+  darwin_versions: ['0.7.0', meson.project_version()],
   dependencies: dependencies,
   gnu_symbol_visibility: 'hidden',
   implicit_include_directories: false,
