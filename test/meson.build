@@ -1,4 +1,4 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 ########
@@ -199,6 +199,8 @@ if add_languages(['cpp'], native: false, required: get_option('tests_cpp'))
       '-Wno-c++98-compat-pedantic',
       '-Wno-nullability-extension',
       '-Wno-padded',
+      '-Wno-unknown-warning-option',
+      '-Wno-unsafe-buffer-usage-in-libc-call',
       '-Wno-zero-as-null-pointer-constant',
     ]
 

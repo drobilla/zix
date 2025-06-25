@@ -291,6 +291,7 @@ zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
   ZixTreeNode* replacement = node;
   if (node->balance == -2) {
     assert(node->left);
+    // NOLINTNEXTLINE(clang-analyzer-core.NullDereference)
     if (node->left->balance == 1) {
       replacement = rotate_left_right(node, height_change);
     } else {
@@ -298,6 +299,7 @@ zix_tree_rebalance(ZixTree* t, ZixTreeNode* node, int* height_change)
     }
   } else if (node->balance == 2) {
     assert(node->right);
+    // NOLINTNEXTLINE(clang-analyzer-core.NullDereference)
     if (node->right->balance == -1) {
       replacement = rotate_right_left(node, height_change);
     } else {

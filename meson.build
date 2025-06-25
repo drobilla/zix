@@ -1,4 +1,4 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 project(
@@ -39,7 +39,9 @@ if cc.get_id() in ['clang', 'emscripten']
       '-Wno-implicit-fallthrough', # Really for clang < 12
       '-Wno-padded',
       '-Wno-switch-default',
+      '-Wno-unknown-warning-option',
       '-Wno-unsafe-buffer-usage',
+      '-Wno-unsafe-buffer-usage-in-libc-call',
     ]
 
     if not meson.is_cross_build()
