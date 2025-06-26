@@ -39,7 +39,6 @@ if cc.get_id() in ['clang', 'emscripten']
       '-Wno-implicit-fallthrough', # Really for clang < 12
       '-Wno-padded',
       '-Wno-switch-default',
-      '-Wno-unknown-warning-option',
       '-Wno-unsafe-buffer-usage',
       '-Wno-unsafe-buffer-usage-in-libc-call',
     ]

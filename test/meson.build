@@ -147,15 +147,11 @@ if cc.get_id() != 'emscripten'
     ]
 
     if not meson.is_cross_build()
-      header_suppressions += [
-        '-Wno-poison-system-directories',
-      ]
+      header_suppressions += ['-Wno-poison-system-directories']
     endif
 
     if host_machine.system() == 'windows'
-      header_suppressions += [
-        '-Wno-nonportable-system-include-path',
-      ]
+      header_suppressions += ['-Wno-nonportable-system-include-path']
     endif
 
   elif cc.get_id() == 'gcc'
@@ -199,21 +195,16 @@ if add_languages(['cpp'], native: false, required: get_option('tests_cpp'))
       '-Wno-c++98-compat-pedantic',
       '-Wno-nullability-extension',
       '-Wno-padded',
-      '-Wno-unknown-warning-option',
       '-Wno-unsafe-buffer-usage-in-libc-call',
       '-Wno-zero-as-null-pointer-constant',
     ]
 
     if not meson.is_cross_build()
-      cpp_test_args += [
-        '-Wno-poison-system-directories',
-      ]
+      cpp_test_args += ['-Wno-poison-system-directories']
     endif
 
     if host_machine.system() == 'windows'
-      cpp_test_args += [
-        '-Wno-nonportable-system-include-path',
-      ]
+      cpp_test_args += ['-Wno-nonportable-system-include-path']
     endif
 
   elif cpp.get_id() == 'gcc'
@@ -240,6 +231,8 @@ if add_languages(['cpp'], native: false, required: get_option('tests_cpp'))
       '/wd5264', # const variable is not used
     ]
   endif
+
+  cpp_test_args = cpp.get_supported_arguments(cpp_test_args)
 
   test(
     'headers_cpp',
