@@ -177,6 +177,8 @@ zix_copy_file(ZixAllocator* const  allocator,
   ZixStatus st = ZIX_STATUS_SUCCESS;
   (void)st;
 
+  errno = 0;
+
 #if USE_CLONEFILE
   // Try to copy via the kernel on MacOS to take advantage of CoW
   st = zix_clonefile(src, dst, options);
