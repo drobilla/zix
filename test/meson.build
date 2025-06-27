@@ -170,6 +170,8 @@ if cc.get_id() != 'emscripten'
     ]
   endif
 
+  header_suppressions = cc.get_supported_arguments(header_suppressions)
+
   test(
     'headers',
     executable(
