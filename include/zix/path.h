@@ -1,4 +1,4 @@
-// Copyright 2007-2022 David Robillard <d@drobilla.net>
+// Copyright 2007-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_PATH_H
@@ -106,10 +106,10 @@ zix_path_root_directory(const char* ZIX_NONNULL path);
    normalized.  For example, "/" is the root of "/", "//", "/.", and "/..".
 
    On Windows, the root may additionally be an absolute drive root like "C:\",
-   a relative drive root like "C:", or a network root like "//Host/".
+   a relative drive root like "C:", or a network root like "\\HOST\".
 
-   @return The newly allocated root path of `path`, or null if it has no root
-   or allocation failed.
+   @return A view of the root path within `path`, or an empty string if it has
+   no root.
 */
 ZIX_PURE_API ZixStringView
 zix_path_root_path(const char* ZIX_NONNULL path);
@@ -136,8 +136,8 @@ zix_path_relative_path(const char* ZIX_NONNULL path);
    If `path` is relative, then this returns either a relative path to the
    parent if possible, or null.  For example, the parent of "a/b" is "a".
 
-   @return The newly allocated path to the parent of `path`, or null if it has
-   no parent or allocation failed.
+   @return A view of the parent path within `path`, or the empty string if it
+   has no parent.
 */
 ZIX_PURE_API ZixStringView
 zix_path_parent_path(const char* ZIX_NONNULL path);
