@@ -338,105 +338,96 @@ test_path_lexically_normal(void)
 #endif
 }
 
+static char*
+lexically_relative(const char* const path, const char* const base)
+{
+  return zix_path_lexically_relative(NULL, path, base);
+}
+
 static void
 test_path_lexically_relative(void)
 {
-  assert(equal(zix_path_lexically_relative(NULL, "", ""), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "", "."), "."));
-  assert(equal(zix_path_lexically_relative(NULL, ".", ""), "."));
-  assert(equal(zix_path_lexically_relative(NULL, ".", "."), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "//base", "a"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "//host", "//host"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "//host", "a"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "//host/", "//host/"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "//host/", "a"), NULL));
-  assert(
-    equal(zix_path_lexically_relative(NULL, "//host/a/b", "//host/a/b"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "/a/b", "/a/"), "b"));
-  assert(equal(zix_path_lexically_relative(NULL, "C:/a/b", "C:/a/"), "b"));
-  assert(equal(zix_path_lexically_relative(NULL, "a", "/"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "a", "//host"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "a", "//host/"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "a", "a"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "a/b", "/a/b"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "a/b", "a/b"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "a/b/c", "a"), "b/c"));
-  assert(equal(zix_path_lexically_relative(NULL, "a/b/c", "a/b/c"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "a/b/c/", "a/b/c/"), "."));
-  assert(match(zix_path_lexically_relative(NULL, "../", "../"), "."));
-  assert(match(zix_path_lexically_relative(NULL, "../", "./"), "../"));
-  assert(match(zix_path_lexically_relative(NULL, "../", "a"), "../../"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "../../a", "../b"), "../../a"));
-  assert(match(zix_path_lexically_relative(NULL, "../a", "../b"), "../a"));
-  assert(match(zix_path_lexically_relative(NULL, "/a", "/b/c/"), "../../a"));
-  assert(match(zix_path_lexically_relative(NULL, "/a/b/c", "/a/b/d/"), "../c"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "/a/b/c", "/a/b/d/e/"), "../../c"));
-  assert(match(zix_path_lexically_relative(NULL, "/a/b/c", "/a/d"), "../b/c"));
-  assert(match(zix_path_lexically_relative(NULL, "/a/d", "/a/b/c"), "../../d"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:/D/", "C:/D/F.txt"), "../"));
-  assert(match(zix_path_lexically_relative(NULL, "C:/D/F", "C:/D/S/"), "../F"));
-  assert(match(zix_path_lexically_relative(NULL, "C:/D/F", "C:/G"), "../D/F"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:/D/F.txt", "C:/D/"), "F.txt"));
-  assert(match(zix_path_lexically_relative(NULL, "C:/E", "C:/D/G"), "../../E"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:/a", "C:/b/c/"), "../../a"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:/a/b/c", "C:/a/b/d/"), "../c"));
-  assert(match(zix_path_lexically_relative(NULL, "a/b", "c/d"), "../../a/b"));
-  assert(match(zix_path_lexically_relative(NULL, "a/b/c", "../"), NULL));
-  assert(match(zix_path_lexically_relative(NULL, "a/b/c", "../../"), NULL));
-  assert(
-    match(zix_path_lexically_relative(NULL, "a/b/c", "a/b/c/x/y"), "../.."));
+  assert(equal(lexically_relative("", ""), "."));
+  assert(equal(lexically_relative("", "."), "."));
+  assert(equal(lexically_relative(".", ""), "."));
+  assert(equal(lexically_relative(".", "."), "."));
+  assert(equal(lexically_relative("//base", "a"), NULL));
+  assert(equal(lexically_relative("//host", "//host"), "."));
+  assert(equal(lexically_relative("//host", "a"), NULL));
+  assert(equal(lexically_relative("//host/", "//host/"), "."));
+  assert(equal(lexically_relative("//host/", "a"), NULL));
+  assert(equal(lexically_relative("//host/a/b", "//host/a/b"), "."));
+  assert(equal(lexically_relative("/a/b", "/a/"), "b"));
+  assert(equal(lexically_relative("C:/a/b", "C:/a/"), "b"));
+  assert(equal(lexically_relative("a", "/"), NULL));
+  assert(equal(lexically_relative("a", "//host"), NULL));
+  assert(equal(lexically_relative("a", "//host/"), NULL));
+  assert(equal(lexically_relative("a", "a"), "."));
+  assert(equal(lexically_relative("a/b", "/a/b"), NULL));
+  assert(equal(lexically_relative("a/b", "a/b"), "."));
+  assert(equal(lexically_relative("a/b/c", "a"), "b/c"));
+  assert(equal(lexically_relative("a/b/c", "a/b/c"), "."));
+  assert(equal(lexically_relative("a/b/c/", "a/b/c/"), "."));
+  assert(match(lexically_relative("../", "../"), "."));
+  assert(match(lexically_relative("../", "./"), "../"));
+  assert(match(lexically_relative("../", "a"), "../../"));
+  assert(match(lexically_relative("../../a", "../b"), "../../a"));
+  assert(match(lexically_relative("../a", "../b"), "../a"));
+  assert(match(lexically_relative("/a", "/b/c/"), "../../a"));
+  assert(match(lexically_relative("/a/b/c", "/a/b/d/"), "../c"));
+  assert(match(lexically_relative("/a/b/c", "/a/b/d/e/"), "../../c"));
+  assert(match(lexically_relative("/a/b/c", "/a/d"), "../b/c"));
+  assert(match(lexically_relative("/a/d", "/a/b/c"), "../../d"));
+  assert(match(lexically_relative("C:/D/", "C:/D/F.txt"), "../"));
+  assert(match(lexically_relative("C:/D/F", "C:/D/S/"), "../F"));
+  assert(match(lexically_relative("C:/D/F", "C:/G"), "../D/F"));
+  assert(match(lexically_relative("C:/D/F.txt", "C:/D/"), "F.txt"));
+  assert(match(lexically_relative("C:/E", "C:/D/G"), "../../E"));
+  assert(match(lexically_relative("C:/a", "C:/b/c/"), "../../a"));
+  assert(match(lexically_relative("C:/a/b/c", "C:/a/b/d/"), "../c"));
+  assert(match(lexically_relative("a/b", "c/d"), "../../a/b"));
+  assert(match(lexically_relative("a/b/c", "../"), NULL));
+  assert(match(lexically_relative("a/b/c", "../../"), NULL));
+  assert(match(lexically_relative("a/b/c", "a/b/c/x/y"), "../.."));
 
 #ifdef _WIN32
-  assert(equal(zix_path_lexically_relative(NULL, "/", "a"), "/"));
-  assert(equal(zix_path_lexically_relative(NULL, "//host", "//host/"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "//host/", "//host"), "/"));
-  assert(equal(zix_path_lexically_relative(NULL, "//host/", "/a"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "/a", "//host"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "/a", "//host/"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "C:/D/", "C:F.txt"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "C:/D/S/", "F.txt"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "C:F", "C:/D/"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "C:F", "D:G"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "F", "C:/D/S/"), NULL));
-  assert(match(zix_path_lexically_relative(NULL, "C:../", "C:../"), "."));
-  assert(match(zix_path_lexically_relative(NULL, "C:../", "C:./"), "../"));
-  assert(match(zix_path_lexically_relative(NULL, "C:../", "C:a"), "../../"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:../../a", "C:../b"), "../../a"));
-  assert(match(zix_path_lexically_relative(NULL, "C:../a", "C:../b"), "../a"));
-  assert(match(zix_path_lexically_relative(NULL, "C:a/b/c", "C:../"), NULL));
-  assert(match(zix_path_lexically_relative(NULL, "C:a/b/c", "C:../../"), NULL));
+  assert(equal(lexically_relative("/", "a"), "/"));
+  assert(equal(lexically_relative("//host", "//host/"), NULL));
+  assert(equal(lexically_relative("//host/", "//host"), "/"));
+  assert(equal(lexically_relative("//host/", "/a"), NULL));
+  assert(equal(lexically_relative("/a", "//host"), NULL));
+  assert(equal(lexically_relative("/a", "//host/"), NULL));
+  assert(equal(lexically_relative("C:/D/", "C:F.txt"), NULL));
+  assert(equal(lexically_relative("C:/D/S/", "F.txt"), NULL));
+  assert(equal(lexically_relative("C:F", "C:/D/"), NULL));
+  assert(equal(lexically_relative("C:F", "D:G"), NULL));
+  assert(equal(lexically_relative("F", "C:/D/S/"), NULL));
+  assert(match(lexically_relative("C:../", "C:../"), "."));
+  assert(match(lexically_relative("C:../", "C:./"), "../"));
+  assert(match(lexically_relative("C:../", "C:a"), "../../"));
+  assert(match(lexically_relative("C:../../a", "C:../b"), "../../a"));
+  assert(match(lexically_relative("C:../a", "C:../b"), "../a"));
+  assert(match(lexically_relative("C:a/b/c", "C:../"), NULL));
+  assert(match(lexically_relative("C:a/b/c", "C:../../"), NULL));
 #else
-  assert(equal(zix_path_lexically_relative(NULL, "/", "a"), NULL));
-  assert(equal(zix_path_lexically_relative(NULL, "//host", "//host/"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "//host/", "//host"), "."));
-  assert(equal(zix_path_lexically_relative(NULL, "//host/", "/a"), "../host/"));
-  assert(equal(zix_path_lexically_relative(NULL, "/a", "//host"), "../a"));
-  assert(equal(zix_path_lexically_relative(NULL, "/a", "//host/"), "../a"));
-  assert(
-    equal(zix_path_lexically_relative(NULL, "C:/D/", "C:F.txt"), "../C:/D/"));
-  assert(
-    equal(zix_path_lexically_relative(NULL, "C:/D/S/", "F.txt"), "../C:/D/S/"));
-  assert(equal(zix_path_lexically_relative(NULL, "C:F", "C:/D/"), "../../C:F"));
-  assert(equal(zix_path_lexically_relative(NULL, "C:F", "D:G"), "../C:F"));
-  assert(
-    equal(zix_path_lexically_relative(NULL, "F", "C:/D/S/"), "../../../F"));
-  assert(match(zix_path_lexically_relative(NULL, "C:../", "C:../"), "."));
-  assert(match(zix_path_lexically_relative(NULL, "C:../", "C:./"), "../C:../"));
-  assert(match(zix_path_lexically_relative(NULL, "C:../", "C:a"), "../C:../"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:../../a", "C:../b"), "../../a"));
-  assert(match(zix_path_lexically_relative(NULL, "C:../a", "C:../b"), "../a"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:a/b/c", "C:../"), "../C:a/b/c"));
-  assert(
-    match(zix_path_lexically_relative(NULL, "C:a/b/c", "C:../../"), "C:a/b/c"));
+  assert(equal(lexically_relative("/", "a"), NULL));
+  assert(equal(lexically_relative("//host", "//host/"), "."));
+  assert(equal(lexically_relative("//host/", "//host"), "."));
+  assert(equal(lexically_relative("//host/", "/a"), "../host/"));
+  assert(equal(lexically_relative("/a", "//host"), "../a"));
+  assert(equal(lexically_relative("/a", "//host/"), "../a"));
+  assert(equal(lexically_relative("C:/D/", "C:F.txt"), "../C:/D/"));
+  assert(equal(lexically_relative("C:/D/S/", "F.txt"), "../C:/D/S/"));
+  assert(equal(lexically_relative("C:F", "C:/D/"), "../../C:F"));
+  assert(equal(lexically_relative("C:F", "D:G"), "../C:F"));
+  assert(equal(lexically_relative("F", "C:/D/S/"), "../../../F"));
+  assert(match(lexically_relative("C:../", "C:../"), "."));
+  assert(match(lexically_relative("C:../", "C:./"), "../C:../"));
+  assert(match(lexically_relative("C:../", "C:a"), "../C:../"));
+  assert(match(lexically_relative("C:../../a", "C:../b"), "../../a"));
+  assert(match(lexically_relative("C:../a", "C:../b"), "../a"));
+  assert(match(lexically_relative("C:a/b/c", "C:../"), "../C:a/b/c"));
+  assert(match(lexically_relative("C:a/b/c", "C:../../"), "C:a/b/c"));
 #endif
 }
 
