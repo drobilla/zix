@@ -1,4 +1,4 @@
-// Copyright 2007-2024 David Robillard <d@drobilla.net>
+// Copyright 2007-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/path.h>
@@ -33,7 +33,7 @@ is_any_sep(const char c)
   return c == '/' || c == ':' || c == '\\';
 }
 
-static bool
+static inline bool
 is_root_name_char(const char c)
 {
   return c && !is_dir_sep(c);
@@ -88,6 +88,12 @@ zix_path_root_name_range(const char* const path)
 }
 
 #endif
+
+static inline char
+normal_path_char(const char c)
+{
+  return (char)(is_dir_sep(c) ? ZIX_DIR_SEP : c);
+}
 
 typedef struct {
   ZixIndexRange name;
@@ -289,7 +295,7 @@ zix_path_preferred(ZixAllocator* const allocator, const char* const path)
 
   if (result) {
     for (size_t i = 0U; i < path_view.length; ++i) {
-      result[i] = (char)(is_dir_sep(path[i]) ? ZIX_DIR_SEP : path[i]);
+      result[i] = normal_path_char(path[i]);
     }
   }
 
@@ -321,15 +327,15 @@ zix_path_lexically_normal(ZixAllocator* const allocator, const char* const path)
   const ZixIndexRange root     = zix_path_root_path_range(path);
   const size_t        root_len = root.end - root.begin;
   for (size_t i = 0; i < root_len; ++i) {
-    result[r++] = (char)(is_dir_sep(path[i]) ? sep : path[i]);
+    result[r++] = normal_path_char(path[i]);
   }
 
   // Copy path, removing dot entries and collapsing separators as we go
   for (size_t i = root.end; i < path_len; ++i) {
     if (is_dir_sep(path[i])) {
-      if ((i >= root.end) && ((r == root.end + 1U && result[r - 1] == '.') ||
-                              (r >= root.end + 2U && result[r - 2] == sep &&
-                               result[r - 1] == '.'))) {
+      if (((r == root.end + 1U && result[r - 1] == '.') ||
+           (r >= root.end + 2U && result[r - 2] == sep &&
+            result[r - 1] == '.'))) {
         // Remove dot entry and any immediately following separators
         result[--r] = '\0';
 
@@ -505,8 +511,7 @@ zix_path_lexically_relative(ZixAllocator* const allocator,
   // Find the first mismatching element in the paths (or the end)
   ZixPathIter a = zix_path_begin(path);
   ZixPathIter b = zix_path_begin(base);
-  while (a.state != ZIX_PATH_END && b.state != ZIX_PATH_END &&
-         a.state == b.state &&
+  while (a.state != ZIX_PATH_END && a.state == b.state &&
          zix_string_ranges_equal(path, a.range, base, b.range)) {
     a = zix_path_next(path, a);
     b = zix_path_next(base, b);
@@ -697,7 +702,7 @@ zix_path_is_absolute(const char* const path)
 {
 #ifdef _WIN32
   const ZixRootSlices root = zix_path_root_slices(path);
-  return (path && !zix_is_empty_range(root.name) &&
+  return (!zix_is_empty_range(root.name) &&
           (!zix_is_empty_range(root.dir) ||
            (is_dir_sep(path[0]) && is_dir_sep(path[1]))));
 

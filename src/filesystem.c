@@ -99,7 +99,7 @@ zix_file_equals(ZixAllocator* const allocator,
   }
 
   bool match = false;
-  if (stat_a.st_dev == stat_b.st_dev && stat_a.st_ino && stat_b.st_ino &&
+  if (stat_a.st_dev == stat_b.st_dev && stat_a.st_ino &&
       stat_a.st_ino == stat_b.st_ino) {
     match = true; // Fast path: paths refer to the same file
   } else if (stat_a.st_size == stat_b.st_size) {
