@@ -1,4 +1,4 @@
-// Copyright 2020-2024 David Robillard <d@drobilla.net>
+// Copyright 2020-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -271,6 +272,7 @@ test_copy_file(const char* data_file_path)
 
   assert(!write_to_path(tmp_file_path, "test\n"));
 
+  // Fail to copy to/from a nonexistent file
   assert(zix_copy_file(NULL, tmp_file_path, "/does/not/exist", 0U));
   assert(zix_copy_file(NULL, "/does/not/exist", copy_path, 0U));
   assert(zix_file_type(copy_path) == ZIX_FILE_TYPE_NONE);
@@ -523,8 +525,18 @@ test_create_directories(void)
   free(temp_dir);
 }
 
+static bool
+check_file_equals(const char* const path1, const char* const path2)
+{
+  const bool r1 = zix_file_equals(NULL, path1, path2);
+  const bool r2 = zix_file_equals(NULL, path2, path1);
+  assert(r2 == r1);
+
+  return r1;
+}
+
 static void
-test_file_equals(void)
+test_file_equals(const char* const data_file_path)
 {
   char* const temp_dir = create_temp_dir("zixXXXXXX");
   char* const path1    = zix_path_join(NULL, temp_dir, "zix1");
@@ -534,26 +546,33 @@ test_file_equals(void)
   // Equal: test, test
   assert(!write_to_path(path1, "test"));
   assert(!write_to_path(path2, "test"));
-  assert(zix_file_equals(NULL, path1, path2));
+  assert(check_file_equals(path1, path2));
 
-  // Missing files
-  assert(!zix_file_equals(NULL, path1, "/does/not/exist"));
-  assert(!zix_file_equals(NULL, "/does/not/exist", path2));
+  // Missing file
+  assert(!check_file_equals(path1, "/does/not/exist"));
 
   // Longer RHS: test, testdiff
   assert(!write_to_path(path2, "diff"));
-  assert(!zix_file_equals(NULL, path1, path2));
+  assert(!check_file_equals(path1, path2));
 
   // Longer LHS: testdifflong, testdiff
   assert(!write_to_path(path1, "difflong"));
-  assert(!zix_file_equals(NULL, path1, path2));
+  assert(!check_file_equals(path1, path2));
 
   // Equal sizes but different content: testdifflong, testdifflang
   assert(!write_to_path(path2, "difflang"));
-  assert(!zix_file_equals(NULL, path1, path2));
+  assert(!check_file_equals(path1, path2));
 
-  assert(zix_file_equals(NULL, path1, path1));
-  assert(zix_file_equals(NULL, path2, path2));
+  // Same path
+  assert(check_file_equals(path1, path1));
+
+  // Different devices
+  if (data_file_path) {
+    assert(!check_file_equals(data_file_path, path2));
+    assert(!zix_remove(path2));
+    assert(!zix_copy_file(NULL, data_file_path, path2, 0U));
+    assert(check_file_equals(data_file_path, path2));
+  }
 
   assert(!zix_remove(path2));
   assert(!zix_remove(path1));
@@ -567,17 +586,24 @@ test_file_equals(void)
 static void
 test_file_size(void)
 {
-  static const char* const contents = "file size test";
+  static const ZixStringView contents = ZIX_STATIC_STRING("file size test");
 
   char* const temp_dir = create_temp_dir("zixXXXXXX");
-  char* const path     = zix_path_join(NULL, temp_dir, "zix_test");
-
   assert(temp_dir);
-  assert(!write_to_path(path, contents));
 
-  const ZixFileOffset size = zix_file_size(path);
-  assert(size > 0);
-  assert((size_t)size == strlen(contents));
+  char* const path = zix_path_join(NULL, temp_dir, "zix_test");
+
+  // Nonexistent files
+  assert(!zix_file_size(path));
+  assert(!zix_file_size("/does/not/exist"));
+
+  // Empty file
+  assert(!write_to_path(path, ""));
+  assert(!zix_file_size(path));
+
+  // Non-empty file
+  assert(!write_to_path(path, contents.data));
+  assert((size_t)zix_file_size(path) == contents.length);
 
   assert(!zix_remove(path));
   assert(!zix_remove(temp_dir));
@@ -718,7 +744,7 @@ main(const int argc, char** const argv)
   test_create_temporary_directory();
   test_create_directory_like();
   test_create_directories();
-  test_file_equals();
+  test_file_equals(data_file_path);
   test_file_size();
   test_create_symlink();
   test_create_directory_symlink();

@@ -94,8 +94,6 @@ zix_copy_file(ZixAllocator* const  allocator,
               const char* const    dst,
               const ZixCopyOptions options)
 {
-  (void)allocator;
-
   ArgPathChar* const wsrc = arg_path_new(allocator, src);
   ArgPathChar* const wdst = arg_path_new(allocator, dst);
 

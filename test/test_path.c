@@ -1,4 +1,4 @@
-// Copyright 2020-2022 David Robillard <d@drobilla.net>
+// Copyright 2020-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #undef NDEBUG
@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/// Abort if `string` doesn't equal `expected`
+/// Return whether `string` equals `expected`
 static bool
 equal(char* const string, const char* const expected)
 {
@@ -22,7 +22,7 @@ equal(char* const string, const char* const expected)
   return result;
 }
 
-/// Abort if `string` doesn't equal `expected` with preferred separators
+/// Return whether `string` matches `expected` with preferred separators
 static bool
 match(char* const string, const char* const expected)
 {
@@ -37,7 +37,7 @@ match(char* const string, const char* const expected)
   return result;
 }
 
-/// Abort if `view` doesn't equal `expected`
+/// Return whether `view` equals `expected`
 static bool
 view_equal(const ZixStringView view, const char* const expected)
 {
@@ -924,8 +924,22 @@ test_path_is_absolute(void)
   assert(zix_path_is_relative("C:\\a\\b"));
   assert(zix_path_is_relative("D:/a/b"));
   assert(zix_path_is_relative("D:\\a\\b"));
-
 #endif
+}
+
+static void
+test_null_queries(void)
+{
+  assert(!zix_path_has_root_path(NULL));
+  assert(!zix_path_has_root_name(NULL));
+  assert(!zix_path_has_root_directory(NULL));
+  assert(!zix_path_has_relative_path(NULL));
+  assert(!zix_path_has_parent_path(NULL));
+  assert(!zix_path_has_filename(NULL));
+  assert(!zix_path_has_stem(NULL));
+  assert(!zix_path_has_extension(NULL));
+  assert(!zix_path_is_absolute(NULL));
+  assert(zix_path_is_relative(NULL));
 }
 
 int
@@ -938,6 +952,7 @@ main(void)
   test_path_stem();
   test_path_extension();
   test_path_is_absolute();
+  test_null_queries();
 
   test_path_join();
   test_path_preferred();

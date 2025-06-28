@@ -1,4 +1,4 @@
-// Copyright 2007-2022 David Robillard <d@drobilla.net>
+// Copyright 2007-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/filesystem.h>
@@ -158,14 +158,16 @@ copy_blocks(const int    src_fd,
             void* const  block,
             const size_t block_size)
 {
-  ssize_t n_read = 0;
-  while ((n_read = read(src_fd, block, block_size)) > 0) {
+  ZixStatus st     = ZIX_STATUS_SUCCESS;
+  ssize_t   n_read = 0;
+
+  while (!st && (n_read = read(src_fd, block, block_size)) > 0) {
     if (write(dst_fd, block, (size_t)n_read) != n_read) {
-      return zix_errno_status(errno);
+      st = zix_errno_status(errno);
     }
   }
 
-  return ZIX_STATUS_SUCCESS;
+  return st;
 }
 
 ZixStatus
@@ -175,7 +177,6 @@ zix_copy_file(ZixAllocator* const  allocator,
               const ZixCopyOptions options)
 {
   ZixStatus st = ZIX_STATUS_SUCCESS;
-  (void)st;
 
   errno = 0;
 

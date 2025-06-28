@@ -95,6 +95,13 @@ normal_path_char(const char c)
   return (char)(is_dir_sep(c) ? ZIX_DIR_SEP : c);
 }
 
+static ZixStringView
+string_view(const char* const path)
+{
+  const ZixStringView view = {path, strlen(path)};
+  return view;
+}
+
 typedef struct {
   ZixIndexRange name;
   ZixIndexRange dir;
@@ -290,7 +297,7 @@ zix_path_join(ZixAllocator* const allocator,
 char*
 zix_path_preferred(ZixAllocator* const allocator, const char* const path)
 {
-  const ZixStringView path_view = zix_string(path);
+  const ZixStringView path_view = string_view(path);
   char* const result = (char*)zix_calloc(allocator, path_view.length + 1U, 1U);
 
   if (result) {
@@ -318,7 +325,7 @@ zix_path_lexically_normal(ZixAllocator* const allocator, const char* const path)
   }
 
   // Allocate a result buffer, with space for one additional character
-  const ZixStringView path_view = zix_string(path);
+  const ZixStringView path_view = string_view(path);
   const size_t        path_len  = path_view.length;
   char* const         result = (char*)zix_calloc(allocator, path_len + 2U, 1);
   size_t              r      = 0U;
@@ -616,35 +623,34 @@ zix_path_root_path(const char* const path)
 ZixStringView
 zix_path_relative_path(const char* const path)
 {
-  const ZixStringView path_view = zix_string(path);
-  const size_t        path_len  = path_view.length;
-  const ZixIndexRange root      = zix_path_root_path_range(path);
+  const ZixStringView view = string_view(path);
+  const ZixIndexRange root = zix_path_root_path_range(path);
 
-  return range_string_view(path, zix_make_range(root.end, path_len));
+  return range_string_view(path, zix_make_range(root.end, view.length));
 }
 
 ZixStringView
 zix_path_parent_path(const char* const path)
 {
-  return range_string_view(path, zix_path_parent_path_range(zix_string(path)));
+  return range_string_view(path, zix_path_parent_path_range(string_view(path)));
 }
 
 ZixStringView
 zix_path_filename(const char* const path)
 {
-  return range_string_view(path, zix_path_filename_range(zix_string(path)));
+  return range_string_view(path, zix_path_filename_range(string_view(path)));
 }
 
 ZixStringView
 zix_path_stem(const char* const path)
 {
-  return range_string_view(path, zix_path_stem_range(zix_string(path)));
+  return range_string_view(path, zix_path_stem_range(string_view(path)));
 }
 
 ZixStringView
 zix_path_extension(const char* const path)
 {
-  return range_string_view(path, zix_path_extension_range(zix_string(path)));
+  return range_string_view(path, zix_path_extension_range(string_view(path)));
 }
 
 // Queries
