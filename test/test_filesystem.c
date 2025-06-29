@@ -62,6 +62,20 @@ create_temp_dir(const char* const name_pattern)
   return result;
 }
 
+static int
+write_to_path(const char* const path, const char* const contents)
+{
+  int         ret = -1;
+  FILE* const f   = fopen(path, "wb");
+  if (f) {
+    fwrite(contents, 1, strlen(contents), f);
+    ret = fflush(f) ? errno : ferror(f) ? EBADF : 0;
+    ret = (fclose(f) && !ret) ? errno : ret;
+  }
+
+  return ret;
+}
+
 static void
 test_canonical_path(void)
 {
@@ -74,13 +88,7 @@ test_canonical_path(void)
 
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   assert(file_path);
-
-  {
-    FILE* const f = fopen(file_path, "w");
-    assert(f);
-    fprintf(f, "test\n");
-    fclose(f);
-  }
+  assert(!write_to_path(file_path, "test\n"));
 
 #ifndef _WIN32
   // Test symlink resolution
@@ -152,10 +160,7 @@ test_file_type(void)
   assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
 
   // Regular file
-  FILE* f = fopen(file_path, "w");
-  assert(f);
-  fprintf(f, "test\n");
-  fclose(f);
+  assert(!write_to_path(file_path, "test\n"));
   assert(zix_file_type(file_path) == ZIX_FILE_TYPE_REGULAR);
   assert(!zix_remove(file_path));
 
@@ -195,22 +200,6 @@ test_file_type(void)
   assert(!zix_remove(temp_dir));
   free(file_path);
   free(temp_dir);
-}
-
-static int
-write_to_path(const char* const path, const char* const contents)
-{
-  int         ret = -1;
-  FILE* const f   = fopen(path, "w");
-  if (f) {
-    const size_t len = strlen(contents);
-    fwrite(contents, 1, len, f);
-
-    ret = fflush(f) ? errno : ferror(f) ? EBADF : 0;
-    ret = (fclose(f) && !ret) ? errno : ret;
-  }
-
-  return ret;
 }
 
 static void
@@ -289,7 +278,7 @@ test_copy_file(const char* data_file_path)
       NULL, tmp_file_path, "/dev/full", ZIX_COPY_OPTION_OVERWRITE_EXISTING));
 
     // Copy long file (error during writing)
-    FILE* const f = fopen(tmp_file_path, "w");
+    FILE* const f = fopen(tmp_file_path, "wb");
     assert(f);
     for (size_t i = 0; i < 4096; ++i) {
       fprintf(f, "test\n");
@@ -314,8 +303,8 @@ test_flock(void)
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   assert(file_path);
 
-  FILE* const f1 = fopen(file_path, "w");
-  FILE* const f2 = fopen(file_path, "a+");
+  FILE* const f1 = fopen(file_path, "wb");
+  FILE* const f2 = fopen(file_path, "a+b");
 
   assert(f1);
   assert(f2);
@@ -371,14 +360,8 @@ test_dir_for_each(void)
   assert(path1);
   assert(path2);
 
-  FILE* const f1 = fopen(path1, "w");
-  FILE* const f2 = fopen(path2, "w");
-  assert(f1);
-  assert(f2);
-  fprintf(f1, "test\n");
-  fprintf(f2, "test\n");
-  fclose(f2);
-  fclose(f1);
+  assert(!write_to_path(path1, "test\n"));
+  assert(!write_to_path(path2, "test\n"));
 
   FileList file_list = {0, NULL};
   zix_dir_for_each(temp_dir, &file_list, visit);
@@ -462,11 +445,7 @@ test_create_directories(void)
   assert(zix_file_type(child_dir) == ZIX_FILE_TYPE_DIRECTORY);
 
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  FILE* const f         = fopen(file_path, "w");
-
-  assert(f);
-  fprintf(f, "test\n");
-  fclose(f);
+  assert(!write_to_path(file_path, "test\n"));
 
   assert(zix_create_directories(NULL, file_path) == ZIX_STATUS_EXISTS);
 
@@ -573,12 +552,7 @@ test_create_symlink(void)
 
   // Write contents to original file
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  {
-    FILE* const f = fopen(file_path, "w");
-    assert(f);
-    fprintf(f, "%s", contents);
-    fclose(f);
-  }
+  assert(!write_to_path(file_path, contents));
 
   // Ensure original file exists and is a regular file
   assert(zix_symlink_type(file_path) == ZIX_FILE_TYPE_REGULAR);
@@ -639,12 +613,7 @@ test_create_hard_link(void)
 
   // Write contents to original file
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  {
-    FILE* const f = fopen(file_path, "w");
-    assert(f);
-    fprintf(f, "%s", contents);
-    fclose(f);
-  }
+  assert(!write_to_path(file_path, contents));
 
   // Ensure original file exists and is a regular file
   assert(zix_symlink_type(file_path) == ZIX_FILE_TYPE_REGULAR);
