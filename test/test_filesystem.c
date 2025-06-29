@@ -148,6 +148,9 @@ test_file_type(void)
   assert(file_path);
   assert(zix_file_type(file_path) == ZIX_FILE_TYPE_NONE);
 
+  // Directory
+  assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
+
   // Regular file
   FILE* f = fopen(file_path, "w");
   assert(f);
@@ -190,53 +193,6 @@ test_file_type(void)
 #endif
 
   assert(!zix_remove(temp_dir));
-  free(file_path);
-  free(temp_dir);
-}
-
-static void
-test_path_exists(void)
-{
-  char* const temp_dir  = create_temp_dir("zixXXXXXX");
-  char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  assert(file_path);
-
-  assert(zix_file_type(file_path) == ZIX_FILE_TYPE_NONE);
-
-  FILE* f = fopen(file_path, "w");
-  assert(f);
-  fprintf(f, "test\n");
-  fclose(f);
-
-  assert(zix_file_type(file_path) == ZIX_FILE_TYPE_REGULAR);
-
-  assert(!zix_remove(file_path));
-  assert(!zix_remove(temp_dir));
-
-  free(file_path);
-  free(temp_dir);
-}
-
-static void
-test_is_directory(void)
-{
-  char* const temp_dir  = create_temp_dir("zixXXXXXX");
-  char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  assert(file_path);
-
-  assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
-  assert(zix_file_type(file_path) == ZIX_FILE_TYPE_NONE);
-
-  FILE* f = fopen(file_path, "w");
-  assert(f);
-  fprintf(f, "test\n");
-  fclose(f);
-
-  assert(zix_file_type(file_path) == ZIX_FILE_TYPE_REGULAR);
-
-  assert(!zix_remove(file_path));
-  assert(!zix_remove(temp_dir));
-
   free(file_path);
   free(temp_dir);
 }
@@ -728,8 +684,6 @@ main(const int argc, char** const argv)
   test_current_path();
   test_canonical_path();
   test_file_type();
-  test_path_exists();
-  test_is_directory();
   test_copy_file(data_file_path);
   test_flock();
   test_dir_for_each();
