@@ -1,4 +1,4 @@
-// Copyright 2007-2022 David Robillard <d@drobilla.net>
+// Copyright 2007-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/filesystem.h>
@@ -23,7 +23,6 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
 ZixStatus
@@ -37,36 +36,37 @@ zix_create_directories(ZixAllocator* const allocator,
   // Allocate a working copy of the path to chop along the way
   const size_t path_len = strlen(dir_path);
   char* const  path     = (char*)zix_malloc(allocator, path_len + 1U);
-  ZixStatus    st       = path ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NO_MEM;
-  if (path) {
-    // Copy directory path as prefix
-    memcpy(path, dir_path, path_len + 1U);
-
-    // Start at the root directory (past any name)
-    ZixPathIter p = zix_path_begin(path);
-    while (p.state < ZIX_PATH_FILE_NAME) {
-      p = zix_path_next(path, p);
-    }
-
-    // Create each directory down the path
-    while (p.state != ZIX_PATH_END) {
-      char* const end      = &path[p.range.end];
-      const char  old_last = *end;
-
-      *end = '\0';
-      if (zix_file_type(path) != ZIX_FILE_TYPE_DIRECTORY) {
-        if ((st = zix_create_directory(path))) {
-          break;
-        }
-      }
-
-      *end = old_last;
-      p    = zix_path_next(path, p);
-    }
-
-    zix_free(allocator, path);
+  if (!path) {
+    return ZIX_STATUS_NO_MEM;
   }
 
+  // Copy directory path as prefix
+  memcpy(path, dir_path, path_len + 1U);
+
+  // Start at the root directory (past any name)
+  ZixPathIter p = zix_path_begin(path);
+  while (p.state < ZIX_PATH_FILE_NAME) {
+    p = zix_path_next(path, p);
+  }
+
+  // Create each directory down the path
+  ZixStatus st = ZIX_STATUS_SUCCESS;
+  while (p.state != ZIX_PATH_END) {
+    char* const end      = &path[p.range.end];
+    const char  old_last = *end;
+
+    *end = '\0';
+    if (zix_file_type(path) != ZIX_FILE_TYPE_DIRECTORY) {
+      if ((st = zix_create_directory(path))) {
+        break;
+      }
+    }
+
+    *end = old_last;
+    p    = zix_path_next(path, p);
+  }
+
+  zix_free(allocator, path);
   return st;
 }
 

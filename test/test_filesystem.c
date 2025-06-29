@@ -3,6 +3,8 @@
 
 #undef NDEBUG
 
+#include "failing_allocator.h"
+
 #include <zix/allocator.h>
 #include <zix/filesystem.h>
 #include <zix/path.h>
@@ -491,6 +493,13 @@ test_create_directories(void)
 
   char* const child_dir      = zix_path_join(NULL, temp_dir, "child");
   char* const grandchild_dir = zix_path_join(NULL, child_dir, "grandchild");
+
+  {
+    ZixFailingAllocator bad_allocator = zix_failing_allocator();
+    zix_failing_allocator_reset(&bad_allocator, 0U);
+    assert(zix_create_directories(&bad_allocator.base, grandchild_dir) ==
+           ZIX_STATUS_NO_MEM);
+  }
 
   assert(!zix_create_directories(NULL, grandchild_dir));
   assert(zix_file_type(grandchild_dir) == ZIX_FILE_TYPE_DIRECTORY);
