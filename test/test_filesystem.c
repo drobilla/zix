@@ -49,11 +49,14 @@ test_current_path(void)
 static char*
 create_temp_dir(const char* const name_pattern)
 {
-  char* const temp         = zix_temp_directory_path(NULL);
+  char* const temp = zix_temp_directory_path(NULL);
+  assert(temp);
+
   char* const path_pattern = zix_path_join(NULL, temp, name_pattern);
   char* const result       = zix_create_temporary_directory(NULL, path_pattern);
   free(path_pattern);
   zix_free(NULL, temp);
+  assert(result);
   return result;
 }
 
@@ -63,9 +66,7 @@ test_canonical_path(void)
   assert(!zix_canonical_path(NULL, NULL));
 
   char* const temp_dir = create_temp_dir("zixXXXXXX");
-  assert(temp_dir);
-
-  char* const sub_dir = zix_path_join(NULL, temp_dir, "sub");
+  char* const sub_dir  = zix_path_join(NULL, temp_dir, "sub");
   assert(!zix_create_directory(sub_dir));
   assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
 
@@ -140,9 +141,7 @@ test_canonical_path(void)
 static void
 test_file_type(void)
 {
-  char* const temp_dir = create_temp_dir("zixXXXXXX");
-  assert(temp_dir);
-
+  char* const temp_dir  = create_temp_dir("zixXXXXXX");
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   assert(file_path);
   assert(zix_file_type(file_path) == ZIX_FILE_TYPE_NONE);
@@ -198,7 +197,6 @@ test_path_exists(void)
 {
   char* const temp_dir  = create_temp_dir("zixXXXXXX");
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  assert(temp_dir);
   assert(file_path);
 
   assert(zix_file_type(file_path) == ZIX_FILE_TYPE_NONE);
@@ -222,7 +220,6 @@ test_is_directory(void)
 {
   char* const temp_dir  = create_temp_dir("zixXXXXXX");
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  assert(temp_dir);
   assert(file_path);
 
   assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
@@ -264,7 +261,6 @@ test_copy_file(const char* data_file_path)
   char* const temp_dir      = create_temp_dir("zixXXXXXX");
   char* const tmp_file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
   char* const copy_path     = zix_path_join(NULL, temp_dir, "zix_test_copy");
-  assert(temp_dir);
   assert(tmp_file_path);
   assert(copy_path);
 
@@ -358,7 +354,6 @@ test_flock(void)
 {
   char* const temp_dir  = create_temp_dir("zixXXXXXX");
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
-  assert(temp_dir);
   assert(file_path);
 
   FILE* const f1 = fopen(file_path, "w");
@@ -415,7 +410,6 @@ test_dir_for_each(void)
   char* const temp_dir = create_temp_dir("zixXXXXXX");
   char* const path1    = zix_path_join(NULL, temp_dir, "zix_test_1");
   char* const path2    = zix_path_join(NULL, temp_dir, "zix_test_2");
-  assert(temp_dir);
   assert(path1);
   assert(path2);
 
@@ -455,15 +449,12 @@ test_create_temporary_directory(void)
   assert(!zix_create_temporary_directory(NULL, ""));
 
   char* const path1 = create_temp_dir("zixXXXXXX");
-
   assert(path1);
   assert(zix_file_type(path1) == ZIX_FILE_TYPE_DIRECTORY);
 
   char* const path2 = create_temp_dir("zixXXXXXX");
-
   assert(path2);
   assert(strcmp(path1, path2));
-  assert(zix_file_type(path1) == ZIX_FILE_TYPE_DIRECTORY);
   assert(zix_file_type(path2) == ZIX_FILE_TYPE_DIRECTORY);
 
   assert(!zix_remove(path2));
@@ -476,7 +467,6 @@ static void
 test_create_directory_like(void)
 {
   char* const temp_dir = create_temp_dir("zixXXXXXX");
-  assert(temp_dir);
   assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
 
   char* const sub_dir = zix_path_join(NULL, temp_dir, "sub");
@@ -494,9 +484,9 @@ static void
 test_create_directories(void)
 {
   char* const temp_dir = create_temp_dir("zixXXXXXX");
-
   assert(temp_dir);
   assert(zix_file_type(temp_dir) == ZIX_FILE_TYPE_DIRECTORY);
+
   assert(zix_create_directories(NULL, "") == ZIX_STATUS_BAD_ARG);
 
   char* const child_dir      = zix_path_join(NULL, temp_dir, "child");
@@ -541,7 +531,6 @@ test_file_equals(const char* const data_file_path)
   char* const temp_dir = create_temp_dir("zixXXXXXX");
   char* const path1    = zix_path_join(NULL, temp_dir, "zix1");
   char* const path2    = zix_path_join(NULL, temp_dir, "zix2");
-  assert(temp_dir);
 
   // Equal: test, test
   assert(!write_to_path(path1, "test"));
@@ -589,9 +578,7 @@ test_file_size(void)
   static const ZixStringView contents = ZIX_STATIC_STRING("file size test");
 
   char* const temp_dir = create_temp_dir("zixXXXXXX");
-  assert(temp_dir);
-
-  char* const path = zix_path_join(NULL, temp_dir, "zix_test");
+  char* const path     = zix_path_join(NULL, temp_dir, "zix_test");
 
   // Nonexistent files
   assert(!zix_file_size(path));
@@ -618,7 +605,6 @@ test_create_symlink(void)
   static const char* const contents = "zixtest";
 
   char* const temp_dir = create_temp_dir("zixXXXXXX");
-  assert(temp_dir);
 
   // Write contents to original file
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
@@ -657,9 +643,7 @@ test_create_symlink(void)
 static void
 test_create_directory_symlink(void)
 {
-  char* const temp_dir = create_temp_dir("zixXXXXXX");
-  assert(temp_dir);
-
+  char* const     temp_dir  = create_temp_dir("zixXXXXXX");
   char* const     link_path = zix_path_join(NULL, temp_dir, "zix_test_link");
   const ZixStatus st        = zix_create_directory_symlink(temp_dir, link_path);
 
@@ -687,7 +671,6 @@ test_create_hard_link(void)
   static const char* const contents = "zixtest";
 
   char* const temp_dir = create_temp_dir("zixXXXXXX");
-  assert(temp_dir);
 
   // Write contents to original file
   char* const file_path = zix_path_join(NULL, temp_dir, "zix_test_file");
