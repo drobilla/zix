@@ -3,6 +3,9 @@
 
 #undef NDEBUG
 
+#include "failing_allocator.h"
+
+#include <zix/allocator.h>
 #include <zix/path.h>
 #include <zix/string_view.h>
 
@@ -933,6 +936,89 @@ test_null_queries(void)
   assert(zix_path_is_relative(NULL));
 }
 
+typedef char* (*AllocCheckFunc)(ZixAllocator*);
+
+static char*
+check_join_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_join(allocator, "a", "b");
+}
+
+static char*
+check_join_empty_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_join(allocator, "", "b");
+}
+
+static char*
+check_preferred_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_preferred(allocator, "/a/b");
+}
+
+static char*
+check_lexically_normal_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_lexically_normal(allocator, "./a/././b/./");
+}
+
+static char*
+check_lexically_normal_empty_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_lexically_normal(allocator, "");
+}
+
+static char*
+check_lexically_relative_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_lexically_relative(allocator, "../../a", "../b");
+}
+
+static char*
+check_lexically_relative_equal_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_lexically_relative(allocator, "a", "a");
+}
+
+static char*
+check_lexically_relative_dot_alloc(ZixAllocator* const allocator)
+{
+  return zix_path_lexically_relative(allocator, "", ".");
+}
+
+static void
+check_failed_alloc(const AllocCheckFunc check)
+{
+  ZixFailingAllocator allocator = zix_failing_allocator();
+
+  // Successfully perform check to count the number of allocations
+  {
+    char* const result = check(&allocator.base);
+    assert(result);
+    zix_free(&allocator.base, result);
+  }
+
+  // Test that each allocation failing is handled gracefully
+  const size_t n_new_allocs = zix_failing_allocator_reset(&allocator, 0);
+  for (size_t i = 0U; i < n_new_allocs; ++i) {
+    zix_failing_allocator_reset(&allocator, i);
+    assert(!check(&allocator.base));
+  }
+}
+
+static void
+test_failed_alloc(void)
+{
+  check_failed_alloc(check_join_alloc);
+  check_failed_alloc(check_join_empty_alloc);
+  check_failed_alloc(check_preferred_alloc);
+  check_failed_alloc(check_lexically_normal_alloc);
+  check_failed_alloc(check_lexically_normal_empty_alloc);
+  check_failed_alloc(check_lexically_relative_alloc);
+  check_failed_alloc(check_lexically_relative_equal_alloc);
+  check_failed_alloc(check_lexically_relative_dot_alloc);
+}
+
 int
 main(void)
 {
@@ -949,6 +1035,8 @@ main(void)
   test_path_preferred();
   test_path_lexically_normal();
   test_path_lexically_relative();
+
+  test_failed_alloc();
 
   return 0;
 }

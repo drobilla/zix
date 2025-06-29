@@ -328,11 +328,14 @@ zix_path_lexically_normal(ZixAllocator* const allocator, const char* const path)
   const ZixStringView path_view = string_view(path);
   const size_t        path_len  = path_view.length;
   char* const         result = (char*)zix_calloc(allocator, path_len + 2U, 1);
-  size_t              r      = 0U;
+  if (!result) {
+    return NULL;
+  }
 
   // Copy root, normalizing separators as we go
   const ZixIndexRange root     = zix_path_root_path_range(path);
   const size_t        root_len = root.end - root.begin;
+  size_t              r        = 0U;
   for (size_t i = 0; i < root_len; ++i) {
     result[r++] = normal_path_char(path[i]);
   }
@@ -560,6 +563,9 @@ zix_path_lexically_relative(ZixAllocator* const allocator,
   const size_t path_len = strlen(path);
   const size_t rel_len  = (n_up * 3U) + path_len - a.range.begin;
   char* const  rel      = (char*)zix_calloc(allocator, rel_len + 1U, 1U);
+  if (!rel) {
+    return NULL;
+  }
 
   // Write leading up-references
   size_t offset = 0U;

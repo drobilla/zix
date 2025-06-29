@@ -1,9 +1,10 @@
 zix (0.6.3) unstable; urgency=medium
 
+  * Gracefully handle failed allocation in path functions
   * Reduce empty BTree memory requirements
   * Use getenv() instead of environ to avoid issues on FreeBSD
 
- -- David Robillard <d@drobilla.net>  Thu, 29 May 2025 15:22:01 +0000
+ -- David Robillard <d@drobilla.net>  Sun, 29 Jun 2025 15:55:47 +0000
 
 zix (0.6.2) stable; urgency=medium
 
