@@ -113,16 +113,14 @@ elif cc.get_id() == 'msvc'
     ]
   endif
 
-  if warning_level in ['everything', '3', '2']
-    c_suppressions += [
-      '/wd4996', # POSIX name for this item is deprecated
-    ]
-  endif
-
   if warning_level in ['everything', '3', '2', '1']
     c_suppressions += [
       '/wd4114', # same type qualifier used more than once
     ]
+  endif
+
+  if get_option('win_ver') in ['nt4', 'xp']
+    c_suppressions += ['/D_CRT_SECURE_NO_WARNINGS']
   endif
 endif
 
@@ -255,6 +253,10 @@ else
   }
 
   windows_checks = {
+    'sopen_s': template.format(
+      'io.h',
+      'int fd; return (int)_sopen_s(&fd, "/", 0, 0, 0644);',
+    ),
     'CreateFile2': template.format(
       'windows.h',
       'CREATEFILE2_EXTENDED_PARAMETERS p = {0};\n'

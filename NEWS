@@ -1,5 +1,6 @@
 zix (0.6.3) unstable; urgency=medium
 
+  * Avoid "deprecated" POSIX functions on Windows
   * Gracefully handle failed allocation in path functions
   * Reduce empty BTree memory requirements
   * Use getenv() instead of environ to avoid issues on FreeBSD

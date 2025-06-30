@@ -9,20 +9,12 @@
 #include <zix/allocator.h>
 #include <zix/status.h>
 
-#ifdef _WIN32
-#  include <direct.h>
-#  include <io.h>
-#else
-#  include <unistd.h>
-#endif
-
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include <errno.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <string.h>
 
 ZixStatus
@@ -89,8 +81,8 @@ zix_file_equals(ZixAllocator* const allocator,
   errno = 0;
 
   // Open files and get file information
-  const int   fd_a = zix_system_open_fd(path_a, O_RDONLY, 0);
-  const int   fd_b = zix_system_open_fd(path_b, O_RDONLY, 0);
+  const int   fd_a = zix_system_open(path_a, O_RDONLY, 0);
+  const int   fd_b = zix_system_open(path_b, O_RDONLY, 0);
   struct stat stat_a;
   struct stat stat_b;
   if (fd_a < 0 || fd_b < 0 || fstat(fd_a, &stat_a) || fstat(fd_b, &stat_b)) {
@@ -110,8 +102,8 @@ zix_file_equals(ZixAllocator* const allocator,
 
     if (page_a && page_b) {
       match = true;
-      for (ZixSystemCountReturn n = 0; (n = read(fd_a, page_a, size)) > 0;) {
-        if (read(fd_b, page_b, size) != n ||
+      for (ssize_t n = 0; (n = zix_system_read(fd_a, page_a, size)) > 0;) {
+        if (zix_system_read(fd_b, page_b, size) != n ||
             !!memcmp(page_a, page_b, (size_t)n)) {
           match = false;
           break;

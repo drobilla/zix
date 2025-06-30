@@ -189,7 +189,7 @@ zix_copy_file(ZixAllocator* const  allocator,
 #endif
 
   // Open source file and get its status
-  const int   src_fd = zix_system_open_fd(src, O_RDONLY, 0);
+  const int   src_fd = zix_system_open(src, O_RDONLY, 0);
   struct stat src_stat;
   if (src_fd < 0 || fstat(src_fd, &src_stat)) {
     return finish_copy(-1, src_fd, zix_errno_status(errno));
@@ -203,7 +203,7 @@ zix_copy_file(ZixAllocator* const  allocator,
   // Open a new destination file
   const bool  overwrite = (options == ZIX_COPY_OPTION_OVERWRITE_EXISTING);
   const int   dst_flags = O_WRONLY | O_CREAT | (overwrite ? O_TRUNC : O_EXCL);
-  const int   dst_fd    = zix_system_open_fd(dst, dst_flags, 0644);
+  const int   dst_fd    = zix_system_open(dst, dst_flags, 0644);
   struct stat dst_stat;
   if (dst_fd < 0 || fstat(dst_fd, &dst_stat)) {
     return finish_copy(dst_fd, src_fd, zix_errno_status(errno));

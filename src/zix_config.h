@@ -170,6 +170,13 @@
 #    endif
 #  endif
 
+// Windows Vista (Desktop, UWP): _sopen_s()
+#  ifndef HAVE_SOPEN_S
+#    if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0600
+#      define HAVE_SOPEN_S 1
+#    endif
+#  endif
+
 // POSIX.1-2001: sysconf()
 #  ifndef HAVE_SYSCONF
 #    if ZIX_POSIX_VERSION >= 200112L
@@ -282,6 +289,12 @@
 #  define USE_SEM_TIMEDWAIT 1
 #else
 #  define USE_SEM_TIMEDWAIT 0
+#endif
+
+#if defined(HAVE_SOPEN_S) && HAVE_SOPEN_S
+#  define USE_SOPEN_S 1
+#else
+#  define USE_SOPEN_S 0
 #endif
 
 #if defined(HAVE_SYSCONF) && HAVE_SYSCONF
