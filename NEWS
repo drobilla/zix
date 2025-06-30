@@ -1,9 +1,10 @@
 zix (0.8.3) unstable; urgency=medium
 
+  * Add ZixRankTree
   * Clean up and strengthen Hash implementation
   * Suppress warning in MinGW build on Debian 12
 
- -- David Robillard <d@drobilla.net>  Fri, 03 Jul 2026 23:39:16 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 03 Jul 2026 23:39:50 +0000
 
 zix (0.8.2) stable; urgency=medium
 

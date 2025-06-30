@@ -66,6 +66,7 @@ INPUT                  = @ZIX_SRCDIR@/include/zix/zix.h \
                          \
                          @ZIX_SRCDIR@/include/zix/btree.h \
                          @ZIX_SRCDIR@/include/zix/hash.h \
+                         @ZIX_SRCDIR@/include/zix/rank_tree.h \
                          @ZIX_SRCDIR@/include/zix/ring.h \
                          @ZIX_SRCDIR@/include/zix/tree.h \
                          \
