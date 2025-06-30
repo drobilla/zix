@@ -49,7 +49,6 @@ if cc.get_id() in ['clang', 'emscripten']
 
     if host_machine.system() == 'windows'
       c_suppressions += [
-        '-Wno-bad-function-cast',
         '-Wno-deprecated-declarations',
         '-Wno-nonportable-system-include-path',
       ]
@@ -76,7 +75,6 @@ elif cc.get_id() == 'gcc'
 
     if host_machine.system() == 'windows'
       c_suppressions += [
-        '-Wno-bad-function-cast',
         '-Wno-suggest-attribute=const',
         '-Wno-suggest-attribute=format',
         '-Wno-suggest-attribute=pure',
@@ -110,12 +108,6 @@ elif cc.get_id() == 'msvc'
   if warning_level in ['everything', '3']
     c_suppressions += [
       '/wd4706', # assignment within conditional expression
-    ]
-  endif
-
-  if warning_level in ['everything', '3', '2', '1']
-    c_suppressions += [
-      '/wd4114', # same type qualifier used more than once
     ]
   endif
 
@@ -159,7 +151,7 @@ elif host_machine.system() in ['gnu', 'linux']
   ]
 elif host_machine.system() in ['dragonfly', 'freebsd', 'netbsd', 'openbsd']
   system_c_args += [
-    '-D_BSD_SOURCE',
+    '-D_BSD_SOURCE'
   ]
 elif host_machine.system() == 'windows'
   if not get_option('win_wchar').disabled()

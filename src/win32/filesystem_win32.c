@@ -226,15 +226,15 @@ zix_file_lock(FILE* const file, const ZixFileLockMode mode)
   return ZIX_STATUS_NOT_SUPPORTED;
 #else
 
-  HANDLE     handle     = (HANDLE)_get_osfhandle(fileno(file));
-  OVERLAPPED overlapped = {0};
+  const intptr_t handle     = _get_osfhandle(fileno(file));
+  OVERLAPPED     overlapped = {0};
 
   const DWORD flags =
     (LOCKFILE_EXCLUSIVE_LOCK |
      (mode == ZIX_FILE_LOCK_TRY ? LOCKFILE_FAIL_IMMEDIATELY : 0));
 
   return zix_windows_status(
-    LockFileEx(handle, flags, 0, UINT32_MAX, UINT32_MAX, &overlapped));
+    LockFileEx((HANDLE)handle, flags, 0, UINT32_MAX, UINT32_MAX, &overlapped));
 #endif
 }
 
@@ -247,11 +247,11 @@ zix_file_unlock(FILE* const file, const ZixFileLockMode mode)
   return ZIX_STATUS_NOT_SUPPORTED;
 #else
 
-  HANDLE     handle     = (HANDLE)_get_osfhandle(fileno(file));
-  OVERLAPPED overlapped = {0};
+  const intptr_t handle     = _get_osfhandle(fileno(file));
+  OVERLAPPED     overlapped = {0};
 
   return zix_windows_status(
-    UnlockFileEx(handle, 0, UINT32_MAX, UINT32_MAX, &overlapped));
+    UnlockFileEx((HANDLE)handle, 0, UINT32_MAX, UINT32_MAX, &overlapped));
 #endif
 }
 
