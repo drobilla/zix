@@ -69,6 +69,21 @@ zix_file_size(const char* const path)
   return stat(path, &sb) ? (off_t)0 : sb.st_size;
 }
 
+// Wrapper for read() that transparently deals with short reads
+static ssize_t
+full_read(const int fd, void* const buf, const size_t count)
+{
+  size_t  n = 0;
+  ssize_t r = 0;
+
+  while (n < count &&
+         (r = zix_system_read(fd, (char*)buf + n, count - n)) > 0) {
+    n += (size_t)r;
+  }
+
+  return (ssize_t)n;
+}
+
 bool
 zix_file_equals(ZixAllocator* const allocator,
                 const char* const   path_a,
@@ -96,23 +111,28 @@ zix_file_equals(ZixAllocator* const allocator,
     match = true; // Fast path: paths refer to the same file
   } else if (stat_a.st_size == stat_b.st_size) {
     // Slow path: files have equal size, compare contents
-    const uint32_t size   = zix_system_page_size();
-    void* const    page_a = zix_aligned_alloc(allocator, size, size);
-    void* const    page_b = zix_aligned_alloc(allocator, size, size);
 
-    if (page_a && page_b) {
-      match = true;
-      for (ssize_t n = 0; (n = zix_system_read(fd_a, page_a, size)) > 0;) {
-        if (zix_system_read(fd_b, page_b, size) != n ||
-            !!memcmp(page_a, page_b, (size_t)n)) {
-          match = false;
-          break;
-        }
+    // Allocate two blocks in a single buffer (to simplify error handling)
+    const uint32_t align  = zix_system_page_size();
+    const uint32_t size   = zix_system_max_block_size(&stat_a, &stat_b, align);
+    BlockBuffer    blocks = zix_system_new_block(allocator, align, 2U * size);
+    void* const    data   = blocks.buffer ? blocks.buffer : blocks.fallback;
+
+    // Compare files a block at a time
+    const uint32_t block_size = blocks.size / 2U;
+    void* const    block_a    = data;
+    void* const    block_b    = (void*)((char*)data + block_size);
+    match                     = true;
+    for (ssize_t n = 0; n < stat_a.st_size && match;) {
+      const ssize_t r = zix_system_read(fd_a, block_a, block_size);
+      if (r <= 0 || full_read(fd_b, block_b, (uint32_t)r) != r ||
+          !!memcmp(block_a, block_b, (size_t)r)) {
+        match = false;
       }
+      n += r;
     }
 
-    zix_aligned_free(allocator, page_b);
-    zix_aligned_free(allocator, page_a);
+    zix_system_free_block(allocator, blocks);
   }
 
   return !zix_system_close_fds(fd_b, fd_a) && match;

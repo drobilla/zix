@@ -466,6 +466,14 @@ check_file_equals(const char* const path1, const char* const path2)
   const bool r2 = zix_file_equals(NULL, path2, path1);
   assert(r2 == r1);
 
+  ZixFailingAllocator bad_allocator = zix_failing_allocator();
+  zix_failing_allocator_reset(&bad_allocator, 0U);
+
+  const bool r3 = zix_file_equals(&bad_allocator.base, path1, path2);
+  const bool r4 = zix_file_equals(&bad_allocator.base, path2, path1);
+  assert(r3 == r1);
+  assert(r4 == r1);
+
   return r1;
 }
 

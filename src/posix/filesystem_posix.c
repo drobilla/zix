@@ -26,34 +26,21 @@
 
 #include <dirent.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 #include <errno.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifndef MAX
-#  define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#endif
 
 static inline ZixStatus
 zix_posix_status(const int rc)
 {
   return rc ? zix_errno_status(errno) : ZIX_STATUS_SUCCESS;
-}
-
-static uint32_t
-zix_get_block_size(const struct stat* const s1, const struct stat* const s2)
-{
-  const blksize_t b1 = s1->st_blksize;
-  const blksize_t b2 = s2->st_blksize;
-
-  return (b1 > 0 && b2 > 0) ? (uint32_t)MAX(b1, b2) : 4096U;
 }
 
 static ZixStatus
@@ -225,20 +212,14 @@ zix_copy_file(ZixAllocator* const  allocator,
 
   errno = 0;
 
-  // Allocate a block for copying
-  const size_t   align      = zix_system_page_size();
-  const uint32_t block_size = zix_get_block_size(&src_stat, &dst_stat);
-  void* const    block      = zix_aligned_alloc(allocator, align, block_size);
+  // Allocate a block and copy file content one block at a time
+  const uint32_t align = zix_system_page_size();
+  const uint32_t size  = zix_system_max_block_size(&src_stat, &dst_stat, align);
+  BlockBuffer    block = zix_system_new_block(allocator, align, size);
+  void* const    data  = block.buffer ? block.buffer : block.fallback;
+  st                   = copy_blocks(src_fd, dst_fd, data, block.size);
 
-  // Fall back to using a small stack buffer if allocation is unavailable
-  char         stack_buf[512];
-  void* const  buffer      = block ? block : stack_buf;
-  const size_t buffer_size = block ? block_size : sizeof(stack_buf);
-
-  // Copy file content one buffer at a time
-  st = copy_blocks(src_fd, dst_fd, buffer, buffer_size);
-
-  zix_aligned_free(NULL, block);
+  zix_system_free_block(allocator, block);
   return finish_copy(dst_fd, src_fd, st);
 }
 

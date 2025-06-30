@@ -7,7 +7,6 @@
 #include <fcntl.h>
 #include <io.h>
 #include <share.h>
-#include <stdio.h>
 #include <windows.h>
 
 #include <limits.h>
@@ -22,6 +21,23 @@ zix_system_page_size(void)
   return (info.dwPageSize > 0 && info.dwPageSize < UINT32_MAX)
            ? (uint32_t)info.dwPageSize
            : 512U;
+}
+
+uint32_t
+zix_system_max_block_size(const struct stat* const s1,
+                          const struct stat* const s2,
+                          const uint32_t           fallback)
+{
+  (void)s1;
+  (void)s2;
+
+  /* Windows doesn't provide st_blksize, so to implement this properly, we'd
+     need to do something like get the corresponding device handle from the
+     files and use DeviceIoControl to query it. This is pretty tedious, and
+     shouldn't affect performance very much (if at all) in most cases, so just
+     use the fallback for now. */
+
+  return fallback;
 }
 
 int

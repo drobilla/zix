@@ -5,11 +5,15 @@
 #include "../zix_config.h"
 
 #include <fcntl.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <stddef.h>
-#include <stdint.h>
+#ifndef MAX
+#  define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
 
 #if defined(PAGE_SIZE)
 #  define ZIX_DEFAULT_PAGE_SIZE PAGE_SIZE
@@ -26,6 +30,16 @@ zix_system_page_size(void)
 #else
   return (uint32_t)ZIX_DEFAULT_PAGE_SIZE;
 #endif
+}
+
+uint32_t
+zix_system_max_block_size(const struct stat* const s1,
+                          const struct stat* const s2,
+                          const uint32_t           fallback)
+{
+  const blksize_t size = MAX(s1->st_blksize, s2->st_blksize);
+
+  return (size > 0) ? (uint32_t)size : fallback;
 }
 
 int
