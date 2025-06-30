@@ -50,6 +50,11 @@ sequential_tests = {
   'filesystem': {'': files('../README.md')},
   'hash': {'': []},
   'path': {'': []},
+  'rank_tree': {
+    '': [],
+    '_small': ['4'],
+    '_large': ['1000000'],
+  },
   'status': {'': []},
   'string_view': {'': []},
   'tree': {
@@ -75,6 +80,9 @@ threaded_tests = {
 # Bad command-line argument (meta-)tests
 bad_tests = {
   'btree': {
+    '_extra': ['4', '1337'],
+  },
+  'rank_tree': {
     '_extra': ['4', '1337'],
   },
   'ring': {
@@ -147,6 +155,7 @@ if cc.get_id() != 'emscripten'
       '-Wno-declaration-after-statement',
       '-Wno-nullability-extension',
       '-Wno-padded',
+      '-Wno-pre-c11-compat',
       '-Wno-pre-c23-compat',
     ]
 

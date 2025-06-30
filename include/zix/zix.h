@@ -46,6 +46,7 @@
 
 #include <zix/btree.h>
 #include <zix/hash.h>
+#include <zix/rank_tree.h>
 #include <zix/ring.h>
 #include <zix/tree.h>
 

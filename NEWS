@@ -1,10 +1,11 @@
 zix (0.8.1) unstable; urgency=medium
 
+  * Add ZixRankTree
   * Clean up and strengthen Hash implementation
   * Fix build with configure checks disabled
   * Fix handling of invalid ring size parameters
 
- -- David Robillard <d@drobilla.net>  Fri, 23 Jan 2026 21:44:15 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 23 Jan 2026 21:44:38 +0000
 
 zix (0.8.0) stable; urgency=medium
 

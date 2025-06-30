@@ -1,4 +1,4 @@
-# Copyright 2021-2023 David Robillard <d@drobilla.net>
+# Copyright 2021-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 config = configuration_data()
@@ -60,6 +60,10 @@ doxygen_xml = custom_target(
     'group__zix__path__decomposition.xml',
     'group__zix__path__lexical.xml',
     'group__zix__path__queries.xml',
+    'group__zix__rank__tree.xml',
+    'group__zix__rank__tree__access.xml',
+    'group__zix__rank__tree__modification.xml',
+    'group__zix__rank__tree__setup.xml',
     'group__zix__ring.xml',
     'group__zix__ring__read.xml',
     'group__zix__ring__setup.xml',
@@ -79,6 +83,7 @@ doxygen_xml = custom_target(
     'group__zix__utilities.xml',
     'hash_8h.xml',
     'path_8h.xml',
+    'rank__tree_8h.xml',
     'ring_8h.xml',
     'sem_8h.xml',
     'status_8h.xml',

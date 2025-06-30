@@ -1,4 +1,4 @@
-// Copyright 2022 David Robillard <d@drobilla.net>
+// Copyright 2022-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/allocator.h>      // IWYU pragma: keep
@@ -10,6 +10,7 @@
 #include <zix/filesystem.h>     // IWYU pragma: keep
 #include <zix/hash.h>           // IWYU pragma: keep
 #include <zix/path.h>           // IWYU pragma: keep
+#include <zix/rank_tree.h>      // IWYU pragma: keep
 #include <zix/ring.h>           // IWYU pragma: keep
 #include <zix/sem.h>            // IWYU pragma: keep
 #include <zix/status.h>         // IWYU pragma: keep
