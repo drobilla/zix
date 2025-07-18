@@ -228,6 +228,15 @@ test_remove_cases(void)
 
   ZixBTree* const t = zix_btree_new(NULL, int_cmp, NULL);
 
+  {
+    // Try to remove from an emptry tree
+    ZixBTreeIter    next  = zix_btree_end(t);
+    const uintptr_t value = 42U;
+    void*           out   = NULL;
+    assert(zix_btree_remove(t, (void*)value, &out, &next) ==
+           ZIX_STATUS_NOT_FOUND);
+  }
+
   // Insert in s1-sized chunks
   for (uintptr_t phase = 0U; phase < s1; ++phase) {
     for (uintptr_t r = 0U; r < n_insertions / s1; ++r) {

@@ -740,6 +740,10 @@ zix_btree_remove(ZixBTree* const     t,
   assert(t);
   assert(out);
 
+  if (!t->root) {
+    return ZIX_STATUS_NOT_FOUND;
+  }
+
   ZixBTreeNode* n  = t->root;
   ZixBTreeIter* ti = next;
   ZixStatus     st = ZIX_STATUS_SUCCESS;
