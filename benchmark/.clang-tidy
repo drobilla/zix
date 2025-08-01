@@ -6,11 +6,10 @@ Checks: >
   -android-cloexec-fopen,
   -bugprone-easily-swappable-parameters,
   -cert-err33-c,
-  -clang-analyzer-core.NonNullParamChecker,
   -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
   -llvm-header-guard,
   -performance-no-int-to-ptr,
 CheckOptions:
   - key:   readability-function-cognitive-complexity.Threshold
-    value: '25'
+    value: '26'
 InheritParentConfig: true

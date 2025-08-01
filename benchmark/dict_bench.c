@@ -1,4 +1,4 @@
-// Copyright 2011-2023 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "bench.h"
@@ -64,6 +64,17 @@ zix_chunk_equal(const ZixChunk* a, const ZixChunk* b)
 
 static const unsigned seed = 1;
 
+static void
+free_inputs(const Inputs* const inputs)
+{
+  for (size_t i = 0; i < inputs->n_chunks; ++i) {
+    free(inputs->chunks[i].buf);
+  }
+
+  free(inputs->chunks);
+  free(inputs->buf);
+}
+
 static Inputs
 read_inputs(FILE* const fd)
 {
@@ -83,8 +94,7 @@ read_inputs(FILE* const fd)
         inputs.chunks, (inputs.n_chunks + 1) * sizeof(ZixChunk));
 
       if (!new_chunks) {
-        free(inputs.chunks);
-        free(inputs.buf);
+        free_inputs(&inputs);
         return no_inputs;
       }
 
@@ -104,8 +114,7 @@ read_inputs(FILE* const fd)
 
         char* const new_buf = (char*)realloc(inputs.buf, buf_len);
         if (!new_buf) {
-          free(inputs.chunks);
-          free(inputs.buf);
+          free_inputs(&inputs);
           return no_inputs;
         }
 
@@ -127,7 +136,20 @@ run(FILE* const fd)
   fclose(fd);
 
   FILE* insert_dat = fopen("dict_insert.txt", "w");
+  if (!insert_dat) {
+    fprintf(stderr, "error: Failed to open dict_insert.txt\n");
+    free_inputs(&inputs);
+    return 1;
+  }
+
   FILE* search_dat = fopen("dict_search.txt", "w");
+  if (!search_dat) {
+    fclose(insert_dat);
+    free_inputs(&inputs);
+    fprintf(stderr, "error: Failed to open dict_search.txt\n");
+    return 1;
+  }
+
   assert(insert_dat);
   assert(search_dat);
   fprintf(insert_dat, "# n\tGHashTable\tZixHash\n");
@@ -202,15 +224,9 @@ run(FILE* const fd)
     g_hash_table_unref(hash);
   }
 
-  fclose(insert_dat);
   fclose(search_dat);
-
-  for (size_t i = 0; i < inputs.n_chunks; ++i) {
-    free(inputs.chunks[i].buf);
-  }
-
-  free(inputs.chunks);
-  free(inputs.buf);
+  fclose(insert_dat);
+  free_inputs(&inputs);
 
   fprintf(stderr, "Wrote dict_insert.txt dict_search.txt\n");
   return 0;

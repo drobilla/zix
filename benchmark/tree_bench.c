@@ -1,4 +1,4 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "../test/test_data.h"
@@ -261,6 +261,24 @@ bench_glib(size_t n_elems,
   return EXIT_SUCCESS;
 }
 
+static FILE*
+open_output(const char* const path)
+{
+  FILE* const f = fopen(path, "w");
+  if (!f) {
+    fprintf(stderr, "error: Failed to open %s\n", path);
+  }
+  return f;
+}
+
+static void
+close_output(FILE* const f)
+{
+  if (f) {
+    fclose(f);
+  }
+}
+
 int
 main(int argc, char** argv)
 {
@@ -276,10 +294,18 @@ main(int argc, char** argv)
 
 #define HEADER "# n\tZixTree\tZixBTree\tGSequence\n"
 
-  FILE* insert_dat = fopen("tree_insert.txt", "w");
-  FILE* search_dat = fopen("tree_search.txt", "w");
-  FILE* iter_dat   = fopen("tree_iterate.txt", "w");
-  FILE* del_dat    = fopen("tree_delete.txt", "w");
+  FILE* const insert_dat = open_output("tree_insert.txt");
+  FILE* const search_dat = open_output("tree_search.txt");
+  FILE* const iter_dat   = open_output("tree_iterate.txt");
+  FILE* const del_dat    = open_output("tree_delete.txt");
+  if (!insert_dat || !search_dat || !iter_dat || !del_dat) {
+    close_output(del_dat);
+    close_output(iter_dat);
+    close_output(search_dat);
+    close_output(insert_dat);
+    return EXIT_FAILURE;
+  }
+
   assert(insert_dat);
   assert(search_dat);
   assert(iter_dat);
@@ -303,10 +329,10 @@ main(int argc, char** argv)
     fprintf(iter_dat, "\n");
     fprintf(del_dat, "\n");
   }
-  fclose(insert_dat);
-  fclose(search_dat);
-  fclose(iter_dat);
-  fclose(del_dat);
+  close_output(del_dat);
+  close_output(iter_dat);
+  close_output(search_dat);
+  close_output(insert_dat);
 
   fprintf(
     stderr,
