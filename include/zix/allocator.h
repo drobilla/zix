@@ -1,4 +1,4 @@
-// Copyright 2021-2022 David Robillard <d@drobilla.net>
+// Copyright 2021-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_ALLOCATOR_H
@@ -107,7 +107,7 @@ ZIX_CONST_API ZixAllocator* ZIX_NONNULL
 zix_default_allocator(void);
 
 /// Convenience wrapper that defers to malloc() if allocator is null
-ZIX_MALLOC_FUNC static inline void* ZIX_ALLOCATED
+ZIX_MALLOC_FUNC ZIX_ALLOC_SIZE(2) static inline void* ZIX_ALLOCATED
 zix_malloc(ZixAllocator* const ZIX_NULLABLE allocator, const size_t size)
 {
   ZixAllocator* const actual = allocator ? allocator : zix_default_allocator();
@@ -116,7 +116,7 @@ zix_malloc(ZixAllocator* const ZIX_NULLABLE allocator, const size_t size)
 }
 
 /// Convenience wrapper that defers to calloc() if allocator is null
-ZIX_MALLOC_FUNC static inline void* ZIX_ALLOCATED
+ZIX_MALLOC_FUNC ZIX_ALLOC_COUNT_SIZE(2, 3) static inline void* ZIX_ALLOCATED
 zix_calloc(ZixAllocator* const ZIX_NULLABLE allocator,
            const size_t                     nmemb,
            const size_t                     size)
@@ -127,7 +127,7 @@ zix_calloc(ZixAllocator* const ZIX_NULLABLE allocator,
 }
 
 /// Convenience wrapper that defers to realloc() if allocator is null
-ZIX_NODISCARD static inline void* ZIX_ALLOCATED
+ZIX_NODISCARD ZIX_ALLOC_SIZE(3) static inline void* ZIX_ALLOCATED
 zix_realloc(ZixAllocator* const ZIX_NULLABLE allocator,
             void* const ZIX_NULLABLE         ptr,
             const size_t                     size)
@@ -148,7 +148,7 @@ zix_free(ZixAllocator* const ZIX_NULLABLE allocator,
 }
 
 /// Convenience wrapper that defers to the system allocator if allocator is null
-ZIX_MALLOC_FUNC static inline void* ZIX_ALLOCATED
+ZIX_MALLOC_FUNC ZIX_ALLOC_SIZE(3) static inline void* ZIX_ALLOCATED
 zix_aligned_alloc(ZixAllocator* const ZIX_NULLABLE allocator,
                   const size_t                     alignment,
                   const size_t                     size)

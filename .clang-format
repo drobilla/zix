@@ -6,6 +6,8 @@ AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
 AlignEscapedNewlines: Left
 AttributeMacros:
+  - ZIX_ALLOC_COUNT_SIZE
+  - ZIX_ALLOC_SIZE
   - ZIX_ALWAYS_INLINE_FUNC
   - ZIX_API
   - ZIX_CONST_API

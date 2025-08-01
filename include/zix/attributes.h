@@ -56,6 +56,16 @@
 /// A malloc function in the public API that returns allocated memory
 #define ZIX_MALLOC_API ZIX_API ZIX_MALLOC_FUNC ZIX_NODISCARD
 
+// Malloc and calloc-like functions with count/size arguments
+#if (defined(__GNUC__) && __GNUC__ >= 11) || \
+  (defined(__clang__) && __clang_major__ >= 4)
+#  define ZIX_ALLOC_SIZE(s) __attribute__((alloc_size(s)))
+#  define ZIX_ALLOC_COUNT_SIZE(n, s) __attribute__((alloc_size(n, s)))
+#else
+#  define ZIX_ALLOC_SIZE(s)          ///< Size parameter (ala malloc)
+#  define ZIX_ALLOC_COUNT_SIZE(n, s) ///< Count and size parameters (ala calloc)
+#endif
+
 // Printf-like format functions
 #ifdef __GNUC__
 #  define ZIX_LOG_FUNC(fmt, arg1) __attribute__((format(printf, fmt, arg1)))

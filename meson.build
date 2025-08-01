@@ -14,7 +14,7 @@ project(
   ],
   license: 'ISC',
   meson_version: '>= 0.56.0',
-  version: '0.6.3',
+  version: '0.7.1',
 )
 
 zix_src_root = meson.current_source_dir()
@@ -432,7 +432,7 @@ libzix = library(
   versioned_name,
   sources,
   c_args: c_suppressions + library_c_args,
-  darwin_versions: ['0.6.0', meson.project_version()],
+  darwin_versions: ['0.7.0', meson.project_version()],
   dependencies: dependencies,
   gnu_symbol_visibility: 'hidden',
   implicit_include_directories: false,

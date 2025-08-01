@@ -29,6 +29,8 @@ EXPAND_ONLY_PREDEF     = YES
 MACRO_EXPANSION        = YES
 SKIP_FUNCTION_MACROS   = NO
 PREDEFINED             = ZIX_ALLOCATED= \
+                         ZIX_ALLOC_COUNT_SIZE(n,s)= \
+                         ZIX_ALLOC_SIZE(s)= \
                          ZIX_ALWAYS_INLINE_FUNC= \
                          ZIX_API= \
                          ZIX_BEGIN_DECLS= \
