@@ -139,14 +139,15 @@ foreach test, cases : bad_tests
   endforeach
 endforeach
 
-# Test that headers have no warnings (ignoring the usual suppressions)
+# Test that headers have (almost) no warnings
 if cc.get_id() != 'emscripten'
   header_suppressions = []
-  if cc.get_id() in ['clang', 'emscripten']
+  if cc.get_id() == 'clang'
     header_suppressions += [
       '-Wno-declaration-after-statement',
       '-Wno-nullability-extension',
       '-Wno-padded',
+      '-Wno-pre-c23-compat',
     ]
 
     if not meson.is_cross_build()

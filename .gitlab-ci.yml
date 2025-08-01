@@ -1,4 +1,4 @@
-# Copyright 2019-2024 David Robillard <d@drobilla.net>
+# Copyright 2019-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 stages: [build, deploy]
@@ -40,7 +40,7 @@ sanitize:
     - meson setup build -Db_lundef=false -Dbuildtype=plain -Dwarning_level=3 -Dwerror=true -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dcpp_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Dcpp_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Ddocs=disabled
     - ninja -C build test
     - meson configure build -Dbuildtype=debugoptimized -Dc_args="" -Dc_link_args="" -Dcpp_args="" -Dcpp_link_args=""
-    - meson configure build -Db_sanitize=thread
+    - meson configure build -Dc_std=c17 -Db_sanitize=thread
     - ninja -C build test
     - meson configure build -Db_sanitize=memory -Dtests_cpp=disabled
     - ninja -C build test

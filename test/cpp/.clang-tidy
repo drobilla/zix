@@ -4,7 +4,6 @@
 Checks: >
   -*-avoid-c-arrays,
   -*-no-malloc,
-  -*-use-nullptr,
   -android-cloexec-fopen,
   -bugprone-exception-escape,
   -cppcoreguidelines-macro-usage,
@@ -15,5 +14,4 @@ Checks: >
   -modernize-use-trailing-return-type,
   -modernize-use-using,
   -performance-enum-size,
-  -readability-implicit-bool-conversion,
 InheritParentConfig: true
