@@ -1,4 +1,4 @@
-# Copyright 2021-2022 David Robillard <d@drobilla.net>
+# Copyright 2021-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 PROJECT_NAME           = Zix
@@ -35,6 +35,7 @@ PREDEFINED             = ZIX_ALLOCATED= \
                          ZIX_CONST_API= \
                          ZIX_CONST_FUNC= \
                          ZIX_END_DECLS= \
+                         ZIX_LOG_FUNC(f,a)= \
                          ZIX_MALLOC_API= \
                          ZIX_MALLOC_FUNC= \
                          ZIX_NODISCARD= \
@@ -45,6 +46,7 @@ PREDEFINED             = ZIX_ALLOCATED= \
                          ZIX_PURE_WIN_API= \
                          ZIX_THREAD_FUNC= \
                          ZIX_UNSPECIFIED= \
+                         ZIX_UNUSED(n)= \
 
 STRIP_FROM_PATH        = @ZIX_SRCDIR@
 INPUT                  = @ZIX_SRCDIR@/include/zix/zix.h \
