@@ -43,7 +43,7 @@ zix_system_close_fds(int fd1, int fd2);
 ssize_t
 zix_system_read(int fd, void* ZIX_NONNULL buf, size_t count);
 
-uint32_t
+ZIX_PURE_FUNC uint32_t
 zix_system_max_block_size(const struct stat* ZIX_NONNULL s1,
                           const struct stat* ZIX_NONNULL s2,
                           uint32_t                       fallback);
