@@ -1,7 +1,9 @@
-// Copyright 2011-2021 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/hash.h>
+
+#include "qualifiers.h"
 
 #include <zix/allocator.h>
 #include <zix/status.h>
@@ -25,8 +27,8 @@ struct ZixHashImpl {
   ZixHashEntry*   entries;    ///< Pointer to dynamically allocated table
 };
 
-static const size_t min_n_entries = 4U;
-static const size_t tombstone     = 0xDEADU;
+static ZIX_CONSTEXPR size_t min_n_entries = 4U;
+static ZIX_CONSTEXPR size_t tombstone     = 0xDEADU;
 
 ZixHash*
 zix_hash_new(ZixAllocator* const   allocator,

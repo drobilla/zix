@@ -1,9 +1,10 @@
-// Copyright 2007-2024 David Robillard <d@drobilla.net>
+// Copyright 2007-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/filesystem.h>
 
 #include "../errno_status.h"
+#include "../qualifiers.h"
 #include "../zix_config.h"
 #include "win32_util.h"
 
@@ -35,7 +36,7 @@ path_result(ZixAllocator* const allocator, wchar_t* const path)
     return NULL;
   }
 
-  static const wchar_t* const long_prefix = L"\\\\?\\";
+  ZIX_CONSTEXPR wchar_t* const long_prefix = L"\\\\?\\";
 
   const size_t p      = !wcsncmp(path, long_prefix, 4U) ? 4U : 0U;
   char* const  result = zix_wchar_to_utf8(allocator, path + p);
@@ -109,8 +110,8 @@ zix_copy_file(ZixAllocator* const  allocator,
 static inline uint32_t
 lcg32(const uint32_t i)
 {
-  static const uint32_t a = 134775813U;
-  static const uint32_t c = 1U;
+  ZIX_CONSTEXPR uint32_t a = 134775813U;
+  ZIX_CONSTEXPR uint32_t c = 1U;
 
   return (a * i) + c;
 }
@@ -119,8 +120,8 @@ char*
 zix_create_temporary_directory(ZixAllocator* const allocator,
                                const char* const   path_pattern)
 {
-  static const char   chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  static const size_t n_chars = sizeof(chars) - 1;
+  ZIX_CONSTEXPR char   chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  ZIX_CONSTEXPR size_t n_chars = sizeof(chars) - 1;
 
   // Ensure that the pattern ends with "XXXXXX"
   const size_t length = strlen(path_pattern);
@@ -173,8 +174,8 @@ zix_dir_for_each(const char* const          path,
                  void* const                data,
                  const ZixDirEntryVisitFunc f)
 {
-  static const TCHAR* const dot    = TEXT(".");
-  static const TCHAR* const dotdot = TEXT("..");
+  ZIX_CONSTEXPR TCHAR* const dot    = TEXT(".");
+  ZIX_CONSTEXPR TCHAR* const dotdot = TEXT("..");
 
 #ifdef UNICODE
   const int path_size = MultiByteToWideChar(CP_UTF8, 0, path, -1, NULL, 0);
@@ -421,7 +422,7 @@ ZixStatus
 zix_create_symlink(const char* const target_path, const char* const link_path)
 {
 #if USE_CREATESYMBOLICLINK
-  static const DWORD flags = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
+  ZIX_CONSTEXPR DWORD flags = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
 
   ArgPathChar* const wtarget = arg_path_new(NULL, target_path);
   ArgPathChar* const wlink   = arg_path_new(NULL, link_path);
@@ -444,7 +445,7 @@ zix_create_directory_symlink(const char* const target_path,
                              const char* const link_path)
 {
 #if USE_CREATESYMBOLICLINK
-  static const DWORD flags =
+  ZIX_CONSTEXPR DWORD flags =
     SYMBOLIC_LINK_FLAG_DIRECTORY | SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
 
   ArgPathChar* const wtarget = arg_path_new(NULL, target_path);

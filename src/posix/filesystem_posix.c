@@ -4,6 +4,7 @@
 #include <zix/filesystem.h>
 
 #include "../errno_status.h"
+#include "../qualifiers.h"
 #include "../system.h"
 #include "../zix_config.h"
 
@@ -371,7 +372,7 @@ stat_file_type(const struct stat* sb)
     ZixFileType type;
   } Mapping;
 
-  static const Mapping map[] = {
+  ZIX_CONSTEXPR Mapping map[] = {
     {S_IFREG, ZIX_FILE_TYPE_REGULAR},
     {S_IFDIR, ZIX_FILE_TYPE_DIRECTORY},
     {S_IFLNK, ZIX_FILE_TYPE_SYMLINK},

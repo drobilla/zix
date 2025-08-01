@@ -1,7 +1,9 @@
-// Copyright 2014-2022 David Robillard <d@drobilla.net>
+// Copyright 2014-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include "errno_status.h"
+
+#include "qualifiers.h"
 
 #include <zix/status.h>
 
@@ -22,7 +24,7 @@ zix_errno_status(const int e)
     ZixStatus status;
   } Mapping;
 
-  static const Mapping map[] = {
+  ZIX_CONSTEXPR Mapping map[] = {
     {0, ZIX_STATUS_SUCCESS},
     {EACCES, ZIX_STATUS_BAD_PERMS},
     {EAGAIN, ZIX_STATUS_UNAVAILABLE},
@@ -41,7 +43,7 @@ zix_errno_status(const int e)
     {0, ZIX_STATUS_ERROR}, // Fallback mapping
   };
 
-  static const size_t n_mappings = (sizeof(map) / sizeof(Mapping)) - 1U;
+  ZIX_CONSTEXPR size_t n_mappings = (sizeof(map) / sizeof(Mapping)) - 1U;
 
   // Find the index of the matching mapping (or leave it at the fallback entry)
   size_t m = 0;

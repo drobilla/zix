@@ -1,7 +1,9 @@
-// Copyright 2012-2021 David Robillard <d@drobilla.net>
+// Copyright 2012-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/digest.h>
+
+#include "qualifiers.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -32,7 +34,7 @@ mix64(uint64_t h)
 uint64_t
 zix_digest64(const uint64_t seed, const void* const buf, const size_t len)
 {
-  static const uint64_t m = 0x880355F21E6D1965ULL;
+  ZIX_CONSTEXPR uint64_t m = 0x880355F21E6D1965ULL;
 
   // Process as many 64-bit blocks as possible
   const size_t         n_blocks   = len / sizeof(uint64_t);
@@ -82,7 +84,7 @@ zix_digest64(const uint64_t seed, const void* const buf, const size_t len)
 uint64_t
 zix_digest64_aligned(const uint64_t seed, const void* const buf, size_t len)
 {
-  static const uint64_t m = 0x880355F21E6D1965ULL;
+  ZIX_CONSTEXPR uint64_t m = 0x880355F21E6D1965ULL;
 
   assert((uintptr_t)buf % sizeof(uint64_t) == 0U);
   assert(len % sizeof(uint64_t) == 0U);
@@ -130,8 +132,8 @@ mix32(uint32_t h)
 uint32_t
 zix_digest32(const uint32_t seed, const void* const buf, const size_t len)
 {
-  static const uint32_t c1 = 0xCC9E2D51U;
-  static const uint32_t c2 = 0x1B873593U;
+  ZIX_CONSTEXPR uint32_t c1 = 0xCC9E2D51U;
+  ZIX_CONSTEXPR uint32_t c2 = 0x1B873593U;
 
   // Process as many 32-bit blocks as possible
   const size_t         n_blocks   = len / sizeof(uint32_t);
@@ -177,8 +179,8 @@ zix_digest32_aligned(const uint32_t    seed,
                      const void* const buf,
                      const size_t      len)
 {
-  static const uint32_t c1 = 0xCC9E2D51U;
-  static const uint32_t c2 = 0x1B873593U;
+  ZIX_CONSTEXPR uint32_t c1 = 0xCC9E2D51U;
+  ZIX_CONSTEXPR uint32_t c2 = 0x1B873593U;
 
   assert((uintptr_t)buf % sizeof(uint32_t) == 0U);
   assert(len % sizeof(uint32_t) == 0U);

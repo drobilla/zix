@@ -5,6 +5,7 @@
 
 #include "index_range.h"
 #include "path_iter.h"
+#include "qualifiers.h"
 
 #include <zix/allocator.h>
 #include <zix/attributes.h>
@@ -14,8 +15,8 @@
 #include <stddef.h>
 #include <string.h>
 
-static const ZixIndexRange two_range = {0U, 2U};
-static const ZixIndexRange one_range = {0U, 1U};
+static ZIX_CONSTEXPR ZixIndexRange two_range = {0U, 2U};
+static ZIX_CONSTEXPR ZixIndexRange one_range = {0U, 1U};
 
 #ifdef _WIN32
 
@@ -312,7 +313,7 @@ zix_path_preferred(ZixAllocator* const allocator, const char* const path)
 char*
 zix_path_lexically_normal(ZixAllocator* const allocator, const char* const path)
 {
-  static const char sep = ZIX_DIR_SEP;
+  ZIX_CONSTEXPR char sep = ZIX_DIR_SEP;
 
   /* Loosely following the normalization algorithm from
      <https://en.cppreference.com/w/cpp/filesystem/path>, but in such a way
