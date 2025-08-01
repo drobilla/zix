@@ -1,4 +1,4 @@
-# Copyright 2020-2024 David Robillard <d@drobilla.net>
+# Copyright 2020-2025 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 Checks: >
@@ -14,5 +14,7 @@ Checks: >
   -google-readability-casting,
   -llvm-header-guard,
   -performance-no-int-to-ptr,
-  -readability-function-cognitive-complexity,
+CheckOptions:
+  - key:   readability-function-cognitive-complexity.Threshold
+    value: '194'
 InheritParentConfig: true
