@@ -1,9 +1,10 @@
-// Copyright 2014-2022 David Robillard <d@drobilla.net>
+// Copyright 2014-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
+#include <zix/attributes.h>
 #include <zix/status.h>
 
-const char*
+ZIX_REALTIME const char*
 zix_strerror(const ZixStatus status)
 {
   switch (status) {

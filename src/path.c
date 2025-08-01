@@ -598,7 +598,7 @@ range_string_view(const char* const path, const ZixIndexRange range)
 
 #ifdef _WIN32
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_root_name(const char* const path)
 {
   return range_string_view(path, zix_path_root_name_range(path));
@@ -606,7 +606,7 @@ zix_path_root_name(const char* const path)
 
 #else
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_root_name(const char* const path)
 {
   (void)path;
@@ -615,19 +615,19 @@ zix_path_root_name(const char* const path)
 
 #endif
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_root_directory(const char* const path)
 {
   return range_string_view(path, zix_path_root_slices(path).dir);
 }
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_root_path(const char* const path)
 {
   return range_string_view(path, zix_path_root_path_range(path));
 }
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_relative_path(const char* const path)
 {
   const ZixStringView view = string_view(path);
@@ -636,25 +636,25 @@ zix_path_relative_path(const char* const path)
   return range_string_view(path, zix_make_range(root.end, view.length));
 }
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_parent_path(const char* const path)
 {
   return range_string_view(path, zix_path_parent_path_range(string_view(path)));
 }
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_filename(const char* const path)
 {
   return range_string_view(path, zix_path_filename_range(string_view(path)));
 }
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_stem(const char* const path)
 {
   return range_string_view(path, zix_path_stem_range(string_view(path)));
 }
 
-ZixStringView
+ZIX_NONBLOCKING ZixStringView
 zix_path_extension(const char* const path)
 {
   return range_string_view(path, zix_path_extension_range(string_view(path)));
@@ -662,55 +662,55 @@ zix_path_extension(const char* const path)
 
 // Queries
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_root_path(const char* const path)
 {
   return !zix_is_empty_range(zix_path_root_path_range(path));
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_root_name(const char* const path)
 {
   return !zix_is_empty_range(zix_path_root_name_range(path));
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_root_directory(const char* const path)
 {
   return !zix_is_empty_range(zix_path_root_slices(path).dir);
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_relative_path(const char* const path)
 {
   return path && path[zix_path_root_path_range(path).end];
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_parent_path(const char* const path)
 {
   return !zix_is_empty_range(zix_path_parent_path_range(zix_string(path)));
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_filename(const char* const path)
 {
   return !zix_is_empty_range(zix_path_filename_range(zix_string(path)));
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_stem(const char* const path)
 {
   return !zix_is_empty_range(zix_path_stem_range(zix_string(path)));
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_has_extension(const char* const path)
 {
   return !zix_is_empty_range(zix_path_extension_range(zix_string(path)));
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_is_absolute(const char* const path)
 {
 #ifdef _WIN32
@@ -724,7 +724,7 @@ zix_path_is_absolute(const char* const path)
 #endif
 }
 
-bool
+ZIX_NONBLOCKING bool
 zix_path_is_relative(const char* const path)
 {
   return !zix_path_is_absolute(path);

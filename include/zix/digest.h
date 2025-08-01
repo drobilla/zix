@@ -29,7 +29,7 @@ ZIX_BEGIN_DECLS
 
    This can be used for any size or alignment.
 */
-ZIX_PURE_API uint32_t
+ZIX_PURE_API ZIX_NONBLOCKING uint32_t
 zix_digest32(uint32_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
@@ -38,7 +38,7 @@ zix_digest32(uint32_t seed, const void* ZIX_NONNULL buf, size_t len);
    Both the buffer and size must be aligned to 32 bits.  For data that fits
    these requirements, this is equivalent to, but faster than, zix_digest32().
 */
-ZIX_PURE_API uint32_t
+ZIX_PURE_API ZIX_NONBLOCKING uint32_t
 zix_digest32_aligned(uint32_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
@@ -46,7 +46,7 @@ zix_digest32_aligned(uint32_t seed, const void* ZIX_NONNULL buf, size_t len);
 
    This can be used for any size or alignment.
 */
-ZIX_PURE_API uint64_t
+ZIX_PURE_API ZIX_NONBLOCKING uint64_t
 zix_digest64(uint64_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
@@ -55,7 +55,7 @@ zix_digest64(uint64_t seed, const void* ZIX_NONNULL buf, size_t len);
    Both the buffer and size must be aligned to 64 bits.  For data that fits
    these requirements, this is equivalent to, but faster than, zix_digest64().
 */
-ZIX_PURE_API uint64_t
+ZIX_PURE_API ZIX_NONBLOCKING uint64_t
 zix_digest64_aligned(uint64_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
@@ -66,7 +66,7 @@ zix_digest64_aligned(uint64_t seed, const void* ZIX_NONNULL buf, size_t len);
    Internally, this simply dispatches to zix_digest32() or zix_digest64() as
    appropriate.
 */
-ZIX_PURE_API size_t
+ZIX_PURE_API ZIX_NONBLOCKING size_t
 zix_digest(size_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**
@@ -79,7 +79,7 @@ zix_digest(size_t seed, const void* ZIX_NONNULL buf, size_t len);
    Internally, this simply dispatches to zix_digest32_aligned() or
    zix_digest64_aligned() as appropriate.
 */
-ZIX_PURE_API size_t
+ZIX_PURE_API ZIX_NONBLOCKING size_t
 zix_digest_aligned(size_t seed, const void* ZIX_NONNULL buf, size_t len);
 
 /**

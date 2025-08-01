@@ -1,4 +1,4 @@
-// Copyright 2012-2022 David Robillard <d@drobilla.net>
+// Copyright 2012-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_SEM_H
@@ -69,7 +69,7 @@ zix_sem_destroy(ZixSem* ZIX_NONNULL sem);
    if the maximum possible value would have been exceeded, or
    #ZIX_STATUS_BAD_ARG if `sem` is invalid.
 */
-ZIX_API ZixStatus
+ZIX_API ZIX_REALTIME ZixStatus
 zix_sem_post(ZixSem* ZIX_NONNULL sem);
 
 /**

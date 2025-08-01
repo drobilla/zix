@@ -1,4 +1,4 @@
-// Copyright 2021-2022 David Robillard <d@drobilla.net>
+// Copyright 2021-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_ATTRIBUTES_H
@@ -45,6 +45,15 @@
 #  define ZIX_CONST_FUNC         ///< Only reads its parameters
 #  define ZIX_MALLOC_FUNC        ///< Allocates memory with no pointers in it
 #  define ZIX_NODISCARD          ///< Returns a value that must be used
+#endif
+
+// Clang nonallocating/nonblocking function attributes
+#if defined(__clang__) && __clang_major__ >= 20
+#  define ZIX_NONBLOCKING __attribute__((nonblocking))
+#  define ZIX_REALTIME ZIX_NONBLOCKING
+#else
+#  define ZIX_NONBLOCKING ///< Doesn't allocate or block
+#  define ZIX_REALTIME    ///< Nonblocking and constant time
 #endif
 
 /// A pure function in the public API that only reads memory

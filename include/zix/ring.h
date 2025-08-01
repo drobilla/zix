@@ -1,4 +1,4 @@
-// Copyright 2011-2022 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_RING_H
@@ -74,7 +74,7 @@ zix_ring_mlock(ZixRing* ZIX_NONNULL ring);
    This function is NOT thread-safe, it may only be called when there is no
    reader or writer.
 */
-ZIX_API void
+ZIX_API ZIX_REALTIME void
 zix_ring_reset(ZixRing* ZIX_NONNULL ring);
 
 /**
@@ -83,7 +83,7 @@ zix_ring_reset(ZixRing* ZIX_NONNULL ring);
    This function returns a constant for any given ring, and may (but usually
    shouldn't) be called anywhere.
 */
-ZIX_PURE_API uint32_t
+ZIX_PURE_API ZIX_REALTIME uint32_t
 zix_ring_capacity(const ZixRing* ZIX_NONNULL ring);
 
 /**
@@ -98,7 +98,7 @@ zix_ring_capacity(const ZixRing* ZIX_NONNULL ring);
 
    This function returns at most one less than the ring's buffer size.
 */
-ZIX_PURE_API uint32_t
+ZIX_PURE_API ZIX_REALTIME uint32_t
 zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
 
 /**
@@ -111,7 +111,7 @@ zix_ring_read_space(const ZixRing* ZIX_NONNULL ring);
    @return The number of bytes read, which is either `size` on success, or zero
    on failure.
 */
-ZIX_API uint32_t
+ZIX_API ZIX_NONBLOCKING uint32_t
 zix_ring_peek(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
 /**
@@ -124,7 +124,7 @@ zix_ring_peek(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
    @return The number of bytes read, which is either `size` on success, or zero
    on failure.
 */
-ZIX_API uint32_t
+ZIX_API ZIX_NONBLOCKING uint32_t
 zix_ring_read(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
 
 /**
@@ -133,7 +133,7 @@ zix_ring_read(ZixRing* ZIX_NONNULL ring, void* ZIX_NONNULL dst, uint32_t size);
    @return Either `size` on success, or zero if there aren't enough bytes to
    skip.
 */
-ZIX_API uint32_t
+ZIX_API ZIX_REALTIME uint32_t
 zix_ring_skip(ZixRing* ZIX_NONNULL ring, uint32_t size);
 
 /**
@@ -165,7 +165,7 @@ typedef struct {
 
    This function returns at most one less than the ring's buffer size.
 */
-ZIX_PURE_API uint32_t
+ZIX_PURE_API ZIX_REALTIME uint32_t
 zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
 
 /**
@@ -180,7 +180,7 @@ zix_ring_write_space(const ZixRing* ZIX_NONNULL ring);
    @return The number of bytes written, which is either `size` on success, or
    zero on failure.
 */
-ZIX_API uint32_t
+ZIX_API ZIX_NONBLOCKING uint32_t
 zix_ring_write(ZixRing* ZIX_NONNULL    ring,
                const void* ZIX_NONNULL src,
                uint32_t                size);
@@ -199,7 +199,7 @@ zix_ring_write(ZixRing* ZIX_NONNULL    ring,
    @param ring The ring to write data to.
    @return A new empty transaction.
 */
-ZIX_API ZIX_NODISCARD ZixRingTransaction
+ZIX_API ZIX_REALTIME ZIX_NODISCARD ZixRingTransaction
 zix_ring_begin_write(ZixRing* ZIX_NONNULL ring);
 
 /**
@@ -220,7 +220,7 @@ zix_ring_begin_write(ZixRing* ZIX_NONNULL ring);
    @param size Length of data to write in bytes.
    @return #ZIX_STATUS_NO_MEM or #ZIX_STATUS_SUCCESS.
 */
-ZIX_API ZixStatus
+ZIX_API ZIX_NONBLOCKING ZixStatus
 zix_ring_amend_write(ZixRing* ZIX_NONNULL            ring,
                      ZixRingTransaction* ZIX_NONNULL tx,
                      const void* ZIX_NONNULL         src,
@@ -239,7 +239,7 @@ zix_ring_amend_write(ZixRing* ZIX_NONNULL            ring,
    @param tx The active transaction, from zix_ring_begin_write().
    @return #ZIX_STATUS_SUCCESS.
 */
-ZIX_API ZixStatus
+ZIX_API ZIX_REALTIME ZixStatus
 zix_ring_commit_write(ZixRing* ZIX_NONNULL                  ring,
                       const ZixRingTransaction* ZIX_NONNULL tx);
 

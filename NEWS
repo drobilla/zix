@@ -1,5 +1,7 @@
 zix (0.7.1) unstable; urgency=medium
 
+  * Add ZIX_REALTIME and ZIX_NONBLOCKING attributes
+  * Add warning suppression macros
   * Annotate count and size parameters of allocator API
   * Avoid "deprecated" POSIX functions on Windows
   * Avoid over-use of yielding meson options
@@ -8,7 +10,7 @@ zix (0.7.1) unstable; urgency=medium
   * Strengthen zix_file_equals()
   * Use getenv() instead of environ to avoid issues on FreeBSD
 
- -- David Robillard <d@drobilla.net>  Fri, 01 Aug 2025 14:16:06 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 01 Aug 2025 17:12:01 +0000
 
 zix (0.6.2) stable; urgency=medium
 

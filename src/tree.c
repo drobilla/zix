@@ -1,4 +1,4 @@
-// Copyright 2011-2020 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/tree.h>
@@ -95,7 +95,7 @@ zix_tree_free(ZixTree* t)
   }
 }
 
-size_t
+ZIX_REALTIME size_t
 zix_tree_size(const ZixTree* t)
 {
   return t->size;
@@ -561,13 +561,13 @@ zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
   return (n) ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
 }
 
-void*
+ZIX_REALTIME void*
 zix_tree_get(const ZixTreeIter* ti)
 {
   return ti ? ti->data : NULL;
 }
 
-ZixTreeIter*
+ZIX_NONBLOCKING ZixTreeIter*
 zix_tree_begin(ZixTree* t)
 {
   if (!t->root) {
@@ -582,13 +582,13 @@ zix_tree_begin(ZixTree* t)
   return n;
 }
 
-ZixTreeIter*
+ZIX_REALTIME ZixTreeIter*
 zix_tree_end(ZixTree* ZIX_UNUSED(t))
 {
   return NULL;
 }
 
-ZixTreeIter*
+ZIX_NONBLOCKING ZixTreeIter*
 zix_tree_rbegin(ZixTree* t)
 {
   if (!t->root) {
@@ -603,25 +603,25 @@ zix_tree_rbegin(ZixTree* t)
   return n;
 }
 
-ZixTreeIter*
+ZIX_REALTIME ZixTreeIter*
 zix_tree_rend(ZixTree* ZIX_UNUSED(t))
 {
   return NULL;
 }
 
-bool
+ZIX_REALTIME bool
 zix_tree_iter_is_end(const ZixTreeIter* i)
 {
   return !i;
 }
 
-bool
+ZIX_REALTIME bool
 zix_tree_iter_is_rend(const ZixTreeIter* i)
 {
   return !i;
 }
 
-ZixTreeIter*
+ZIX_NONBLOCKING ZixTreeIter*
 zix_tree_iter_next(ZixTreeIter* i)
 {
   if (!i) {
@@ -644,7 +644,7 @@ zix_tree_iter_next(ZixTreeIter* i)
   return i;
 }
 
-ZixTreeIter*
+ZIX_NONBLOCKING ZixTreeIter*
 zix_tree_iter_prev(ZixTreeIter* i)
 {
   if (!i) {

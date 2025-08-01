@@ -91,11 +91,11 @@ zix_path_lexically_relative(ZixAllocator* ZIX_NULLABLE allocator,
 */
 
 /// Return the root name of `path` like "C:", or null
-ZIX_PURE_WIN_API ZixStringView
+ZIX_PURE_WIN_API ZIX_NONBLOCKING ZixStringView
 zix_path_root_name(const char* ZIX_NONNULL path);
 
 /// Return the root directory of `path` like "/" or "\", or null
-ZIX_PURE_API ZixStringView
+ZIX_PURE_API ZIX_NONBLOCKING ZixStringView
 zix_path_root_directory(const char* ZIX_NONNULL path);
 
 /**
@@ -111,7 +111,7 @@ zix_path_root_directory(const char* ZIX_NONNULL path);
    @return A view of the root path within `path`, or an empty string if it has
    no root.
 */
-ZIX_PURE_API ZixStringView
+ZIX_PURE_API ZIX_NONBLOCKING ZixStringView
 zix_path_root_path(const char* ZIX_NONNULL path);
 
 /**
@@ -120,7 +120,7 @@ zix_path_root_path(const char* ZIX_NONNULL path);
    If the path has no relative path (because it is empty or a root path), this
    returns null.
 */
-ZIX_PURE_API ZixStringView
+ZIX_PURE_API ZIX_NONBLOCKING ZixStringView
 zix_path_relative_path(const char* ZIX_NONNULL path);
 
 /**
@@ -139,7 +139,7 @@ zix_path_relative_path(const char* ZIX_NONNULL path);
    @return A view of the parent path within `path`, or the empty string if it
    has no parent.
 */
-ZIX_PURE_API ZixStringView
+ZIX_PURE_API ZIX_NONBLOCKING ZixStringView
 zix_path_parent_path(const char* ZIX_NONNULL path);
 
 /**
@@ -148,7 +148,7 @@ zix_path_parent_path(const char* ZIX_NONNULL path);
    The filename is the name after the last directory separator.  If the path
    has no filename, this returns null.
 */
-ZIX_PURE_API ZixStringView
+ZIX_PURE_API ZIX_NONBLOCKING ZixStringView
 zix_path_filename(const char* ZIX_NONNULL path);
 
 /**
@@ -157,7 +157,7 @@ zix_path_filename(const char* ZIX_NONNULL path);
    The "stem" is the filename without the extension, that is, everything up to
    the last "." if "." is not the first character.
 */
-ZIX_PURE_API ZixStringView
+ZIX_PURE_API ZIX_NONBLOCKING ZixStringView
 zix_path_stem(const char* ZIX_NONNULL path);
 
 /**
@@ -166,7 +166,7 @@ zix_path_stem(const char* ZIX_NONNULL path);
    The "extension" is everything past the last "." in the filename, if "." is
    not the first character.
 */
-ZIX_PURE_API ZixStringView
+ZIX_PURE_API ZIX_NONBLOCKING ZixStringView
 zix_path_extension(const char* ZIX_NONNULL path);
 
 /**
@@ -176,43 +176,43 @@ zix_path_extension(const char* ZIX_NONNULL path);
 */
 
 /// Return true if `path` has a root path like "/" or "C:\"
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_has_root_path(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a root name like "C:"
-ZIX_PURE_WIN_API bool
+ZIX_PURE_WIN_API ZIX_NONBLOCKING bool
 zix_path_has_root_name(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a root directory like "/" or "\"
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_has_root_directory(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a relative path "dir/file.txt"
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_has_relative_path(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a parent path like "dir/"
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_has_parent_path(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a filename like "file.txt"
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_has_filename(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has a stem like "file"
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_has_stem(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` has an extension like ".txt"
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_has_extension(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` is an absolute path
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_is_absolute(const char* ZIX_NULLABLE path);
 
 /// Return true if `path` is a relative path
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_path_is_relative(const char* ZIX_NULLABLE path);
 
 /**

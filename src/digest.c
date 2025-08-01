@@ -1,6 +1,7 @@
 // Copyright 2012-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
+#include <zix/attributes.h>
 #include <zix/digest.h>
 
 #include "qualifiers.h"
@@ -31,7 +32,7 @@ mix64(uint64_t h)
   return h;
 }
 
-uint64_t
+ZIX_NONBLOCKING uint64_t
 zix_digest64(const uint64_t seed, const void* const buf, const size_t len)
 {
   ZIX_CONSTEXPR uint64_t m = 0x880355F21E6D1965ULL;
@@ -81,7 +82,7 @@ zix_digest64(const uint64_t seed, const void* const buf, const size_t len)
   return mix64(h);
 }
 
-uint64_t
+ZIX_NONBLOCKING uint64_t
 zix_digest64_aligned(const uint64_t seed, const void* const buf, size_t len)
 {
   ZIX_CONSTEXPR uint64_t m = 0x880355F21E6D1965ULL;
@@ -129,7 +130,7 @@ mix32(uint32_t h)
   return h;
 }
 
-uint32_t
+ZIX_NONBLOCKING uint32_t
 zix_digest32(const uint32_t seed, const void* const buf, const size_t len)
 {
   ZIX_CONSTEXPR uint32_t c1 = 0xCC9E2D51U;
@@ -174,7 +175,7 @@ zix_digest32(const uint32_t seed, const void* const buf, const size_t len)
   return mix32(h ^ (uint32_t)len);
 }
 
-uint32_t
+ZIX_NONBLOCKING uint32_t
 zix_digest32_aligned(const uint32_t    seed,
                      const void* const buf,
                      const size_t      len)
@@ -205,7 +206,7 @@ zix_digest32_aligned(const uint32_t    seed,
 
 // Native word size wrapper
 
-size_t
+ZIX_NONBLOCKING size_t
 zix_digest(const size_t seed, const void* const buf, const size_t len)
 {
 #if UINTPTR_MAX >= UINT64_MAX
@@ -215,7 +216,7 @@ zix_digest(const size_t seed, const void* const buf, const size_t len)
 #endif
 }
 
-size_t
+ZIX_NONBLOCKING size_t
 zix_digest_aligned(const size_t seed, const void* const buf, const size_t len)
 {
 #if UINTPTR_MAX >= UINT64_MAX

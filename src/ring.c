@@ -1,4 +1,4 @@
-// Copyright 2011-2024 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/ring.h>
@@ -7,6 +7,7 @@
 #include "zix_config.h"
 
 #include <zix/allocator.h>
+#include <zix/attributes.h>
 #include <zix/status.h>
 
 #if USE_VIRTUALLOCK
@@ -124,7 +125,7 @@ zix_ring_mlock(ZixRing* const ring)
 #endif
 }
 
-void
+ZIX_REALTIME void
 zix_ring_reset(ZixRing* const ring)
 {
   ring->write_head = 0;
@@ -145,7 +146,7 @@ read_space_internal(const ZixRing* const ring,
   return (w - r) & ring->size_mask;
 }
 
-uint32_t
+ZIX_REALTIME uint32_t
 zix_ring_read_space(const ZixRing* const ring)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
@@ -161,7 +162,7 @@ write_space_internal(const ZixRing* const ring,
   return (r - w - 1U) & ring->size_mask;
 }
 
-uint32_t
+ZIX_REALTIME uint32_t
 zix_ring_write_space(const ZixRing* const ring)
 {
   const uint32_t r = zix_atomic_load(&ring->read_head);
@@ -169,7 +170,7 @@ zix_ring_write_space(const ZixRing* const ring)
   return write_space_internal(ring, r, ring->write_head);
 }
 
-uint32_t
+ZIX_REALTIME uint32_t
 zix_ring_capacity(const ZixRing* const ring)
 {
   return ring->size - 1U;
@@ -197,7 +198,7 @@ peek_internal(const ZixRing* const ring,
   return size;
 }
 
-uint32_t
+ZIX_REALTIME uint32_t
 zix_ring_peek(ZixRing* const ring, void* const dst, const uint32_t size)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
@@ -205,7 +206,7 @@ zix_ring_peek(ZixRing* const ring, void* const dst, const uint32_t size)
   return peek_internal(ring, ring->read_head, w, size, dst);
 }
 
-uint32_t
+ZIX_REALTIME uint32_t
 zix_ring_read(ZixRing* const ring, void* const dst, const uint32_t size)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
@@ -218,7 +219,7 @@ zix_ring_read(ZixRing* const ring, void* const dst, const uint32_t size)
   return size;
 }
 
-uint32_t
+ZIX_REALTIME uint32_t
 zix_ring_skip(ZixRing* const ring, const uint32_t size)
 {
   const uint32_t w = zix_atomic_load(&ring->write_head);
@@ -231,7 +232,7 @@ zix_ring_skip(ZixRing* const ring, const uint32_t size)
   return size;
 }
 
-ZixRingTransaction
+ZIX_REALTIME ZixRingTransaction
 zix_ring_begin_write(ZixRing* const ring)
 {
   const uint32_t r = zix_atomic_load(&ring->read_head);
@@ -241,7 +242,7 @@ zix_ring_begin_write(ZixRing* const ring)
   return tx;
 }
 
-ZixStatus
+ZIX_REALTIME ZixStatus
 zix_ring_amend_write(ZixRing* const            ring,
                      ZixRingTransaction* const tx,
                      const void* const         src,
@@ -268,14 +269,14 @@ zix_ring_amend_write(ZixRing* const            ring,
   return ZIX_STATUS_SUCCESS;
 }
 
-ZixStatus
+ZIX_REALTIME ZixStatus
 zix_ring_commit_write(ZixRing* const ring, const ZixRingTransaction* const tx)
 {
   zix_atomic_store(&ring->write_head, tx->write_head);
   return ZIX_STATUS_SUCCESS;
 }
 
-uint32_t
+ZIX_REALTIME uint32_t
 zix_ring_write(ZixRing* const ring, const void* src, const uint32_t size)
 {
   ZixRingTransaction tx = zix_ring_begin_write(ring);

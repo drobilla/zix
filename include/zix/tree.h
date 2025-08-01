@@ -1,4 +1,4 @@
-// Copyright 2011-2022 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_TREE_H
@@ -56,7 +56,7 @@ ZIX_API void
 zix_tree_free(ZixTree* ZIX_NULLABLE t);
 
 /// Return the number of elements in `t`
-ZIX_PURE_API size_t
+ZIX_PURE_API ZIX_REALTIME size_t
 zix_tree_size(const ZixTree* ZIX_NONNULL t);
 
 /**
@@ -69,39 +69,39 @@ zix_tree_size(const ZixTree* ZIX_NONNULL t);
 typedef struct ZixTreeNodeImpl ZixTreeIter;
 
 /// Return the data associated with the given tree item
-ZIX_PURE_API void* ZIX_UNSPECIFIED
+ZIX_PURE_API ZIX_REALTIME void* ZIX_UNSPECIFIED
 zix_tree_get(const ZixTreeIter* ZIX_NULLABLE ti);
 
 /// Return an iterator to the first (smallest) element in `t`
-ZIX_PURE_API ZixTreeIter* ZIX_NULLABLE
+ZIX_PURE_API ZIX_NONBLOCKING ZixTreeIter* ZIX_NULLABLE
 zix_tree_begin(ZixTree* ZIX_NONNULL t);
 
 /// Return an iterator the the element one past the last element in `t`
-ZIX_CONST_API ZixTreeIter* ZIX_NULLABLE
+ZIX_CONST_API ZIX_REALTIME ZixTreeIter* ZIX_NULLABLE
 zix_tree_end(ZixTree* ZIX_NONNULL t);
 
 /// Return true iff `i` is an iterator to the end of its tree
-ZIX_CONST_API bool
+ZIX_CONST_API ZIX_REALTIME bool
 zix_tree_iter_is_end(const ZixTreeIter* ZIX_NULLABLE i);
 
 /// Return an iterator to the last (largest) element in `t`
-ZIX_PURE_API ZixTreeIter* ZIX_NULLABLE
+ZIX_PURE_API ZIX_NONBLOCKING ZixTreeIter* ZIX_NULLABLE
 zix_tree_rbegin(ZixTree* ZIX_NONNULL t);
 
 /// Return an iterator the the element one before the first element in `t`
-ZIX_CONST_API ZixTreeIter* ZIX_NULLABLE
+ZIX_CONST_API ZIX_REALTIME ZixTreeIter* ZIX_NULLABLE
 zix_tree_rend(ZixTree* ZIX_NONNULL t);
 
 /// Return true iff `i` is an iterator to the reverse end of its tree
-ZIX_CONST_API bool
+ZIX_CONST_API ZIX_REALTIME bool
 zix_tree_iter_is_rend(const ZixTreeIter* ZIX_NULLABLE i);
 
 /// Return an iterator that points to the element one past `i`
-ZIX_PURE_API ZixTreeIter* ZIX_NULLABLE
+ZIX_PURE_API ZIX_NONBLOCKING ZixTreeIter* ZIX_NULLABLE
 zix_tree_iter_next(ZixTreeIter* ZIX_NULLABLE i);
 
 /// Return an iterator that points to the element one before `i`
-ZIX_PURE_API ZixTreeIter* ZIX_NULLABLE
+ZIX_PURE_API ZIX_NONBLOCKING ZixTreeIter* ZIX_NULLABLE
 zix_tree_iter_prev(ZixTreeIter* ZIX_NULLABLE i);
 
 /**

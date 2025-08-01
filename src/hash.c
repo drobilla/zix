@@ -6,6 +6,7 @@
 #include "qualifiers.h"
 
 #include <zix/allocator.h>
+#include <zix/attributes.h>
 #include <zix/status.h>
 
 #include <assert.h>
@@ -73,21 +74,21 @@ zix_hash_free(ZixHash* const hash)
   }
 }
 
-ZixHashIter
+ZIX_NONBLOCKING ZixHashIter
 zix_hash_begin(const ZixHash* const hash)
 {
   assert(hash);
   return hash->entries[0U].value ? 0U : zix_hash_next(hash, 0U);
 }
 
-ZixHashIter
+ZIX_REALTIME ZixHashIter
 zix_hash_end(const ZixHash* const hash)
 {
   assert(hash);
   return hash->n_entries;
 }
 
-ZixHashRecord*
+ZIX_REALTIME ZixHashRecord*
 zix_hash_get(const ZixHash* hash, const ZixHashIter i)
 {
   assert(hash);
@@ -96,7 +97,7 @@ zix_hash_get(const ZixHash* hash, const ZixHashIter i)
   return hash->entries[i].value;
 }
 
-ZixHashIter
+ZIX_NONBLOCKING ZixHashIter
 zix_hash_next(const ZixHash* const hash, ZixHashIter i)
 {
   assert(hash);
@@ -107,7 +108,7 @@ zix_hash_next(const ZixHash* const hash, ZixHashIter i)
   return i;
 }
 
-size_t
+ZIX_REALTIME size_t
 zix_hash_size(const ZixHash* const hash)
 {
   assert(hash);
@@ -305,7 +306,7 @@ zix_hash_plan_insert(const ZixHash* const hash, const ZixHashKey* const key)
     hash, hash->hash_func(key), hash->equal_func, key);
 }
 
-ZixHashRecord*
+ZIX_REALTIME ZixHashRecord*
 zix_hash_record_at(const ZixHash* const hash, const ZixHashInsertPlan position)
 {
   assert(hash);

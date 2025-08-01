@@ -1,4 +1,4 @@
-// Copyright 2011-2024 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/btree.h>
@@ -167,7 +167,7 @@ zix_btree_clear(ZixBTree* const           t,
   t->size = 0U;
 }
 
-size_t
+ZIX_REALTIME size_t
 zix_btree_size(const ZixBTree* const t)
 {
   assert(t);
@@ -929,7 +929,7 @@ zix_btree_lower_bound(const ZixBTree* const     t,
   return ZIX_STATUS_SUCCESS;
 }
 
-void*
+ZIX_REALTIME void*
 zix_btree_get(const ZixBTreeIter ti)
 {
   const ZixBTreeNode* const node  = ti.nodes[ti.level];
@@ -942,7 +942,7 @@ zix_btree_get(const ZixBTreeIter ti)
                        : node->data.inode.vals[index];
 }
 
-ZixBTreeIter
+ZIX_NONBLOCKING ZixBTreeIter
 zix_btree_begin(const ZixBTree* const t)
 {
   assert(t);
@@ -962,7 +962,7 @@ zix_btree_begin(const ZixBTree* const t)
   return iter;
 }
 
-ZixBTreeIter
+ZIX_REALTIME ZixBTreeIter
 zix_btree_end(const ZixBTree* const t)
 {
   (void)t;
@@ -970,7 +970,7 @@ zix_btree_end(const ZixBTree* const t)
   return zix_btree_end_iter;
 }
 
-bool
+ZIX_REALTIME bool
 zix_btree_iter_equals(const ZixBTreeIter lhs, const ZixBTreeIter rhs)
 {
   const size_t indexes_size = ((size_t)lhs.level + 1U) * sizeof(uint16_t);
@@ -979,7 +979,7 @@ zix_btree_iter_equals(const ZixBTreeIter lhs, const ZixBTreeIter rhs)
          (!lhs.nodes[0U] || !memcmp(lhs.indexes, rhs.indexes, indexes_size));
 }
 
-ZixStatus
+ZIX_NONBLOCKING ZixStatus
 zix_btree_iter_increment(ZixBTreeIter* const i)
 {
   assert(i);
@@ -1017,7 +1017,7 @@ zix_btree_iter_increment(ZixBTreeIter* const i)
   return ZIX_STATUS_SUCCESS;
 }
 
-ZixBTreeIter
+ZIX_NONBLOCKING ZixBTreeIter
 zix_btree_iter_next(const ZixBTreeIter iter)
 {
   ZixBTreeIter next = iter;

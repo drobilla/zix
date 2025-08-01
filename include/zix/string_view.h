@@ -94,7 +94,7 @@ zix_string_view_copy(ZixAllocator* ZIX_NULLABLE allocator, ZixStringView view);
    has fast paths for when the operands have different lengths, or point to the
    same string data.
 */
-ZIX_PURE_API bool
+ZIX_PURE_API ZIX_NONBLOCKING bool
 zix_string_view_equals(ZixStringView lhs, ZixStringView rhs);
 
 /**

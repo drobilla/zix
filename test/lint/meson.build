@@ -17,6 +17,7 @@ if not meson.is_subproject()
       '--enable=warning,style,performance,portability',
       '--error-exitcode=1',
       '--project=' + compdb_path,
+      '--suppress=arrayIndexOutOfBoundsCond',
       '--suppress=constParameterCallback',
       '--suppress=constParameterPointer',
       '--suppress=normalCheckLevelMaxBranches',

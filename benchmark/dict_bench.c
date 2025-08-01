@@ -16,6 +16,7 @@ typedef struct {
 #include <zix/digest.h>
 #include <zix/hash.h>
 #include <zix/status.h>
+#include <zix/warnings.h>
 
 ZIX_DISABLE_GLIB_WARNINGS
 #include <glib.h>

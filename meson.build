@@ -330,6 +330,7 @@ include_dirs = include_directories(['include'])
 c_headers = files(
   'include/zix/allocator.h',
   'include/zix/attributes.h',
+  'include/zix/warnings.h',
   'include/zix/btree.h',
   'include/zix/bump_allocator.h',
   'include/zix/digest.h',

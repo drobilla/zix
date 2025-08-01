@@ -1,4 +1,4 @@
-// Copyright 2011-2022 David Robillard <d@drobilla.net>
+// Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_HASH_H
@@ -113,7 +113,7 @@ ZIX_API void
 zix_hash_free(ZixHash* ZIX_NULLABLE hash);
 
 /// Return the number of elements in the hash
-ZIX_PURE_API size_t
+ZIX_PURE_API ZIX_REALTIME size_t
 zix_hash_size(const ZixHash* ZIX_NONNULL hash);
 
 /**
@@ -131,19 +131,19 @@ zix_hash_size(const ZixHash* ZIX_NONNULL hash);
 typedef size_t ZixHashIter;
 
 /// Return an iterator to the first record in a hash, or the end if it is empty
-ZIX_PURE_API ZixHashIter
+ZIX_PURE_API ZIX_NONBLOCKING ZixHashIter
 zix_hash_begin(const ZixHash* ZIX_NONNULL hash);
 
 /// Return an iterator one past the last possible record in a hash
-ZIX_PURE_API ZixHashIter
+ZIX_PURE_API ZIX_REALTIME ZixHashIter
 zix_hash_end(const ZixHash* ZIX_NONNULL hash);
 
 /// Return the record pointed to by an iterator
-ZIX_PURE_API ZixHashRecord* ZIX_NULLABLE
+ZIX_PURE_API ZIX_REALTIME ZixHashRecord* ZIX_NULLABLE
 zix_hash_get(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
 /// Return an iterator that has been advanced to the next record in a hash
-ZIX_PURE_API ZixHashIter
+ZIX_PURE_API ZIX_NONBLOCKING ZixHashIter
 zix_hash_next(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
 /**
@@ -218,7 +218,7 @@ zix_hash_plan_insert_prehashed(const ZixHash* ZIX_NONNULL            hash,
    can be used to insert a new record, or to access the existing matching
    record.
 */
-ZIX_PURE_API ZixHashRecord* ZIX_NULLABLE
+ZIX_PURE_API ZIX_REALTIME ZixHashRecord* ZIX_NULLABLE
 zix_hash_record_at(const ZixHash* ZIX_NONNULL hash, ZixHashInsertPlan position);
 
 /**

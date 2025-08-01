@@ -1,4 +1,4 @@
-// Copyright 2016-2022 David Robillard <d@drobilla.net>
+// Copyright 2016-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #ifndef ZIX_STATUS_H
@@ -38,7 +38,7 @@ typedef enum {
    The returned string is always one sentence, with an uppercase first
    character, and no trailing period.
 */
-ZIX_CONST_API const char*
+ZIX_CONST_API ZIX_REALTIME const char*
 zix_strerror(ZixStatus status);
 
 /**

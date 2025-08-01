@@ -134,7 +134,7 @@ zix_bump_aligned_free(ZixAllocator* const allocator, void* const ptr)
   zix_bump_free(allocator, ptr);
 }
 
-ZIX_CONST_FUNC ZixBumpAllocator
+ZIX_CONST_FUNC ZIX_REALTIME ZixBumpAllocator
 zix_bump_allocator(const size_t capacity, void* buffer)
 {
   const size_t aligned_top = (uintptr_t)buffer % min_alignment;

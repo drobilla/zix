@@ -1,4 +1,4 @@
-// Copyright 2012-2022 David Robillard <d@drobilla.net>
+// Copyright 2012-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
 #include <zix/sem.h>
@@ -6,7 +6,9 @@
 #include "../errno_status.h"
 #include "../zix_config.h"
 
+#include <zix/attributes.h>
 #include <zix/status.h>
+#include <zix/warnings.h>
 
 #include <semaphore.h>
 
@@ -26,10 +28,12 @@ zix_sem_destroy(ZixSem* sem)
   return zix_errno_status_if(sem_destroy(&sem->sem));
 }
 
-ZixStatus
+ZIX_REALTIME ZixStatus
 zix_sem_post(ZixSem* sem)
 {
+  ZIX_DISABLE_EFFECT_WARNINGS
   return zix_errno_status_if(sem_post(&sem->sem));
+  ZIX_RESTORE_WARNINGS
 }
 
 ZixStatus
