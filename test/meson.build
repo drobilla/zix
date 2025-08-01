@@ -26,7 +26,10 @@ if cc.get_id() in ['clang', 'emscripten']
     endif
   endif
 elif cc.get_id() == 'gcc'
-  test_suppressions += ['-Wno-bad-function-cast']
+  test_suppressions += [
+    '-Wno-analyzer-malloc-leak',
+    '-Wno-bad-function-cast',
+  ]
 
   if host_machine.system() == 'windows'
     test_suppressions += ['-Wno-format']
