@@ -1,4 +1,4 @@
-zix (0.7.1) unstable; urgency=medium
+zix (0.8.0) stable; urgency=medium
 
   * Add ZIX_REALTIME and ZIX_NONBLOCKING attributes
   * Add warning suppression macros
@@ -11,7 +11,7 @@ zix (0.7.1) unstable; urgency=medium
   * Strengthen zix_file_equals()
   * Use getenv() instead of environ to avoid issues on FreeBSD
 
- -- David Robillard <d@drobilla.net>  Mon, 08 Sep 2025 04:44:48 +0000
+ -- David Robillard <d@drobilla.net>  Wed, 12 Nov 2025 18:40:15 +0000
 
 zix (0.6.2) stable; urgency=medium
 
