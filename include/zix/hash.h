@@ -154,8 +154,8 @@ zix_hash_next(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 
 /// User function for determining if a key matches in a custom search
 typedef bool (*ZixKeyMatchFunc)(
-  const ZixHashKey* ZIX_NONNULL         key,
-  const ZixHashSearchData* ZIX_NULLABLE user_data);
+  const ZixHashKey* ZIX_NONNULL            key,
+  const ZixHashSearchData* ZIX_UNSPECIFIED user_data);
 
 /**
    A "plan" (position) to insert a record in a hash table.
@@ -206,10 +206,11 @@ zix_hash_plan_insert(const ZixHash* ZIX_NONNULL    hash,
    with (the first argument) matches the key to be inserted.
 */
 ZIX_API ZixHashInsertPlan
-zix_hash_plan_insert_prehashed(const ZixHash* ZIX_NONNULL            hash,
-                               ZixHashCode                           code,
-                               ZixKeyMatchFunc ZIX_NONNULL           predicate,
-                               const ZixHashSearchData* ZIX_NULLABLE user_data);
+zix_hash_plan_insert_prehashed( //
+  const ZixHash* ZIX_NONNULL               hash,
+  ZixHashCode                              code,
+  ZixKeyMatchFunc ZIX_NONNULL              predicate,
+  const ZixHashSearchData* ZIX_UNSPECIFIED user_data);
 
 /**
    Return the record at the given position, or null.
