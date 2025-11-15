@@ -89,6 +89,15 @@ zix_hash_end(const ZixHash* const hash)
   return hash->n_entries;
 }
 
+ZIX_REALTIME ZixHashCode
+zix_hash_get_code(const ZixHash* hash, const ZixHashIter i)
+{
+  assert(hash);
+  assert(i < hash->n_entries);
+
+  return hash->entries[i].code;
+}
+
 ZIX_REALTIME ZixHashRecord*
 zix_hash_get(const ZixHash* hash, const ZixHashIter i)
 {
