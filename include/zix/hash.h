@@ -228,15 +228,12 @@ zix_hash_record_at(const ZixHash* ZIX_NONNULL hash, ZixHashInsertPlan position);
    zix_hash_plan_insert(), and no modifications must have been made to the hash
    table since.
 
-   @param hash The hash table.
-
+   @param hash The hash table to insert into.
    @param position The position for the new record.
+   @param record The record to insert.
 
-   @param record The record to insert which, on success, can now be considered
-   owned by the hash table.
-
-   @return ZIX_STATUS_SUCCESS, ZIX_STATUS_EXISTS if a record already exists at
-   this position, or ZIX_STATUS_NO_MEM if growing the hash table failed.
+   @return #ZIX_STATUS_SUCCESS, #ZIX_STATUS_EXISTS if a record already exists
+   at `position`, or #ZIX_STATUS_NO_MEM if growing the hash table failed.
 */
 ZIX_API ZixStatus
 zix_hash_insert_at(ZixHash* ZIX_NONNULL       hash,
@@ -250,12 +247,11 @@ zix_hash_insert_at(ZixHash* ZIX_NONNULL       hash,
    zix_hash_insert_at() that is more convenient when record construction is not
    expensive.
 
-   @param hash The hash table.
+   @param hash The hash table to insert into.
+   @param record The record to insert.
 
-   @param record The record to insert which, on success, can now be considered
-   owned by the hash table.
-
-   @return ZIX_STATUS_SUCCESS, ZIX_STATUS_EXISTS, or ZIX_STATUS_NO_MEM.
+   @return #ZIX_STATUS_SUCCESS, #ZIX_STATUS_EXISTS if the hash already has an
+   equivalent record, or #ZIX_STATUS_NO_MEM if growing the hash table failed.
 */
 ZIX_API ZixStatus
 zix_hash_insert(ZixHash* ZIX_NONNULL hash, ZixHashRecord* ZIX_NONNULL record);
@@ -263,16 +259,12 @@ zix_hash_insert(ZixHash* ZIX_NONNULL hash, ZixHashRecord* ZIX_NONNULL record);
 /**
    Erase a record at a specific position.
 
-   @param hash The hash table to remove the record from.
-
-   @param i Iterator to the record to remove.  This must be a valid iterator
-   from an earlier call to zix_hash_find(), that is, the hash table must not
-   have been modified since.
-
+   @param hash The hash table to remove from.
+   @param i A valid iterator to the record to remove.
    @param removed Set to the removed record, or null.
 
-   @return ZIX_STATUS_SUCCES or ZIX_STATUS_BAD_ARG if `i` does not point at a
-   removable record.
+   @return #ZIX_STATUS_SUCCESS or #ZIX_STATUS_NO_MEM if the record was erased,
+   but shrinking the hash failed.
 */
 ZIX_API ZixStatus
 zix_hash_erase(ZixHash* ZIX_NONNULL                     hash,
@@ -282,10 +274,10 @@ zix_hash_erase(ZixHash* ZIX_NONNULL                     hash,
 /**
    Remove a record.
 
-   @param hash The hash table.
+   @param hash The hash table to remove from.
    @param key The key of the record to remove.
    @param removed Set to the removed record, or null.
-   @return ZIX_STATUS_SUCCES or ZIX_STATUS_NOT_FOUND.
+   @return #ZIX_STATUS_SUCCESS or #ZIX_STATUS_NOT_FOUND.
 */
 ZIX_API ZixStatus
 zix_hash_remove(ZixHash* ZIX_NONNULL                     hash,
@@ -302,11 +294,8 @@ zix_hash_remove(ZixHash* ZIX_NONNULL                     hash,
    Find the position of a record with a given key.
 
    @param hash The hash table to search.
-
    @param key The key of the desired record.
-
-   @return An iterator to the matching record, or the end iterator if no such
-   record exists.
+   @return An iterator to a matching record, or the end.
 */
 ZIX_API ZixHashIter
 zix_hash_find(const ZixHash* ZIX_NONNULL    hash,
@@ -319,10 +308,8 @@ zix_hash_find(const ZixHash* ZIX_NONNULL    hash,
    the record for convenience.
 
    @param hash The hash table to search.
-
    @param key The key of the desired record.
-
-   @return A pointer to the matching record, of null if no such record exists.
+   @return A pointer to a matching record, or null.
 */
 ZIX_API ZixHashRecord* ZIX_NULLABLE
 zix_hash_find_record(const ZixHash* ZIX_NONNULL    hash,
