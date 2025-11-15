@@ -5,6 +5,7 @@
 
 #define ZIX_HASH_KEY_TYPE const char
 #define ZIX_HASH_RECORD_TYPE const char
+#define ZIX_HASH_SEARCH_DATA_TYPE const char
 
 #include "ensure.h"
 #include "failing_allocator.h"
@@ -28,6 +29,7 @@ typedef struct {
   ZixHash* hash;
   char*    buffer;
   char**   strings;
+  size_t*  codes;
 } TestState;
 
 ZIX_LOG_FUNC(2, 3)
@@ -128,20 +130,24 @@ stress_with(ZixAllocator* const allocator,
             const size_t        n_elems)
 {
   ZixHash*  hash  = zix_hash_new(allocator, identity, hash_func, string_equal);
-  TestState state = {hash, NULL, NULL};
+  TestState state = {hash, NULL, NULL, NULL};
   ENSURE(&state, hash, "Failed to allocate hash\n");
 
   static const size_t string_length = 15;
 
-  char* const  buffer  = (char*)calloc(1, n_elems * (string_length + 1));
-  char** const strings = state.strings = (char**)calloc(n_elems, sizeof(char*));
-  state.buffer                         = buffer;
-  state.strings                        = strings;
-  ENSURE(&state, buffer && state.strings, "Failed to allocate strings\n");
+  state.buffer  = (char*)calloc(1, n_elems * (string_length + 1));
+  state.strings = (char**)calloc(n_elems, sizeof(char*));
+  state.codes   = (size_t*)calloc(n_elems, sizeof(size_t));
+  ENSURE(&state,
+         state.buffer && state.strings && state.codes,
+         "Failed to allocate test data\n");
+
+  char** const  strings = state.strings;
+  size_t* const codes   = state.codes;
 
   uint32_t seed = 1U;
   for (size_t i = 0U; i < n_elems; ++i) {
-    strings[i] = buffer + (i * (string_length + 1));
+    strings[i] = state.buffer + (i * (string_length + 1));
     assert((uintptr_t)strings[i] % sizeof(size_t) == 0);
     assert((uintptr_t)strings[i] % sizeof(uint32_t) == 0);
 
@@ -153,8 +159,10 @@ stress_with(ZixAllocator* const allocator,
 
   // Insert each string
   for (size_t i = 0; i < n_elems; ++i) {
-    ZixStatus st = zix_hash_insert(hash, strings[i]);
+    const ZixHashInsertPlan plan = zix_hash_plan_insert(hash, strings[i]);
+    const ZixStatus         st   = zix_hash_insert(hash, strings[i]);
     ENSUREV(&state, !st, "Failed to insert `%s'\n", strings[i]);
+    codes[i] = plan.code;
   }
 
   // Ensure hash size is correct
@@ -166,7 +174,10 @@ stress_with(ZixAllocator* const allocator,
 
   // Attempt to insert each string again
   for (size_t i = 0; i < n_elems; ++i) {
-    ZixStatus st = zix_hash_insert(hash, strings[i]);
+    const ZixHashInsertPlan plan =
+      zix_hash_plan_insert_prehashed(hash, codes[i], string_equal, strings[i]);
+
+    const ZixStatus st = zix_hash_insert_at(hash, plan, strings[i]);
     ENSUREV(&state,
             st == ZIX_STATUS_EXISTS,
             "Double inserted `%s' (%s)\n",
@@ -183,6 +194,12 @@ stress_with(ZixAllocator* const allocator,
             "Bad match for `%s': `%s'\n",
             strings[i],
             match);
+
+    const ZixHashIter iter = zix_hash_find(hash, strings[i]);
+    ENSUREV(&state,
+            zix_hash_get_code(hash, iter) == codes[i],
+            "Unexpected hash code for `%s`\n",
+            strings[i]);
   }
 
   static const char* const not_indexed_string = "__not__indexed__";
@@ -245,6 +262,10 @@ stress_with(ZixAllocator* const allocator,
     assert(!zix_hash_record_at(hash, plan));
     ZixStatus st = zix_hash_insert_at(hash, plan, strings[i]);
     ENSUREV(&state, !st, "Failed to insert `%s'\n", strings[i]);
+
+    ZixHashInsertPlan replan =
+      zix_hash_plan_insert_prehashed(hash, plan.code, string_equal, strings[i]);
+    assert(replan.code == plan.code);
   }
 
   // Check key == value (and test zix_hash_foreach)
@@ -260,8 +281,9 @@ stress_with(ZixAllocator* const allocator,
 
   ENSURE(&state, n_checked == n_elems, "Check failed\n");
 
-  free(strings);
-  free(buffer);
+  free(state.codes);
+  free(state.strings);
+  free(state.buffer);
   zix_hash_free(hash);
 
   return 0;

@@ -138,6 +138,10 @@ zix_hash_begin(const ZixHash* ZIX_NONNULL hash);
 ZIX_PURE_API ZIX_REALTIME ZixHashIter
 zix_hash_end(const ZixHash* ZIX_NONNULL hash);
 
+/// Return the unfolded hash code for the record pointed to by an iterator
+ZIX_PURE_API ZIX_REALTIME ZixHashCode
+zix_hash_get_code(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
+
 /// Return the record pointed to by an iterator
 ZIX_PURE_API ZIX_REALTIME ZixHashRecord* ZIX_NULLABLE
 zix_hash_get(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
