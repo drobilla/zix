@@ -1,9 +1,10 @@
 // Copyright 2011-2025 David Robillard <d@drobilla.net>
 // SPDX-License-Identifier: ISC
 
-#include <zix/hash.h>
-
+#include "default_hash.h" // IWYU pragma: keep
 #include "qualifiers.h"
+
+#include <zix/hash.h>
 
 #include <zix/allocator.h>
 #include <zix/attributes.h>
@@ -11,6 +12,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct ZixHashEntry {
   ZixHashCode    code;   ///< Non-folded hash code
@@ -20,7 +22,8 @@ typedef struct ZixHashEntry {
 struct ZixHashImpl {
   ZixAllocator*   allocator;  ///< User allocator
   ZixKeyFunc      key_func;   ///< User key accessor
-  ZixHashFunc     hash_func;  ///< User hashing function
+  ZixHashExtFunc  hash_func;  ///< User hashing function
+  ZixHashExtData  hash_data;  ///< User data for hashing function
   ZixKeyEqualFunc equal_func; ///< User equality comparison function
   size_t          count;      ///< Number of records stored in the table
   size_t          mask;       ///< Bit mask for fast modulo (n_entries - 1)
@@ -32,11 +35,18 @@ static ZIX_CONSTEXPR size_t min_n_entries    = 4U;
 static ZIX_CONSTEXPR size_t min_load_divisor = 4U;
 static ZIX_CONSTEXPR size_t tombstone        = 0xDEADU;
 
+static ZixHashCode
+wrap_hash_func(const ZixHashKey* const key, const ZixHashExtData user_data)
+{
+  return ((ZixHashFunc)user_data)(key);
+}
+
 ZixHash*
-zix_hash_new(ZixAllocator* const   allocator,
-             const ZixKeyFunc      key_func,
-             const ZixHashFunc     hash_func,
-             const ZixKeyEqualFunc equal_func)
+zix_hash_new_ext(ZixAllocator* const   allocator,
+                 const ZixKeyFunc      key_func,
+                 const ZixHashExtFunc  hash_func,
+                 const ZixHashExtData  hash_data,
+                 const ZixKeyEqualFunc equal_func)
 {
   assert(key_func);
   assert(hash_func);
@@ -50,6 +60,7 @@ zix_hash_new(ZixAllocator* const   allocator,
   hash->allocator  = allocator;
   hash->key_func   = key_func;
   hash->hash_func  = hash_func;
+  hash->hash_data  = hash_data;
   hash->equal_func = equal_func;
   hash->count      = 0U;
   hash->n_entries  = min_n_entries;
@@ -64,6 +75,16 @@ zix_hash_new(ZixAllocator* const   allocator,
   }
 
   return hash;
+}
+
+ZixHash*
+zix_hash_new(ZixAllocator* const   allocator,
+             const ZixKeyFunc      key_func,
+             const ZixHashFunc     hash_func,
+             const ZixKeyEqualFunc equal_func)
+{
+  return zix_hash_new_ext(
+    allocator, key_func, wrap_hash_func, (ZixHashExtData)hash_func, equal_func);
 }
 
 void
@@ -156,11 +177,14 @@ next_index(const ZixHash* const hash, const size_t i)
   return (i == hash->mask) ? 0U : (i + 1U);
 }
 
-static inline ZixHashIter
-find_entry(const ZixHash* const    hash,
-           const ZixHashKey* const key,
-           const ZixHashCode       code)
+ZixHashIter
+zix_hash_find_prehashed(const ZixHash* const    hash,
+                        const ZixHashCode       code,
+                        const ZixHashKey* const key)
 {
+  assert(hash);
+  assert(key);
+
   size_t i = fold_code(code, hash->mask);
 
   while (!is_empty(&hash->entries[i]) &&
@@ -194,9 +218,9 @@ rehash(ZixHash* const hash,
   for (size_t i = 0U; i < old_n_entries; ++i) {
     const ZixHashEntry* const entry = &old_entries[i];
     if (entry->record) {
-      const ZixHashKey* const key   = hash->key_func(entry->record);
-      const size_t            index = find_entry(hash, key, entry->code);
-      new_entries[index]            = *entry;
+      const ZixHashKey* const key = hash->key_func(entry->record);
+      const size_t index = zix_hash_find_prehashed(hash, entry->code, key);
+      new_entries[index] = *entry;
     }
   }
 
@@ -211,7 +235,8 @@ zix_hash_find(const ZixHash* const hash, const ZixHashKey* const key)
   assert(hash);
   assert(key);
 
-  const ZixHashIter i = find_entry(hash, key, hash->hash_func(key));
+  const ZixHashCode h = hash->hash_func(key, hash->hash_data);
+  const ZixHashIter i = zix_hash_find_prehashed(hash, h, key);
   return is_empty(&hash->entries[i]) ? hash->n_entries : i;
 }
 
@@ -221,7 +246,8 @@ zix_hash_find_record(const ZixHash* const hash, const ZixHashKey* const key)
   assert(hash);
   assert(key);
 
-  const ZixHashIter i = find_entry(hash, key, hash->hash_func(key));
+  const ZixHashIter i =
+    zix_hash_find_prehashed(hash, hash->hash_func(key, hash->hash_data), key);
   return hash->entries[i].record;
 }
 
@@ -273,8 +299,8 @@ zix_hash_plan_insert(const ZixHash* const hash, const ZixHashKey* const key)
   assert(hash);
   assert(key);
 
-  return zix_hash_plan_insert_prehashed(
-    hash, hash->hash_func(key), hash->equal_func, key);
+  const ZixHashCode h = hash->hash_func(key, hash->hash_data);
+  return zix_hash_plan_insert_prehashed(hash, h, hash->equal_func, key);
 }
 
 ZIX_REALTIME ZixHashRecord*

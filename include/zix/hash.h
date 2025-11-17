@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 ZIX_BEGIN_DECLS
 
@@ -43,6 +44,13 @@ typedef void ZixHashRecord; ///< The type of a hash table record
 typedef ZIX_HASH_SEARCH_DATA_TYPE ZixHashSearchData;
 #else
 typedef void ZixHashSearchData; ///< User data for key comparison function
+#endif
+
+// ZIX_HASH_EXT_DATA_TYPE can be defined to make the API more type-safe
+#ifdef ZIX_HASH_EXT_DATA_TYPE
+typedef ZIX_HASH_EXT_DATA_TYPE ZixHashExtData;
+#else
+typedef uintptr_t ZixHashExtData; ///< User data for node hashing function
 #endif
 
 /**
@@ -82,6 +90,11 @@ typedef const ZixHashKey* ZIX_NONNULL (*ZixKeyFunc)(
   const ZixHashRecord* ZIX_NONNULL record);
 
 /// User function for computing the hash of a key
+typedef ZixHashCode (*ZixHashExtFunc)( //
+  const ZixHashKey* ZIX_NONNULL key,
+  ZixHashExtData                user_data);
+
+/// User function for computing the hash of a key
 typedef ZixHashCode (*ZixHashFunc)(const ZixHashKey* ZIX_NONNULL key);
 
 /// User function for determining if two keys are truly equal
@@ -93,6 +106,22 @@ typedef bool (*ZixKeyEqualFunc)(const ZixHashKey* ZIX_NONNULL a,
    @defgroup zix_hash_setup Setup
    @{
 */
+
+/**
+   Create a new hash table with an extended hash function.
+
+   @param allocator Allocator used for the internal array.
+   @param key_func A function to retrieve the key from a record.
+   @param hash_func The key hashing function.
+   @param hash_user_data Opaque user data to pass to `hash_func`.
+   @param equal_func A function to test keys for equality.
+*/
+ZIX_API ZIX_NODISCARD ZixHash* ZIX_ALLOCATED
+zix_hash_new_ext(ZixAllocator* ZIX_NULLABLE  allocator,
+                 ZixKeyFunc ZIX_NONNULL      key_func,
+                 ZixHashExtFunc ZIX_NONNULL  hash_func,
+                 ZixHashExtData              hash_user_data,
+                 ZixKeyEqualFunc ZIX_NONNULL equal_func);
 
 /**
    Create a new hash table.
@@ -305,6 +334,19 @@ zix_hash_remove(ZixHash* ZIX_NONNULL                     hash,
 ZIX_API ZixHashIter
 zix_hash_find(const ZixHash* ZIX_NONNULL    hash,
               const ZixHashKey* ZIX_NONNULL key);
+
+/**
+   Find the position of a record with a given hash code and key.
+
+   @param hash The hash table to search.
+   @param code The hash code for `key`.
+   @param key The key of the desired record.
+   @return An iterator to a matching record, or the end.
+*/
+ZIX_API ZixHashIter
+zix_hash_find_prehashed(const ZixHash* ZIX_NONNULL    hash,
+                        ZixHashCode                   code,
+                        const ZixHashKey* ZIX_NONNULL key);
 
 /**
    Find a record with a given key.
