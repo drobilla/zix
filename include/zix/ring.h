@@ -42,9 +42,9 @@ typedef struct ZixRingImpl ZixRing;
 
    @param allocator Allocator for the ring object and its array.
 
-   @param size Minimum size of the ring in bytes (rounded up to a power of 2).
-
-   Note that one byte of the ring is reserved, so in order to be able to write
+   @param size Minimum size of the ring array in bytes.  This must be between 2
+   and 2147483648 inclusive, and is rounded up to the next power of 2
+   internally.  Note that one byte is reserved, so in order to be able to write
    `n` bytes to the ring at once, `size` must be `n + 1`.
 */
 ZIX_API ZIX_NODISCARD ZixRing* ZIX_ALLOCATED

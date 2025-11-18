@@ -160,6 +160,27 @@ test_ring(const unsigned size)
 }
 
 static void
+test_capacity(void)
+{
+  assert(!zix_ring_new(NULL, 0));
+  assert(!zix_ring_new(NULL, 1));
+  assert(!zix_ring_new(NULL, 2147483649U));
+
+  {
+    ZixRing* const smallest = zix_ring_new(NULL, 2U);
+    assert(smallest);
+    assert(zix_ring_capacity(smallest) == 1U);
+    zix_ring_free(smallest);
+  }
+  {
+    ZixRing* const rounded = zix_ring_new(NULL, 6U);
+    assert(rounded);
+    assert(zix_ring_capacity(rounded) == 7U);
+    zix_ring_free(rounded);
+  }
+}
+
+static void
 test_failed_alloc(void)
 {
   ZixFailingAllocator allocator = zix_failing_allocator();
@@ -192,6 +213,7 @@ main(int argc, char** argv)
   n_writes = (argc > 2) ? (unsigned)zix_test_size_arg(argv[2], 4U, 1U << 20U)
                         : size * 1024;
 
+  test_capacity();
   test_failed_alloc();
   test_ring(size);
   return 0;

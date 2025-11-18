@@ -14,7 +14,7 @@ project(
   ],
   license: 'ISC',
   meson_version: '>= 0.56.0',
-  version: '0.8.0',
+  version: '0.8.1',
 )
 
 zix_src_root = meson.current_source_dir()

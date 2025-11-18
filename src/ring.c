@@ -79,6 +79,10 @@ next_power_of_two(uint32_t size)
 ZixRing*
 zix_ring_new(ZixAllocator* const allocator, const uint32_t size)
 {
+  if (size < 2U || size > 2147483648U) {
+    return NULL;
+  }
+
   ZixRing* ring = (ZixRing*)zix_malloc(allocator, sizeof(ZixRing));
 
   if (ring) {
