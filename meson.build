@@ -171,8 +171,52 @@ elif host_machine.system() == 'windows'
     'win8': '0x0602',
   }
   system_c_args += [
-    '-DWIN32_LEAN_AND_MEAN',
+    # Set minimum target version
+    '-DWINVER=' + winvers[get_option('win_ver')],
     '-D_WIN32_WINNT=' + winvers[get_option('win_ver')],
+
+    # Disable as many things from windows.h as possible
+    '-DWIN32_LEAN_AND_MEAN',
+    '-DNOGDICAPMASKS', # CC_*, LC_*, PC_*, CP_*, TC_*, RC_
+    '-DNOVIRTUALKEYCODES', # VK_*
+    '-DNOWINMESSAGES', # WM_*, EM_*, LB_*, CB_*
+    '-DNOWINSTYLES', # WS_*, CS_*, ES_*, LBS_*, SBS_*, CBS_*
+    '-DNOSYSMETRICS', # SM_*
+    '-DNOMENUS', # MF_*
+    '-DNOICONS', # IDI_*
+    '-DNOKEYSTATES', # MK_*
+    '-DNOSYSCOMMANDS', # SC_*
+    '-DNORASTEROPS', # Binary and Tertiary raster ops
+    '-DNOSHOWWINDOW', # SW_*
+    '-DOEMRESOURCE', # OEM Resource values
+    '-DNOATOM', # Atom Manager routines
+    '-DNOCLIPBOARD', # Clipboard routines
+    '-DNOCOLOR', # Screen colors
+    '-DNOCTLMGR', # Control and Dialog routines
+    '-DNODRAWTEXT', # DrawText() and DT_*
+    '-DNOGDI', # All GDI defines and routines
+    '-DNOKERNEL', # All KERNEL defines and routines
+    '-DNOUSER', # All USER defines and routines
+    # Needed for MultiByteToWideChar/WideCharToMultiByte:
+    # '-DNONLS', # All NLS defines and routines
+    '-DNOMB', # MB_* and MessageBox()
+    '-DNOMEMMGR', # GMEM_*, LMEM_*, GHND, LHND, associated routines
+    '-DNOMETAFILE', # typedef METAFILEPICT
+    '-DNOMINMAX', # Macros min(a,b) and max(a,b)
+    '-DNOMSG', # typedef MSG and associated routines
+    '-DNOOPENFILE', # OpenFile(), OemToAnsi, AnsiToOem, and OF_*
+    '-DNOSCROLL', # SB_* and scrolling routines
+    '-DNOSERVICE', # All Service Controller routines, SERVICE_ equates, etc.
+    '-DNOSOUND', # Sound driver routines
+    '-DNOTEXTMETRIC', # typedef TEXTMETRIC and associated routines
+    '-DNOWH', # SetWindowsHook and WH_*
+    '-DNOWINOFFSETS', # GWL_*, GCL_*, associated routines
+    '-DNOCOMM', # COMM driver routines
+    '-DNOKANJI', # Kanji support stuff
+    '-DNOHELP', # Help engine interface
+    '-DNOPROFILER', # Profiler interface
+    '-DNODEFERWINDOWPOS', # DeferWindowPos routines
+    '-DNOMCX', # Modem Configuration Extensions
   ]
 else
   system_c_args += [
