@@ -8,7 +8,6 @@
 #include <zix/attributes.h>
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <string.h>
 
 ZIX_BEGIN_DECLS

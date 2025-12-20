@@ -26,7 +26,6 @@
 #endif
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 
 struct ZixRingImpl {

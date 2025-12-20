@@ -12,7 +12,6 @@
 #include <zix/string_view.h>
 
 #include <stdbool.h>
-#include <stddef.h>
 #include <string.h>
 
 static ZIX_CONSTEXPR ZixIndexRange two_range = {0U, 2U};
