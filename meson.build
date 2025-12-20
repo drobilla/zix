@@ -40,6 +40,7 @@ if cc.get_id() in ['clang', 'emscripten']
       '-Wno-c++98-compat',
       '-Wno-declaration-after-statement',
       '-Wno-implicit-fallthrough', # Really for clang < 12
+      '-Wno-nrvo',
       '-Wno-padded',
       '-Wno-pre-c11-compat',
       '-Wno-pre-c23-compat',
