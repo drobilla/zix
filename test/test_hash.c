@@ -142,7 +142,7 @@ stress_with(ZixAllocator* const allocator,
 
   uint32_t seed = 1U;
   for (size_t i = 0U; i < n_elems; ++i) {
-    strings[i] = buffer + i * (string_length + 1);
+    strings[i] = buffer + (i * (string_length + 1));
     assert((uintptr_t)strings[i] % sizeof(size_t) == 0);
     assert((uintptr_t)strings[i] % sizeof(uint32_t) == 0);
 

@@ -151,7 +151,7 @@ zix_digest32(const uint32_t seed, const void* const buf, const size_t len)
 
     h ^= k;
     h = rotl32(h, 13);
-    h = h * 5U + 0xE6546B64U;
+    h = (h * 5U) + 0xE6546B64U;
   }
 
   // Process any trailing bytes
@@ -198,7 +198,7 @@ zix_digest32_aligned(const uint32_t    seed,
 
     h ^= k;
     h = rotl32(h, 13);
-    h = h * 5U + 0xE6546B64U;
+    h = (h * 5U) + 0xE6546B64U;
   }
 
   return mix32(h ^ (uint32_t)len);

@@ -68,7 +68,7 @@ zix_btree_node_new(ZixAllocator* const allocator, const bool leaf)
       (defined(__cplusplus) && __cplusplus >= 201103L))
   assert(sizeof(ZixBTreeNode) <= ZIX_BTREE_PAGE_SIZE);
   assert(sizeof(ZixBTreeNode) >=
-         ZIX_BTREE_PAGE_SIZE - 2U * sizeof(ZixBTreeNode*));
+         ZIX_BTREE_PAGE_SIZE - (2U * sizeof(ZixBTreeNode*)));
 #endif
 
   ZixBTreeNode* const node = (ZixBTreeNode*)zix_aligned_alloc(
