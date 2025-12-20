@@ -153,9 +153,9 @@ zix_hash_next(const ZixHash* ZIX_NONNULL hash, ZixHashIter i);
 */
 
 /// User function for determining if a key matches in a custom search
-typedef bool (*ZixKeyMatchFunc)(const ZixHashKey* ZIX_NONNULL key,
-                                const ZixHashSearchData* ZIX_NULLABLE
-                                  user_data);
+typedef bool (*ZixKeyMatchFunc)(
+  const ZixHashKey* ZIX_NONNULL         key,
+  const ZixHashSearchData* ZIX_NULLABLE user_data);
 
 /**
    A "plan" (position) to insert a record in a hash table.
