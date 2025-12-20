@@ -35,7 +35,7 @@
 #ifndef ZIX_CONFIG_H
 #define ZIX_CONFIG_H
 
-#if !defined(ZIX_NO_DEFAULT_CONFIG)
+#ifndef ZIX_NO_DEFAULT_CONFIG
 
 // We need unistd.h to check _POSIX_VERSION
 #  ifndef ZIX_NO_POSIX

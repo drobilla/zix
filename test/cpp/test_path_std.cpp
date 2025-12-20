@@ -333,7 +333,7 @@ const char* const paths[] = {
   "C:a/c:/b",
   "C:a/c:\\b",
 
-#if !defined(_WIN32)
+#ifndef _WIN32
   // Filenames with colons that aren't handled consistently on Windows
   "C:/a/C:b",
   "C:/a/D:b",
@@ -349,7 +349,7 @@ const char* const paths[] = {
   "nodrive:",
 #endif
 
-#if !defined(_WIN32)
+#ifndef _WIN32
   // Invalid root and network paths that aren't handled consistently on Windows
   "//a//",
   "//host/dir/../../../a",

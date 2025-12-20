@@ -87,7 +87,7 @@
 #endif
 
 // Unused parameter macro to suppresses warnings and make it impossible to use
-#if defined(__cplusplus)
+#ifdef __cplusplus
 #  define ZIX_UNUSED(name)
 #elif defined(__GNUC__) || defined(__clang__)
 #  define ZIX_UNUSED(name) name##_unused __attribute__((__unused__))

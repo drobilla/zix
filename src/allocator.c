@@ -53,7 +53,7 @@ zix_default_aligned_alloc(ZixAllocator* const allocator,
 {
   (void)allocator;
 
-#if defined(_WIN32)
+#ifdef _WIN32
   return _aligned_malloc(size, alignment);
 #elif USE_POSIX_MEMALIGN
   void* ptr = NULL;
@@ -68,7 +68,7 @@ zix_default_aligned_free(ZixAllocator* const allocator, void* const ptr)
 {
   (void)allocator;
 
-#if defined(_WIN32)
+#ifdef _WIN32
   _aligned_free(ptr);
 #else
   free(ptr);

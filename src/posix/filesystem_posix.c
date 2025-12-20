@@ -419,7 +419,7 @@ zix_temp_directory_path(ZixAllocator* const allocator)
 char*
 zix_current_path(ZixAllocator* const allocator)
 {
-#if defined(PATH_MAX)
+#ifdef PATH_MAX
   // Some POSIX systems have a static PATH_MAX so we can store it on the stack
   char        buffer[PATH_MAX] = {0};
   char* const cwd              = getcwd(buffer, PATH_MAX);

@@ -112,7 +112,7 @@ zix_sem_timed_wait(ZixSem* ZIX_NONNULL sem,
    @cond
 */
 
-#if defined(__APPLE__)
+#ifdef __APPLE__
 
 struct ZixSemImpl {
   semaphore_t sem;

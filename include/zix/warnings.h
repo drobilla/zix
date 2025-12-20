@@ -10,7 +10,7 @@
    @{
 */
 
-#if defined(__clang__)
+#ifdef __clang__
 
 #  if __clang_major__ >= 20
 #    define ZIX_DISABLE_EFFECT_WARNINGS \

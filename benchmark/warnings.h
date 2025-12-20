@@ -6,7 +6,7 @@
 
 #include <zix/warnings.h>
 
-#if defined(__clang__)
+#ifdef __clang__
 
 #  define ZIX_DISABLE_GLIB_WARNINGS                                         \
     _Pragma("clang diagnostic push")                                        \

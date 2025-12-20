@@ -15,7 +15,7 @@
 #  define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
-#if defined(PAGE_SIZE)
+#ifdef PAGE_SIZE
 #  define ZIX_DEFAULT_PAGE_SIZE PAGE_SIZE
 #else
 #  define ZIX_DEFAULT_PAGE_SIZE 4096U
@@ -45,7 +45,7 @@ zix_system_max_block_size(const struct stat* const s1,
 int
 zix_system_open(const char* const path, const int flags, const mode_t mode)
 {
-#if defined(O_CLOEXEC)
+#ifdef O_CLOEXEC
   return open(path, flags | O_CLOEXEC, mode); // NOLINT(hicpp-signed-bitwise)
 #else
   return open(path, flags, mode);

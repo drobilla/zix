@@ -21,7 +21,7 @@
   stdatomic.h support arrives before anyone cares about running this code on
   Windows on ARM.
 */
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #  include <intrin.h>
 #endif
 
@@ -41,7 +41,7 @@ struct ZixRingImpl {
 static inline uint32_t
 zix_atomic_load(const uint32_t* const ptr)
 {
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
   const uint32_t val = *ptr;
   _ReadBarrier();
   return val;
@@ -54,7 +54,7 @@ static inline void
 zix_atomic_store(uint32_t* const ptr, // NOLINT(readability-non-const-parameter)
                  const uint32_t  val)
 {
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
   _WriteBarrier();
   *ptr = val;
 #else
