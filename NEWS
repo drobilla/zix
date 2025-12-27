@@ -5,8 +5,9 @@ zix (0.8.1) unstable; urgency=medium
   * Clean up and strengthen Hash implementation
   * Fix build with configure checks disabled
   * Fix handling of invalid ring size parameters
+  * Fix potential out of bounds access on error
 
- -- David Robillard <d@drobilla.net>  Fri, 23 Jan 2026 21:45:26 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 23 Jan 2026 21:45:41 +0000
 
 zix (0.8.0) stable; urgency=medium
 
