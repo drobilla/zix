@@ -59,6 +59,8 @@ zix_default_aligned_alloc(ZixAllocator* const allocator,
   void* ptr = NULL;
   return posix_memalign(&ptr, alignment, size) ? NULL : ptr;
 #else
+  (void)alignment;
+  (void)size;
   return NULL;
 #endif
 }
