@@ -230,7 +230,7 @@ endif
 platform_c_args = []
 if get_option('checks').disabled()
   # Generic build without platform-specific features
-  platform_c_args += ['-DZIX_NO_DEFAULT_CONFIG']
+  platform_c_args += ['-DZIX_NO_DEFAULT_CONFIG'] + system_c_args
 elif get_option('checks').auto()
   # Statically detect configuration from the build environment
   platform_c_args += system_c_args

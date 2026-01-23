@@ -1,8 +1,9 @@
 zix (0.8.1) unstable; urgency=medium
 
+  * Fix build with configure checks disabled
   * Fix handling of invalid ring size parameters
 
- -- David Robillard <d@drobilla.net>  Tue, 18 Nov 2025 16:59:46 +0000
+ -- David Robillard <d@drobilla.net>  Fri, 23 Jan 2026 15:06:26 +0000
 
 zix (0.8.0) stable; urgency=medium
 
