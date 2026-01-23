@@ -49,7 +49,7 @@
 #  endif
 
 // Define ZIX_POSIX_VERSION unconditionally for convenience
-#  if defined(_POSIX_VERSION)
+#  ifdef _POSIX_VERSION
 #    define ZIX_POSIX_VERSION _POSIX_VERSION
 #  else
 #    define ZIX_POSIX_VERSION 0
