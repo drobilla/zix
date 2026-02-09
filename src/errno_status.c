@@ -55,7 +55,7 @@ zix_errno_status(const int e)
 {
   // Find the index of the matching mapping (or leave it at the fallback entry)
   size_t m = 0;
-  while (m < N_ERRNO_MAPPINGS && errno_map[m].code != e) {
+  while (m < (N_ERRNO_MAPPINGS - 1) && errno_map[m].code != e) {
     ++m;
   }
 
