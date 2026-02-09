@@ -83,7 +83,7 @@ zix_btree_new(ZixAllocator* ZIX_NULLABLE      allocator,
 ZIX_API void
 zix_btree_free(ZixBTree* ZIX_NULLABLE           t,
                ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
-               const void* ZIX_NULLABLE         destroy_data);
+               const void* ZIX_UNSPECIFIED      destroy_data);
 
 /**
    Clear everything from `t`, leaving it empty.
@@ -98,7 +98,7 @@ zix_btree_free(ZixBTree* ZIX_NULLABLE           t,
 ZIX_API void
 zix_btree_clear(ZixBTree* ZIX_NONNULL            t,
                 ZixBTreeDestroyFunc ZIX_NULLABLE destroy,
-                const void* ZIX_NULLABLE         destroy_data);
+                const void* ZIX_UNSPECIFIED      destroy_data);
 
 /// Return the number of elements in `t`
 ZIX_PURE_API ZIX_REALTIME size_t
@@ -238,7 +238,7 @@ zix_btree_find(const ZixBTree* ZIX_NONNULL t,
 ZIX_API ZixStatus
 zix_btree_lower_bound(const ZixBTree* ZIX_NONNULL      t,
                       ZixBTreeCompareFunc ZIX_NULLABLE compare_key,
-                      const void* ZIX_NULLABLE         compare_key_data,
+                      const void* ZIX_UNSPECIFIED      compare_key_data,
                       const void* ZIX_UNSPECIFIED      key,
                       ZixBTreeIter* ZIX_NONNULL        ti);
 

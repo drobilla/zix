@@ -49,7 +49,7 @@ zix_tree_new(ZixAllocator* ZIX_NULLABLE      allocator,
              ZixTreeCompareFunc ZIX_NONNULL  cmp,
              void* ZIX_UNSPECIFIED           cmp_data,
              ZixTreeDestroyFunc ZIX_NULLABLE destroy,
-             const void* ZIX_NULLABLE        destroy_user_data);
+             const void* ZIX_UNSPECIFIED     destroy_user_data);
 
 /// Free `t`
 ZIX_API void
