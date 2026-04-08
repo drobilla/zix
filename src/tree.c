@@ -558,7 +558,7 @@ zix_tree_find(const ZixTree* t, const void* e, ZixTreeIter** ti)
   }
 
   *ti = n;
-  return (n) ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
+  return n ? ZIX_STATUS_SUCCESS : ZIX_STATUS_NOT_FOUND;
 }
 
 ZIX_REALTIME void*

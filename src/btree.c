@@ -24,7 +24,7 @@ typedef uint16_t ZixShort;
 #  define ZIX_BTREE_PAGE_SIZE 4096U
 #endif
 
-#define ZIX_BTREE_NODE_SPACE (ZIX_BTREE_PAGE_SIZE - 2U * sizeof(ZixShort))
+#define ZIX_BTREE_NODE_SPACE (ZIX_BTREE_PAGE_SIZE - (2U * sizeof(ZixShort)))
 #define ZIX_BTREE_LEAF_VALS ((ZIX_BTREE_NODE_SPACE / sizeof(void*)) - 1U)
 #define ZIX_BTREE_INODE_VALS (ZIX_BTREE_LEAF_VALS / 2U)
 
