@@ -94,7 +94,7 @@ zix_create_directories(ZixAllocator* ZIX_NULLABLE allocator,
                        const char* ZIX_NONNULL    dir_path);
 
 /**
-   Create a hard link at path `link` that points to path `target`.
+   Create a hard link at `link_path` that points to `target_path`.
 
    @return #ZIX_STATUS_SUCCESS, or an error.
 */
@@ -103,7 +103,7 @@ zix_create_hard_link(const char* ZIX_NONNULL target_path,
                      const char* ZIX_NONNULL link_path);
 
 /**
-   Create a symbolic link at path `link` that points to path `target`.
+   Create a symbolic link at `link_path` that points to `target_path`.
 
    Note that portable code should use zix_create_directory_symlink() if the
    target is a directory, since this function won't work for that on some
@@ -116,7 +116,7 @@ zix_create_symlink(const char* ZIX_NONNULL target_path,
                    const char* ZIX_NONNULL link_path);
 
 /**
-   Create a symbolic link at path `link` that points to the directory `target`.
+   Create a symbolic link at `link_path` that points to `target_path`.
 
    This is a separate function from zix_create_symlink() because some systems
    (like Windows) require directory symlinks to be created specially.
