@@ -14,7 +14,7 @@ project(
   ],
   license: 'ISC',
   meson_version: '>= 0.56.0',
-  version: '0.8.2',
+  version: '0.8.3',
 )
 
 zix_src_root = meson.current_source_dir()
@@ -82,6 +82,7 @@ elif cc.get_id() == 'gcc'
 
     if host_machine.system() == 'windows'
       c_suppressions += [
+        '-Wno-arith-conversion',
         '-Wno-suggest-attribute=const',
         '-Wno-suggest-attribute=format',
         '-Wno-suggest-attribute=pure',

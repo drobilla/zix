@@ -1,3 +1,9 @@
+zix (0.8.3) unstable; urgency=medium
+
+  * Suppress warning in MinGW build on Debian 12
+
+ -- David Robillard <d@drobilla.net>  Wed, 01 Jul 2026 23:29:13 +0000
+
 zix (0.8.2) stable; urgency=medium
 
   * Fix build with configure checks disabled
