@@ -241,16 +241,19 @@ main(int argc, char** argv)
     }
   }
 
-  printf(
-    "Running %u tests with %zu elements (seed %zu)", n_tests, n_elems, seed);
+  fprintf(stderr,
+          "Running %u tests with %zu elements (seed %zu)",
+          n_tests,
+          n_elems,
+          seed);
 
   int st = 0;
   for (unsigned i = 0; !st && i < n_tests; ++i) {
-    printf(".");
+    fprintf(stderr, ".");
     fflush(stdout);
     st = stress(NULL, i, n_elems);
   }
 
-  printf("\n");
+  fprintf(stderr, "\n");
   return EXIT_SUCCESS;
 }

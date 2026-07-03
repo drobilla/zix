@@ -157,7 +157,7 @@ run(FILE* const fd)
   fprintf(search_dat, "# n\tGHashTable\tZixHash\n");
 
   for (size_t n = inputs.n_chunks / 16; n <= inputs.n_chunks; n *= 2) {
-    printf("Benchmarking n = %zu\n", n);
+    fprintf(stderr, "Benchmarking n = %zu\n", n);
     GHashTable* hash = g_hash_table_new(g_str_hash, g_str_equal);
 
     ZixHash* zhash = zix_hash_new(NULL,

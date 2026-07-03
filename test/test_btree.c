@@ -614,15 +614,15 @@ main(int argc, char** argv)
   const char*    size_arg = (argc > 1) ? argv[1] : "65536";
   const size_t   n_elems  = zix_test_size_arg(size_arg, 4U, 1U << 20U);
 
-  printf("Running %u tests with %zu elements", n_tests, n_elems);
+  fprintf(stderr, "Running %u tests with %zu elements", n_tests, n_elems);
 
   int st = 0;
   for (unsigned i = 0; !st && i < n_tests; ++i) {
-    printf(".");
+    fprintf(stderr, ".");
     fflush(stdout);
     st = stress(NULL, i, n_elems);
   }
 
-  printf("\n");
+  fprintf(stderr, "\n");
   return st;
 }

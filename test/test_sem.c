@@ -18,26 +18,26 @@ static unsigned n_signals = 1024;
 static ZixThreadResult ZIX_THREAD_FUNC
 reader(void* ZIX_UNUSED(arg))
 {
-  printf("Reader starting\n");
+  fprintf(stderr, "Reader starting\n");
 
   for (unsigned i = 0; i < n_signals; ++i) {
     assert(!zix_sem_wait(&sem));
   }
 
-  printf("Reader finished\n");
+  fprintf(stderr, "Reader finished\n");
   return ZIX_THREAD_RESULT;
 }
 
 static ZixThreadResult ZIX_THREAD_FUNC
 writer(void* ZIX_UNUSED(arg))
 {
-  printf("Writer starting\n");
+  fprintf(stderr, "Writer starting\n");
 
   for (unsigned i = 0; i < n_signals; ++i) {
     assert(!zix_sem_post(&sem));
   }
 
-  printf("Writer finished\n");
+  fprintf(stderr, "Writer finished\n");
   return ZIX_THREAD_RESULT;
 }
 
@@ -69,7 +69,7 @@ int
 main(int argc, char** argv)
 {
   if (argc > 2) {
-    printf("Usage: %s N_SIGNALS\n", argv[0]);
+    fprintf(stderr, "Usage: %s N_SIGNALS\n", argv[0]);
     return 1;
   }
 
@@ -80,7 +80,7 @@ main(int argc, char** argv)
   test_try_wait();
   test_timed_wait();
 
-  printf("Testing %u signals...\n", n_signals);
+  fprintf(stderr, "Testing %u signals...\n", n_signals);
 
   assert(!zix_sem_init(&sem, 0));
 

@@ -26,7 +26,7 @@ test_strerror(void)
   msg = zix_strerror((ZixStatus)1000000);
   assert(!strcmp(msg, "Unknown error"));
 
-  printf("Success\n");
+  fprintf(stderr, "Success\n");
 }
 
 int

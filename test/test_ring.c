@@ -47,7 +47,7 @@ cmp_msg(const int* const msg1, const int* const msg2)
 static ZixThreadResult ZIX_THREAD_FUNC
 reader(void* ZIX_UNUSED(arg))
 {
-  printf("Reader starting\n");
+  fprintf(stderr, "Reader starting\n");
 
   int ref_msg[MSG_SIZE];  // Reference generated for comparison
   int read_msg[MSG_SIZE]; // Read from ring
@@ -61,14 +61,14 @@ reader(void* ZIX_UNUSED(arg))
     }
   }
 
-  printf("Reader finished\n");
+  fprintf(stderr, "Reader finished\n");
   return ZIX_THREAD_RESULT;
 }
 
 static ZixThreadResult ZIX_THREAD_FUNC
 writer(void* ZIX_UNUSED(arg))
 {
-  printf("Writer starting\n");
+  fprintf(stderr, "Writer starting\n");
 
   int write_msg[MSG_SIZE]; // Written to ring
   int start = gen_msg(write_msg, 0);
@@ -80,7 +80,7 @@ writer(void* ZIX_UNUSED(arg))
     }
   }
 
-  printf("Writer finished\n");
+  fprintf(stderr, "Writer finished\n");
   return ZIX_THREAD_RESULT;
 }
 
@@ -89,10 +89,11 @@ test_ring(const unsigned size)
 {
   zix_ring_free(NULL);
 
-  printf("Testing %u writes of %u ints to a %u int ring...\n",
-         n_writes,
-         MSG_SIZE,
-         size);
+  fprintf(stderr,
+          "Testing %u writes of %u ints to a %u int ring...\n",
+          n_writes,
+          MSG_SIZE,
+          size);
 
   ring = zix_ring_new(NULL, size);
   assert(ring);
@@ -203,7 +204,7 @@ int
 main(int argc, char** argv)
 {
   if (argc > 3) {
-    printf("Usage: %s SIZE [N_WRITES]\n", argv[0]);
+    fprintf(stderr, "Usage: %s SIZE [N_WRITES]\n", argv[0]);
     return 1;
   }
 
