@@ -1,4 +1,4 @@
-# Copyright 2024 David Robillard <d@drobilla.net>
+# Copyright 2024-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 if not meson.is_subproject()
@@ -18,6 +18,7 @@ if not meson.is_subproject()
       '--error-exitcode=1',
       '--project=' + compdb_path,
       '--suppress=arrayIndexOutOfBoundsCond',
+      '--suppress=constParameter',
       '--suppress=constParameterCallback',
       '--suppress=constParameterPointer',
       '--suppress=normalCheckLevelMaxBranches',
