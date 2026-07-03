@@ -63,11 +63,11 @@ sequential_tests = {
 threaded_tests = {
   'ring': {
     '': [],
-    'small': ['4', '1024'],
+    '_small': ['4', '1024'],
   },
   'sem': {
     '': [],
-    'one': ['1'],
+    '_one': ['1'],
   },
   'thread': {'': []},
 }
