@@ -372,7 +372,7 @@ stat_file_type(const struct stat* sb)
     ZixFileType type;
   } Mapping;
 
-  ZIX_CONSTEXPR Mapping map[] = {
+  static ZIX_CONSTEXPR Mapping map[] = {
     {S_IFREG, ZIX_FILE_TYPE_REGULAR},
     {S_IFDIR, ZIX_FILE_TYPE_DIRECTORY},
     {S_IFLNK, ZIX_FILE_TYPE_SYMLINK},
