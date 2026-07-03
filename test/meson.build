@@ -106,7 +106,9 @@ foreach test, cases : sequential_tests
 endforeach
 
 # Test multi-threaded
-if thread_dep.found()
+# Temporarily disabled because emscripten is characteristically flaky
+# See https://github.com/emscripten-core/emscripten/issues/24500
+if thread_dep.found() and cc.get_id() != 'emscripten'
   foreach test, cases : threaded_tests
     sources = common_test_sources + files('test_@0@.c'.format(test))
     exe = executable(
@@ -129,6 +131,10 @@ endif
 # Test bad cases
 foreach test, cases : bad_tests
   foreach suffix, args : cases
+    if test not in test_executables
+      continue
+    endif
+
     test(
       test + suffix,
       test_executables[test],
