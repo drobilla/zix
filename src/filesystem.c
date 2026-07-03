@@ -65,7 +65,7 @@ zix_create_directories(ZixAllocator* const allocator,
 ZixFileOffset
 zix_file_size(const char* const path)
 {
-  struct stat sb;
+  struct stat sb = {0};
   return stat(path, &sb) ? (off_t)0 : sb.st_size;
 }
 
@@ -96,10 +96,10 @@ zix_file_equals(ZixAllocator* const allocator,
   errno = 0;
 
   // Open files and get file information
-  const int   fd_a = zix_system_open(path_a, O_RDONLY, 0);
-  const int   fd_b = zix_system_open(path_b, O_RDONLY, 0);
-  struct stat stat_a;
-  struct stat stat_b;
+  const int   fd_a   = zix_system_open(path_a, O_RDONLY, 0);
+  const int   fd_b   = zix_system_open(path_b, O_RDONLY, 0);
+  struct stat stat_a = {0};
+  struct stat stat_b = {0};
   if (fd_a < 0 || fd_b < 0 || fstat(fd_a, &stat_a) || fstat(fd_b, &stat_b)) {
     zix_system_close_fds(fd_b, fd_a);
     return false;

@@ -177,8 +177,8 @@ zix_copy_file(ZixAllocator* const  allocator,
 #endif
 
   // Open source file and get its status
-  const int   src_fd = zix_system_open(src, O_RDONLY, 0);
-  struct stat src_stat;
+  const int   src_fd   = zix_system_open(src, O_RDONLY, 0);
+  struct stat src_stat = {0};
   if (src_fd < 0 || fstat(src_fd, &src_stat)) {
     return finish_copy(-1, src_fd, zix_errno_status(errno));
   }
@@ -192,7 +192,7 @@ zix_copy_file(ZixAllocator* const  allocator,
   const bool  overwrite = (options == ZIX_COPY_OPTION_OVERWRITE_EXISTING);
   const int   dst_flags = O_WRONLY | O_CREAT | (overwrite ? O_TRUNC : O_EXCL);
   const int   dst_fd    = zix_system_open(dst, dst_flags, 0644);
-  struct stat dst_stat;
+  struct stat dst_stat  = {0};
   if (dst_fd < 0 || fstat(dst_fd, &dst_stat)) {
     return finish_copy(dst_fd, src_fd, zix_errno_status(errno));
   }
@@ -235,7 +235,7 @@ ZixStatus
 zix_create_directory_like(const char* const dir_path,
                           const char* const existing_path)
 {
-  struct stat sb;
+  struct stat sb = {0};
   return !dir_path[0] ? ZIX_STATUS_BAD_ARG
          : stat(existing_path, &sb)
            ? zix_errno_status(errno)
@@ -395,14 +395,14 @@ stat_file_type(const struct stat* sb)
 ZixFileType
 zix_file_type(const char* const path)
 {
-  struct stat sb;
+  struct stat sb = {0};
   return stat(path, &sb) ? ZIX_FILE_TYPE_NONE : stat_file_type(&sb);
 }
 
 ZixFileType
 zix_symlink_type(const char* const path)
 {
-  struct stat sb;
+  struct stat sb = {0};
   return lstat(path, &sb) ? ZIX_FILE_TYPE_NONE : stat_file_type(&sb);
 }
 
