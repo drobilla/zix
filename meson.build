@@ -356,7 +356,7 @@ int main(void) { sem_t s; struct timespec t; return sem_timedwait(&s, &t); }''',
       continue
     endif
 
-    if cc.get_id() == 'emscripten' and name in ['flock', 'fileno']
+    if cc.get_id() == 'emscripten' and name in ['flock', 'fileno', 'mlock']
       message('Ignoring emscripten stub @0@'.format(name))
       continue
     endif
@@ -463,7 +463,7 @@ if cc.get_id() == 'emscripten'
   ]
 
   wasm_link_args = wasm_c_args + [
-    ['-s', 'ENVIRONMENT=node,worker'],
+    ['-s', 'ENVIRONMENT=node'],
     ['-s', 'INITIAL_MEMORY=33554432'],
   ]
 

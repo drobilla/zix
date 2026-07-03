@@ -1,4 +1,4 @@
-# Copyright 2019-2025 David Robillard <d@drobilla.net>
+# Copyright 2019-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
 stages: [build, deploy]
@@ -28,7 +28,7 @@ dev:
 
 static:
   stage: build
-  image: lv2plugin/debian-x64
+  image: lv2plugin/debian-dev
   script:
     - meson setup build -Ddefault_library=static -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
     - ninja -C build test
@@ -37,7 +37,7 @@ sanitize:
   stage: build
   image: lv2plugin/debian-x64-clang
   script:
-    - meson setup build -Db_lundef=false -Dbuildtype=plain -Dwarning_level=3 -Dwerror=true -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=local-bounds -fsanitize=nullability" -Dcpp_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Dcpp_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=undefined -fsanitize=float-divide-by-zero" -Ddocs=disabled
+    - meson setup build -Db_lundef=false -Dbuildtype=plain -Dwarning_level=3 -Dwerror=true -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=local-bounds -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=local-bounds -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dcpp_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dcpp_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Ddocs=disabled
     - ninja -C build test
     - meson configure build -Dbuildtype=debugoptimized -Dc_args="" -Dc_link_args="" -Dcpp_args="" -Dcpp_link_args=""
     - meson configure build -Dc_std=c17 -Db_sanitize=thread
@@ -104,7 +104,7 @@ mingw32:
     - meson configure -Dwin_wchar=disabled build
     - ninja -C build test
   variables:
-    WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\10-win32"
+    WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\12-win32"
 
 mingw64:
   stage: build
@@ -121,7 +121,7 @@ mingw64:
     - meson configure -Dwin_wchar=disabled build
     - ninja -C build test
   variables:
-    WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\10-win32"
+    WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\12-win32"
 
 wasm:
   stage: build
