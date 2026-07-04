@@ -1,18 +1,21 @@
 # Copyright 2019-2026 David Robillard <d@drobilla.net>
 # SPDX-License-Identifier: 0BSD OR ISC
 
+# yamllint disable rule:line-length
+---
+
 stages: [build, deploy]
 
 default:
   stage: build
-  image: lv2plugin/debian-x64
+  image: lv2plugin/debian-gcc
   script:
     - meson setup build -Dwerror=true
     - ninja -C build test
 
 dev:
   stage: build
-  image: lv2plugin/debian-x64
+  image: lv2plugin/debian-gcc-dev
   script:
     - meson setup build -Dbuildtype=debug -Dc_std=c11 -Dwarning_level=3 -Dwerror=true -Db_coverage=true -Dlint=true -Ddocs=enabled -Dprefix=/
     - ninja -C build test
@@ -28,14 +31,14 @@ dev:
 
 static:
   stage: build
-  image: lv2plugin/debian-dev
+  image: lv2plugin/debian-gcc
   script:
     - meson setup build -Ddefault_library=static -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
     - ninja -C build test
 
 sanitize:
   stage: build
-  image: lv2plugin/debian-x64-clang
+  image: lv2plugin/debian-clang-dev
   script:
     - meson setup build -Db_lundef=false -Dbuildtype=plain -Dwarning_level=3 -Dwerror=true -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=local-bounds -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=local-bounds -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dcpp_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dcpp_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Ddocs=disabled
     - ninja -C build test
@@ -60,9 +63,9 @@ fedora:
 
 # Linux Platforms
 
-arm32:
+armnf:
   stage: build
-  image: lv2plugin/debian-arm32
+  image: lv2plugin/debian-gcc-armhf
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
     - ninja -C build test
@@ -71,16 +74,16 @@ arm32:
 
 arm64:
   stage: build
-  image: lv2plugin/debian-arm64
+  image: lv2plugin/debian-gcc-arm64
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
     - ninja -C build test
     - meson configure -Dbuildtype=release build
     - ninja -C build test
 
-x32:
+i386:
   stage: build
-  image: lv2plugin/debian-x32
+  image: lv2plugin/debian-gcc-i386
   script:
     - meson setup build --cross-file=/usr/share/meson/cross/i686-linux-gnu.ini -Dbuildtype=debug -Dwarning_level=3 -Dwerror=true -Ddocs=disabled
     - ninja -C build test
@@ -136,7 +139,7 @@ wasm:
 
 freebsd:
   stage: build
-  tags: [freebsd,meson]
+  tags: [freebsd, meson]
   script:
     - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
     - ninja -C build test
@@ -154,7 +157,7 @@ mac:
 
 win:
   stage: build
-  tags: [windows,meson]
+  tags: [windows, meson]
   script:
     - meson setup build -Dbuildtype=debug -Dwarning_level=everything -Dwerror=true -Ddocs=disabled
     - ninja -C build test
@@ -185,6 +188,6 @@ pages:
     - dev
   artifacts:
     paths:
-     - public
+      - public
   only:
     - main
