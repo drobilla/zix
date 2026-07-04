@@ -43,6 +43,7 @@ class SensibleScalarFormatter(matplotlib.ticker.ScalarFormatter):
         super()._set_order_of_magnitude()
 
         # Round down to sensible (millions, billions, etc) order
+        # pylint: disable=invalid-name
         self.orderOfMagnitude = self.orderOfMagnitude - (
             self.orderOfMagnitude % 3
         )
