@@ -159,7 +159,7 @@ rotate_left(ZixTreeNode* p, int* height_change)
   // p->balance -= 1 + MAX(0, q->balance);
   // q->balance -= 1 - MIN(0, p->balance);
   --q->balance;
-  p->balance = -(q->balance);
+  p->balance = -q->balance;
 
   ASSERT_BALANCE(p);
   ASSERT_BALANCE(q);
@@ -190,7 +190,7 @@ rotate_right(ZixTreeNode* p, int* height_change)
   // p->balance += 1 - MIN(0, q->balance);
   // q->balance += 1 + MAX(0, p->balance);
   ++q->balance;
-  p->balance = -(q->balance);
+  p->balance = -q->balance;
 
   ASSERT_BALANCE(p);
   ASSERT_BALANCE(q);
