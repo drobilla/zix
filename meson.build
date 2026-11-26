@@ -66,7 +66,10 @@ if cc.get_id() in ['clang', 'emscripten']
   endif
 
   if cc.get_id() == 'emscripten'
-    c_suppressions += ['-Wno-format']
+    c_suppressions += [
+      '-Wno-disabled-macro-expansion',
+      '-Wno-format',
+    ]
   endif
 
 elif cc.get_id() == 'gcc'
@@ -80,9 +83,12 @@ elif cc.get_id() == 'gcc'
       '-Wno-unsuffixed-float-constants',
     ]
 
+    if host_machine.cpu_family() in ['arm', 'riscv32', 'x86']
+      c_suppressions += ['-Wno-arith-conversion']
+    endif
+
     if host_machine.system() == 'windows'
       c_suppressions += [
-        '-Wno-arith-conversion',
         '-Wno-suggest-attribute=const',
         '-Wno-suggest-attribute=format',
         '-Wno-suggest-attribute=pure',

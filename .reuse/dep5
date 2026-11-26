@@ -4,5 +4,10 @@ Upstream-Contact: David Robillard <d@drobilla.net>
 Source: https://gitlab.com/drobilla/zix
 
 Files: *.md NEWS
-Copyright: 2021-2025 David Robillard <d@drobilla.net>
+Copyright: 2021-2026 David Robillard <d@drobilla.net>
+License: 0BSD OR ISC
+
+Files: doc/site/index.html
+Copyright: 2026 David Robillard <d@drobilla.net>
+Comment: Trivial site index
 License: 0BSD OR ISC

@@ -41,26 +41,25 @@ Platforms
 
 Zix is continually tested on:
 
-  * Debian 11 (x86, x64, arm32, and arm64)
-  * Fedora 36 (x64)
-  * FreeBSD 14 (x64)
-  * MacOS 14 (M2)
-  * Node 12 (as wasm via emscripten 2.0.12)
+  * Debian 12 (x86, x64, arm32, and arm64)
+  * Fedora 43 (x64)
+  * FreeBSD 15 (x64)
+  * MacOS 15 (M2)
+  * Node 20 (as wasm via emscripten 3.1.69)
   * Windows 10 (x64)
 
 Dependencies
 ------------
 
-None,
-except the C standard library,
-and some POSIX and platform-specific APIs where necessary.
+None, except the C standard library, and some POSIX and platform-specific APIs
+where necessary.
 
 Documentation
 -------------
 
   * [Installation Instructions](INSTALL.md)
-  * [API reference (single page)](https://drobilla.gitlab.io/zix/doc/singlehtml/)
-  * [API reference (paginated)](https://drobilla.gitlab.io/zix/doc/html/)
-  * [Test Coverage](https://drobilla.gitlab.io/zix/coverage/)
+  * [API reference](https://drobilla.codeberg.page/zix/doc/html/)
+    * [Single page](https://drobilla.codeberg.page/zix/doc/singlehtml/)
+  * [Test Coverage](https://drobilla.codeberg.page/zix/coverage/)
 
  -- David Robillard <d@drobilla.net>

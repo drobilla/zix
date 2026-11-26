@@ -1,0 +1,407 @@
+# Copyright 2026 David Robillard <d@drobilla.net>
+# SPDX-License-Identifier: 0BSD OR ISC
+# yamllint disable rule:line-length
+---
+name: test
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+
+jobs:
+  default:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup"
+        run: meson setup build -Dwerror=true
+      - name: "Build"
+        run: ninja -C build
+      - name: "Test"
+        run: ninja -C build test
+
+  dev:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc-dev:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Set epoch"
+        run: echo "SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)" >> $FORGEJO_ENV
+      - name: "Setup (debug)"
+        run: meson setup build -Dbuildtype=debug -Ddocs=enabled -Dlint=true -Dprefix=/ -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+      - name: "Install"
+        run: meson install -C build --destdir dest
+      - name: "Upload index"
+        if: >
+          forgejo.server_url == 'https://codeberg.org' &&
+          forgejo.ref_name == 'main'
+        uses: https://codeberg.org/git-pages/action@v2
+        with:
+          site: https://${{ forge.repository_owner }}.codeberg.page/zix/
+          server: codeberg.page
+          token: ${{ forge.token }}
+          source: doc/site/
+      - name: "Upload documentation"
+        if: >
+          forgejo.server_url == 'https://codeberg.org' &&
+          forgejo.ref_name == 'main'
+        uses: https://codeberg.org/git-pages/action@v2
+        with:
+          site: https://${{ forge.repository_owner }}.codeberg.page/zix/
+          server: codeberg.page
+          path: doc
+          token: ${{ forge.token }}
+          source: build/dest/share/doc/zix-0/
+
+  coverage:
+    needs: dev
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc-dev:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup"
+        run: meson setup build -Db_coverage=true -Dbuildtype=debug -Dwerror=true
+      - name: "Build"
+        run: ninja -C build
+      - name: "Test"
+        run: ninja -C build test
+      - name: "Build coverage report"
+        run: ninja -C build coverage-html
+      - name: "Upload coverage report"
+        if: >
+          forgejo.server_url == 'https://codeberg.org' &&
+          forgejo.ref_name == 'main'
+        uses: https://codeberg.org/git-pages/action@v2
+        with:
+          site: https://${{ forge.repository_owner }}.codeberg.page/zix/
+          server: codeberg.page
+          path: coverage
+          token: ${{ forge.token }}
+          source: build/meson-logs/coveragereport/
+
+  cpp:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Build"
+        run: |
+          mkdir -p build
+          g++ -fPIC -Iinclude -Wall -Werror -Wextra -Wpedantic -Wno-missing-field-initializers -rdynamic -shared -std=c++17 -o build/libzix.so src/*.c
+
+  static:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup"
+        run: meson setup build -Dbuildtype=debug -Dc_std=c11 -Ddefault_library=static -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build"
+        run: ninja -C build
+      - name: "Test"
+        run: ninja -C build test
+
+  sanitize:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-clang:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (address/etc)"
+        run: meson setup build -Db_lundef=false -Dbuildtype=plain -Dc_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=local-bounds -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dc_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-conversion -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=local-bounds -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dcpp_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Dcpp_link_args="-fno-sanitize-recover=all -fsanitize=address -fsanitize=alignment -fsanitize=bool -fsanitize=bounds -fsanitize=builtin -fsanitize=enum -fsanitize=float-cast-overflow -fsanitize=float-divide-by-zero -fsanitize=implicit-integer-sign-change -fsanitize=implicit-signed-integer-truncation -fsanitize=implicit-unsigned-integer-truncation -fsanitize=integer-divide-by-zero -fsanitize=nonnull-attribute -fsanitize=null -fsanitize=nullability-arg -fsanitize=nullability-assign -fsanitize=nullability-return -fsanitize=pointer-overflow -fsanitize=return -fsanitize=returns-nonnull-attribute -fsanitize=shift -fsanitize=signed-integer-overflow -fsanitize=unreachable -fsanitize=vla-bound -fsanitize=vptr" -Ddocs=disabled -Dwarning_level=3 -Dwerror=true
+      - name: "Build (address/etc)"
+        run: ninja -C build
+      - name: "Test (address/etc)"
+        run: ninja -C build test
+      - name: "Configure (thread)"
+        run: meson configure build -Db_sanitize=thread -Dbuildtype=debugoptimized -Dc_args="" -Dc_link_args="" -Dc_std=c17 -Dcpp_args="" -Dcpp_link_args=""
+      - name: "Test (thread)"
+        run: ninja -C build test
+      - name: "Configure (memory)"
+        run: meson configure build -Db_sanitize=memory -Dc_args="" -Dc_link_args="" -Dcpp_args="" -Dcpp_link_args="" -Dtests_cpp=disabled
+      - name: "Build (memory)"
+        run: ninja -C build
+      - name: "Test (memory)"
+        run: ninja -C build test
+
+  fedora:
+    runs-on: docker
+    container:
+      image: lv2plugin/fedora-dev:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (fortified)"
+        run: meson setup build -Dbuildtype=plain -Dc_args="-O2 -D_FORTIFY_SOURCE=2" -Dwarning_level=everything -Dwerror=true
+      - name: "Build (fortified)"
+        run: ninja -C build
+      - name: "Test (fortified)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  armhf:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc-armhf:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build --cross-file=/usr/share/meson/cross/arm-linux-gnueabihf.ini -Dbuildtype=debug -Dc_std=c11 -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  arm64:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc-arm64:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build --cross-file=/usr/share/meson/cross/aarch64-linux-gnu.ini -Dbuildtype=debug -Dc_std=c11 -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  i386:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-gcc-i386:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build --cross-file=/usr/share/meson/cross/i686-linux-gnu.ini -Dbuildtype=debug -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  mingw32:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-mingw32:20261014
+    env:
+      WINEPATH: "Z:\\usr\\lib\\gcc\\i686-w64-mingw32\\12-win32"
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build --cross-file=/usr/share/meson/cross/i686-w64-mingw32.ini -Dbuildtype=debug -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: meson test -C build -t 2
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  mingw64:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-mingw64:20261014
+    env:
+      WINEPATH: "Z:\\usr\\lib\\gcc\\x86_64-w64-mingw32\\12-win32"
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build --cross-file=/usr/share/meson/cross/x86_64-w64-mingw32.ini -Dbuildtype=debug -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: meson test -C build -t 2
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  wasm:
+    runs-on: docker
+    container:
+      image: lv2plugin/debian-wasm:20261014
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build --cross-file=/usr/share/meson/cross/wasm.ini -Dbuildtype=debug -Ddefault_library=static -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: meson test -C build -t 2
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  freebsd:
+    runs-on: [freebsd, meson, ninja]
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build -Dbuildtype=debug -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  mac:
+    runs-on: [macos-arm64, meson, ninja]
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch $FORGEJO_REF_NAME --depth 1
+          $FORGEJO_SERVER_URL/$FORGEJO_REPOSITORY.git .
+      - name: "Setup (debug)"
+        run: meson setup build -Dbuildtype=debug -Dc_std=c11 -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+
+  win:
+    runs-on: [windows, meson, ninja, msvc]
+    steps:
+      - name: "Clone"
+        run: >
+          git clone --branch ${Env:FORGEJO_REF_NAME} --depth 1
+          ${Env:FORGEJO_SERVER_URL}/${Env:FORGEJO_REPOSITORY}.git .
+      - name: "Setup (debug)"
+        run: meson setup build -Dbuildtype=debug -Ddocs=disabled -Dwarning_level=everything -Dwerror=true
+      - name: "Build (debug)"
+        run: ninja -C build
+      - name: "Test (debug)"
+        run: ninja -C build test
+      - name: "Configure (release)"
+        run: meson configure build -Dbuildtype=release
+      - name: "Build (release)"
+        run: ninja -C build
+      - name: "Test (release)"
+        run: ninja -C build test
+      - name: "Configure (vista)"
+        run: meson configure build -Dwin_ver=vista
+      - name: "Build (vista)"
+        run: ninja -C build
+      - name: "Test (vista)"
+        run: ninja -C build test
+      - name: "Configure (winxp)"
+        run: meson configure build -Dwin_ver=winxp
+      - name: "Build (winxp)"
+        run: ninja -C build
+      - name: "Test (winxp)"
+        run: ninja -C build test
+      - name: "Configure (nt4)"
+        run: meson configure build -Dwin_ver=nt4
+      - name: "Build (nt4)"
+        run: ninja -C build
+      - name: "Test (nt4)"
+        run: ninja -C build test
+      - name: "Configure (char)"
+        run: meson configure build -Dwin_wchar=disabled
+      - name: "Build (char)"
+        run: ninja -C build
+      - name: "Test (char)"
+        run: ninja -C build test
+      - name: "Configure (win8/uwp)"
+        run: meson configure build -Dwin_wchar=enabled -Dwin_ver=win8 -Dc_args="/DWINAPI_FAMILY=WINAPI_FAMILY_PC_APP" -Dc_link_args="/APPCONTAINER"
+      - name: "Build (win8/uwp)"
+        run: ninja -C build
+      - name: "Test (win8/uwp)"
+        run: ninja -C build test

@@ -42,7 +42,7 @@ if yamllint.found()
   test(
     'yamllint',
     yamllint,
-    args: ['-f', 'parsable', '-s', files('../../.gitlab-ci.yml')],
+    args: ['-f', 'parsable', '-s', files('../../.forgejo/workflows/test.yml')],
     suite: 'data',
   )
 endif
