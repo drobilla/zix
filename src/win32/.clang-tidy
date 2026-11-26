@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: 0BSD OR ISC
 
 Checks: >
-  -hicpp-signed-bitwise,
+  -*-signed-bitwise,
   -misc-misplaced-const,
   -performance-no-int-to-ptr,
 InheritParentConfig: true

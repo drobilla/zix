@@ -43,7 +43,7 @@ zix_system_max_block_size(const struct stat* const s1,
 int
 zix_system_open(const char* const path, const int flags, const mode_t mode)
 {
-  const int oflag = flags | O_BINARY; //  NOLINT(hicpp-signed-bitwise)
+  const int oflag = flags | O_BINARY; //  NOLINT(*-signed-bitwise)
 
 #if USE_SOPEN_S
   int           fd  = 0;

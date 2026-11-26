@@ -16,6 +16,8 @@
 #include <stdint.h>
 #include <time.h>
 
+// NOLINTBEGIN(bugprone-assignment-in-selection-statement,cert-exp45-c)
+
 ZixStatus
 zix_sem_init(ZixSem* sem, unsigned initial)
 {
@@ -94,3 +96,5 @@ zix_sem_timed_wait(ZixSem*        sem,
 #  undef NS_PER_SECOND
 #endif
 }
+
+// NOLINTEND(bugprone-assignment-in-selection-statement,cert-exp45-c)

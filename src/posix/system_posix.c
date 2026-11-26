@@ -46,7 +46,7 @@ int
 zix_system_open(const char* const path, const int flags, const mode_t mode)
 {
 #ifdef O_CLOEXEC
-  return open(path, flags | O_CLOEXEC, mode); // NOLINT(hicpp-signed-bitwise)
+  return open(path, flags | O_CLOEXEC, mode); // NOLINT(*-signed-bitwise)
 #else
   return open(path, flags, mode);
 #endif

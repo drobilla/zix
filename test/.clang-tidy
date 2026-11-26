@@ -14,6 +14,8 @@ Checks: >
   -google-readability-casting,
   -llvm-header-guard,
   -performance-no-int-to-ptr,
+  -readability-redundant-nested-if,
+  -readability-trailing-comma,
 CheckOptions:
   - key:   readability-function-cognitive-complexity.Threshold
     value: '194'
