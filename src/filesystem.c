@@ -43,15 +43,13 @@ zix_create_directories(ZixAllocator* const allocator,
 
   // Create each directory down the path
   ZixStatus st = ZIX_STATUS_SUCCESS;
-  while (p.state != ZIX_PATH_END) {
+  while (!st && p.state != ZIX_PATH_END) {
     char* const end      = &path[p.range.end];
     const char  old_last = *end;
 
     *end = '\0';
     if (zix_file_type(path) != ZIX_FILE_TYPE_DIRECTORY) {
-      if ((st = zix_create_directory(path))) {
-        break;
-      }
+      st = zix_create_directory(path);
     }
 
     *end = old_last;

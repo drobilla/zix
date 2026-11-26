@@ -428,16 +428,18 @@ zix_btree_insert(ZixBTree* const t, void* const e)
 {
   assert(t);
 
-  ZixStatus st = ZIX_STATUS_SUCCESS;
-
   if (!t->root) {
     // Empty tree, create a new leaf root
-    if (!(t->root = zix_btree_node_new(t->allocator, true))) {
+    t->root = zix_btree_node_new(t->allocator, true);
+    if (!t->root) {
       return ZIX_STATUS_NO_MEM;
     }
-  } else if (zix_btree_is_full(t->root)) {
+  }
+
+  if (zix_btree_is_full(t->root)) {
     // Grow up if necessary to ensure the root is not full
-    if ((st = zix_btree_grow_up(t))) {
+    const ZixStatus st = zix_btree_grow_up(t);
+    if (st) {
       return st;
     }
   }

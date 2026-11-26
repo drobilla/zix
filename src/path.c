@@ -452,11 +452,9 @@ zix_path_begin(const char* const path)
 ZixPathIter
 zix_path_next(const char* const path, ZixPathIter iter)
 {
-  if (iter.state == ZIX_PATH_ROOT_NAME) {
-    if (is_dir_sep(path[iter.range.end])) {
-      return make_iter(ZIX_PATH_ROOT_DIRECTORY,
-                       zix_make_range(iter.range.end, iter.range.end + 1U));
-    }
+  if (iter.state == ZIX_PATH_ROOT_NAME && is_dir_sep(path[iter.range.end])) {
+    return make_iter(ZIX_PATH_ROOT_DIRECTORY,
+                     zix_make_range(iter.range.end, iter.range.end + 1U));
   }
 
   if (iter.state <= ZIX_PATH_ROOT_DIRECTORY) {

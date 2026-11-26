@@ -67,7 +67,8 @@ copy_path(ZixAllocator* const allocator,
   char* result = NULL;
 
   if (path) {
-    if ((result = (char*)zix_calloc(allocator, length + 1U, 1U))) {
+    result = (char*)zix_calloc(allocator, length + 1U, 1U);
+    if (result) {
       memcpy(result, path, length + 1U);
     }
   }
